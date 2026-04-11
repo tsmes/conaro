@@ -7,7 +7,7 @@ import { events } from "@/lib/db/schema/events";
 import type { Amenities } from "@/lib/db/schema/events";
 import { auth } from "@/lib/auth";
 import { type ActionState } from "@/lib/validations/auth";
-import { eventSchema } from "@/lib/validations/convention";
+import { eventSchema, type EventInput } from "@/lib/validations/convention";
 import {
   getOrganizerConvention,
   getOrganizerEvent,
@@ -30,6 +30,60 @@ function extractAmenities(data: {
   };
 }
 
+const EVENT_FIELD_NAMES = [
+  "name",
+  "description",
+  "eventStartDate",
+  "eventEndDate",
+  "applicationOpenDate",
+  "applicationCloseDate",
+  "venueName",
+  "venueAddress",
+  "venueCity",
+  "venueCountry",
+  "mapEmbedUrl",
+  "availableStands",
+  "tableDimensions",
+  "priceInfo",
+  "setupTime",
+  "teardownTime",
+  "amenities_electricity",
+  "amenities_wifi",
+  "amenities_tables",
+  "amenities_chairs",
+  "amenities_other",
+] as const;
+
+function extractEventFormData(formData: FormData): Record<string, string> {
+  const raw: Record<string, string> = {};
+  for (const name of EVENT_FIELD_NAMES) {
+    raw[name] = (formData.get(name) ?? "").toString();
+  }
+  return raw;
+}
+
+function buildEventColumns(data: EventInput) {
+  return {
+    name: data.name,
+    description: data.description || null,
+    eventStartDate: data.eventStartDate,
+    eventEndDate: data.eventEndDate || null,
+    applicationOpenDate: data.applicationOpenDate || null,
+    applicationCloseDate: data.applicationCloseDate || null,
+    venueName: data.venueName || null,
+    venueAddress: data.venueAddress || null,
+    venueCity: data.venueCity || null,
+    venueCountry: data.venueCountry || null,
+    mapEmbedUrl: data.mapEmbedUrl || null,
+    availableStands: data.availableStands,
+    tableDimensions: data.tableDimensions || null,
+    priceInfo: data.priceInfo || null,
+    setupTime: data.setupTime || null,
+    teardownTime: data.teardownTime || null,
+    amenities: extractAmenities(data),
+  };
+}
+
 export async function createEvent(
   _prevState: ActionState,
   formData: FormData
@@ -49,39 +103,17 @@ export async function createEvent(
     return { error: "Convention not found" };
   }
 
-  const raw: Record<string, string> = {};
-  for (const [key, value] of formData.entries()) {
-    raw[key] = value.toString();
-  }
+  const raw = extractEventFormData(formData);
 
   const result = eventSchema.safeParse(raw);
   if (!result.success) {
     return { fieldErrors: result.error.flatten().fieldErrors };
   }
 
-  const data = result.data;
-  const amenities = extractAmenities(data);
-
   try {
     await db.insert(events).values({
       conventionId: convention.id,
-      name: data.name,
-      description: data.description || null,
-      eventStartDate: data.eventStartDate,
-      eventEndDate: data.eventEndDate || null,
-      applicationOpenDate: data.applicationOpenDate || null,
-      applicationCloseDate: data.applicationCloseDate || null,
-      venueName: data.venueName || null,
-      venueAddress: data.venueAddress || null,
-      venueCity: data.venueCity || null,
-      venueCountry: data.venueCountry || null,
-      mapEmbedUrl: data.mapEmbedUrl || null,
-      availableStands: data.availableStands,
-      tableDimensions: data.tableDimensions || null,
-      priceInfo: data.priceInfo || null,
-      setupTime: data.setupTime || null,
-      teardownTime: data.teardownTime || null,
-      amenities,
+      ...buildEventColumns(result.data),
       fieldRequirements: buildDefaultFieldRequirements(),
       minPortfolioImages: 0,
     });
@@ -117,42 +149,18 @@ export async function updateEvent(
     return { error: "Event not found" };
   }
 
-  const raw: Record<string, string> = {};
-  for (const [key, value] of formData.entries()) {
-    if (key !== "eventId") {
-      raw[key] = value.toString();
-    }
-  }
+  const raw = extractEventFormData(formData);
 
   const result = eventSchema.safeParse(raw);
   if (!result.success) {
     return { fieldErrors: result.error.flatten().fieldErrors };
   }
 
-  const data = result.data;
-  const amenities = extractAmenities(data);
-
   try {
     await db
       .update(events)
       .set({
-        name: data.name,
-        description: data.description || null,
-        eventStartDate: data.eventStartDate,
-        eventEndDate: data.eventEndDate || null,
-        applicationOpenDate: data.applicationOpenDate || null,
-        applicationCloseDate: data.applicationCloseDate || null,
-        venueName: data.venueName || null,
-        venueAddress: data.venueAddress || null,
-        venueCity: data.venueCity || null,
-        venueCountry: data.venueCountry || null,
-        mapEmbedUrl: data.mapEmbedUrl || null,
-        availableStands: data.availableStands,
-        tableDimensions: data.tableDimensions || null,
-        priceInfo: data.priceInfo || null,
-        setupTime: data.setupTime || null,
-        teardownTime: data.teardownTime || null,
-        amenities,
+        ...buildEventColumns(result.data),
         updatedAt: new Date(),
       })
       .where(eq(events.id, event.id));

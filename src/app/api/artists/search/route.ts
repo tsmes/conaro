@@ -16,7 +16,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ results: [] });
   }
 
-  const pattern = `%${query}%`;
+  const escaped = query.replace(/[%_\\]/g, "\\$&");
+  const pattern = `%${escaped}%`;
 
   const results = await db
     .select({
@@ -38,12 +39,10 @@ export async function GET(request: NextRequest) {
     .limit(10);
 
   return NextResponse.json({
-    results: results
-      .filter((r) => r.id)
-      .map((r) => ({
-        id: r.id,
-        displayName: r.displayName,
-        contactEmail: r.contactEmail ?? null,
-      })),
+    results: results.map((r) => ({
+      id: r.id,
+      displayName: r.displayName,
+      contactEmail: r.contactEmail ?? null,
+    })),
   });
 }

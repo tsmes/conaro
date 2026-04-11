@@ -39,10 +39,34 @@ export const eventSchema = z
       .max(5000, "Description is too long")
       .optional()
       .default(""),
-    eventStartDate: z.string().min(1, "Event start date is required"),
-    eventEndDate: z.string().optional().default(""),
-    applicationOpenDate: z.string().optional().default(""),
-    applicationCloseDate: z.string().optional().default(""),
+    eventStartDate: z
+      .string()
+      .min(1, "Event start date is required")
+      .regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in YYYY-MM-DD format"),
+    eventEndDate: z
+      .string()
+      .optional()
+      .default("")
+      .refine(
+        (val) => val === "" || /^\d{4}-\d{2}-\d{2}$/.test(val),
+        "Date must be in YYYY-MM-DD format"
+      ),
+    applicationOpenDate: z
+      .string()
+      .optional()
+      .default("")
+      .refine(
+        (val) => val === "" || /^\d{4}-\d{2}-\d{2}$/.test(val),
+        "Date must be in YYYY-MM-DD format"
+      ),
+    applicationCloseDate: z
+      .string()
+      .optional()
+      .default("")
+      .refine(
+        (val) => val === "" || /^\d{4}-\d{2}-\d{2}$/.test(val),
+        "Date must be in YYYY-MM-DD format"
+      ),
     venueName: z
       .string()
       .max(200, "Venue name is too long")

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useOptimistic, useTransition } from "react";
+import { useCallback, useTransition } from "react";
 import { ArtistSearchDialog } from "./artist-search-dialog";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,12 +31,10 @@ export function ArtistListManager({
   blockList: initialBlock,
 }: ArtistListManagerProps) {
   const [isPending, startTransition] = useTransition();
-  const [allowList, setOptimisticAllow] = useOptimistic(initialAllow);
-  const [blockList, setOptimisticBlock] = useOptimistic(initialBlock);
 
   const allProfileIds = new Set([
-    ...allowList.map((e) => e.profileId),
-    ...blockList.map((e) => e.profileId),
+    ...initialAllow.map((e) => e.profileId),
+    ...initialBlock.map((e) => e.profileId),
   ]);
 
   const handleAdd = useCallback(
@@ -53,18 +51,11 @@ export function ArtistListManager({
 
   const handleRemove = useCallback((profileId: string) => {
     startTransition(async () => {
-      setOptimisticAllow((prev) =>
-        prev.filter((e) => e.profileId !== profileId)
-      );
-      setOptimisticBlock((prev) =>
-        prev.filter((e) => e.profileId !== profileId)
-      );
-
       const formData = new FormData();
       formData.set("profileId", profileId);
       await removeFromList({}, formData);
     });
-  }, [setOptimisticAllow, setOptimisticBlock]);
+  }, []);
 
   return (
     <div className="space-y-8">
@@ -78,13 +69,13 @@ export function ArtistListManager({
           />
         </CardHeader>
         <CardContent>
-          {allowList.length === 0 ? (
+          {initialAllow.length === 0 ? (
             <p className="text-sm text-muted-foreground">
               No artists on the allow list.
             </p>
           ) : (
             <div className="space-y-2">
-              {allowList.map((entry) => (
+              {initialAllow.map((entry) => (
                 <div
                   key={entry.profileId}
                   className="flex items-center justify-between rounded-md border p-3"
@@ -124,13 +115,13 @@ export function ArtistListManager({
           />
         </CardHeader>
         <CardContent>
-          {blockList.length === 0 ? (
+          {initialBlock.length === 0 ? (
             <p className="text-sm text-muted-foreground">
               No artists on the block list.
             </p>
           ) : (
             <div className="space-y-2">
-              {blockList.map((entry) => (
+              {initialBlock.map((entry) => (
                 <div
                   key={entry.profileId}
                   className="flex items-center justify-between rounded-md border p-3"

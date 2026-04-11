@@ -5,10 +5,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { events } from "@/lib/db/schema/events";
 import type { FieldRequirements } from "@/lib/db/schema/events";
-import {
-  getOrganizerConvention,
-  getOrganizerEvent,
-} from "@/lib/conventions/queries";
+import { getOrganizerEvent } from "@/lib/conventions/queries";
 import { FieldConfigForm } from "@/components/conventions/field-config-form";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -27,11 +24,6 @@ export default async function FieldConfigPage({
     redirect("/login");
   }
 
-  const convention = await getOrganizerConvention(session.user.profileId);
-  if (!convention) {
-    redirect("/login");
-  }
-
   const event = await getOrganizerEvent(session.user.profileId, eventId);
   if (!event) {
     notFound();
@@ -47,7 +39,10 @@ export default async function FieldConfigPage({
     })
     .from(events)
     .where(
-      and(eq(events.conventionId, convention.id), ne(events.id, eventId))
+      and(
+        eq(events.conventionId, event.conventionId),
+        ne(events.id, eventId)
+      )
     );
 
   return (

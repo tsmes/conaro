@@ -1,4 +1,4 @@
-import { and, isNotNull } from "drizzle-orm";
+import { isNotNull } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { conventions } from "@/lib/db/schema/conventions";
 import { storage } from "@/lib/storage";
@@ -11,10 +11,12 @@ import {
 } from "@/components/ui/card";
 
 export default async function ConventionsDirectoryPage() {
+  // Show conventions that have a description (indicates a completed profile)
   const conventionList = await db
     .select()
     .from(conventions)
-    .where(and(isNotNull(conventions.description)));
+    .where(isNotNull(conventions.description))
+    .orderBy(conventions.name);
 
   return (
     <div className="container mx-auto max-w-5xl px-4 py-8">

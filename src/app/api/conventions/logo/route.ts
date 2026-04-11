@@ -62,18 +62,22 @@ export async function POST(request: NextRequest) {
   try {
     const processed = await processImage(buffer);
 
-    // Delete old logo if exists
-    if (convention.logoPath) {
-      await storage.delete(convention.logoPath).catch(() => {});
-    }
-
+    // Upload new logo first, then update DB, then delete old
     await storage.upload(storagePath, processed.data, "image/webp");
+
+    const oldLogoPath = convention.logoPath;
 
     await db
       .update(conventions)
       .set({ logoPath: storagePath, updatedAt: new Date() })
       .where(eq(conventions.id, convention.id));
+
+    // Delete old logo after DB update succeeds (if it was a different path)
+    if (oldLogoPath && oldLogoPath !== storagePath) {
+      await storage.delete(oldLogoPath).catch(() => {});
+    }
   } catch {
+    // Clean up newly uploaded file on failure
     await storage.delete(storagePath).catch(() => {});
     return NextResponse.json(
       { error: "Failed to upload logo. Please try again." },

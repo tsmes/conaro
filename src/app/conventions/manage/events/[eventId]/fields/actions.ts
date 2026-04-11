@@ -4,10 +4,7 @@ import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { events } from "@/lib/db/schema/events";
-import type {
-  FieldRequirementState,
-  FieldRequirements,
-} from "@/lib/db/schema/events";
+import type { FieldRequirements } from "@/lib/db/schema/events";
 import { FIELD_REGISTRY } from "@/lib/db/field-registry";
 import { auth } from "@/lib/auth";
 import { type ActionState } from "@/lib/validations/auth";
@@ -48,20 +45,25 @@ export async function updateFieldConfig(
 
   const result = fieldConfigSchema.safeParse(raw);
   if (!result.success) {
-    const fieldErrors = result.error.flatten().fieldErrors as Record<
-      string,
-      string[]
-    >;
+    const flat = result.error.flatten().fieldErrors;
+    const fieldErrors: Record<string, string[]> = {};
+    for (const [key, val] of Object.entries(flat)) {
+      if (val) fieldErrors[key] = val;
+    }
     return { fieldErrors };
   }
 
-  const validated = result.data as Record<string, unknown>;
-  const minImages = Number(validated.minPortfolioImages ?? 0);
+  const validated = result.data;
+  const minImages = Number(validated.minPortfolioImages) || 0;
 
+  const validStates = new Set(["required", "optional", "not_requested"]);
   const fieldRequirements: FieldRequirements = {};
   for (const field of FIELD_REGISTRY) {
-    fieldRequirements[field.key] = (validated[field.key] ??
-      "not_requested") as FieldRequirementState;
+    const value = (validated as Record<string, unknown>)[field.key];
+    const state = typeof value === "string" && validStates.has(value)
+      ? value
+      : "not_requested";
+    fieldRequirements[field.key] = state as FieldRequirements[string];
   }
 
   try {
