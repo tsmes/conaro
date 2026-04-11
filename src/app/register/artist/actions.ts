@@ -1,28 +1,27 @@
 "use server";
 
-import { eq } from "drizzle-orm";
-import { redirect } from "next/navigation";
+import { AuthError } from "next-auth";
 import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema/auth";
 import { profiles } from "@/lib/db/schema/profiles";
 import { hashPassword } from "@/lib/auth/helpers";
 import { signIn } from "@/lib/auth";
-import { artistRegistrationSchema } from "@/lib/validations/auth";
+import {
+  artistRegistrationSchema,
+  type ActionState,
+} from "@/lib/validations/auth";
 
-interface ActionState {
-  error?: string;
-  fieldErrors?: Record<string, string[]>;
-}
+const UNIQUE_VIOLATION = "23505";
 
 export async function registerArtist(
   _prevState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
   const raw = {
-    email: formData.get("email") as string,
-    password: formData.get("password") as string,
-    confirmPassword: formData.get("confirmPassword") as string,
-    displayName: formData.get("displayName") as string,
+    email: (formData.get("email") ?? "").toString(),
+    password: (formData.get("password") ?? "").toString(),
+    confirmPassword: (formData.get("confirmPassword") ?? "").toString(),
+    displayName: (formData.get("displayName") ?? "").toString(),
   };
 
   const result = artistRegistrationSchema.safeParse(raw);
@@ -30,40 +29,51 @@ export async function registerArtist(
     return { fieldErrors: result.error.flatten().fieldErrors };
   }
 
-  const { email, password, displayName } = result.data;
-
-  const existingUser = await db.query.users.findFirst({
-    where: eq(users.email, email),
-  });
-
-  if (existingUser) {
-    return { error: "An account with this email already exists" };
-  }
-
+  const { password, displayName } = result.data;
+  const email = result.data.email.toLowerCase().trim();
   const hashedPassword = await hashPassword(password);
 
-  await db.transaction(async (tx) => {
-    const [user] = await tx
-      .insert(users)
-      .values({
-        email,
-        name: displayName,
-        password: hashedPassword,
-      })
-      .returning();
+  try {
+    await db.transaction(async (tx) => {
+      const [user] = await tx
+        .insert(users)
+        .values({
+          email,
+          name: displayName,
+          password: hashedPassword,
+        })
+        .returning();
 
-    await tx.insert(profiles).values({
-      userId: user.id,
-      role: "artist",
-      displayName,
+      await tx.insert(profiles).values({
+        userId: user.id,
+        role: "artist",
+        displayName,
+      });
     });
-  });
+  } catch (error: unknown) {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      (error as { code: string }).code === UNIQUE_VIOLATION
+    ) {
+      return { error: "An account with this email already exists" };
+    }
+    throw error;
+  }
 
-  await signIn("credentials", {
-    email,
-    password,
-    redirectTo: "/dashboard",
-  });
+  try {
+    await signIn("credentials", {
+      email,
+      password,
+      redirectTo: "/dashboard",
+    });
+  } catch (error) {
+    if (error instanceof AuthError) {
+      return { error: "Account created. Please log in." };
+    }
+    throw error;
+  }
 
-  redirect("/dashboard");
+  return {};
 }

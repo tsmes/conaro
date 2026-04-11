@@ -1,30 +1,29 @@
 "use server";
 
-import { eq } from "drizzle-orm";
-import { redirect } from "next/navigation";
+import { AuthError } from "next-auth";
 import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema/auth";
 import { profiles } from "@/lib/db/schema/profiles";
 import { conventions } from "@/lib/db/schema/conventions";
 import { hashPassword } from "@/lib/auth/helpers";
 import { signIn } from "@/lib/auth";
-import { organizerRegistrationSchema } from "@/lib/validations/auth";
+import {
+  organizerRegistrationSchema,
+  type ActionState,
+} from "@/lib/validations/auth";
 
-interface ActionState {
-  error?: string;
-  fieldErrors?: Record<string, string[]>;
-}
+const UNIQUE_VIOLATION = "23505";
 
 export async function registerOrganizer(
   _prevState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
   const raw = {
-    email: formData.get("email") as string,
-    password: formData.get("password") as string,
-    confirmPassword: formData.get("confirmPassword") as string,
-    displayName: formData.get("displayName") as string,
-    conventionName: formData.get("conventionName") as string,
+    email: (formData.get("email") ?? "").toString(),
+    password: (formData.get("password") ?? "").toString(),
+    confirmPassword: (formData.get("confirmPassword") ?? "").toString(),
+    displayName: (formData.get("displayName") ?? "").toString(),
+    conventionName: (formData.get("conventionName") ?? "").toString(),
   };
 
   const result = organizerRegistrationSchema.safeParse(raw);
@@ -32,48 +31,59 @@ export async function registerOrganizer(
     return { fieldErrors: result.error.flatten().fieldErrors };
   }
 
-  const { email, password, displayName, conventionName } = result.data;
-
-  const existingUser = await db.query.users.findFirst({
-    where: eq(users.email, email),
-  });
-
-  if (existingUser) {
-    return { error: "An account with this email already exists" };
-  }
-
+  const { password, displayName, conventionName } = result.data;
+  const email = result.data.email.toLowerCase().trim();
   const hashedPassword = await hashPassword(password);
 
-  await db.transaction(async (tx) => {
-    const [user] = await tx
-      .insert(users)
-      .values({
-        email,
-        name: displayName,
-        password: hashedPassword,
-      })
-      .returning();
+  try {
+    await db.transaction(async (tx) => {
+      const [user] = await tx
+        .insert(users)
+        .values({
+          email,
+          name: displayName,
+          password: hashedPassword,
+        })
+        .returning();
 
-    const [profile] = await tx
-      .insert(profiles)
-      .values({
-        userId: user.id,
-        role: "organizer",
-        displayName,
-      })
-      .returning();
+      const [profile] = await tx
+        .insert(profiles)
+        .values({
+          userId: user.id,
+          role: "organizer",
+          displayName,
+        })
+        .returning();
 
-    await tx.insert(conventions).values({
-      organizerId: profile.id,
-      name: conventionName,
+      await tx.insert(conventions).values({
+        organizerId: profile.id,
+        name: conventionName,
+      });
     });
-  });
+  } catch (error: unknown) {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      (error as { code: string }).code === UNIQUE_VIOLATION
+    ) {
+      return { error: "An account with this email already exists" };
+    }
+    throw error;
+  }
 
-  await signIn("credentials", {
-    email,
-    password,
-    redirectTo: "/conventions",
-  });
+  try {
+    await signIn("credentials", {
+      email,
+      password,
+      redirectTo: "/conventions",
+    });
+  } catch (error) {
+    if (error instanceof AuthError) {
+      return { error: "Account created. Please log in." };
+    }
+    throw error;
+  }
 
-  redirect("/conventions");
+  return {};
 }

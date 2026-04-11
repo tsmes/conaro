@@ -2,24 +2,19 @@
 
 import { AuthError } from "next-auth";
 import { eq } from "drizzle-orm";
-import { redirect } from "next/navigation";
 import { signIn } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { profiles } from "@/lib/db/schema/profiles";
 import { users } from "@/lib/db/schema/auth";
-import { loginSchema } from "@/lib/validations/auth";
-
-interface ActionState {
-  error?: string;
-}
+import { loginSchema, type ActionState } from "@/lib/validations/auth";
 
 export async function login(
   _prevState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
   const raw = {
-    email: formData.get("email") as string,
-    password: formData.get("password") as string,
+    email: (formData.get("email") ?? "").toString(),
+    password: (formData.get("password") ?? "").toString(),
   };
 
   const result = loginSchema.safeParse(raw);
@@ -27,21 +22,10 @@ export async function login(
     return { error: "Invalid email or password" };
   }
 
-  const { email, password } = result.data;
+  const password = result.data.password;
+  const email = result.data.email.toLowerCase().trim();
 
-  try {
-    await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
-  } catch (error) {
-    if (error instanceof AuthError) {
-      return { error: "Invalid email or password" };
-    }
-    throw error;
-  }
-
+  // Look up role before signIn to determine redirect target
   const user = await db.query.users.findFirst({
     where: eq(users.email, email),
   });
@@ -54,9 +38,21 @@ export async function login(
     where: eq(profiles.userId, user.id),
   });
 
-  if (profile?.role === "organizer") {
-    redirect("/conventions");
+  const redirectTo =
+    profile?.role === "organizer" ? "/conventions" : "/dashboard";
+
+  try {
+    await signIn("credentials", {
+      email,
+      password,
+      redirectTo,
+    });
+  } catch (error) {
+    if (error instanceof AuthError) {
+      return { error: "Invalid email or password" };
+    }
+    throw error;
   }
 
-  redirect("/dashboard");
+  return {};
 }

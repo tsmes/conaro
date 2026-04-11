@@ -30,8 +30,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         if (!email || !password) return null;
 
+        const normalizedEmail = email.toLowerCase().trim();
+
         const user = await db.query.users.findFirst({
-          where: eq(users.email, email),
+          where: eq(users.email, normalizedEmail),
         });
 
         if (!user?.password) return null;
@@ -52,18 +54,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           where: eq(profiles.userId, user.id),
         });
 
-        if (profile) {
-          token.role = profile.role;
-          token.profileId = profile.id;
-        }
+        token.role = profile?.role;
+        token.profileId = profile?.id;
       }
       return token;
     },
     async session({ session, token }) {
       if (token) {
         session.user.id = token.id as string;
-        session.user.role = token.role as "artist" | "organizer";
-        session.user.profileId = token.profileId as string;
+        session.user.role = token.role;
+        session.user.profileId = token.profileId;
       }
       return session;
     },
