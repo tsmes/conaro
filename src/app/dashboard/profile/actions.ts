@@ -1,6 +1,7 @@
 "use server";
 
 import { eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { profiles } from "@/lib/db/schema/profiles";
 import { artistProfiles } from "@/lib/db/schema/artist-profiles";
@@ -64,6 +65,8 @@ export async function updateBasicInfo(
     return { error: "Failed to update profile. Please try again." };
   }
 
+  revalidatePath("/dashboard/profile");
+  revalidatePath("/dashboard");
   return { success: true };
 }
 
@@ -110,5 +113,7 @@ export async function updateLogistics(
     return { error: "Failed to update logistics. Please try again." };
   }
 
+  revalidatePath("/dashboard/profile");
+  revalidatePath("/dashboard");
   return { success: true };
 }
