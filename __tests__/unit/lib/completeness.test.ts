@@ -67,28 +67,34 @@ describe("computeCompleteness", () => {
     expect(result.portfolio.complete).toBe(false);
   });
 
-  it("computes overall percentage correctly", () => {
-    // All three complete
-    const allComplete = computeCompleteness(filledProfile, {
+  it("computes overall percentage based on total fields filled", () => {
+    // Total fields: 7 basic + 4 logistics + 1 portfolio = 12
+    // displayName(1) + contactEmail(1) + helpers(1) + image(1) = 4/12 = 33%
+    const partial = computeCompleteness(filledProfile, {
       ...emptyArtistProfile,
       contactEmail: "test@example.com",
       helpers: 2,
     }, 1);
-    expect(allComplete.overall).toBe(100);
+    expect(partial.overall).toBe(33);
 
-    // Two of three complete
-    const twoComplete = computeCompleteness(filledProfile, {
-      ...emptyArtistProfile,
+    // Empty profile = 0/12 = 0%
+    const empty = computeCompleteness(emptyProfile, emptyArtistProfile, 0);
+    expect(empty.overall).toBe(0);
+
+    // All fields filled = 12/12 = 100%
+    const full = computeCompleteness(filledProfile, {
       contactEmail: "test@example.com",
+      realName: "Real Name",
+      phone: "123",
+      bio: "Bio",
+      websiteUrl: "https://example.com",
+      socialLinks: "@artist",
+      helpers: 2,
+      accessibilityNeeds: "Needs",
+      tableSizePreference: "2m",
+      notes: "Notes",
     }, 1);
-    expect(twoComplete.overall).toBe(67);
-
-    // One of three complete
-    const oneComplete = computeCompleteness(filledProfile, {
-      ...emptyArtistProfile,
-      contactEmail: "test@example.com",
-    }, 0);
-    expect(oneComplete.overall).toBe(33);
+    expect(full.overall).toBe(100);
   });
 
   it("handles undefined profile and artist profile", () => {

@@ -16,8 +16,10 @@ export const basicInfoSchema = z.object({
   websiteUrl: z
     .string()
     .max(500, "URL is too long")
-    .url("Please enter a valid URL")
-    .or(z.literal(""))
+    .refine(
+      (val) => val === "" || /^https?:\/\/.+/.test(val),
+      "Please enter a valid URL starting with http:// or https://"
+    )
     .optional()
     .default(""),
   socialLinks: z

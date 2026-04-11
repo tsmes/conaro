@@ -63,6 +63,22 @@ describe("basicInfoSchema", () => {
     });
     expect(result.success).toBe(false);
   });
+
+  it("rejects URL without http/https prefix", () => {
+    const result = basicInfoSchema.safeParse({
+      ...validInput,
+      websiteUrl: "https:artdeck/@wsp",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("accepts valid http URL", () => {
+    const result = basicInfoSchema.safeParse({
+      ...validInput,
+      websiteUrl: "https://example.com",
+    });
+    expect(result.success).toBe(true);
+  });
 });
 
 describe("logisticsSchema", () => {

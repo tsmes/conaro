@@ -51,8 +51,9 @@ export function computeCompleteness(
 
   // Logistics: no required fields, complete when any field is filled
   const logisticsFields = [
-    artistProfile?.helpers !== null && artistProfile?.helpers !== undefined
-      && artistProfile.helpers > 0,
+    artistProfile?.helpers !== null &&
+      artistProfile?.helpers !== undefined &&
+      artistProfile.helpers > 0,
     !!artistProfile?.accessibilityNeeds,
     !!artistProfile?.tableSizePreference,
     !!artistProfile?.notes,
@@ -61,11 +62,7 @@ export function computeCompleteness(
   const logisticsFilled = logisticsFields.filter(Boolean).length;
 
   // Portfolio: complete when at least 1 image
-  const portfolio: SectionStatus = {
-    complete: imageCount > 0,
-    filled: imageCount,
-    total: 20,
-  };
+  const portfolioFilled = Math.min(imageCount, 1);
 
   const basic: SectionStatus = {
     complete: basicRequiredFilled,
@@ -79,9 +76,17 @@ export function computeCompleteness(
     total: logisticsFields.length,
   };
 
-  const sections = [basic, logistics, portfolio];
-  const completeSections = sections.filter((s) => s.complete).length;
-  const overall = Math.round((completeSections / sections.length) * 100);
+  const portfolio: SectionStatus = {
+    complete: imageCount > 0,
+    filled: imageCount,
+    total: 20,
+  };
+
+  // Overall: percentage of all countable fields filled across sections
+  // Basic (7 fields) + Logistics (4 fields) + Portfolio (1 point for having images)
+  const totalFields = basicFields.length + logisticsFields.length + 1;
+  const filledFields = basicFilled + logisticsFilled + portfolioFilled;
+  const overall = Math.round((filledFields / totalFields) * 100);
 
   return { basic, logistics, portfolio, overall };
 }
