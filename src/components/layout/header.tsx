@@ -34,7 +34,7 @@ export async function Header() {
               )}
               {session.user.role === "organizer" && (
                 <Link
-                  href="/conventions"
+                  href="/conventions/manage"
                   className={cn(buttonVariants({ variant: "ghost" }))}
                 >
                   Conventions

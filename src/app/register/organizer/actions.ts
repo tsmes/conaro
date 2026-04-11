@@ -70,7 +70,7 @@ export async function registerOrganizer(
     await signIn("credentials", {
       email,
       password,
-      redirectTo: "/conventions",
+      redirectTo: "/conventions/manage",
     });
   } catch (error) {
     if (error instanceof AuthError) {
