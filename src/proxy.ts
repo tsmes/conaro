@@ -8,7 +8,7 @@ const authRoutes = ["/login", "/register"];
 
 const { auth } = NextAuth(authConfig);
 
-export default auth((req) => {
+export const proxy = auth((req) => {
   const { pathname } = req.nextUrl;
   const session = req.auth;
 
