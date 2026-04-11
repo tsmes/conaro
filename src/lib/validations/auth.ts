@@ -3,6 +3,7 @@ import { z } from "zod";
 export interface ActionState {
   error?: string;
   fieldErrors?: Record<string, string[]>;
+  success?: boolean;
 }
 
 export const artistRegistrationSchema = z
