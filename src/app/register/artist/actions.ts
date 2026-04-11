@@ -4,6 +4,7 @@ import { AuthError } from "next-auth";
 import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema/auth";
 import { profiles } from "@/lib/db/schema/profiles";
+import { artistProfiles } from "@/lib/db/schema/artist-profiles";
 import { hashPassword } from "@/lib/auth/helpers";
 import { signIn } from "@/lib/auth";
 import {
@@ -43,10 +44,17 @@ export async function registerArtist(
         })
         .returning();
 
-      await tx.insert(profiles).values({
-        userId: user.id,
-        role: "artist",
-        displayName,
+      const [profile] = await tx
+        .insert(profiles)
+        .values({
+          userId: user.id,
+          role: "artist",
+          displayName,
+        })
+        .returning();
+
+      await tx.insert(artistProfiles).values({
+        profileId: profile.id,
       });
     });
   } catch (error: unknown) {

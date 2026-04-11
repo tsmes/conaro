@@ -3,8 +3,12 @@ import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema/auth";
 import { profiles } from "@/lib/db/schema/profiles";
 import { conventions } from "@/lib/db/schema/conventions";
+import { artistProfiles } from "@/lib/db/schema/artist-profiles";
+import { portfolioImages } from "@/lib/db/schema/portfolio-images";
 
 export async function cleanDatabase() {
+  await db.delete(portfolioImages);
+  await db.delete(artistProfiles);
   await db.delete(conventions);
   await db.delete(profiles);
   await db.delete(users);
@@ -21,6 +25,14 @@ export async function findProfileByUserId(userId: string) {
     .from(profiles)
     .where(eq(profiles.userId, userId));
   return profile ?? undefined;
+}
+
+export async function findArtistProfileByProfileId(profileId: string) {
+  const [artistProfile] = await db
+    .select()
+    .from(artistProfiles)
+    .where(eq(artistProfiles.profileId, profileId));
+  return artistProfile ?? undefined;
 }
 
 export async function findConventionByOrganizerId(organizerId: string) {
