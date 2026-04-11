@@ -19,8 +19,10 @@ interface LogisticsFormProps {
 export function LogisticsForm({ defaultValues }: LogisticsFormProps) {
   const [state, formAction, pending] = useActionState(updateLogistics, {});
 
+  const formKey = JSON.stringify(defaultValues);
+
   return (
-    <form action={formAction} className="space-y-4">
+    <form key={formKey} action={formAction} className="space-y-4">
       {!pending && state.error && (
         <p
           role="alert"

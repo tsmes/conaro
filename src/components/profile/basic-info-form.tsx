@@ -22,8 +22,12 @@ interface BasicInfoFormProps {
 export function BasicInfoForm({ defaultValues }: BasicInfoFormProps) {
   const [state, formAction, pending] = useActionState(updateBasicInfo, {});
 
+  // Key forces remount after save so defaultValues are picked up cleanly
+  // (avoids Base UI FieldControl warning about changing defaultValue)
+  const formKey = JSON.stringify(defaultValues);
+
   return (
-    <form action={formAction} className="space-y-4">
+    <form key={formKey} action={formAction} className="space-y-4">
       {!pending && state.error && (
         <p
           role="alert"
