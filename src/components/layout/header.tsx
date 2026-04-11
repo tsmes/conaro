@@ -1,8 +1,12 @@
 import Link from "next/link";
+import { auth } from "@/lib/auth";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { LogoutButton } from "@/components/auth/logout-button";
 
-export function Header() {
+export async function Header() {
+  const session = await auth();
+
   return (
     <header className="border-b">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
@@ -10,15 +14,39 @@ export function Header() {
           Art Apply
         </Link>
         <nav className="flex items-center gap-2">
-          <Link
-            href="/login"
-            className={cn(buttonVariants({ variant: "ghost" }))}
-          >
-            Log in
-          </Link>
-          <Link href="/register" className={cn(buttonVariants())}>
-            Register
-          </Link>
+          {session?.user ? (
+            <>
+              {session.user.role === "artist" && (
+                <Link
+                  href="/dashboard"
+                  className={cn(buttonVariants({ variant: "ghost" }))}
+                >
+                  Dashboard
+                </Link>
+              )}
+              {session.user.role === "organizer" && (
+                <Link
+                  href="/conventions"
+                  className={cn(buttonVariants({ variant: "ghost" }))}
+                >
+                  Conventions
+                </Link>
+              )}
+              <LogoutButton />
+            </>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className={cn(buttonVariants({ variant: "ghost" }))}
+              >
+                Log in
+              </Link>
+              <Link href="/register" className={cn(buttonVariants())}>
+                Register
+              </Link>
+            </>
+          )}
         </nav>
       </div>
     </header>
