@@ -17,12 +17,20 @@ export async function Header() {
           {session?.user ? (
             <>
               {session.user.role === "artist" && (
-                <Link
-                  href="/dashboard"
-                  className={cn(buttonVariants({ variant: "ghost" }))}
-                >
-                  Dashboard
-                </Link>
+                <>
+                  <Link
+                    href="/dashboard"
+                    className={cn(buttonVariants({ variant: "ghost" }))}
+                  >
+                    Dashboard
+                  </Link>
+                  <Link
+                    href="/dashboard/profile"
+                    className={cn(buttonVariants({ variant: "ghost" }))}
+                  >
+                    Profile
+                  </Link>
+                </>
               )}
               {session.user.role === "organizer" && (
                 <Link
