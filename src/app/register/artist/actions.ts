@@ -10,8 +10,7 @@ import {
   artistRegistrationSchema,
   type ActionState,
 } from "@/lib/validations/auth";
-
-const UNIQUE_VIOLATION = "23505";
+import { isUniqueViolation } from "@/lib/db/errors";
 
 export async function registerArtist(
   _prevState: ActionState,
@@ -51,12 +50,7 @@ export async function registerArtist(
       });
     });
   } catch (error: unknown) {
-    if (
-      typeof error === "object" &&
-      error !== null &&
-      "code" in error &&
-      (error as { code: string }).code === UNIQUE_VIOLATION
-    ) {
+    if (isUniqueViolation(error)) {
       return { error: "An account with this email already exists" };
     }
     throw error;
