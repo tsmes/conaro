@@ -1,0 +1,62 @@
+"use server";
+
+import { eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
+import { db } from "@/lib/db";
+import { conventions } from "@/lib/db/schema/conventions";
+import { auth } from "@/lib/auth";
+import { type ActionState } from "@/lib/validations/auth";
+import { conventionProfileSchema } from "@/lib/validations/convention";
+import { getOrganizerConvention } from "@/lib/conventions/queries";
+
+export async function updateConventionProfile(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const session = await auth();
+  if (!session?.user?.id || session.user.role !== "organizer") {
+    return { error: "Unauthorized" };
+  }
+
+  const profileId = session.user.profileId;
+  if (!profileId) {
+    return { error: "Profile not found" };
+  }
+
+  const raw = {
+    name: (formData.get("name") ?? "").toString(),
+    description: (formData.get("description") ?? "").toString(),
+    websiteUrl: (formData.get("websiteUrl") ?? "").toString(),
+  };
+
+  const result = conventionProfileSchema.safeParse(raw);
+  if (!result.success) {
+    return { fieldErrors: result.error.flatten().fieldErrors };
+  }
+
+  const convention = await getOrganizerConvention(profileId);
+  if (!convention) {
+    return { error: "Convention not found" };
+  }
+
+  const { name, description, websiteUrl } = result.data;
+
+  try {
+    await db
+      .update(conventions)
+      .set({
+        name,
+        description: description || null,
+        websiteUrl: websiteUrl || null,
+        updatedAt: new Date(),
+      })
+      .where(eq(conventions.id, convention.id));
+  } catch {
+    return { error: "Failed to update convention. Please try again." };
+  }
+
+  revalidatePath("/conventions/manage");
+  revalidatePath("/conventions/manage/edit");
+  revalidatePath("/conventions");
+  return { success: true };
+}
