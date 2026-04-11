@@ -11,6 +11,13 @@ export class LocalStorageAdapter implements StorageAdapter {
     await fs.writeFile(filePath, data);
   }
 
+  async copy(fromKey: string, toKey: string): Promise<void> {
+    const fromPath = path.join(UPLOADS_DIR, fromKey);
+    const toPath = path.join(UPLOADS_DIR, toKey);
+    await fs.mkdir(path.dirname(toPath), { recursive: true });
+    await fs.copyFile(fromPath, toPath);
+  }
+
   async delete(key: string): Promise<void> {
     const filePath = path.join(UPLOADS_DIR, key);
     try {

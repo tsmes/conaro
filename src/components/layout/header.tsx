@@ -25,6 +25,12 @@ export async function Header() {
                     Dashboard
                   </Link>
                   <Link
+                    href="/events"
+                    className={cn(buttonVariants({ variant: "ghost" }))}
+                  >
+                    Events
+                  </Link>
+                  <Link
                     href="/dashboard/profile"
                     className={cn(buttonVariants({ variant: "ghost" }))}
                   >
@@ -44,6 +50,12 @@ export async function Header() {
             </>
           ) : (
             <>
+              <Link
+                href="/events"
+                className={cn(buttonVariants({ variant: "ghost" }))}
+              >
+                Events
+              </Link>
               <Link
                 href="/login"
                 className={cn(buttonVariants({ variant: "ghost" }))}

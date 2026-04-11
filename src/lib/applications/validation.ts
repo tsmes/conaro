@@ -1,0 +1,103 @@
+import {
+  FIELD_REGISTRY,
+  type FieldDefinition,
+} from "@/lib/db/field-registry";
+import type { FieldRequirements } from "@/lib/db/schema/events";
+
+export interface MissingField {
+  key: string;
+  label: string;
+  section: "basic" | "logistics" | "portfolio";
+}
+
+export type ValidationResult =
+  | { valid: true }
+  | { valid: false; missingFields: MissingField[] };
+
+interface ProfileData {
+  displayName: string;
+}
+
+interface ArtistProfileData {
+  realName: string | null;
+  contactEmail: string | null;
+  phone: string | null;
+  bio: string | null;
+  websiteUrl: string | null;
+  socialLinks: string | null;
+  helpers: number | null;
+  accessibilityNeeds: string | null;
+  tableSizePreference: string | null;
+  notes: string | null;
+}
+
+function isFieldFilled(
+  field: FieldDefinition,
+  profile: ProfileData,
+  artistProfile: ArtistProfileData,
+  imageCount: number
+): boolean {
+  if (field.key === "displayName") {
+    return !!profile.displayName;
+  }
+
+  if (field.key === "portfolioImages") {
+    return imageCount > 0;
+  }
+
+  const value = artistProfile[field.key as keyof ArtistProfileData];
+
+  if (field.type === "number") {
+    return value !== null && value !== undefined;
+  }
+
+  return !!value;
+}
+
+export function validateProfileForEvent(
+  fieldRequirements: FieldRequirements | null,
+  minPortfolioImages: number | null,
+  profile: ProfileData,
+  artistProfile: ArtistProfileData,
+  imageCount: number
+): ValidationResult {
+  if (!fieldRequirements) {
+    return { valid: true };
+  }
+
+  const missingFields: MissingField[] = [];
+
+  for (const field of FIELD_REGISTRY) {
+    const requirement = fieldRequirements[field.key];
+    if (requirement !== "required") continue;
+
+    if (field.key === "portfolioImages") {
+      const minRequired = Math.max(minPortfolioImages ?? 1, 1);
+      if (imageCount < minRequired) {
+        missingFields.push({
+          key: field.key,
+          label:
+            minRequired > 1
+              ? `${field.label} (at least ${minRequired})`
+              : field.label,
+          section: field.section,
+        });
+      }
+      continue;
+    }
+
+    if (!isFieldFilled(field, profile, artistProfile, imageCount)) {
+      missingFields.push({
+        key: field.key,
+        label: field.label,
+        section: field.section,
+      });
+    }
+  }
+
+  if (missingFields.length === 0) {
+    return { valid: true };
+  }
+
+  return { valid: false, missingFields };
+}

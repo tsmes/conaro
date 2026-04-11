@@ -3,5 +3,7 @@ export * from "./profiles";
 export * from "./conventions";
 export * from "./events";
 export * from "./convention-artist-lists";
+export * from "./applications";
+export * from "./convention-follows";
 export * from "./artist-profiles";
 export * from "./portfolio-images";
