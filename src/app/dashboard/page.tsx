@@ -17,20 +17,18 @@ export default async function DashboardPage() {
 
   const profileId = session.user.profileId;
 
-  const [profile] = await db
-    .select()
-    .from(profiles)
-    .where(eq(profiles.id, profileId));
+  const [profileResult, artistProfileResult, countResult] = await Promise.all([
+    db.select().from(profiles).where(eq(profiles.id, profileId)),
+    db.select().from(artistProfiles).where(eq(artistProfiles.profileId, profileId)),
+    db
+      .select({ value: count() })
+      .from(portfolioImages)
+      .where(eq(portfolioImages.profileId, profileId)),
+  ]);
 
-  const [artistProfile] = await db
-    .select()
-    .from(artistProfiles)
-    .where(eq(artistProfiles.profileId, profileId));
-
-  const [{ value: imageCount }] = await db
-    .select({ value: count() })
-    .from(portfolioImages)
-    .where(eq(portfolioImages.profileId, profileId));
+  const [profile] = profileResult;
+  const [artistProfile] = artistProfileResult;
+  const [{ value: imageCount }] = countResult;
 
   const completeness = computeCompleteness(profile, artistProfile, imageCount);
 

@@ -26,21 +26,18 @@ export default async function ProfilePage() {
 
   const profileId = session.user.profileId;
 
-  const [profile] = await db
-    .select()
-    .from(profiles)
-    .where(eq(profiles.id, profileId));
+  const [profileResult, artistProfileResult, images] = await Promise.all([
+    db.select().from(profiles).where(eq(profiles.id, profileId)),
+    db.select().from(artistProfiles).where(eq(artistProfiles.profileId, profileId)),
+    db
+      .select()
+      .from(portfolioImages)
+      .where(eq(portfolioImages.profileId, profileId))
+      .orderBy(asc(portfolioImages.sortOrder)),
+  ]);
 
-  const [artistProfile] = await db
-    .select()
-    .from(artistProfiles)
-    .where(eq(artistProfiles.profileId, profileId));
-
-  const images = await db
-    .select()
-    .from(portfolioImages)
-    .where(eq(portfolioImages.profileId, profileId))
-    .orderBy(asc(portfolioImages.sortOrder));
+  const [profile] = profileResult;
+  const [artistProfile] = artistProfileResult;
 
   const imagesWithUrls = images.map((img) => ({
     ...img,

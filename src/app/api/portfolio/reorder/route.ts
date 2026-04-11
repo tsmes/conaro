@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { eq, and, inArray } from "drizzle-orm";
+import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { portfolioImages } from "@/lib/db/schema/portfolio-images";
+
+const reorderSchema = z.object({
+  imageIds: z.array(z.string().min(1)).min(1),
+});
 
 export async function PUT(request: NextRequest) {
   const session = await auth();
@@ -10,10 +15,29 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { imageIds } = await request.json();
-  if (!Array.isArray(imageIds) || imageIds.length === 0) {
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json(
+      { error: "Invalid request body" },
+      { status: 400 }
+    );
+  }
+
+  const parsed = reorderSchema.safeParse(body);
+  if (!parsed.success) {
     return NextResponse.json(
       { error: "imageIds array is required" },
+      { status: 400 }
+    );
+  }
+
+  const { imageIds } = parsed.data;
+
+  if (new Set(imageIds).size !== imageIds.length) {
+    return NextResponse.json(
+      { error: "Duplicate image IDs" },
       { status: 400 }
     );
   }

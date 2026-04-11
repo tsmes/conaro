@@ -40,25 +40,29 @@ export async function updateBasicInfo(
     return { error: "Profile not found" };
   }
 
-  await db.transaction(async (tx) => {
-    await tx
-      .update(profiles)
-      .set({ displayName, updatedAt: new Date() })
-      .where(eq(profiles.id, profileId));
+  try {
+    await db.transaction(async (tx) => {
+      await tx
+        .update(profiles)
+        .set({ displayName, updatedAt: new Date() })
+        .where(eq(profiles.id, profileId));
 
-    await tx
-      .update(artistProfiles)
-      .set({
-        realName: realName || null,
-        contactEmail,
-        phone: phone || null,
-        bio: bio || null,
-        websiteUrl: websiteUrl || null,
-        socialLinks: socialLinks || null,
-        updatedAt: new Date(),
-      })
-      .where(eq(artistProfiles.profileId, profileId));
-  });
+      await tx
+        .update(artistProfiles)
+        .set({
+          realName: realName || null,
+          contactEmail,
+          phone: phone || null,
+          bio: bio || null,
+          websiteUrl: websiteUrl || null,
+          socialLinks: socialLinks || null,
+          updatedAt: new Date(),
+        })
+        .where(eq(artistProfiles.profileId, profileId));
+    });
+  } catch {
+    return { error: "Failed to update profile. Please try again." };
+  }
 
   return { success: true };
 }
@@ -91,16 +95,20 @@ export async function updateLogistics(
     return { error: "Profile not found" };
   }
 
-  await db
-    .update(artistProfiles)
-    .set({
-      helpers,
-      accessibilityNeeds: accessibilityNeeds || null,
-      tableSizePreference: tableSizePreference || null,
-      notes: notes || null,
-      updatedAt: new Date(),
-    })
-    .where(eq(artistProfiles.profileId, profileId));
+  try {
+    await db
+      .update(artistProfiles)
+      .set({
+        helpers,
+        accessibilityNeeds: accessibilityNeeds || null,
+        tableSizePreference: tableSizePreference || null,
+        notes: notes || null,
+        updatedAt: new Date(),
+      })
+      .where(eq(artistProfiles.profileId, profileId));
+  } catch {
+    return { error: "Failed to update logistics. Please try again." };
+  }
 
   return { success: true };
 }

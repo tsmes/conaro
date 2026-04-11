@@ -13,7 +13,7 @@ export async function Header() {
         <Link href="/" className="text-xl font-bold">
           Art Apply
         </Link>
-        <nav className="flex items-center gap-2">
+        <nav aria-label="Main navigation" className="flex items-center gap-2">
           {session?.user ? (
             <>
               {session.user.role === "artist" && (

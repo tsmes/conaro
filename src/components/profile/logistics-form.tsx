@@ -21,7 +21,7 @@ export function LogisticsForm({ defaultValues }: LogisticsFormProps) {
 
   return (
     <form action={formAction} className="space-y-4">
-      {state.error && (
+      {!pending && state.error && (
         <p
           role="alert"
           className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive"
@@ -29,7 +29,7 @@ export function LogisticsForm({ defaultValues }: LogisticsFormProps) {
           {state.error}
         </p>
       )}
-      {state.success && (
+      {!pending && state.success && (
         <p
           role="status"
           className="rounded-md bg-green-50 px-3 py-2 text-sm text-green-700 dark:bg-green-950 dark:text-green-300"

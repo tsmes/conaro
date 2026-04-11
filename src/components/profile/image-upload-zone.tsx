@@ -66,13 +66,26 @@ export function ImageUploadZone({ disabled, onUpload }: ImageUploadZoneProps) {
   return (
     <div>
       <div
+        role="button"
+        tabIndex={disabled || uploading ? -1 : 0}
+        aria-label="Upload image"
         onDragOver={(e) => {
           e.preventDefault();
           if (!disabled && !uploading) setDragging(true);
         }}
         onDragLeave={() => setDragging(false)}
         onDrop={handleDrop}
-        className={`flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 transition-colors ${
+        onKeyDown={(e) => {
+          if (
+            (e.key === "Enter" || e.key === " ") &&
+            !disabled &&
+            !uploading
+          ) {
+            e.preventDefault();
+            inputRef.current?.click();
+          }
+        }}
+        className={`flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
           dragging
             ? "border-primary bg-primary/5"
             : "border-muted-foreground/25"
