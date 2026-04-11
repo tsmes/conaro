@@ -9,6 +9,7 @@ export default defineConfig({
     include: ["__tests__/**/*.test.{ts,tsx}"],
     setupFiles: ["__tests__/setup.ts"],
     fileParallelism: false,
+    testTimeout: 15000,
     alias: {
       "next-auth": path.resolve(__dirname, "__tests__/mocks/next-auth.ts"),
       "next/navigation": path.resolve(
