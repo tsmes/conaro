@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { isNotNull } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { conventions } from "@/lib/db/schema/conventions";
 import { storage } from "@/lib/storage";
@@ -12,11 +11,9 @@ import {
 } from "@/components/ui/card";
 
 export default async function ConventionsDirectoryPage() {
-  // Show conventions that have a description (indicates a completed profile)
   const conventionList = await db
     .select()
     .from(conventions)
-    .where(isNotNull(conventions.description))
     .orderBy(conventions.name);
 
   return (
