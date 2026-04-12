@@ -31,6 +31,7 @@ const STATUS_STYLES: Record<
   under_review: { label: "Under Review", variant: "default" },
   accepted: { label: "Accepted", variant: "outline" },
   rejected: { label: "Rejected", variant: "destructive" },
+  revoked: { label: "Revoked", variant: "destructive" },
 };
 
 export default async function DashboardPage() {
@@ -65,6 +66,7 @@ export default async function DashboardPage() {
         createdAt: applications.createdAt,
         eventName: events.name,
         eventId: events.id,
+        eventStatus: events.status,
         conventionName: conventions.name,
       })
       .from(applications)
@@ -123,8 +125,16 @@ export default async function DashboardPage() {
           ) : (
             <div className="space-y-3">
               {applicationList.map((app) => {
-                const statusInfo = STATUS_STYLES[app.status] ?? {
-                  label: app.status,
+                // Mask in-progress decisions: show "Under Review" while
+                // event is in reviewing status (before results published)
+                const displayStatus =
+                  app.eventStatus === "reviewing" &&
+                  app.status !== "submitted"
+                    ? "under_review"
+                    : app.status;
+
+                const statusInfo = STATUS_STYLES[displayStatus] ?? {
+                  label: displayStatus,
                   variant: "secondary" as const,
                 };
 
@@ -154,9 +164,10 @@ export default async function DashboardPage() {
                         {app.createdAt.toISOString().slice(0, 10)}
                       </CardDescription>
                     </CardHeader>
-                    {app.responseMessage && (
+                    {app.responseMessage &&
+                      app.eventStatus === "results_published" && (
                       <CardContent className="pt-0">
-                        <p className="text-sm text-muted-foreground">
+                        <p className="whitespace-pre-line text-sm text-muted-foreground">
                           {app.responseMessage}
                         </p>
                       </CardContent>

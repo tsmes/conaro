@@ -21,6 +21,7 @@ const STATUS_LABELS: Record<string, { label: string; variant: "default" | "secon
   draft: { label: "Draft", variant: "secondary" },
   accepting_applications: { label: "Accepting Applications", variant: "default" },
   reviewing: { label: "Reviewing", variant: "outline" },
+  results_published: { label: "Results Published", variant: "default" },
 };
 
 export default async function ConventionManagePage() {

@@ -15,6 +15,7 @@ const STATUS_DISPLAY: Record<
     variant: "default",
   },
   reviewing: { label: "Reviewing", variant: "outline" },
+  results_published: { label: "Results Published", variant: "default" },
 };
 
 interface EventStatusControlsProps {

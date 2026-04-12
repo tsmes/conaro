@@ -1,6 +1,9 @@
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
+import { eq, count } from "drizzle-orm";
 import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { applications } from "@/lib/db/schema/applications";
 import { getOrganizerEvent } from "@/lib/conventions/queries";
 import {
   updateEvent,
@@ -29,6 +32,18 @@ export default async function EventDetailPage({
   const event = await getOrganizerEvent(session.user.profileId, eventId);
   if (!event) {
     notFound();
+  }
+
+  // Get application count for the review link
+  const showReviewLink =
+    event.status === "reviewing" || event.status === "results_published";
+  let applicationCount = 0;
+  if (showReviewLink) {
+    const [{ value }] = await db
+      .select({ value: count() })
+      .from(applications)
+      .where(eq(applications.eventId, event.id));
+    applicationCount = value;
   }
 
   const amenities = event.amenities as {
@@ -63,6 +78,14 @@ export default async function EventDetailPage({
             Field Configuration
           </Button>
         </Link>
+
+        {showReviewLink && (
+          <Link href={`/conventions/manage/events/${event.id}/applications`}>
+            <Button variant="outline" size="sm">
+              Review Applications ({applicationCount})
+            </Button>
+          </Link>
+        )}
       </div>
 
       <Separator className="my-6" />

@@ -14,6 +14,7 @@ export const eventStatusEnum = pgEnum("event_status", [
   "draft",
   "accepting_applications",
   "reviewing",
+  "results_published",
 ]);
 
 export type Amenities = {
@@ -57,6 +58,8 @@ export const events = pgTable(
     amenities: jsonb("amenities").$type<Amenities>(),
     fieldRequirements: jsonb("field_requirements").$type<FieldRequirements>(),
     minPortfolioImages: integer("min_portfolio_images"),
+    acceptanceMessage: text("acceptance_message"),
+    rejectionMessage: text("rejection_message"),
     createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
   },

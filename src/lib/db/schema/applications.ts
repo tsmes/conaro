@@ -16,6 +16,7 @@ export const applicationStatusEnum = pgEnum("application_status", [
   "under_review",
   "accepted",
   "rejected",
+  "revoked",
 ]);
 
 export interface SnapshotImage {
@@ -59,6 +60,7 @@ export const applications = pgTable(
       .notNull()
       .$type<ProfileSnapshot>(),
     isBlockListed: boolean("is_block_listed").notNull().default(false),
+    paymentConfirmed: boolean("payment_confirmed").notNull().default(false),
     responseMessage: text("response_message"),
     createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
