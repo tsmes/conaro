@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { LogoutButton } from "@/components/auth/logout-button";
+import { NotificationBell } from "@/components/notifications/notification-bell";
 
 export async function Header() {
   const session = await auth();
@@ -46,6 +47,13 @@ export async function Header() {
                   Conventions
                 </Link>
               )}
+              <NotificationBell />
+              <Link
+                href="/settings/notifications"
+                className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}
+              >
+                Settings
+              </Link>
               <LogoutButton />
             </>
           ) : (
