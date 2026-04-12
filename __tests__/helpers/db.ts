@@ -9,9 +9,15 @@ import { conventionFollows } from "@/lib/db/schema/convention-follows";
 import { conventionArtistLists } from "@/lib/db/schema/convention-artist-lists";
 import { artistProfiles } from "@/lib/db/schema/artist-profiles";
 import { portfolioImages } from "@/lib/db/schema/portfolio-images";
+import {
+  notifications,
+  notificationPreferences,
+} from "@/lib/db/schema/notifications";
 import { hashPassword } from "@/lib/auth/helpers";
 
 export async function cleanDatabase() {
+  await db.delete(notifications);
+  await db.delete(notificationPreferences);
   await db.delete(applications);
   await db.delete(conventionFollows);
   await db.delete(conventionArtistLists);
@@ -187,6 +193,13 @@ export async function createTestApplication(
     .returning();
 
   return application;
+}
+
+export async function findNotificationsByProfileId(profileId: string) {
+  return db
+    .select()
+    .from(notifications)
+    .where(eq(notifications.recipientProfileId, profileId));
 }
 
 export function buildFormData(data: Record<string, string>): FormData {
