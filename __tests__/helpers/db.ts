@@ -158,6 +158,37 @@ export async function createTestEvent(
   return event;
 }
 
+export async function createTestApplication(
+  eventId: string,
+  profileId: string,
+  overrides: Partial<typeof applications.$inferInsert> = {}
+) {
+  const [application] = await db
+    .insert(applications)
+    .values({
+      eventId,
+      profileId,
+      profileSnapshot: {
+        displayName: "Test Artist",
+        realName: null,
+        contactEmail: "artist@test.com",
+        phone: null,
+        bio: null,
+        websiteUrl: null,
+        socialLinks: null,
+        helpers: null,
+        accessibilityNeeds: null,
+        tableSizePreference: null,
+        notes: null,
+        images: [],
+      },
+      ...overrides,
+    })
+    .returning();
+
+  return application;
+}
+
 export function buildFormData(data: Record<string, string>): FormData {
   const formData = new FormData();
   for (const [key, value] of Object.entries(data)) {
