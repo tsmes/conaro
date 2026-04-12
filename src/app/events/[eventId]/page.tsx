@@ -10,9 +10,11 @@ import { profiles } from "@/lib/db/schema/profiles";
 import { artistProfiles } from "@/lib/db/schema/artist-profiles";
 import { portfolioImages } from "@/lib/db/schema/portfolio-images";
 import { applications } from "@/lib/db/schema/applications";
+import { conventionFollows } from "@/lib/db/schema/convention-follows";
 import { storage } from "@/lib/storage";
 import { validateProfileForEvent } from "@/lib/applications/validation";
 import { ApplyButton } from "@/components/events/apply-button";
+import { FollowButton } from "@/components/conventions/follow-button";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -78,6 +80,7 @@ export default async function EventDetailPage({
     session?.user?.profileId && session.user.role === "artist";
 
   let hasExistingApplication = false;
+  let isFollowingConvention = false;
   let validationResult: { valid: true } | { valid: false; missingFields: Array<{ key: string; label: string; section: "basic" | "logistics" | "portfolio" }> } = {
     valid: true,
   };
@@ -85,7 +88,7 @@ export default async function EventDetailPage({
   if (isArtist) {
     const profileId = session.user.profileId!;
 
-    const [[profile], [artistProfile], [{ value: imageCount }], [existingApp]] =
+    const [[profile], [artistProfile], [{ value: imageCount }], [existingApp], [follow]] =
       await Promise.all([
         db.select().from(profiles).where(eq(profiles.id, profileId)),
         db
@@ -105,9 +108,19 @@ export default async function EventDetailPage({
               eq(applications.profileId, profileId)
             )
           ),
+        db
+          .select({ id: conventionFollows.id })
+          .from(conventionFollows)
+          .where(
+            and(
+              eq(conventionFollows.profileId, profileId),
+              eq(conventionFollows.conventionId, event.conventionId)
+            )
+          ),
       ]);
 
     hasExistingApplication = !!existingApp;
+    isFollowingConvention = !!follow;
 
     if (profile && artistProfile) {
       validationResult = validateProfileForEvent(
@@ -133,20 +146,28 @@ export default async function EventDetailPage({
       </div>
 
       <div className="mt-4">
-        <div className="flex items-center gap-3">
-          {conventionLogoUrl && (
-            <img
-              src={conventionLogoUrl}
-              alt={`${event.conventionName} logo`}
-              className="h-10 w-auto rounded object-contain"
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {conventionLogoUrl && (
+              <img
+                src={conventionLogoUrl}
+                alt={`${event.conventionName} logo`}
+                className="h-10 w-auto rounded object-contain"
+              />
+            )}
+            <Link
+              href={`/conventions/${event.conventionId}`}
+              className="text-sm text-muted-foreground hover:underline"
+            >
+              {event.conventionName}
+            </Link>
+          </div>
+          {isArtist && (
+            <FollowButton
+              conventionId={event.conventionId}
+              isFollowing={isFollowingConvention}
             />
           )}
-          <Link
-            href={`/conventions/${event.conventionId}`}
-            className="text-sm text-muted-foreground hover:underline"
-          >
-            {event.conventionName}
-          </Link>
         </div>
         <h1 className="mt-2 text-3xl font-bold">{event.name}</h1>
         {!isAccepting && (
