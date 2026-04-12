@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { isNotNull } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { conventions } from "@/lib/db/schema/conventions";
@@ -37,7 +38,12 @@ export default async function ConventionsDirectoryPage() {
               : null;
 
             return (
-              <Card key={convention.id}>
+              <Link
+                key={convention.id}
+                href={`/conventions/${convention.id}`}
+                className="block"
+              >
+              <Card className="h-full transition-colors hover:bg-muted/50">
                 {logoUrl && (
                   <div className="flex items-center justify-center p-4 pb-0">
                     <img
@@ -55,19 +61,8 @@ export default async function ConventionsDirectoryPage() {
                     </CardDescription>
                   )}
                 </CardHeader>
-                {convention.websiteUrl && (
-                  <CardContent className="pt-0">
-                    <a
-                      href={convention.websiteUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm text-primary underline underline-offset-4"
-                    >
-                      Website
-                    </a>
-                  </CardContent>
-                )}
               </Card>
+              </Link>
             );
           })}
         </div>
