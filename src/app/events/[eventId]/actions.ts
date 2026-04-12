@@ -10,6 +10,7 @@ import { artistProfiles } from "@/lib/db/schema/artist-profiles";
 import { portfolioImages } from "@/lib/db/schema/portfolio-images";
 import { applications } from "@/lib/db/schema/applications";
 import type { ProfileSnapshot, SnapshotImage } from "@/lib/db/schema/applications";
+import { conventions } from "@/lib/db/schema/conventions";
 import { conventionArtistLists } from "@/lib/db/schema/convention-artist-lists";
 import { auth } from "@/lib/auth";
 import { storage } from "@/lib/storage";
@@ -18,6 +19,7 @@ import {
   validateProfileForEvent,
   type MissingField,
 } from "@/lib/applications/validation";
+import { notifyNewApplication } from "@/lib/notifications/triggers";
 import { isUniqueViolation } from "@/lib/db/errors";
 
 export interface ApplyResult extends ActionState {
@@ -163,6 +165,25 @@ export async function applyToEvent(
       return { error: "You have already applied to this event" };
     }
     return { error: "Failed to submit application. Please try again." };
+  }
+
+  // Notify the convention organizer of the new application
+  try {
+    const [convention] = await db
+      .select({ organizerId: conventions.organizerId })
+      .from(conventions)
+      .where(eq(conventions.id, event.conventionId));
+
+    if (convention) {
+      await notifyNewApplication(
+        convention.organizerId,
+        profile.displayName,
+        eventId,
+        event.name
+      );
+    }
+  } catch (error) {
+    console.error("Failed to send new application notification:", error);
   }
 
   revalidatePath("/dashboard");

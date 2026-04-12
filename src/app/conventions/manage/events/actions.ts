@@ -13,6 +13,7 @@ import {
   getOrganizerEvent,
   buildDefaultFieldRequirements,
 } from "@/lib/conventions/queries";
+import { notifyEventOpened } from "@/lib/notifications/triggers";
 
 function extractAmenities(data: {
   amenities_electricity: boolean;
@@ -208,6 +209,13 @@ export async function openApplications(
       .where(eq(events.id, event.id));
   } catch {
     return { error: "Failed to open applications. Please try again." };
+  }
+
+  // Notify followers and "any new event" subscribers
+  try {
+    await notifyEventOpened(event.id, event.name, event.conventionId);
+  } catch (error) {
+    console.error("Failed to send event opened notifications:", error);
   }
 
   revalidatePath("/conventions/manage");

@@ -8,6 +8,10 @@ import { applications } from "@/lib/db/schema/applications";
 import { auth } from "@/lib/auth";
 import { type ActionState } from "@/lib/validations/auth";
 import { getOrganizerEvent } from "@/lib/conventions/queries";
+import {
+  notifyResultsPublished,
+  notifyApplicationRevoked,
+} from "@/lib/notifications/triggers";
 
 export async function setApplicationDecision(
   _prevState: ActionState,
@@ -140,6 +144,13 @@ export async function publishResults(
     return { error: "Failed to publish results. Please try again." };
   }
 
+  // Notify all applicants
+  try {
+    await notifyResultsPublished(eventId, event.name);
+  } catch (error) {
+    console.error("Failed to send results published notifications:", error);
+  }
+
   revalidatePath("/conventions/manage");
   revalidatePath(`/conventions/manage/events/${eventId}`);
   revalidatePath(`/conventions/manage/events/${eventId}/applications`);
@@ -213,7 +224,11 @@ export async function revokeApplication(
   }
 
   const [application] = await db
-    .select({ id: applications.id, status: applications.status })
+    .select({
+      id: applications.id,
+      status: applications.status,
+      profileId: applications.profileId,
+    })
     .from(applications)
     .where(
       and(eq(applications.id, applicationId), eq(applications.eventId, eventId))
@@ -231,6 +246,13 @@ export async function revokeApplication(
       updatedAt: new Date(),
     })
     .where(eq(applications.id, applicationId));
+
+  // Notify the affected artist
+  try {
+    await notifyApplicationRevoked(application.profileId, event.name);
+  } catch (error) {
+    console.error("Failed to send revocation notification:", error);
+  }
 
   revalidatePath(`/conventions/manage/events/${eventId}/applications`);
   return { success: true };

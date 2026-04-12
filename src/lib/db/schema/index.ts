@@ -5,5 +5,6 @@ export * from "./events";
 export * from "./convention-artist-lists";
 export * from "./applications";
 export * from "./convention-follows";
+export * from "./notifications";
 export * from "./artist-profiles";
 export * from "./portfolio-images";
