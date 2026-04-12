@@ -45,6 +45,11 @@ function isFieldFilled(
     return imageCount > 0;
   }
 
+  // Guard against field keys not present on the artist profile interface
+  if (!(field.key in artistProfile)) {
+    return true;
+  }
+
   const value = artistProfile[field.key as keyof ArtistProfileData];
 
   if (field.type === "number") {

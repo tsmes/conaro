@@ -57,7 +57,7 @@ export function ApplyButton({
   if (!validationResult.valid) {
     return (
       <div className="space-y-3">
-        <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+        <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive" role="alert">
           Complete your profile before applying. The following fields are
           required:
         </div>

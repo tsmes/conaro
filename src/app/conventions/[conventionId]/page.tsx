@@ -39,43 +39,43 @@ export default async function ConventionDetailPage({
     ? storage.getUrl(convention.logoPath)
     : null;
 
-  // Fetch open events for this convention
-  const openEvents = await db
-    .select({
-      id: events.id,
-      name: events.name,
-      eventStartDate: events.eventStartDate,
-      eventEndDate: events.eventEndDate,
-      venueCity: events.venueCity,
-      venueCountry: events.venueCountry,
-      applicationCloseDate: events.applicationCloseDate,
-    })
-    .from(events)
-    .where(
-      and(
-        eq(events.conventionId, conventionId),
-        eq(events.status, "accepting_applications")
-      )
-    );
-
-  // Check follow state for logged-in artists
+  // Check session and fetch data in parallel
   const session = await auth();
   const isArtist =
     session?.user?.profileId && session.user.role === "artist";
 
-  let isFollowing = false;
-  if (isArtist) {
-    const [follow] = await db
-      .select({ id: conventionFollows.id })
-      .from(conventionFollows)
+  const [openEvents, followResult] = await Promise.all([
+    db
+      .select({
+        id: events.id,
+        name: events.name,
+        eventStartDate: events.eventStartDate,
+        eventEndDate: events.eventEndDate,
+        venueCity: events.venueCity,
+        venueCountry: events.venueCountry,
+        applicationCloseDate: events.applicationCloseDate,
+      })
+      .from(events)
       .where(
         and(
-          eq(conventionFollows.profileId, session.user.profileId!),
-          eq(conventionFollows.conventionId, conventionId)
+          eq(events.conventionId, conventionId),
+          eq(events.status, "accepting_applications")
         )
-      );
-    isFollowing = !!follow;
-  }
+      ),
+    isArtist
+      ? db
+          .select({ id: conventionFollows.id })
+          .from(conventionFollows)
+          .where(
+            and(
+              eq(conventionFollows.profileId, session.user.profileId!),
+              eq(conventionFollows.conventionId, conventionId)
+            )
+          )
+      : Promise.resolve([]),
+  ]);
+
+  const isFollowing = followResult.length > 0;
 
   return (
     <div className="container mx-auto max-w-3xl px-4 py-8">

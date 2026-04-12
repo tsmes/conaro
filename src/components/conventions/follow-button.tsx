@@ -1,12 +1,8 @@
 "use client";
 
 import { useActionState } from "react";
-import {
-  followConvention,
-  unfollowConvention,
-} from "@/app/conventions/[conventionId]/actions";
+import { toggleFollow } from "@/app/conventions/[conventionId]/actions";
 import { Button } from "@/components/ui/button";
-import type { ActionState } from "@/lib/validations/auth";
 
 interface FollowButtonProps {
   conventionId: string;
@@ -17,10 +13,9 @@ export function FollowButton({
   conventionId,
   isFollowing,
 }: FollowButtonProps) {
-  const action = isFollowing ? unfollowConvention : followConvention;
-  const [state, formAction, pending] = useActionState(action, {});
+  const [state, formAction, pending] = useActionState(toggleFollow, {});
 
-  // After successful toggle, show opposite state
+  // Each successful toggle flips the state
   const currentlyFollowing = state.success ? !isFollowing : isFollowing;
 
   return (

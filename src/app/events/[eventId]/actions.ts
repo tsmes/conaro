@@ -116,10 +116,13 @@ export async function applyToEvent(
         height: image.height,
         sortOrder: image.sortOrder,
       });
-    } catch {
+    } catch (copyError) {
+      console.error("Snapshot image copy failed:", copyError);
       // Clean up any already-copied images on failure
       for (const copied of snapshotImages) {
-        await storage.delete(copied.storagePath).catch(() => {});
+        await storage.delete(copied.storagePath).catch((e) => {
+          console.error("Failed to clean up snapshot image:", e);
+        });
       }
       return { error: "Failed to process application. Please try again." };
     }
@@ -152,7 +155,9 @@ export async function applyToEvent(
   } catch (error: unknown) {
     // Clean up snapshot images on DB failure
     for (const img of snapshotImages) {
-      await storage.delete(img.storagePath).catch(() => {});
+      await storage.delete(img.storagePath).catch((e) => {
+        console.error("Failed to clean up snapshot image:", e);
+      });
     }
     if (isUniqueViolation(error)) {
       return { error: "You have already applied to this event" };

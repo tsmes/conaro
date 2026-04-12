@@ -8,7 +8,7 @@ import { conventionFollows } from "@/lib/db/schema/convention-follows";
 import { auth } from "@/lib/auth";
 import { type ActionState } from "@/lib/validations/auth";
 
-export async function followConvention(
+export async function toggleFollow(
   _prevState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
@@ -31,41 +31,29 @@ export async function followConvention(
     return { error: "Convention not found" };
   }
 
-  await db
-    .insert(conventionFollows)
-    .values({
-      profileId: session.user.profileId,
-      conventionId,
-    })
-    .onConflictDoNothing();
+  const profileId = session.user.profileId;
 
-  revalidatePath(`/conventions/${conventionId}`);
-  revalidatePath("/dashboard");
-  return { success: true };
-}
-
-export async function unfollowConvention(
-  _prevState: ActionState,
-  formData: FormData
-): Promise<ActionState> {
-  const session = await auth();
-  if (!session?.user?.profileId || session.user.role !== "artist") {
-    return { error: "Unauthorized" };
-  }
-
-  const conventionId = formData.get("conventionId")?.toString();
-  if (!conventionId) {
-    return { error: "Convention ID is required" };
-  }
-
-  await db
-    .delete(conventionFollows)
+  // Check current follow state and toggle
+  const [existing] = await db
+    .select({ id: conventionFollows.id })
+    .from(conventionFollows)
     .where(
       and(
-        eq(conventionFollows.profileId, session.user.profileId),
+        eq(conventionFollows.profileId, profileId),
         eq(conventionFollows.conventionId, conventionId)
       )
     );
+
+  if (existing) {
+    await db
+      .delete(conventionFollows)
+      .where(eq(conventionFollows.id, existing.id));
+  } else {
+    await db
+      .insert(conventionFollows)
+      .values({ profileId, conventionId })
+      .onConflictDoNothing();
+  }
 
   revalidatePath(`/conventions/${conventionId}`);
   revalidatePath("/dashboard");

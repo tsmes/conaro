@@ -6,10 +6,7 @@ import {
   findFollowsByProfileId,
   buildFormData,
 } from "../helpers/db";
-import {
-  followConvention,
-  unfollowConvention,
-} from "@/app/conventions/[conventionId]/actions";
+import { toggleFollow } from "@/app/conventions/[conventionId]/actions";
 
 const mockAuth = vi.fn();
 
@@ -27,7 +24,7 @@ describe("convention follows", () => {
     vi.clearAllMocks();
   });
 
-  it("creates a follow record", async () => {
+  it("creates a follow record when not following", async () => {
     const { convention } = await createTestOrganizer();
     const artist = await createTestArtist();
 
@@ -35,7 +32,7 @@ describe("convention follows", () => {
       user: { id: "u", role: "artist", profileId: artist.profile.id },
     });
 
-    const result = await followConvention(
+    const result = await toggleFollow(
       {},
       buildFormData({ conventionId: convention.id })
     );
@@ -46,7 +43,7 @@ describe("convention follows", () => {
     expect(follows[0].conventionId).toBe(convention.id);
   });
 
-  it("is idempotent — second follow does not error", async () => {
+  it("removes follow record when already following (toggle off)", async () => {
     const { convention } = await createTestOrganizer();
     const artist = await createTestArtist();
 
@@ -54,34 +51,14 @@ describe("convention follows", () => {
       user: { id: "u", role: "artist", profileId: artist.profile.id },
     });
 
-    await followConvention(
-      {},
-      buildFormData({ conventionId: convention.id })
-    );
-    const result = await followConvention(
-      {},
-      buildFormData({ conventionId: convention.id })
-    );
-    expect(result.success).toBe(true);
-
-    const follows = await findFollowsByProfileId(artist.profile.id);
-    expect(follows).toHaveLength(1);
-  });
-
-  it("removes the follow record on unfollow", async () => {
-    const { convention } = await createTestOrganizer();
-    const artist = await createTestArtist();
-
-    mockAuth.mockResolvedValue({
-      user: { id: "u", role: "artist", profileId: artist.profile.id },
-    });
-
-    await followConvention(
+    // Follow
+    await toggleFollow(
       {},
       buildFormData({ conventionId: convention.id })
     );
 
-    const result = await unfollowConvention(
+    // Toggle off
+    const result = await toggleFollow(
       {},
       buildFormData({ conventionId: convention.id })
     );
@@ -91,6 +68,23 @@ describe("convention follows", () => {
     expect(follows).toHaveLength(0);
   });
 
+  it("can re-follow after unfollowing (toggle on-off-on)", async () => {
+    const { convention } = await createTestOrganizer();
+    const artist = await createTestArtist();
+
+    mockAuth.mockResolvedValue({
+      user: { id: "u", role: "artist", profileId: artist.profile.id },
+    });
+
+    // Follow -> unfollow -> follow
+    await toggleFollow({}, buildFormData({ conventionId: convention.id }));
+    await toggleFollow({}, buildFormData({ conventionId: convention.id }));
+    await toggleFollow({}, buildFormData({ conventionId: convention.id }));
+
+    const follows = await findFollowsByProfileId(artist.profile.id);
+    expect(follows).toHaveLength(1);
+  });
+
   it("rejects non-artist role", async () => {
     const { profile, convention } = await createTestOrganizer();
 
@@ -98,7 +92,7 @@ describe("convention follows", () => {
       user: { id: "u", role: "organizer", profileId: profile.id },
     });
 
-    const result = await followConvention(
+    const result = await toggleFollow(
       {},
       buildFormData({ conventionId: convention.id })
     );

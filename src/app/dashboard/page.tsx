@@ -151,11 +151,7 @@ export default async function DashboardPage() {
                       </div>
                       <CardDescription>
                         Applied{" "}
-                        {app.createdAt.toLocaleDateString("en-US", {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                        })}
+                        {app.createdAt.toISOString().slice(0, 10)}
                       </CardDescription>
                     </CardHeader>
                     {app.responseMessage && (

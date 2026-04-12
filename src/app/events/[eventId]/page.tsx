@@ -12,7 +12,10 @@ import { portfolioImages } from "@/lib/db/schema/portfolio-images";
 import { applications } from "@/lib/db/schema/applications";
 import { conventionFollows } from "@/lib/db/schema/convention-follows";
 import { storage } from "@/lib/storage";
-import { validateProfileForEvent } from "@/lib/applications/validation";
+import {
+  validateProfileForEvent,
+  type ValidationResult,
+} from "@/lib/applications/validation";
 import { ApplyButton } from "@/components/events/apply-button";
 import { FollowButton } from "@/components/conventions/follow-button";
 import { Button } from "@/components/ui/button";
@@ -81,9 +84,7 @@ export default async function EventDetailPage({
 
   let hasExistingApplication = false;
   let isFollowingConvention = false;
-  let validationResult: { valid: true } | { valid: false; missingFields: Array<{ key: string; label: string; section: "basic" | "logistics" | "portfolio" }> } = {
-    valid: true,
-  };
+  let validationResult: ValidationResult = { valid: true };
 
   if (isArtist) {
     const profileId = session.user.profileId!;
