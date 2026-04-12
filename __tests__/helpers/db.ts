@@ -4,12 +4,16 @@ import { users } from "@/lib/db/schema/auth";
 import { profiles } from "@/lib/db/schema/profiles";
 import { conventions } from "@/lib/db/schema/conventions";
 import { events } from "@/lib/db/schema/events";
+import { applications } from "@/lib/db/schema/applications";
+import { conventionFollows } from "@/lib/db/schema/convention-follows";
 import { conventionArtistLists } from "@/lib/db/schema/convention-artist-lists";
 import { artistProfiles } from "@/lib/db/schema/artist-profiles";
 import { portfolioImages } from "@/lib/db/schema/portfolio-images";
 import { hashPassword } from "@/lib/auth/helpers";
 
 export async function cleanDatabase() {
+  await db.delete(applications);
+  await db.delete(conventionFollows);
   await db.delete(conventionArtistLists);
   await db.delete(events);
   await db.delete(portfolioImages);
@@ -59,6 +63,20 @@ export async function findListEntriesByConventionId(conventionId: string) {
     .where(eq(conventionArtistLists.conventionId, conventionId));
 }
 
+export async function findApplicationsByEventId(eventId: string) {
+  return db
+    .select()
+    .from(applications)
+    .where(eq(applications.eventId, eventId));
+}
+
+export async function findFollowsByProfileId(profileId: string) {
+  return db
+    .select()
+    .from(conventionFollows)
+    .where(eq(conventionFollows.profileId, profileId));
+}
+
 export async function createTestOrganizer(
   email = "organizer@test.com",
   conventionName = "Test Convention"
@@ -105,6 +123,39 @@ export async function createTestArtist(
     .returning();
 
   return { user, profile, artistProfile };
+}
+
+export async function createTestEvent(
+  conventionId: string,
+  overrides: Partial<typeof events.$inferInsert> = {}
+) {
+  const [event] = await db
+    .insert(events)
+    .values({
+      conventionId,
+      name: "Test Event",
+      eventStartDate: "2026-07-15",
+      status: "accepting_applications",
+      fieldRequirements: {
+        displayName: "required",
+        contactEmail: "required",
+        realName: "not_requested",
+        phone: "not_requested",
+        bio: "not_requested",
+        websiteUrl: "not_requested",
+        socialLinks: "not_requested",
+        helpers: "not_requested",
+        accessibilityNeeds: "not_requested",
+        tableSizePreference: "not_requested",
+        notes: "not_requested",
+        portfolioImages: "not_requested",
+      },
+      minPortfolioImages: 0,
+      ...overrides,
+    })
+    .returning();
+
+  return event;
 }
 
 export function buildFormData(data: Record<string, string>): FormData {
