@@ -240,7 +240,7 @@ Pill shape with uppercase tracked text. Add `success` variant. Update existing v
 
 ---
 
-### 9. Refactor `CompletenessIndicator` into the new widget shape
+### 9. Refactor `CompletenessIndicator` into the new widget shape ✅ DONE
 
 Three-section adaptation (per D4). The component's input API (`{ completeness: CompletenessResult }`) is unchanged. Internal rendering changes completely.
 
