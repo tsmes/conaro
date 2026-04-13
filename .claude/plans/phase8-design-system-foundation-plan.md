@@ -265,7 +265,7 @@ Three-section adaptation (per D4). The component's input API (`{ completeness: C
 
 ---
 
-### 10. Build `ThemeToggle` component
+### 10. Build `ThemeToggle` component ✅ DONE
 
 Client component using shadcn `DropdownMenu` + `Button`. Light / Dark / System options.
 
