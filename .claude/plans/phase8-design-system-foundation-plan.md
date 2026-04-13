@@ -287,7 +287,7 @@ Client component using shadcn `DropdownMenu` + `Button`. Light / Dark / System o
 
 ---
 
-### 11. Build `PublicShell` layout component
+### 11. Build `PublicShell` layout component ✅ DONE
 
 Glass top nav + main slot. Used by `(public)` route group in Task 13.
 
