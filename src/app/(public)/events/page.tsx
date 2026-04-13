@@ -1,25 +1,32 @@
 import Link from "next/link";
+import { MapPin, CalendarDays } from "lucide-react";
 import { eq, ne, asc, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { events } from "@/lib/db/schema/events";
 import { conventions } from "@/lib/db/schema/conventions";
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { storage } from "@/lib/storage";
 import { ARTIST_STATUS_LABELS } from "@/lib/events/status-display";
 
 interface EventsPageProps {
   searchParams: Promise<{ convention?: string }>;
 }
 
+function formatRange(start: string, end: string | null): string {
+  if (!end || start === end) return start;
+  return `${start} – ${end}`;
+}
+
+function conventionInitials(name: string): string {
+  const parts = name.trim().split(/\s+/).slice(0, 2);
+  return parts.map((p) => p[0]?.toUpperCase() ?? "").join("") || "?";
+}
+
 export default async function EventsPage({ searchParams }: EventsPageProps) {
   const { convention: filterConventionId } = await searchParams;
 
-  // Fetch all non-draft events with convention info
   const allEvents = await db
     .select({
       id: events.id,
@@ -34,6 +41,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
       availableStands: events.availableStands,
       conventionId: events.conventionId,
       conventionName: conventions.name,
+      conventionLogoPath: conventions.logoPath,
     })
     .from(events)
     .innerJoin(conventions, eq(conventions.id, events.conventionId))
@@ -43,62 +51,70 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
       asc(events.eventStartDate)
     );
 
-  // Build convention filter options from visible events
   const conventionOptions = Array.from(
     new Map(
       allEvents.map((e) => [e.conventionId, e.conventionName])
     ).entries()
   ).sort((a, b) => a[1].localeCompare(b[1]));
 
-  // Apply filter
   const filteredEvents = filterConventionId
     ? allEvents.filter((e) => e.conventionId === filterConventionId)
     : allEvents;
 
   return (
-    <div className="container mx-auto max-w-5xl px-4 py-8">
-      <h1 className="text-3xl font-bold">Events</h1>
-      <p className="mt-2 text-muted-foreground">
-        Browse upcoming and open events.
-      </p>
+    <div className="mx-auto max-w-5xl px-6 py-16 md:px-8">
+      <header className="mb-10">
+        <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
+          Exhibition directory
+        </p>
+        <h1 className="mt-3 font-heading text-4xl font-extrabold tracking-tight md:text-5xl">
+          Open Events
+        </h1>
+        <p className="mt-3 max-w-2xl text-muted-foreground">
+          Curated selection of upcoming artist showcases and conventions.
+        </p>
+      </header>
 
       {conventionOptions.length > 1 && (
         <div
-          className="mt-4 flex items-center gap-2"
+          className="mb-8 flex flex-wrap items-center gap-2"
           role="group"
           aria-label="Convention filter"
         >
-          <span className="text-sm text-muted-foreground">Filter:</span>
-          <div className="flex flex-wrap gap-2">
-            <Link href="/events">
-              <Badge variant={!filterConventionId ? "default" : "secondary"}>
-                All
+          <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+            Filter
+          </span>
+          <Link href="/events">
+            <Badge variant={!filterConventionId ? "default" : "outline"}>
+              All
+            </Badge>
+          </Link>
+          {conventionOptions.map(([id, name]) => (
+            <Link key={id} href={`/events?convention=${id}`}>
+              <Badge
+                variant={filterConventionId === id ? "default" : "outline"}
+              >
+                {name}
               </Badge>
             </Link>
-            {conventionOptions.map(([id, name]) => (
-              <Link key={id} href={`/events?convention=${id}`}>
-                <Badge
-                  variant={filterConventionId === id ? "default" : "secondary"}
-                >
-                  {name}
-                </Badge>
-              </Link>
-            ))}
-          </div>
+          ))}
         </div>
       )}
 
       {filteredEvents.length === 0 ? (
-        <div className="mt-8 text-center text-muted-foreground">
-          No events to show.
-        </div>
+        <Card className="p-10 text-center text-muted-foreground">
+          No events to show right now.
+        </Card>
       ) : (
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="space-y-6">
           {filteredEvents.map((event) => {
             const statusInfo = ARTIST_STATUS_LABELS[event.status] ?? {
               label: event.status,
-              variant: "secondary" as const,
+              variant: "outline" as const,
             };
+            const logoUrl = event.conventionLogoPath
+              ? storage.getUrl(event.conventionLogoPath)
+              : null;
 
             return (
               <Link
@@ -106,48 +122,68 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
                 href={`/events/${event.id}`}
                 className="block"
               >
-                <Card className="h-full transition-colors hover:bg-muted/50">
-                  <CardHeader>
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="text-xs font-medium text-muted-foreground">
-                        {event.conventionName}
-                      </p>
-                      <Badge variant={statusInfo.variant} className="text-xs">
-                        {statusInfo.label}
-                      </Badge>
-                    </div>
-                    <CardTitle className="text-lg">{event.name}</CardTitle>
-                    <CardDescription className="space-y-1">
-                      <span className="block">
-                        {event.eventStartDate}
-                        {event.eventEndDate && ` — ${event.eventEndDate}`}
+                <Card
+                  interactive
+                  className="grid gap-6 p-6 md:grid-cols-[auto_1fr_auto] md:items-center md:p-8"
+                >
+                  <Avatar className="size-16 rounded-2xl md:size-20">
+                    {logoUrl && <AvatarImage src={logoUrl} alt="" />}
+                    <AvatarFallback className="rounded-2xl bg-secondary text-sm font-semibold">
+                      {conventionInitials(event.conventionName)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="min-w-0 space-y-2">
+                    <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                      {event.conventionName}
+                    </p>
+                    <h2 className="font-heading text-xl font-bold tracking-tight md:text-2xl">
+                      {event.name}
+                    </h2>
+                    <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                      <span className="inline-flex items-center gap-1.5">
+                        <CalendarDays className="size-4" />
+                        {formatRange(event.eventStartDate, event.eventEndDate)}
                       </span>
                       {(event.venueCity || event.venueCountry) && (
-                        <span className="block">
+                        <span className="inline-flex items-center gap-1.5">
+                          <MapPin className="size-4" />
                           {[event.venueCity, event.venueCountry]
                             .filter(Boolean)
                             .join(", ")}
                         </span>
                       )}
-                      <span className="flex items-center gap-2">
-                        {event.availableStands && (
-                          <span>{event.availableStands} stands</span>
-                        )}
-                        {event.status === "published" &&
-                          event.applicationOpenDate && (
-                            <span className="text-xs">
-                              Opens: {event.applicationOpenDate}
-                            </span>
-                          )}
-                        {event.status === "accepting_applications" &&
-                          event.applicationCloseDate && (
-                            <span className="text-xs">
-                              Deadline: {event.applicationCloseDate}
-                            </span>
-                          )}
-                      </span>
-                    </CardDescription>
-                  </CardHeader>
+                      {event.availableStands && (
+                        <span>{event.availableStands} stands</span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-start gap-2 md:items-end">
+                    <Badge variant={statusInfo.variant}>
+                      {statusInfo.label}
+                    </Badge>
+                    {event.status === "accepting_applications" &&
+                      event.applicationCloseDate && (
+                        <div className="text-right">
+                          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                            Deadline
+                          </p>
+                          <p className="font-heading text-base font-bold text-destructive">
+                            {event.applicationCloseDate}
+                          </p>
+                        </div>
+                      )}
+                    {event.status === "published" &&
+                      event.applicationOpenDate && (
+                        <div className="text-right">
+                          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                            Opens
+                          </p>
+                          <p className="font-heading text-base font-bold">
+                            {event.applicationOpenDate}
+                          </p>
+                        </div>
+                      )}
+                  </div>
                 </Card>
               </Link>
             );

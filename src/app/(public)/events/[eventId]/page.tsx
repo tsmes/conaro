@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { eq, and, count } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -18,18 +19,52 @@ import {
 } from "@/lib/applications/validation";
 import { ApplyButton } from "@/components/events/apply-button";
 import { FollowButton } from "@/components/conventions/follow-button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import { Card } from "@/components/ui/card";
 
 interface EventDetailPageProps {
   params: Promise<{ eventId: string }>;
+}
+
+function conventionInitials(name: string): string {
+  const parts = name.trim().split(/\s+/).slice(0, 2);
+  return parts.map((p) => p[0]?.toUpperCase() ?? "").join("") || "?";
+}
+
+function SectionCard({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Card className="p-6 md:p-8">
+      <p className="mb-4 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+        {label}
+      </p>
+      {children}
+    </Card>
+  );
+}
+
+function DetailField({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+        {label}
+      </p>
+      <p className="mt-1 text-sm">{children}</p>
+    </div>
+  );
 }
 
 export default async function EventDetailPage({
@@ -72,8 +107,6 @@ export default async function EventDetailPage({
     notFound();
   }
 
-  // Draft events are not visible to artists (only editable by the organizer
-  // via the manage UI)
   if (event.status === "draft") {
     notFound();
   }
@@ -83,7 +116,6 @@ export default async function EventDetailPage({
     ? storage.getUrl(event.conventionLogoPath)
     : null;
 
-  // Check artist session for apply section
   const session = await auth();
   const isArtist =
     session?.user?.profileId && session.user.role === "artist";
@@ -143,196 +175,182 @@ export default async function EventDetailPage({
   const isAccepting = event.status === "accepting_applications";
 
   return (
-    <div className="container mx-auto max-w-3xl px-4 py-8">
-      <div className="flex items-center gap-4">
-        <Link href="/events">
-          <Button variant="ghost" size="sm">
-            &larr; All Events
-          </Button>
-        </Link>
+    <div className="mx-auto max-w-4xl px-6 py-12 md:px-8">
+      <div className="mb-8">
+        <Button
+          variant="ghost"
+          size="sm"
+          nativeButton={false}
+          render={
+            <Link href="/events" className="inline-flex items-center gap-1">
+              <ArrowLeft className="size-4" />
+              All events
+            </Link>
+          }
+        />
       </div>
 
-      <div className="mt-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            {conventionLogoUrl && (
-              <img
-                src={conventionLogoUrl}
-                alt={`${event.conventionName} logo`}
-                className="h-10 w-auto rounded object-contain"
-              />
-            )}
-            <Link
-              href={`/conventions/${event.conventionId}`}
-              className="text-sm text-muted-foreground hover:underline"
-            >
+      <header className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+        <div className="min-w-0 space-y-3">
+          <Link
+            href={`/conventions/${event.conventionId}`}
+            className="group/conv inline-flex items-center gap-3"
+          >
+            <Avatar className="size-10 rounded-lg">
+              {conventionLogoUrl && <AvatarImage src={conventionLogoUrl} alt="" />}
+              <AvatarFallback className="rounded-lg bg-secondary text-xs font-semibold">
+                {conventionInitials(event.conventionName)}
+              </AvatarFallback>
+            </Avatar>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground transition-colors group-hover/conv:text-primary">
               {event.conventionName}
-            </Link>
-          </div>
-          {isArtist && (
-            <FollowButton
-              conventionId={event.conventionId}
-              isFollowing={isFollowingConvention}
-            />
+            </span>
+          </Link>
+          <h1 className="font-heading text-3xl font-extrabold tracking-tight md:text-5xl">
+            {event.name}
+          </h1>
+          {event.status === "published" && event.applicationOpenDate && (
+            <Badge variant="outline">
+              Applications open {event.applicationOpenDate}
+            </Badge>
+          )}
+          {event.status === "reviewing" && (
+            <Badge variant="secondary">Applications under review</Badge>
+          )}
+          {event.status === "results_published" && (
+            <Badge variant="success">Results published</Badge>
           )}
         </div>
-        <h1 className="mt-2 text-3xl font-bold">{event.name}</h1>
-        {event.status === "published" && event.applicationOpenDate && (
-          <Badge variant="secondary" className="mt-2">
-            Applications open on {event.applicationOpenDate}
-          </Badge>
+        {isArtist && (
+          <FollowButton
+            conventionId={event.conventionId}
+            isFollowing={isFollowingConvention}
+          />
         )}
-        {event.status === "reviewing" && (
-          <Badge variant="secondary" className="mt-2">
-            Applications closed — under review
-          </Badge>
-        )}
-        {event.status === "results_published" && (
-          <Badge variant="secondary" className="mt-2">
-            Results published
-          </Badge>
-        )}
-      </div>
+      </header>
 
       {event.description && (
-        <p className="mt-4 text-muted-foreground">{event.description}</p>
+        <div className="mt-8 max-w-3xl whitespace-pre-line text-base leading-relaxed text-muted-foreground">
+          {event.description}
+        </div>
       )}
 
-      <Separator className="my-6" />
-
-      <div className="space-y-6">
-        {/* Dates */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Dates</CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-2 text-sm sm:grid-cols-2">
-            <div>
-              <span className="font-medium">Event: </span>
+      <div className="mt-12 space-y-6">
+        <SectionCard label="Dates">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <DetailField label="Event">
               {event.eventStartDate}
-              {event.eventEndDate && ` — ${event.eventEndDate}`}
-            </div>
+              {event.eventEndDate && ` – ${event.eventEndDate}`}
+            </DetailField>
             {event.applicationCloseDate && (
-              <div>
-                <span className="font-medium">Application deadline: </span>
-                {event.applicationCloseDate}
-              </div>
+              <DetailField label="Application deadline">
+                <span className="font-semibold text-destructive">
+                  {event.applicationCloseDate}
+                </span>
+              </DetailField>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </SectionCard>
 
-        {/* Location */}
         {(event.venueName || event.venueCity) && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Location</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-1 text-sm">
-              {event.venueName && <p className="font-medium">{event.venueName}</p>}
+          <SectionCard label="Location">
+            <div className="space-y-1 text-sm">
+              {event.venueName && (
+                <p className="font-heading text-base font-bold">
+                  {event.venueName}
+                </p>
+              )}
               {event.venueAddress && <p>{event.venueAddress}</p>}
               {(event.venueCity || event.venueCountry) && (
-                <p>
+                <p className="text-muted-foreground">
                   {[event.venueCity, event.venueCountry]
                     .filter(Boolean)
                     .join(", ")}
                 </p>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </SectionCard>
         )}
 
-        {/* Logistics */}
         {(event.availableStands || event.tableDimensions || event.priceInfo) && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Artist Logistics</CardTitle>
-            </CardHeader>
-            <CardContent className="grid gap-2 text-sm sm:grid-cols-2">
+          <SectionCard label="Artist Logistics">
+            <div className="grid gap-4 sm:grid-cols-2">
               {event.availableStands && (
-                <div>
-                  <span className="font-medium">Available stands: </span>
+                <DetailField label="Available stands">
                   {event.availableStands}
-                </div>
+                </DetailField>
               )}
               {event.tableDimensions && (
-                <div>
-                  <span className="font-medium">Table dimensions: </span>
+                <DetailField label="Table dimensions">
                   {event.tableDimensions}
-                </div>
+                </DetailField>
               )}
               {event.priceInfo && (
                 <div className="sm:col-span-2">
-                  <span className="font-medium">Price: </span>
-                  {event.priceInfo}
+                  <DetailField label="Price">{event.priceInfo}</DetailField>
                 </div>
               )}
               {event.setupTime && (
-                <div>
-                  <span className="font-medium">Setup: </span>
-                  {event.setupTime}
-                </div>
+                <DetailField label="Setup">{event.setupTime}</DetailField>
               )}
               {event.teardownTime && (
-                <div>
-                  <span className="font-medium">Teardown: </span>
-                  {event.teardownTime}
-                </div>
+                <DetailField label="Teardown">{event.teardownTime}</DetailField>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </SectionCard>
         )}
 
-        {/* Amenities */}
         {amenities && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Provided Amenities</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2 text-sm">
+          <SectionCard label="Provided Amenities">
+            <div className="space-y-3">
               <div className="flex flex-wrap gap-2">
-                {amenities.electricity && <Badge variant="secondary">Electricity</Badge>}
-                {amenities.wifi && <Badge variant="secondary">Wi-Fi</Badge>}
-                {amenities.tables && <Badge variant="secondary">Tables</Badge>}
-                {amenities.chairs && <Badge variant="secondary">Chairs</Badge>}
+                {amenities.electricity && (
+                  <Badge variant="outline">Electricity</Badge>
+                )}
+                {amenities.wifi && <Badge variant="outline">Wi-Fi</Badge>}
+                {amenities.tables && <Badge variant="outline">Tables</Badge>}
+                {amenities.chairs && <Badge variant="outline">Chairs</Badge>}
               </div>
               {amenities.other && (
-                <p className="text-muted-foreground">{amenities.other}</p>
+                <p className="text-sm text-muted-foreground">
+                  {amenities.other}
+                </p>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </SectionCard>
         )}
 
-        {/* Apply Section */}
         {isAccepting && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Apply</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {isArtist ? (
-                <ApplyButton
-                  eventId={event.id}
-                  hasExistingApplication={hasExistingApplication}
-                  validationResult={validationResult}
-                />
-              ) : session?.user ? (
-                <p className="text-sm text-muted-foreground">
-                  Only artist accounts can apply to events.
-                </p>
-              ) : (
-                <p className="text-sm text-muted-foreground">
-                  <Link href="/login" className="text-primary underline underline-offset-4">
-                    Log in
-                  </Link>{" "}
-                  or{" "}
-                  <Link href="/register" className="text-primary underline underline-offset-4">
-                    register
-                  </Link>{" "}
-                  as an artist to apply.
-                </p>
-              )}
-            </CardContent>
-          </Card>
+          <SectionCard label="Apply">
+            {isArtist ? (
+              <ApplyButton
+                eventId={event.id}
+                hasExistingApplication={hasExistingApplication}
+                validationResult={validationResult}
+              />
+            ) : session?.user ? (
+              <p className="text-sm text-muted-foreground">
+                Only artist accounts can apply to events.
+              </p>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                <Link
+                  href="/login"
+                  className="font-semibold text-primary underline underline-offset-4"
+                >
+                  Log in
+                </Link>{" "}
+                or{" "}
+                <Link
+                  href="/register"
+                  className="font-semibold text-primary underline underline-offset-4"
+                >
+                  register
+                </Link>{" "}
+                as an artist to apply.
+              </p>
+            )}
+          </SectionCard>
         )}
       </div>
     </div>

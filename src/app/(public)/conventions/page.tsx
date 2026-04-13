@@ -2,13 +2,13 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import { conventions } from "@/lib/db/schema/conventions";
 import { storage } from "@/lib/storage";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card } from "@/components/ui/card";
+
+function conventionInitials(name: string): string {
+  const parts = name.trim().split(/\s+/).slice(0, 2);
+  return parts.map((p) => p[0]?.toUpperCase() ?? "").join("") || "?";
+}
 
 export default async function ConventionsDirectoryPage() {
   const conventionList = await db
@@ -17,18 +17,25 @@ export default async function ConventionsDirectoryPage() {
     .orderBy(conventions.name);
 
   return (
-    <div className="container mx-auto max-w-5xl px-4 py-8">
-      <h1 className="text-3xl font-bold">Conventions</h1>
-      <p className="mt-2 text-muted-foreground">
-        Discover conventions and their upcoming events.
-      </p>
+    <div className="mx-auto max-w-6xl px-6 py-16 md:px-8">
+      <header className="mb-10">
+        <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
+          Convention directory
+        </p>
+        <h1 className="mt-3 font-heading text-4xl font-extrabold tracking-tight md:text-5xl">
+          Discover conventions
+        </h1>
+        <p className="mt-3 max-w-2xl text-muted-foreground">
+          Browse conventions and the upcoming events they&apos;re running.
+        </p>
+      </header>
 
       {conventionList.length === 0 ? (
-        <div className="mt-8 text-center text-muted-foreground">
-          No conventions yet.
-        </div>
+        <Card className="p-10 text-center text-muted-foreground">
+          No conventions listed yet.
+        </Card>
       ) : (
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {conventionList.map((convention) => {
             const logoUrl = convention.logoPath
               ? storage.getUrl(convention.logoPath)
@@ -40,25 +47,29 @@ export default async function ConventionsDirectoryPage() {
                 href={`/conventions/${convention.id}`}
                 className="block"
               >
-              <Card className="h-full transition-colors hover:bg-muted/50">
-                {logoUrl && (
-                  <div className="flex items-center justify-center p-4 pb-0">
-                    <img
-                      src={logoUrl}
-                      alt={`${convention.name} logo`}
-                      className="h-20 w-auto rounded object-contain"
-                    />
+                <Card interactive className="h-full p-6">
+                  <div className="flex items-center gap-4">
+                    <Avatar className="size-14 rounded-2xl">
+                      {logoUrl && (
+                        <AvatarImage
+                          src={logoUrl}
+                          alt={`${convention.name} logo`}
+                        />
+                      )}
+                      <AvatarFallback className="rounded-2xl bg-secondary text-sm font-semibold">
+                        {conventionInitials(convention.name)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <h2 className="min-w-0 font-heading text-lg font-bold tracking-tight">
+                      {convention.name}
+                    </h2>
                   </div>
-                )}
-                <CardHeader className={logoUrl ? "pt-3" : undefined}>
-                  <CardTitle className="text-lg">{convention.name}</CardTitle>
                   {convention.description && (
-                    <CardDescription className="line-clamp-3">
+                    <p className="mt-4 line-clamp-3 text-sm leading-relaxed text-muted-foreground">
                       {convention.description}
-                    </CardDescription>
+                    </p>
                   )}
-                </CardHeader>
-              </Card>
+                </Card>
               </Link>
             );
           })}
