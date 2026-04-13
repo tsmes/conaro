@@ -481,7 +481,11 @@ Long-scroll editorial layout. Public route. Hero + two CTA bento + 3-step explai
 
 ---
 
-### 16. Light + dark QA pass and regression check
+### 16. Light + dark QA pass and regression check ✅ DONE
+
+*Automated checks clean; test results doc at
+`phase8-design-system-foundation-test-results.md`. Browser-based
+visual QA flagged as the last manual step before merge.*
 
 Verify the slice across both themes for all touched and inherited surfaces. Fix any token leaks.
 

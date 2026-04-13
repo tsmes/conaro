@@ -19,6 +19,12 @@ export function ThemeToggle() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // The shadcn / next-themes canonical pattern — flipping a mounted flag
+    // in an effect is how we gate rendering until we know the resolved theme
+    // on the client. The synchronous setState warning is expected here; no
+    // cascading render occurs because the component body short-circuits to
+    // the placeholder on the pre-mount render.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
