@@ -402,7 +402,7 @@ Deleted:
 
 ---
 
-### 14. Redesign artist dashboard page
+### 14. Redesign artist dashboard page ✅ DONE
 
 Welcome hero + completeness widget + quick-action cards + applications table + Following section. Server-side data fetching unchanged.
 
