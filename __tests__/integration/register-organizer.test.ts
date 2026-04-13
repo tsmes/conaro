@@ -6,7 +6,7 @@ import {
   findConventionByOrganizerId,
   buildFormData,
 } from "../helpers/db";
-import { registerOrganizer } from "@/app/register/organizer/actions";
+import { registerOrganizer } from "@/app/(public)/register/organizer/actions";
 
 vi.mock("@/lib/auth", () => ({
   signIn: vi.fn(),

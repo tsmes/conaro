@@ -5,8 +5,8 @@ import {
   findEventsByConventionId,
   buildFormData,
 } from "../helpers/db";
-import { createEvent } from "@/app/conventions/manage/events/actions";
-import { updateFieldConfig } from "@/app/conventions/manage/events/[eventId]/fields/actions";
+import { createEvent } from "@/app/(authenticated)/conventions/manage/events/actions";
+import { updateFieldConfig } from "@/app/(authenticated)/conventions/manage/events/[eventId]/fields/actions";
 import { db } from "@/lib/db";
 import { events } from "@/lib/db/schema/events";
 import type { FieldRequirements } from "@/lib/db/schema/events";

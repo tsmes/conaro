@@ -3,7 +3,7 @@
 import { useActionState, useState } from "react";
 import { FIELD_REGISTRY } from "@/lib/db/field-registry";
 import type { FieldRequirements } from "@/lib/db/schema/events";
-import { updateFieldConfig } from "@/app/conventions/manage/events/[eventId]/fields/actions";
+import { updateFieldConfig } from "@/app/(authenticated)/conventions/manage/events/[eventId]/fields/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

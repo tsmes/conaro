@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { toggleFollow } from "@/app/conventions/[conventionId]/actions";
+import { toggleFollow } from "@/app/(public)/conventions/[conventionId]/actions";
 import { Button } from "@/components/ui/button";
 
 interface FollowButtonProps {

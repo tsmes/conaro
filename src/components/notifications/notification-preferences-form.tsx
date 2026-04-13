@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { updateNotificationPreferences } from "@/app/settings/notifications/actions";
+import { updateNotificationPreferences } from "@/app/(authenticated)/settings/notifications/actions";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Manrope, Inter } from "next/font/google";
-import { Header } from "@/components/layout/header";
 import { Providers } from "@/components/providers";
 import "./globals.css";
 
@@ -22,6 +21,10 @@ export const metadata: Metadata = {
     "A platform for artists to apply for convention stands. Maintain your profile once, apply everywhere.",
 };
 
+// Root layout stays minimal: fonts, providers (theme + session + tooltip),
+// and the global style sheet. Page chrome (headers, sidebars, footers)
+// lives in the route-group layouts — (public)/layout.tsx for the glass
+// PublicShell and (authenticated)/layout.tsx for the AuthShell.
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -33,11 +36,8 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${manrope.variable} ${inter.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-        <Providers>
-          <Header />
-          <main className="flex flex-1 flex-col">{children}</main>
-        </Providers>
+      <body className="min-h-full">
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

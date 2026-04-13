@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { setApplicationDecision } from "@/app/conventions/manage/events/[eventId]/applications/actions";
+import { setApplicationDecision } from "@/app/(authenticated)/conventions/manage/events/[eventId]/applications/actions";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 

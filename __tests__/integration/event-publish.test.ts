@@ -8,7 +8,7 @@ import {
   findNotificationsByProfileId,
   buildFormData,
 } from "../helpers/db";
-import { publishEvent } from "@/app/conventions/manage/events/actions";
+import { publishEvent } from "@/app/(authenticated)/conventions/manage/events/actions";
 import { db } from "@/lib/db";
 import { events } from "@/lib/db/schema/events";
 import { conventionFollows } from "@/lib/db/schema/convention-follows";

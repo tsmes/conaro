@@ -12,7 +12,7 @@ import {
   setApplicationDecision,
   confirmPayment,
   revokeApplication,
-} from "@/app/conventions/manage/events/[eventId]/applications/actions";
+} from "@/app/(authenticated)/conventions/manage/events/[eventId]/applications/actions";
 import { db } from "@/lib/db";
 import { applications } from "@/lib/db/schema/applications";
 import { events } from "@/lib/db/schema/events";

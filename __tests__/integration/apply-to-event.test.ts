@@ -8,7 +8,7 @@ import {
   findApplicationsByEventId,
   buildFormData,
 } from "../helpers/db";
-import { applyToEvent } from "@/app/events/[eventId]/actions";
+import { applyToEvent } from "@/app/(public)/events/[eventId]/actions";
 import { db } from "@/lib/db";
 import { artistProfiles } from "@/lib/db/schema/artist-profiles";
 import { conventionArtistLists } from "@/lib/db/schema/convention-artist-lists";

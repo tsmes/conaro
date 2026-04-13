@@ -6,7 +6,7 @@ import {
   createTestOrganizer,
   buildFormData,
 } from "../helpers/db";
-import { updateNotificationPreferences } from "@/app/settings/notifications/actions";
+import { updateNotificationPreferences } from "@/app/(authenticated)/settings/notifications/actions";
 import { db } from "@/lib/db";
 import { notificationPreferences } from "@/lib/db/schema/notifications";
 

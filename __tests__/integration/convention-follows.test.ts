@@ -6,7 +6,7 @@ import {
   findFollowsByProfileId,
   buildFormData,
 } from "../helpers/db";
-import { toggleFollow } from "@/app/conventions/[conventionId]/actions";
+import { toggleFollow } from "@/app/(public)/conventions/[conventionId]/actions";
 
 const mockAuth = vi.fn();
 

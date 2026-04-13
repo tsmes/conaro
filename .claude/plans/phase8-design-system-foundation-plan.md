@@ -346,7 +346,12 @@ Sidebar + slim top header. Composition only — uses `Sidebar`, `SidebarProvider
 
 ---
 
-### 13. Route group restructure: move pages, mount shells, strip root layout
+### 13. Route group restructure: move pages, mount shells, strip root layout ✅ DONE
+
+*Implementation note: after moving pages, ~20 files across src/ and tests/
+imported server actions via the old absolute `@/app/<subpath>` paths. A
+single bulk sed pass rewrote them to their new `(public)` / `(authenticated)`
+homes. All 190 tests still pass.*
 
 The big coordinated change. After this commit, every page renders inside its appropriate shell. URLs unchanged.
 

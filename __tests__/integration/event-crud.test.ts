@@ -10,7 +10,7 @@ import {
   updateEvent,
   openApplications,
   closeApplications,
-} from "@/app/conventions/manage/events/actions";
+} from "@/app/(authenticated)/conventions/manage/events/actions";
 import { db } from "@/lib/db";
 import { events } from "@/lib/db/schema/events";
 import { eq } from "drizzle-orm";

@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { AuthError } from "next-auth";
 import { cleanDatabase, buildFormData } from "../helpers/db";
-import { registerArtist } from "@/app/register/artist/actions";
-import { registerOrganizer } from "@/app/register/organizer/actions";
-import { login } from "@/app/login/actions";
+import { registerArtist } from "@/app/(public)/register/artist/actions";
+import { registerOrganizer } from "@/app/(public)/register/organizer/actions";
+import { login } from "@/app/(public)/login/actions";
 
 const mockSignIn = vi.fn();
 

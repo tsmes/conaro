@@ -12,7 +12,7 @@ import {
 import {
   addToList,
   removeFromList,
-} from "@/app/conventions/manage/lists/actions";
+} from "@/app/(authenticated)/conventions/manage/lists/actions";
 
 interface ListEntry {
   id: string;

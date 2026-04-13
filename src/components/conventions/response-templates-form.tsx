@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { updateResponseTemplates } from "@/app/conventions/manage/events/[eventId]/applications/actions";
+import { updateResponseTemplates } from "@/app/(authenticated)/conventions/manage/events/[eventId]/applications/actions";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";

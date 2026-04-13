@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { getOrganizerConvention } from "@/lib/conventions/queries";
-import { createEvent } from "@/app/conventions/manage/events/actions";
+import { createEvent } from "@/app/(authenticated)/conventions/manage/events/actions";
 import { EventForm } from "@/components/conventions/event-form";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";

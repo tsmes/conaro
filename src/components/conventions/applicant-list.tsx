@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
   confirmPayment,
   revokeApplication,
-} from "@/app/conventions/manage/events/[eventId]/applications/actions";
+} from "@/app/(authenticated)/conventions/manage/events/[eventId]/applications/actions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {

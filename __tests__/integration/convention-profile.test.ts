@@ -5,7 +5,7 @@ import {
   createTestArtist,
   buildFormData,
 } from "../helpers/db";
-import { updateConventionProfile } from "@/app/conventions/manage/actions";
+import { updateConventionProfile } from "@/app/(authenticated)/conventions/manage/actions";
 import { db } from "@/lib/db";
 import { conventions } from "@/lib/db/schema/conventions";
 import { eq } from "drizzle-orm";

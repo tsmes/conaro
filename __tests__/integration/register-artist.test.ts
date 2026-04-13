@@ -5,7 +5,7 @@ import {
   findProfileByUserId,
   buildFormData,
 } from "../helpers/db";
-import { registerArtist } from "@/app/register/artist/actions";
+import { registerArtist } from "@/app/(public)/register/artist/actions";
 
 // Mock next-auth signIn — it tries to redirect which throws in tests
 vi.mock("@/lib/auth", () => ({

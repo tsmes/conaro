@@ -11,7 +11,7 @@ import {
   openApplications,
   closeApplications,
   publishEvent,
-} from "@/app/conventions/manage/events/actions";
+} from "@/app/(authenticated)/conventions/manage/events/actions";
 import { EventForm } from "@/components/conventions/event-form";
 import { EventStatusControls } from "@/components/conventions/event-status-controls";
 import { Button } from "@/components/ui/button";

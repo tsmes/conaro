@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
-import { applyToEvent, type ApplyResult } from "@/app/events/[eventId]/actions";
+import { applyToEvent, type ApplyResult } from "@/app/(public)/events/[eventId]/actions";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { MissingField } from "@/lib/applications/validation";
