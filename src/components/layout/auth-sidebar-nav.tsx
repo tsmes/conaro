@@ -17,6 +17,8 @@ import {
   SidebarHeader,
   SidebarContent,
   SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
@@ -83,48 +85,63 @@ export function AuthSidebarNav({
 
   return (
     <>
+      {/* Brand header — uses SidebarMenuButton size="lg" so the text half
+          collapses automatically when the sidebar switches to icon mode.
+          The menu-button wrapper also truncates the last span so long
+          titles don't spill when space is tight. */}
       <SidebarHeader>
-        <div className="flex items-center gap-3 px-2 py-2">
-          <div className="flex size-10 items-center justify-center rounded-xl bg-primary-container">
-            <Palette className="size-5 text-on-primary-container" />
-          </div>
-          <div className="min-w-0">
-            <h2 className="font-heading text-sm font-extrabold leading-tight text-primary">
-              {studioTitle}
-            </h2>
-            <p className="font-heading text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-              The Digital Curator
-            </p>
-          </div>
-        </div>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton size="lg" className="hover:bg-transparent">
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary-container">
+                <Palette className="size-5 text-on-primary-container" />
+              </div>
+              <div className="grid flex-1 text-left leading-tight">
+                <span className="truncate font-heading text-sm font-extrabold text-primary">
+                  {studioTitle}
+                </span>
+                <span className="truncate font-heading text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                  The Digital Curator
+                </span>
+              </div>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarMenu>
-          {items.map((item) => {
-            const Icon = item.icon;
-            const active = item.href === activeHref;
-            return (
-              <SidebarMenuItem key={`${item.href}-${item.label}`}>
-                <SidebarMenuButton
-                  isActive={active}
-                  tooltip={item.label}
-                  render={
-                    <Link href={item.href}>
-                      <Icon />
-                      <span>{item.label}</span>
-                    </Link>
-                  }
-                />
-              </SidebarMenuItem>
-            );
-          })}
-        </SidebarMenu>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu className="gap-1.5">
+              {items.map((item) => {
+                const Icon = item.icon;
+                const active = item.href === activeHref;
+                return (
+                  <SidebarMenuItem key={`${item.href}-${item.label}`}>
+                    <SidebarMenuButton
+                      isActive={active}
+                      tooltip={item.label}
+                      size="default"
+                      className="h-10"
+                      render={
+                        <Link href={item.href}>
+                          <Icon />
+                          <span>{item.label}</span>
+                        </Link>
+                      }
+                    />
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <SidebarMenu>
+        <SidebarMenu className="gap-1.5">
           <SidebarMenuItem>
             <SidebarMenuButton
               tooltip="Settings"
+              className="h-10"
               isActive={pathname.startsWith("/settings")}
               render={
                 <Link href="/settings/notifications">
@@ -137,6 +154,7 @@ export function AuthSidebarNav({
           <SidebarMenuItem>
             <SidebarMenuButton
               tooltip="Log out"
+              className="h-10"
               onClick={() => signOut({ callbackUrl: "/" })}
             >
               <LogOut />
