@@ -1,5 +1,6 @@
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
+import { ArrowLeft, ListChecks, Sliders } from "lucide-react";
 import { eq, count } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -15,7 +16,7 @@ import {
 import { EventForm } from "@/components/conventions/event-form";
 import { EventStatusControls } from "@/components/conventions/event-status-controls";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+import { Card } from "@/components/ui/card";
 
 interface EventDetailPageProps {
   params: Promise<{ eventId: string }>;
@@ -36,7 +37,6 @@ export default async function EventDetailPage({
     notFound();
   }
 
-  // Get application count for the review link
   const showReviewLink =
     event.status === "reviewing" || event.status === "results_published";
   let applicationCount = 0;
@@ -51,70 +51,120 @@ export default async function EventDetailPage({
   const amenities = event.amenities as Amenities | null;
 
   return (
-    <div className="container mx-auto max-w-3xl px-4 py-8">
-      <div className="flex items-center gap-4">
-        <Link href="/conventions/manage">
-          <Button variant="ghost" size="sm">
-            &larr; Back
-          </Button>
-        </Link>
-        <h1 className="text-3xl font-bold">{event.name}</h1>
-      </div>
-
-      <div className="mt-4 flex items-center gap-4">
-        <EventStatusControls
-          eventId={event.id}
-          currentStatus={event.status}
-          publishAction={publishEvent}
-          openAction={openApplications}
-          closeAction={closeApplications}
+    <div className="mx-auto max-w-4xl space-y-10 px-6 py-10 md:px-8">
+      <div>
+        <Button
+          variant="ghost"
+          size="sm"
+          nativeButton={false}
+          render={
+            <Link
+              href="/conventions/manage"
+              className="inline-flex items-center gap-1"
+            >
+              <ArrowLeft className="size-4" />
+              Back to workspace
+            </Link>
+          }
         />
-
-        <Link href={`/conventions/manage/events/${event.id}/fields`}>
-          <Button variant="outline" size="sm">
-            Field Configuration
-          </Button>
-        </Link>
-
-        {showReviewLink && (
-          <Link href={`/conventions/manage/events/${event.id}/applications`}>
-            <Button variant="outline" size="sm">
-              Review Applications ({applicationCount})
-            </Button>
-          </Link>
-        )}
       </div>
 
-      <Separator className="my-6" />
+      <header>
+        <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
+          Event
+        </p>
+        <h1 className="mt-3 font-heading text-4xl font-extrabold tracking-tight">
+          {event.name}
+        </h1>
+      </header>
 
-      <EventForm
-        action={updateEvent}
-        defaultValues={{
-          eventId: event.id,
-          name: event.name,
-          description: event.description ?? "",
-          eventStartDate: event.eventStartDate,
-          eventEndDate: event.eventEndDate ?? "",
-          applicationOpenDate: event.applicationOpenDate ?? "",
-          applicationCloseDate: event.applicationCloseDate ?? "",
-          venueName: event.venueName ?? "",
-          venueAddress: event.venueAddress ?? "",
-          venueCity: event.venueCity ?? "",
-          venueCountry: event.venueCountry ?? "",
-          mapEmbedUrl: event.mapEmbedUrl ?? "",
-          availableStands: event.availableStands,
-          tableDimensions: event.tableDimensions ?? "",
-          priceInfo: event.priceInfo ?? "",
-          setupTime: event.setupTime ?? "",
-          teardownTime: event.teardownTime ?? "",
-          amenities_electricity: amenities?.electricity ?? false,
-          amenities_wifi: amenities?.wifi ?? false,
-          amenities_tables: amenities?.tables ?? false,
-          amenities_chairs: amenities?.chairs ?? false,
-          amenities_other: amenities?.other ?? "",
-        }}
-        submitLabel="Save Changes"
-      />
+      <Card className="p-6 md:p-8">
+        <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+          Lifecycle
+        </p>
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <EventStatusControls
+            eventId={event.id}
+            currentStatus={event.status}
+            publishAction={publishEvent}
+            openAction={openApplications}
+            closeAction={closeApplications}
+          />
+          <Button
+            variant="outline"
+            size="sm"
+            nativeButton={false}
+            render={
+              <Link
+                href={`/conventions/manage/events/${event.id}/fields`}
+                className="inline-flex items-center gap-1.5"
+              >
+                <Sliders className="size-4" />
+                Field configuration
+              </Link>
+            }
+          />
+          {showReviewLink && (
+            <Button
+              variant="outline"
+              size="sm"
+              nativeButton={false}
+              render={
+                <Link
+                  href={`/conventions/manage/events/${event.id}/applications`}
+                  className="inline-flex items-center gap-1.5"
+                >
+                  <ListChecks className="size-4" />
+                  Review applications ({applicationCount})
+                </Link>
+              }
+            />
+          )}
+        </div>
+      </Card>
+
+      <Card className="p-8 md:p-10">
+        <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
+          Details
+        </p>
+        <h2 className="mt-2 font-heading text-2xl font-bold tracking-tight">
+          Edit event details
+        </h2>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Save changes anytime. Artists see the latest version on the public
+          event page.
+        </p>
+        <div className="mt-8">
+          <EventForm
+            action={updateEvent}
+            defaultValues={{
+              eventId: event.id,
+              name: event.name,
+              description: event.description ?? "",
+              eventStartDate: event.eventStartDate,
+              eventEndDate: event.eventEndDate ?? "",
+              applicationOpenDate: event.applicationOpenDate ?? "",
+              applicationCloseDate: event.applicationCloseDate ?? "",
+              venueName: event.venueName ?? "",
+              venueAddress: event.venueAddress ?? "",
+              venueCity: event.venueCity ?? "",
+              venueCountry: event.venueCountry ?? "",
+              mapEmbedUrl: event.mapEmbedUrl ?? "",
+              availableStands: event.availableStands,
+              tableDimensions: event.tableDimensions ?? "",
+              priceInfo: event.priceInfo ?? "",
+              setupTime: event.setupTime ?? "",
+              teardownTime: event.teardownTime ?? "",
+              amenities_electricity: amenities?.electricity ?? false,
+              amenities_wifi: amenities?.wifi ?? false,
+              amenities_tables: amenities?.tables ?? false,
+              amenities_chairs: amenities?.chairs ?? false,
+              amenities_other: amenities?.other ?? "",
+            }}
+            submitLabel="Save changes"
+          />
+        </div>
+      </Card>
     </div>
   );
 }

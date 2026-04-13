@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { eq } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -9,7 +10,7 @@ import { artistProfiles } from "@/lib/db/schema/artist-profiles";
 import { getOrganizerConvention } from "@/lib/conventions/queries";
 import { ArtistListManager } from "@/components/conventions/artist-list-manager";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+import { Card } from "@/components/ui/card";
 
 export default async function ListsPage() {
   const session = await auth();
@@ -54,23 +55,41 @@ export default async function ListsPage() {
     }));
 
   return (
-    <div className="container mx-auto max-w-3xl px-4 py-8">
-      <div className="flex items-center gap-4">
-        <Link href="/conventions/manage">
-          <Button variant="ghost" size="sm">
-            &larr; Back
-          </Button>
-        </Link>
-        <h1 className="text-3xl font-bold">Manage Lists</h1>
+    <div className="mx-auto max-w-3xl space-y-10 px-6 py-10 md:px-8">
+      <div>
+        <Button
+          variant="ghost"
+          size="sm"
+          nativeButton={false}
+          render={
+            <Link
+              href="/conventions/manage"
+              className="inline-flex items-center gap-1"
+            >
+              <ArrowLeft className="size-4" />
+              Back to workspace
+            </Link>
+          }
+        />
       </div>
-      <p className="mt-1 text-muted-foreground">
-        Manage your convention&apos;s allow and block lists. These lists persist
-        across all events.
-      </p>
 
-      <Separator className="my-6" />
+      <header>
+        <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
+          Curation controls
+        </p>
+        <h1 className="mt-3 font-heading text-4xl font-extrabold tracking-tight">
+          Allow &amp; Block Lists
+        </h1>
+        <p className="mt-3 max-w-2xl text-muted-foreground">
+          Persist across every event you run at {convention.name}. Artists on
+          the block list can&apos;t submit applications; artists on the allow
+          list bypass manual review.
+        </p>
+      </header>
 
-      <ArtistListManager allowList={allowList} blockList={blockList} />
+      <Card className="p-8 md:p-10">
+        <ArtistListManager allowList={allowList} blockList={blockList} />
+      </Card>
     </div>
   );
 }

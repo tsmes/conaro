@@ -1,19 +1,13 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { getOrganizerConvention } from "@/lib/conventions/queries";
 import { storage } from "@/lib/storage";
 import { ConventionProfileForm } from "@/components/conventions/convention-profile-form";
 import { ConventionLogoUpload } from "@/components/conventions/convention-logo-upload";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import { Card } from "@/components/ui/card";
 
 export default async function EditConventionPage() {
   const session = await auth();
@@ -31,52 +25,72 @@ export default async function EditConventionPage() {
     : null;
 
   return (
-    <div className="container mx-auto max-w-3xl px-4 py-8">
-      <div className="flex items-center gap-4">
-        <Link href="/conventions/manage">
-          <Button variant="ghost" size="sm">
-            &larr; Back
-          </Button>
-        </Link>
-        <h1 className="text-3xl font-bold">Edit Convention</h1>
+    <div className="mx-auto max-w-3xl space-y-10 px-6 py-10 md:px-8">
+      <div>
+        <Button
+          variant="ghost"
+          size="sm"
+          nativeButton={false}
+          render={
+            <Link
+              href="/conventions/manage"
+              className="inline-flex items-center gap-1"
+            >
+              <ArrowLeft className="size-4" />
+              Back to workspace
+            </Link>
+          }
+        />
       </div>
 
-      <Separator className="my-6" />
+      <header>
+        <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
+          Convention settings
+        </p>
+        <h1 className="mt-3 font-heading text-4xl font-extrabold tracking-tight">
+          Edit Convention
+        </h1>
+      </header>
 
-      <div className="space-y-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>Convention Info</CardTitle>
-            <CardDescription>
-              Name, description, and website for your convention.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ConventionProfileForm
-              defaultValues={{
-                name: convention.name,
-                description: convention.description ?? "",
-                websiteUrl: convention.websiteUrl ?? "",
-              }}
-            />
-          </CardContent>
-        </Card>
+      <Card className="p-8 md:p-10">
+        <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
+          Section 1
+        </p>
+        <h2 className="mt-2 font-heading text-2xl font-bold tracking-tight">
+          Convention Info
+        </h2>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Name, description, and website artists see in the directory.
+        </p>
+        <div className="mt-8">
+          <ConventionProfileForm
+            defaultValues={{
+              name: convention.name,
+              description: convention.description ?? "",
+              websiteUrl: convention.websiteUrl ?? "",
+            }}
+          />
+        </div>
+      </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Logo</CardTitle>
-            <CardDescription>
-              Upload a logo or banner image for your convention.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ConventionLogoUpload
-              currentLogoUrl={logoUrl}
-              conventionName={convention.name}
-            />
-          </CardContent>
-        </Card>
-      </div>
+      <Card className="p-8 md:p-10">
+        <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
+          Section 2
+        </p>
+        <h2 className="mt-2 font-heading text-2xl font-bold tracking-tight">
+          Logo
+        </h2>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Upload a square logo — shown on every event card and your public
+          convention page.
+        </p>
+        <div className="mt-8">
+          <ConventionLogoUpload
+            currentLogoUrl={logoUrl}
+            conventionName={convention.name}
+          />
+        </div>
+      </Card>
     </div>
   );
 }

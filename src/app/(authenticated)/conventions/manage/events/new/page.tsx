@@ -1,11 +1,12 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { getOrganizerConvention } from "@/lib/conventions/queries";
 import { createEvent } from "@/app/(authenticated)/conventions/manage/events/actions";
 import { EventForm } from "@/components/conventions/event-form";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+import { Card } from "@/components/ui/card";
 
 export default async function NewEventPage() {
   const session = await auth();
@@ -19,19 +20,38 @@ export default async function NewEventPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-3xl px-4 py-8">
-      <div className="flex items-center gap-4">
-        <Link href="/conventions/manage">
-          <Button variant="ghost" size="sm">
-            &larr; Back
-          </Button>
-        </Link>
-        <h1 className="text-3xl font-bold">Create Event</h1>
+    <div className="mx-auto max-w-3xl space-y-10 px-6 py-10 md:px-8">
+      <div>
+        <Button
+          variant="ghost"
+          size="sm"
+          nativeButton={false}
+          render={
+            <Link
+              href="/conventions/manage"
+              className="inline-flex items-center gap-1"
+            >
+              <ArrowLeft className="size-4" />
+              Back to workspace
+            </Link>
+          }
+        />
       </div>
-
-      <Separator className="my-6" />
-
-      <EventForm action={createEvent} submitLabel="Create Event" />
+      <header>
+        <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
+          New event
+        </p>
+        <h1 className="mt-3 font-heading text-4xl font-extrabold tracking-tight">
+          Create an event
+        </h1>
+        <p className="mt-3 max-w-2xl text-muted-foreground">
+          Draft the event now — you can open applications later from the
+          event&apos;s status controls.
+        </p>
+      </header>
+      <Card className="p-8 md:p-10">
+        <EventForm action={createEvent} submitLabel="Create event" />
+      </Card>
     </div>
   );
 }

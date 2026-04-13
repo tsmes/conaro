@@ -1,5 +1,6 @@
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { eq, and, ne } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -12,7 +13,7 @@ import { ApplicantList } from "@/components/conventions/applicant-list";
 import { PublishResultsButton } from "@/components/conventions/publish-results-button";
 import { ResponseTemplatesForm } from "@/components/conventions/response-templates-form";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+import { Card } from "@/components/ui/card";
 
 interface ApplicationsPageProps {
   params: Promise<{ eventId: string }>;
@@ -38,7 +39,6 @@ export default async function ApplicationsPage({
     redirect("/login");
   }
 
-  // Fetch applications + allow/block list status
   const appRows = await db
     .select({
       id: applications.id,
@@ -52,7 +52,6 @@ export default async function ApplicationsPage({
     .from(applications)
     .where(eq(applications.eventId, eventId));
 
-  // Fetch allow-list entries for this convention
   const allowEntries = await db
     .select({ profileId: conventionArtistLists.profileId })
     .from(conventionArtistLists)
@@ -80,10 +79,12 @@ export default async function ApplicationsPage({
   });
 
   const undecidedCount = applicants.filter(
-    (a) => a.status !== "accepted" && a.status !== "rejected" && a.status !== "revoked"
+    (a) =>
+      a.status !== "accepted" &&
+      a.status !== "rejected" &&
+      a.status !== "revoked"
   ).length;
 
-  // Fetch other events for template copy
   const otherEvents = await db
     .select({
       id: events.id,
@@ -102,50 +103,81 @@ export default async function ApplicationsPage({
   const isPublished = event.status === "results_published";
 
   return (
-    <div className="container mx-auto max-w-4xl px-4 py-8">
-      <div className="flex items-center gap-4">
-        <Link href={`/conventions/manage/events/${event.id}`}>
-          <Button variant="ghost" size="sm">
-            &larr; Back to Event
-          </Button>
-        </Link>
-        <h1 className="text-3xl font-bold">Applications</h1>
-      </div>
-      <p className="mt-1 text-muted-foreground">
-        {event.name} &mdash; {applicants.length} application(s)
-      </p>
-
-      <Separator className="my-6" />
-
-      <ResponseTemplatesForm
-        eventId={event.id}
-        acceptanceMessage={event.acceptanceMessage ?? ""}
-        rejectionMessage={event.rejectionMessage ?? ""}
-        otherEvents={otherEvents.map((e) => ({
-          ...e,
-          acceptanceMessage: e.acceptanceMessage,
-          rejectionMessage: e.rejectionMessage,
-        }))}
-        readOnly={isPublished}
-      />
-
-      <div className="mt-6 flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Applicants</h2>
-        <PublishResultsButton
-          eventId={event.id}
-          eventStatus={event.status}
-          undecidedCount={undecidedCount}
-          totalCount={applicants.length}
+    <div className="mx-auto max-w-5xl space-y-10 px-6 py-10 md:px-8">
+      <div>
+        <Button
+          variant="ghost"
+          size="sm"
+          nativeButton={false}
+          render={
+            <Link
+              href={`/conventions/manage/events/${event.id}`}
+              className="inline-flex items-center gap-1"
+            >
+              <ArrowLeft className="size-4" />
+              Back to event
+            </Link>
+          }
         />
       </div>
 
-      <div className="mt-4">
+      <header>
+        <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
+          {event.name}
+        </p>
+        <h1 className="mt-3 font-heading text-4xl font-extrabold tracking-tight">
+          Review applications
+        </h1>
+        <p className="mt-3 text-muted-foreground">
+          {applicants.length} application{applicants.length === 1 ? "" : "s"} in
+          the pile.
+        </p>
+      </header>
+
+      <Card className="p-8 md:p-10">
+        <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
+          Response templates
+        </p>
+        <h2 className="mt-2 font-heading text-xl font-bold tracking-tight">
+          Default acceptance &amp; rejection messages
+        </h2>
+        <p className="mt-2 text-sm text-muted-foreground">
+          These are the defaults each applicant receives. Individual messages
+          can override them from the single-applicant view.
+        </p>
+        <div className="mt-8">
+          <ResponseTemplatesForm
+            eventId={event.id}
+            acceptanceMessage={event.acceptanceMessage ?? ""}
+            rejectionMessage={event.rejectionMessage ?? ""}
+            otherEvents={otherEvents.map((e) => ({
+              ...e,
+              acceptanceMessage: e.acceptanceMessage,
+              rejectionMessage: e.rejectionMessage,
+            }))}
+            readOnly={isPublished}
+          />
+        </div>
+      </Card>
+
+      <section className="space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-heading text-2xl font-bold tracking-tight">
+            Applicants
+          </h2>
+          <PublishResultsButton
+            eventId={event.id}
+            eventStatus={event.status}
+            undecidedCount={undecidedCount}
+            totalCount={applicants.length}
+          />
+        </div>
         <ApplicantList
           eventId={event.id}
           eventStatus={event.status}
           applicants={applicants}
         />
-      </div>
+      </section>
     </div>
   );
 }

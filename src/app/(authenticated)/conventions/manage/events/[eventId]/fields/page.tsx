@@ -1,5 +1,6 @@
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { eq, ne, and } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -8,7 +9,7 @@ import type { FieldRequirements } from "@/lib/db/schema/events";
 import { getOrganizerEvent } from "@/lib/conventions/queries";
 import { FieldConfigForm } from "@/components/conventions/field-config-form";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+import { Card } from "@/components/ui/card";
 
 interface FieldConfigPageProps {
   params: Promise<{ eventId: string }>;
@@ -29,7 +30,6 @@ export default async function FieldConfigPage({
     notFound();
   }
 
-  // Fetch other events for the "copy from" feature
   const otherEvents = await db
     .select({
       id: events.id,
@@ -46,31 +46,48 @@ export default async function FieldConfigPage({
     );
 
   return (
-    <div className="container mx-auto max-w-3xl px-4 py-8">
-      <div className="flex items-center gap-4">
-        <Link href={`/conventions/manage/events/${event.id}`}>
-          <Button variant="ghost" size="sm">
-            &larr; Back to Event
-          </Button>
-        </Link>
-        <h1 className="text-3xl font-bold">Field Configuration</h1>
+    <div className="mx-auto max-w-3xl space-y-10 px-6 py-10 md:px-8">
+      <div>
+        <Button
+          variant="ghost"
+          size="sm"
+          nativeButton={false}
+          render={
+            <Link
+              href={`/conventions/manage/events/${event.id}`}
+              className="inline-flex items-center gap-1"
+            >
+              <ArrowLeft className="size-4" />
+              Back to event
+            </Link>
+          }
+        />
       </div>
-      <p className="mt-1 text-muted-foreground">
-        Configure which artist profile fields are required when applying to{" "}
-        <strong>{event.name}</strong>.
-      </p>
 
-      <Separator className="my-6" />
+      <header>
+        <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
+          {event.name}
+        </p>
+        <h1 className="mt-3 font-heading text-4xl font-extrabold tracking-tight">
+          Field Configuration
+        </h1>
+        <p className="mt-3 max-w-2xl text-muted-foreground">
+          Pick which profile fields artists must complete before they can
+          apply to this event.
+        </p>
+      </header>
 
-      <FieldConfigForm
-        eventId={event.id}
-        currentConfig={event.fieldRequirements as FieldRequirements | null}
-        minPortfolioImages={event.minPortfolioImages}
-        otherEvents={otherEvents.map((e) => ({
-          ...e,
-          fieldRequirements: e.fieldRequirements as FieldRequirements | null,
-        }))}
-      />
+      <Card className="p-8 md:p-10">
+        <FieldConfigForm
+          eventId={event.id}
+          currentConfig={event.fieldRequirements as FieldRequirements | null}
+          minPortfolioImages={event.minPortfolioImages}
+          otherEvents={otherEvents.map((e) => ({
+            ...e,
+            fieldRequirements: e.fieldRequirements as FieldRequirements | null,
+          }))}
+        />
+      </Card>
     </div>
   );
 }

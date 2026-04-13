@@ -1,27 +1,39 @@
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
+import { ArrowLeft, ExternalLink } from "lucide-react";
 import { eq, and } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { applications } from "@/lib/db/schema/applications";
 import type { ProfileSnapshot } from "@/lib/db/schema/applications";
 import { events } from "@/lib/db/schema/events";
-import { conventions } from "@/lib/db/schema/conventions";
 import { storage } from "@/lib/storage";
 import { getOrganizerEvent } from "@/lib/conventions/queries";
 import { ApplicationDecisionControls } from "@/components/conventions/application-decision-controls";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import { Card } from "@/components/ui/card";
+import { styleForStatus } from "@/lib/applications/status-styles";
 
 interface ApplicationDetailPageProps {
   params: Promise<{ eventId: string; applicationId: string }>;
+}
+
+function Field({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+        {label}
+      </p>
+      <div className="mt-1 text-sm">{children}</div>
+    </div>
+  );
 }
 
 export default async function ApplicationDetailPage({
@@ -52,7 +64,6 @@ export default async function ApplicationDetailPage({
 
   const snapshot = application.profileSnapshot as ProfileSnapshot;
 
-  // Resolve snapshot image URLs
   const snapshotImages = snapshot.images
     .sort((a, b) => a.sortOrder - b.sortOrder)
     .map((img) => ({
@@ -60,7 +71,6 @@ export default async function ApplicationDetailPage({
       url: storage.getUrl(img.storagePath),
     }));
 
-  // Application history: this artist's applications across this convention's events
   const history = await db
     .select({
       id: applications.id,
@@ -79,176 +89,167 @@ export default async function ApplicationDetailPage({
     );
 
   return (
-    <div className="container mx-auto max-w-3xl px-4 py-8">
-      <div className="flex items-center gap-4">
-        <Link href={`/conventions/manage/events/${event.id}/applications`}>
-          <Button variant="ghost" size="sm">
-            &larr; Back to Applications
-          </Button>
-        </Link>
-        <h1 className="text-3xl font-bold">{snapshot.displayName}</h1>
-      </div>
-
-      <div className="mt-4">
-        <ApplicationDecisionControls
-          applicationId={application.id}
-          eventId={event.id}
-          currentStatus={application.status}
-          eventStatus={event.status}
+    <div className="mx-auto max-w-5xl space-y-10 px-6 py-10 md:px-8">
+      <div>
+        <Button
+          variant="ghost"
+          size="sm"
+          nativeButton={false}
+          render={
+            <Link
+              href={`/conventions/manage/events/${event.id}/applications`}
+              className="inline-flex items-center gap-1"
+            >
+              <ArrowLeft className="size-4" />
+              Back to applications
+            </Link>
+          }
         />
       </div>
 
-      <Separator className="my-6" />
+      <header className="space-y-3">
+        <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
+          Applicant review · {event.name}
+        </p>
+        <h1 className="font-heading text-4xl font-extrabold tracking-tight md:text-5xl">
+          {snapshot.displayName}
+        </h1>
+      </header>
 
-      {/* Profile Snapshot */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Profile Snapshot</CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-3 text-sm sm:grid-cols-2">
-          <div>
-            <span className="font-medium">Display Name: </span>
-            {snapshot.displayName}
-          </div>
+      <Card className="p-6 md:p-8">
+        <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+          Decision
+        </p>
+        <div className="mt-4">
+          <ApplicationDecisionControls
+            applicationId={application.id}
+            eventId={event.id}
+            currentStatus={application.status}
+            eventStatus={event.status}
+          />
+        </div>
+      </Card>
+
+      <Card className="p-8 md:p-10">
+        <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
+          Profile snapshot
+        </p>
+        <h2 className="mt-2 font-heading text-xl font-bold tracking-tight">
+          Captured at submission
+        </h2>
+        <div className="mt-6 grid gap-5 sm:grid-cols-2">
+          <Field label="Display name">{snapshot.displayName}</Field>
           {snapshot.realName && (
-            <div>
-              <span className="font-medium">Real Name: </span>
-              {snapshot.realName}
-            </div>
+            <Field label="Real name">{snapshot.realName}</Field>
           )}
           {snapshot.contactEmail && (
-            <div>
-              <span className="font-medium">Email: </span>
-              {snapshot.contactEmail}
-            </div>
+            <Field label="Email">{snapshot.contactEmail}</Field>
           )}
-          {snapshot.phone && (
-            <div>
-              <span className="font-medium">Phone: </span>
-              {snapshot.phone}
-            </div>
-          )}
-          {snapshot.bio && (
-            <div className="sm:col-span-2">
-              <span className="font-medium">Bio: </span>
-              <p className="mt-1 whitespace-pre-line text-muted-foreground">
-                {snapshot.bio}
-              </p>
-            </div>
-          )}
+          {snapshot.phone && <Field label="Phone">{snapshot.phone}</Field>}
           {snapshot.websiteUrl && (
-            <div>
-              <span className="font-medium">Website: </span>
+            <Field label="Website">
               <a
                 href={snapshot.websiteUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary underline underline-offset-4"
+                className="inline-flex items-center gap-1 text-primary underline underline-offset-4"
               >
                 {snapshot.websiteUrl}
+                <ExternalLink className="size-3" />
               </a>
-            </div>
+            </Field>
           )}
           {snapshot.socialLinks && (
-            <div>
-              <span className="font-medium">Social Links: </span>
-              {snapshot.socialLinks}
-            </div>
+            <Field label="Social links">{snapshot.socialLinks}</Field>
           )}
           {snapshot.helpers !== null && (
-            <div>
-              <span className="font-medium">Helpers: </span>
-              {snapshot.helpers}
+            <Field label="Helpers">{snapshot.helpers}</Field>
+          )}
+          {snapshot.tableSizePreference && (
+            <Field label="Table size preference">
+              {snapshot.tableSizePreference}
+            </Field>
+          )}
+          {snapshot.bio && (
+            <div className="sm:col-span-2">
+              <Field label="Bio">
+                <p className="whitespace-pre-line text-muted-foreground">
+                  {snapshot.bio}
+                </p>
+              </Field>
             </div>
           )}
           {snapshot.accessibilityNeeds && (
             <div className="sm:col-span-2">
-              <span className="font-medium">Accessibility Needs: </span>
-              {snapshot.accessibilityNeeds}
-            </div>
-          )}
-          {snapshot.tableSizePreference && (
-            <div>
-              <span className="font-medium">Table Size Preference: </span>
-              {snapshot.tableSizePreference}
+              <Field label="Accessibility needs">
+                {snapshot.accessibilityNeeds}
+              </Field>
             </div>
           )}
           {snapshot.notes && (
             <div className="sm:col-span-2">
-              <span className="font-medium">Notes: </span>
-              {snapshot.notes}
+              <Field label="Notes">{snapshot.notes}</Field>
             </div>
           )}
-        </CardContent>
+        </div>
       </Card>
 
-      {/* Portfolio Gallery */}
       {snapshotImages.length > 0 && (
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle className="text-base">
-              Portfolio ({snapshotImages.length} images)
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-              {snapshotImages.map((img) => (
-                <a
-                  key={img.id}
-                  href={img.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <img
-                    src={img.url}
-                    alt={img.filename}
-                    className="aspect-square w-full rounded-md object-cover transition-opacity hover:opacity-80"
-                  />
-                </a>
-              ))}
-            </div>
-          </CardContent>
+        <Card className="p-8 md:p-10">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
+            Portfolio
+          </p>
+          <h2 className="mt-2 font-heading text-xl font-bold tracking-tight">
+            {snapshotImages.length}{" "}
+            {snapshotImages.length === 1 ? "image" : "images"}
+          </h2>
+          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            {snapshotImages.map((img) => (
+              <a
+                key={img.id}
+                href={img.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block overflow-hidden rounded-xl"
+              >
+                <img
+                  src={img.url}
+                  alt={img.filename}
+                  className="aspect-square w-full object-cover transition-transform hover:scale-105"
+                />
+              </a>
+            ))}
+          </div>
         </Card>
       )}
 
-      {/* Application History */}
       {history.length > 1 && (
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle className="text-base">
-              Convention History ({history.length} applications)
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {history.map((h) => (
+        <Card className="p-8 md:p-10">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
+            Convention history
+          </p>
+          <h2 className="mt-2 font-heading text-xl font-bold tracking-tight">
+            {history.length} applications across events
+          </h2>
+          <div className="mt-6 space-y-2">
+            {history.map((h) => {
+              const style = styleForStatus(h.status);
+              return (
                 <div
                   key={h.id}
-                  className="flex items-center justify-between text-sm"
+                  className="flex items-center justify-between rounded-lg bg-secondary px-4 py-3 text-sm"
                 >
                   <div>
-                    <span className="font-medium">{h.eventName}</span>
+                    <span className="font-semibold">{h.eventName}</span>
                     <span className="ml-2 text-muted-foreground">
                       {h.createdAt.toISOString().slice(0, 10)}
                     </span>
                   </div>
-                  <Badge
-                    variant={
-                      h.status === "accepted"
-                        ? "default"
-                        : h.status === "rejected" || h.status === "revoked"
-                          ? "destructive"
-                          : "secondary"
-                    }
-                  >
-                    {h.status === "submitted"
-                      ? "Pending"
-                      : h.status.charAt(0).toUpperCase() + h.status.slice(1)}
-                  </Badge>
+                  <Badge variant={style.variant}>{style.label}</Badge>
                 </div>
-              ))}
-            </div>
-          </CardContent>
+              );
+            })}
+          </div>
         </Card>
       )}
     </div>
