@@ -244,7 +244,10 @@ export function DashboardView({
                 applications.
               </p>
               <div className="flex justify-center pt-2">
-                <Button render={<Link href="/events">Browse Events</Link>} />
+                <Button
+                  nativeButton={false}
+                  render={<Link href="/events">Browse Events</Link>}
+                />
               </div>
             </CardContent>
           </Card>

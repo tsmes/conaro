@@ -442,7 +442,12 @@ Welcome hero + completeness widget + quick-action cards + applications table + F
 
 ---
 
-### 15. Redesign homepage
+### 15. Redesign homepage ✅ DONE
+
+*Implementation note: Base UI's Button warns when its render prop swaps to
+a non-button element. Pass `nativeButton={false}` whenever rendering a
+Button as a Link to acknowledge the swap intentionally — applied across
+HomepageView, PublicShell, and the dashboard's empty state CTA.*
 
 Long-scroll editorial layout. Public route. Hero + two CTA bento + 3-step explainer + final CTA + footer.
 
