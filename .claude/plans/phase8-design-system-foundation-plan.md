@@ -134,7 +134,12 @@ Install the six primitives the spec mandates. Pure registry adds — no consumer
 
 ---
 
-### 5. Restyle Button
+### 5. Restyle Button ✅ DONE
+
+*Implementation note: "generous padding" was applied to the `lg` size (bumped
+to `h-12 px-8`) rather than the default size — default stays compact for the
+dense form-button usage across the app. The homepage and other hero CTAs
+already use `size="lg"`, so they pick up the generous treatment automatically.*
 
 Apply Curator's Canvas styles to the existing Button without changing its variant/size API. Existing consumers (every page) keep working.
 
