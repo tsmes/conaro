@@ -1,33 +1,33 @@
 import Link from "next/link";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { ArtistRegisterForm } from "@/components/auth/artist-register-form";
 
 export default function ArtistRegisterPage() {
   return (
-    <div className="flex flex-1 items-center justify-center px-4 py-8">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Create artist account</CardTitle>
-          <CardDescription>
-            Set up your profile and start applying to conventions.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ArtistRegisterForm />
-          <p className="mt-4 text-center text-sm text-muted-foreground">
-            Already have an account?{" "}
-            <Link href="/login" className="underline underline-offset-4">
-              Log in
-            </Link>
+    <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-md flex-col items-center justify-center px-6 py-16">
+      <div className="w-full rounded-3xl bg-card p-10 shadow-gallery">
+        <div className="mb-8">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
+            For artists
           </p>
-        </CardContent>
-      </Card>
+          <h1 className="mt-2 font-heading text-3xl font-extrabold tracking-tight md:text-4xl">
+            Create your account
+          </h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Set up your profile once. Apply to any convention with a single
+            click.
+          </p>
+        </div>
+        <ArtistRegisterForm />
+      </div>
+      <p className="mt-6 text-sm text-muted-foreground">
+        Already have an account?{" "}
+        <Link
+          href="/login"
+          className="font-semibold text-primary underline underline-offset-4"
+        >
+          Log in
+        </Link>
+      </p>
     </div>
   );
 }

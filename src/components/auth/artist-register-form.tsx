@@ -6,21 +6,26 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+const LABEL_CLASS =
+  "text-[11px] font-bold uppercase tracking-wider text-muted-foreground";
+
 export function ArtistRegisterForm() {
   const [state, formAction, pending] = useActionState(registerArtist, {});
 
   return (
-    <form action={formAction} className="space-y-4">
+    <form action={formAction} className="space-y-5">
       {state.error && (
         <p
           role="alert"
-          className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive"
+          className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive"
         >
           {state.error}
         </p>
       )}
       <div className="space-y-2">
-        <Label htmlFor="displayName">Display name</Label>
+        <Label htmlFor="displayName" className={LABEL_CLASS}>
+          Display name
+        </Label>
         <Input
           id="displayName"
           name="displayName"
@@ -38,12 +43,14 @@ export function ArtistRegisterForm() {
         )}
       </div>
       <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email" className={LABEL_CLASS}>
+          Email address
+        </Label>
         <Input
           id="email"
           name="email"
           type="email"
-          placeholder="you@example.com"
+          placeholder="curator@artapply.com"
           required
           aria-describedby={
             state.fieldErrors?.email ? "email-error" : undefined
@@ -57,7 +64,9 @@ export function ArtistRegisterForm() {
         )}
       </div>
       <div className="space-y-2">
-        <Label htmlFor="password">Password</Label>
+        <Label htmlFor="password" className={LABEL_CLASS}>
+          Password
+        </Label>
         <Input
           id="password"
           name="password"
@@ -76,7 +85,9 @@ export function ArtistRegisterForm() {
         )}
       </div>
       <div className="space-y-2">
-        <Label htmlFor="confirmPassword">Confirm password</Label>
+        <Label htmlFor="confirmPassword" className={LABEL_CLASS}>
+          Confirm password
+        </Label>
         <Input
           id="confirmPassword"
           name="confirmPassword"
@@ -100,7 +111,7 @@ export function ArtistRegisterForm() {
           </p>
         )}
       </div>
-      <Button type="submit" className="w-full" disabled={pending}>
+      <Button type="submit" size="lg" className="w-full" disabled={pending}>
         {pending ? "Creating account..." : "Create artist account"}
       </Button>
     </form>
