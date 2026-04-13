@@ -162,7 +162,7 @@ Apply Curator's Canvas styles to the existing Button without changing its varian
 
 ---
 
-### 6. Restyle Input and Textarea
+### 6. Restyle Input and Textarea ✅ DONE
 
 Filled-fill design with the signature 2px violet focus ring + 4px offset.
 
