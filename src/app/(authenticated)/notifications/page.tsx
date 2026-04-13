@@ -5,7 +5,6 @@ import {
   getUnreadCount,
 } from "@/lib/notifications/service";
 import { NotificationList } from "@/components/notifications/notification-list";
-import { Separator } from "@/components/ui/separator";
 
 export default async function NotificationsPage() {
   const session = await auth();
@@ -18,22 +17,26 @@ export default async function NotificationsPage() {
     getUnreadCount(session.user.profileId),
   ]);
 
-  // Serialize dates for client component
   const serialized = notificationList.map((n) => ({
     ...n,
     createdAt: n.createdAt.toISOString(),
   }));
 
   return (
-    <div className="container mx-auto max-w-3xl px-4 py-8">
-      <h1 className="text-3xl font-bold">Notifications</h1>
-      <p className="mt-2 text-muted-foreground">
-        {unreadCount > 0
-          ? `You have ${unreadCount} unread notification(s).`
-          : "You're all caught up."}
-      </p>
-
-      <Separator className="my-6" />
+    <div className="mx-auto max-w-3xl space-y-8 px-6 py-10 md:px-8">
+      <header>
+        <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
+          Inbox
+        </p>
+        <h1 className="mt-3 font-heading text-4xl font-extrabold tracking-tight">
+          Notifications
+        </h1>
+        <p className="mt-3 text-muted-foreground">
+          {unreadCount > 0
+            ? `${unreadCount} unread ${unreadCount === 1 ? "notification" : "notifications"}.`
+            : "You're all caught up."}
+        </p>
+      </header>
 
       <NotificationList
         notifications={serialized}
