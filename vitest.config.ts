@@ -8,6 +8,10 @@ import path from "path";
 // Both share the same setup file (jest-dom registration is no-op outside jsdom).
 
 const sharedAlias = {
+  "next-auth/react": path.resolve(
+    __dirname,
+    "__tests__/mocks/next-auth-react.ts"
+  ),
   "next-auth": path.resolve(__dirname, "__tests__/mocks/next-auth.ts"),
   "next/navigation": path.resolve(
     __dirname,

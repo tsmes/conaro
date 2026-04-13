@@ -311,7 +311,17 @@ Glass top nav + main slot. Used by `(public)` route group in Task 13.
 
 ---
 
-### 12. Build `AuthShell` layout component using shadcn Sidebar primitives
+### 12. Build `AuthShell` layout component using shadcn Sidebar primitives ✅ DONE
+
+*Implementation notes:*
+- *Active state uses longest-prefix match across the current role's nav
+  items — prevents `/dashboard` from staying active when the user is on
+  `/dashboard/profile` (which has its own nav entry).*
+- *AuthShell enforces login-or-redirect at the shell level. Per-page role
+  checks still live in each page so role-based authorization is unchanged.*
+- *Added a `next-auth/react` mock to the vitest config so client
+  components that import signOut can be tested without the real auth
+  runtime.*
 
 Sidebar + slim top header. Composition only — uses `Sidebar`, `SidebarProvider`, etc. from Task 4.
 
