@@ -15,7 +15,7 @@ Spec: `.claude/plans/phase8-design-system-foundation-spec.md`
 
 ## Tasks
 
-### 1. Add design tokens, fonts, type scale, and custom utilities to `globals.css`
+### 1. Add design tokens, fonts, type scale, and custom utilities to `globals.css` ✅ DONE
 
 Lay down the foundation that every later task depends on. Pure CSS — no component changes yet. After this commit, every existing page renders with the new color palette (likely looking off, but functional).
 
@@ -42,7 +42,7 @@ Lay down the foundation that every later task depends on. Pure CSS — no compon
 
 ---
 
-### 2. Set up component test infrastructure (jsdom + React Testing Library)
+### 2. Set up component test infrastructure (jsdom + React Testing Library) ✅ DONE
 
 Enable React component tests so subsequent tasks can ship with proper coverage per STANDARDS.md. No tests written yet — just the harness.
 

@@ -1,2 +1,4 @@
 // Global test setup
-// Add shared setup/teardown here as needed
+// jest-dom registers matchers like toBeInTheDocument(), toHaveClass(), etc.
+// Safe to import in both node and jsdom envs — it no-ops without a DOM.
+import "@testing-library/jest-dom/vitest";
