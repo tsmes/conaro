@@ -22,17 +22,7 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { CompletenessIndicator } from "@/components/profile/completeness-indicator";
-
-const STATUS_STYLES: Record<
-  string,
-  { label: string; variant: "default" | "secondary" | "outline" | "destructive" }
-> = {
-  submitted: { label: "Submitted", variant: "secondary" },
-  under_review: { label: "Under Review", variant: "default" },
-  accepted: { label: "Accepted", variant: "outline" },
-  rejected: { label: "Rejected", variant: "destructive" },
-  revoked: { label: "Revoked", variant: "destructive" },
-};
+import { styleForStatus } from "@/lib/applications/status-styles";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -133,10 +123,7 @@ export default async function DashboardPage() {
                     ? "under_review"
                     : app.status;
 
-                const statusInfo = STATUS_STYLES[displayStatus] ?? {
-                  label: displayStatus,
-                  variant: "secondary" as const,
-                };
+                const statusInfo = styleForStatus(displayStatus);
 
                 return (
                   <Card key={app.id}>

@@ -211,7 +211,7 @@ Border-removed, `rounded-2xl`, ambient shadow by default. New optional `interact
 
 ---
 
-### 8. Restyle Badge and add `success` variant
+### 8. Restyle Badge and add `success` variant ✅ DONE
 
 Pill shape with uppercase tracked text. Add `success` variant. Update existing variants' tones.
 
