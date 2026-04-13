@@ -12,6 +12,7 @@ import { db } from "@/lib/db";
 import { conventionFollows } from "@/lib/db/schema/convention-follows";
 import { notificationPreferences } from "@/lib/db/schema/notifications";
 import {
+  notifyEventPublished,
   notifyEventOpened,
   notifyResultsPublished,
   notifyApplicationRevoked,
@@ -33,40 +34,37 @@ describe("notification triggers", () => {
     vi.clearAllMocks();
   });
 
-  describe("notifyEventOpened", () => {
-    it("creates notifications for convention followers", async () => {
+  describe("notifyEventPublished", () => {
+    it("creates event_published notifications for followers", async () => {
       const { convention } = await createTestOrganizer();
       const event = await createTestEvent(convention.id);
       const artist = await createTestArtist();
 
-      // Follow the convention
       await db.insert(conventionFollows).values({
         profileId: artist.profile.id,
         conventionId: convention.id,
       });
 
-      await notifyEventOpened(event.id, event.name, convention.id);
+      await notifyEventPublished(event.id, event.name, convention.id);
 
       const notifs = await findNotificationsByProfileId(artist.profile.id);
       expect(notifs).toHaveLength(1);
-      expect(notifs[0].type).toBe("event_opened");
+      expect(notifs[0].type).toBe("event_published");
       expect(notifs[0].message).toContain(event.name);
-      expect(notifs[0].link).toBe(`/events/${event.id}`);
     });
 
-    it("includes artists with 'any new event' preference", async () => {
+    it("creates new_event notifications for 'any new event' subscribers", async () => {
       const { convention } = await createTestOrganizer();
       const event = await createTestEvent(convention.id);
       const artist = await createTestArtist();
 
-      // Set "new_event" preference (not following the convention)
       await db.insert(notificationPreferences).values({
         profileId: artist.profile.id,
         notificationType: "new_event",
         emailEnabled: false,
       });
 
-      await notifyEventOpened(event.id, event.name, convention.id);
+      await notifyEventPublished(event.id, event.name, convention.id);
 
       const notifs = await findNotificationsByProfileId(artist.profile.id);
       expect(notifs).toHaveLength(1);
@@ -78,7 +76,6 @@ describe("notification triggers", () => {
       const event = await createTestEvent(convention.id);
       const artist = await createTestArtist();
 
-      // Both follow AND have new_event preference
       await db.insert(conventionFollows).values({
         profileId: artist.profile.id,
         conventionId: convention.id,
@@ -89,10 +86,49 @@ describe("notification triggers", () => {
         emailEnabled: false,
       });
 
+      await notifyEventPublished(event.id, event.name, convention.id);
+
+      const notifs = await findNotificationsByProfileId(artist.profile.id);
+      expect(notifs).toHaveLength(1);
+      expect(notifs[0].type).toBe("event_published"); // follower wins
+    });
+  });
+
+  describe("notifyEventOpened", () => {
+    it("creates event_opened notifications for followers only", async () => {
+      const { convention } = await createTestOrganizer();
+      const event = await createTestEvent(convention.id);
+      const artist = await createTestArtist();
+
+      await db.insert(conventionFollows).values({
+        profileId: artist.profile.id,
+        conventionId: convention.id,
+      });
+
       await notifyEventOpened(event.id, event.name, convention.id);
 
       const notifs = await findNotificationsByProfileId(artist.profile.id);
-      expect(notifs).toHaveLength(1); // Not 2
+      expect(notifs).toHaveLength(1);
+      expect(notifs[0].type).toBe("event_opened");
+      expect(notifs[0].message).toContain("Applications are now open");
+    });
+
+    it("does NOT notify 'any new event' subscribers (they're notified on publish)", async () => {
+      const { convention } = await createTestOrganizer();
+      const event = await createTestEvent(convention.id);
+      const artist = await createTestArtist();
+
+      // Subscriber but not a follower
+      await db.insert(notificationPreferences).values({
+        profileId: artist.profile.id,
+        notificationType: "new_event",
+        emailEnabled: false,
+      });
+
+      await notifyEventOpened(event.id, event.name, convention.id);
+
+      const notifs = await findNotificationsByProfileId(artist.profile.id);
+      expect(notifs).toHaveLength(0);
     });
   });
 

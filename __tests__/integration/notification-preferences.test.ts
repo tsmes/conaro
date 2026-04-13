@@ -45,8 +45,8 @@ describe("updateNotificationPreferences", () => {
       .from(notificationPreferences)
       .where(eq(notificationPreferences.profileId, artist.profile.id));
 
-    // Should have entries for all 4 artist types
-    expect(prefs).toHaveLength(4);
+    // Should have entries for all 5 artist types
+    expect(prefs).toHaveLength(5);
 
     const eventOpenedPref = prefs.find(
       (p) => p.notificationType === "event_opened"

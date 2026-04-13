@@ -1,0 +1,151 @@
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { eq } from "drizzle-orm";
+import { NextRequest } from "next/server";
+import {
+  cleanDatabase,
+  createTestOrganizer,
+  createTestEvent,
+} from "../helpers/db";
+import { GET } from "@/app/api/cron/events/tick/route";
+import { db } from "@/lib/db";
+import { events } from "@/lib/db/schema/events";
+
+vi.mock("next/cache", () => ({
+  revalidatePath: vi.fn(),
+}));
+
+function makeRequest(authHeader?: string): NextRequest {
+  const headers = new Headers();
+  if (authHeader) headers.set("authorization", authHeader);
+  return new NextRequest("http://localhost:3000/api/cron/events/tick", {
+    headers,
+  });
+}
+
+describe("cron /api/cron/events/tick", () => {
+  beforeEach(async () => {
+    await cleanDatabase();
+    vi.clearAllMocks();
+  });
+
+  it("returns 401 without authorization header", async () => {
+    const response = await GET(makeRequest());
+    expect(response.status).toBe(401);
+  });
+
+  it("returns 401 with wrong secret", async () => {
+    const response = await GET(makeRequest("Bearer wrong-secret"));
+    expect(response.status).toBe(401);
+  });
+
+  it("transitions published events to accepting_applications when open date reached", async () => {
+    const { convention } = await createTestOrganizer();
+    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000)
+      .toISOString()
+      .slice(0, 10);
+    const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000)
+      .toISOString()
+      .slice(0, 10);
+
+    const event = await createTestEvent(convention.id, {
+      status: "published",
+      applicationOpenDate: yesterday,
+      applicationCloseDate: tomorrow,
+    });
+
+    const secret = process.env.CRON_SECRET!;
+    const response = await GET(makeRequest(`Bearer ${secret}`));
+    expect(response.status).toBe(200);
+    const data = await response.json();
+    expect(data.opened).toBe(1);
+
+    const [updated] = await db
+      .select()
+      .from(events)
+      .where(eq(events.id, event.id));
+    expect(updated.status).toBe("accepting_applications");
+  });
+
+  it("transitions accepting_applications to reviewing when close date has passed", async () => {
+    const { convention } = await createTestOrganizer();
+    const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .slice(0, 10);
+    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000)
+      .toISOString()
+      .slice(0, 10);
+
+    const event = await createTestEvent(convention.id, {
+      status: "accepting_applications",
+      applicationOpenDate: twoDaysAgo,
+      applicationCloseDate: yesterday,
+    });
+
+    const secret = process.env.CRON_SECRET!;
+    const response = await GET(makeRequest(`Bearer ${secret}`));
+    const data = await response.json();
+    expect(data.closed).toBe(1);
+
+    const [updated] = await db
+      .select()
+      .from(events)
+      .where(eq(events.id, event.id));
+    expect(updated.status).toBe("reviewing");
+  });
+
+  it("does not transition events whose dates have not arrived", async () => {
+    const { convention } = await createTestOrganizer();
+    const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000)
+      .toISOString()
+      .slice(0, 10);
+    const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .slice(0, 10);
+
+    const event = await createTestEvent(convention.id, {
+      status: "published",
+      applicationOpenDate: tomorrow,
+      applicationCloseDate: nextWeek,
+    });
+
+    const secret = process.env.CRON_SECRET!;
+    const response = await GET(makeRequest(`Bearer ${secret}`));
+    const data = await response.json();
+    expect(data.opened).toBe(0);
+
+    const [updated] = await db
+      .select()
+      .from(events)
+      .where(eq(events.id, event.id));
+    expect(updated.status).toBe("published");
+  });
+
+  it("is idempotent — running twice does not double-transition", async () => {
+    const { convention } = await createTestOrganizer();
+    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000)
+      .toISOString()
+      .slice(0, 10);
+    const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000)
+      .toISOString()
+      .slice(0, 10);
+
+    const event = await createTestEvent(convention.id, {
+      status: "published",
+      applicationOpenDate: yesterday,
+      applicationCloseDate: tomorrow,
+    });
+
+    const secret = process.env.CRON_SECRET!;
+    await GET(makeRequest(`Bearer ${secret}`));
+    const secondResponse = await GET(makeRequest(`Bearer ${secret}`));
+    const secondData = await secondResponse.json();
+    expect(secondData.opened).toBe(0);
+    expect(secondData.closed).toBe(0);
+
+    const [updated] = await db
+      .select()
+      .from(events)
+      .where(eq(events.id, event.id));
+    expect(updated.status).toBe("accepting_applications");
+  });
+});
