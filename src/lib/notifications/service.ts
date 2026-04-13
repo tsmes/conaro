@@ -145,5 +145,5 @@ function formatSubject(type: NotificationType): string {
     application_revoked: "Your application status has changed",
     new_application: "New application received",
   };
-  return `Art Apply: ${subjects[type]}`;
+  return `Conaro: ${subjects[type]}`;
 }

@@ -16,7 +16,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Art Apply",
+  title: "Conaro",
   description:
     "A platform for artists to apply for convention stands. Maintain your profile once, apply everywhere.",
 };

@@ -1,10 +1,10 @@
-# PRD: Art Apply — Convention Application Platform
+# PRD: Conaro — Convention Application Platform
 
 ## Introduction
 
 Artists applying for stands at conventions currently face a fragmented, repetitive process: filling out Google Forms from scratch each time, hunting for portfolio photos, re-typing the same bio and logistics info, and often receiving no confirmation that their application was submitted. Conventions, on their side, manage applications through spreadsheets and email threads with no structured review workflow.
 
-**Art Apply** is a web platform that solves both sides. Artists maintain a single profile with their information and portfolio. Conventions define what they need and open application periods. Applying is a one-click action. The platform handles notifications, status tracking, and the review process — keeping everything in one place for both parties.
+**Conaro** is a web platform that solves both sides. Artists maintain a single profile with their information and portfolio. Conventions define what they need and open application periods. Applying is a one-click action. The platform handles notifications, status tracking, and the review process — keeping everything in one place for both parties.
 
 ## Goals
 
@@ -369,9 +369,9 @@ An organizer can have one convention with multiple events. Events share the conv
 ## Functional Requirements
 
 - **FR-01**: The system must support two user roles: Artist and Convention Organizer
-- **FR-02**: Users register and log in with email and password (Supabase Auth)
+- **FR-02**: Users register and log in with email and password (Auth.js v5 Credentials provider, backed by Drizzle adapter against PostgreSQL)
 - **FR-03**: Artists can create and edit a persistent profile with basic info, logistics info, and portfolio images
-- **FR-04**: Artists can upload up to 20 images (JPEG, PNG, WebP; max 10 MB each) stored in Supabase Storage
+- **FR-04**: Artists can upload up to 20 images (JPEG, PNG, WebP; max 10 MB each) stored via the project's `StorageAdapter` interface (MVP: local disk; production: Cloudflare R2)
 - **FR-05**: Artists can reorder and delete portfolio images; deleting an image removes the file from R2 immediately
 - **FR-06**: Convention organizers can create a convention profile (the brand) with name, description, website, and branding
 - **FR-07**: Organizers can create multiple events under a convention, each with structured data: name, description, dates (event + application period), location (venue, address, city, country, map embed), and artist logistics (stand count, dimensions, pricing info, setup/teardown times, provided amenities)

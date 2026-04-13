@@ -25,7 +25,7 @@ export async function PublicShell({
             href="/"
             className="font-heading text-xl font-extrabold tracking-tighter text-primary"
           >
-            Art Apply
+            Conaro
           </Link>
           <PublicNavLinks />
           <div className="flex items-center gap-2">

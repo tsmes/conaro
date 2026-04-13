@@ -30,7 +30,7 @@ export function LoginForm() {
           id="email"
           name="email"
           type="email"
-          placeholder="curator@artapply.com"
+          placeholder="curator@conaro.app"
           required
           aria-invalid={!!state.error}
         />

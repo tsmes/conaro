@@ -12,7 +12,7 @@ export default function RegisterPage() {
           Get started
         </p>
         <h1 className="mt-4 font-heading text-4xl font-extrabold tracking-tight md:text-5xl">
-          Join Art Apply
+          Join Conaro
         </h1>
         <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
           Choose your role to get started with the digital curator&apos;s

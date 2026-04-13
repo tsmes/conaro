@@ -50,7 +50,7 @@ export function ArtistRegisterForm() {
           id="email"
           name="email"
           type="email"
-          placeholder="curator@artapply.com"
+          placeholder="curator@conaro.app"
           required
           aria-describedby={
             state.fieldErrors?.email ? "email-error" : undefined

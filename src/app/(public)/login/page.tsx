@@ -16,7 +16,7 @@ export default function LoginPage() {
         <LoginForm />
       </div>
       <p className="mt-6 text-sm text-muted-foreground">
-        New to Art Apply?{" "}
+        New to Conaro?{" "}
         <Link
           href="/register"
           className="font-semibold text-primary underline underline-offset-4"

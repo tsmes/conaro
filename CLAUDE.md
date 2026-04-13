@@ -1,10 +1,10 @@
 # Project
 
-**Art Apply** — A web platform for artists to apply for convention stands. Artists maintain a profile and portfolio once; conventions define events with application periods; applying is one click. Replaces the current process of Google Forms, spreadsheets, and email.
+**Conaro** — A web platform for artists to apply for convention stands. Artists maintain a profile and portfolio once; conventions define events with application periods; applying is one click. Replaces the current process of Google Forms, spreadsheets, and email.
 
 **Tech stack**: Next.js 15 (App Router) + TypeScript + Tailwind CSS + shadcn/ui + Drizzle ORM + PostgreSQL (Railway) + Auth.js v5 + Cloudflare R2 + Resend
 
-**PRD**: `tasks/prd-art-apply.md`
+**PRD**: `tasks/prd-conaro.md`
 
 # Workflow — MANDATORY
 

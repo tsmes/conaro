@@ -9,7 +9,7 @@ export function HomepageFooter() {
     <footer className="border-t-0 bg-background">
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-10 md:flex-row md:px-12">
         <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-          © {new Date().getFullYear()} Art Apply. All rights reserved.
+          © {new Date().getFullYear()} Conaro. All rights reserved.
         </p>
         <nav className="flex gap-8">
           {/* TODO: link to real pages when they exist. */}
