@@ -8,6 +8,12 @@ import { Separator } from "@/components/ui/separator";
 
 const ARTIST_PREFERENCE_TYPES = [
   {
+    type: "event_published",
+    label: "Followed convention publishes a new event",
+    description:
+      "When a convention you follow publishes a new event (before applications open).",
+  },
+  {
     type: "event_opened",
     label: "Followed convention opens event",
     description:

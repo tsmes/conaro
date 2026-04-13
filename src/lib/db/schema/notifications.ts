@@ -10,6 +10,7 @@ import {
 import { profiles } from "./profiles";
 
 export const notificationTypeEnum = pgEnum("notification_type", [
+  "event_published",
   "event_opened",
   "new_event",
   "results_published",

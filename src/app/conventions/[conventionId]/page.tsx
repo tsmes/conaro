@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { eq, and } from "drizzle-orm";
+import { eq, and, ne } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { conventions } from "@/lib/db/schema/conventions";
@@ -8,6 +8,7 @@ import { events } from "@/lib/db/schema/events";
 import { conventionFollows } from "@/lib/db/schema/convention-follows";
 import { storage } from "@/lib/storage";
 import { FollowButton } from "@/components/conventions/follow-button";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -16,6 +17,19 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+
+const EVENT_STATUS_BADGE: Record<
+  string,
+  { label: string; variant: "default" | "secondary" | "outline" }
+> = {
+  published: { label: "Upcoming", variant: "secondary" },
+  accepting_applications: {
+    label: "Accepting Applications",
+    variant: "default",
+  },
+  reviewing: { label: "Reviewing", variant: "outline" },
+  results_published: { label: "Results Published", variant: "outline" },
+};
 
 interface ConventionDetailPageProps {
   params: Promise<{ conventionId: string }>;
@@ -49,17 +63,19 @@ export default async function ConventionDetailPage({
       .select({
         id: events.id,
         name: events.name,
+        status: events.status,
         eventStartDate: events.eventStartDate,
         eventEndDate: events.eventEndDate,
         venueCity: events.venueCity,
         venueCountry: events.venueCountry,
+        applicationOpenDate: events.applicationOpenDate,
         applicationCloseDate: events.applicationCloseDate,
       })
       .from(events)
       .where(
         and(
           eq(events.conventionId, conventionId),
-          eq(events.status, "accepting_applications")
+          ne(events.status, "draft")
         )
       ),
     isArtist
@@ -124,35 +140,51 @@ export default async function ConventionDetailPage({
 
       <Separator className="my-6" />
 
-      <h2 className="text-xl font-semibold">Open Events</h2>
+      <h2 className="text-xl font-semibold">Events</h2>
 
       {openEvents.length === 0 ? (
         <p className="mt-4 text-sm text-muted-foreground">
-          No events are currently accepting applications.
+          No events to show.
         </p>
       ) : (
         <div className="mt-4 space-y-3">
-          {openEvents.map((event) => (
-            <Link
-              key={event.id}
-              href={`/events/${event.id}`}
-              className="block"
-            >
-              <Card className="transition-colors hover:bg-muted/50">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-lg">{event.name}</CardTitle>
-                  <CardDescription>
-                    {event.eventStartDate}
-                    {event.eventEndDate && ` — ${event.eventEndDate}`}
-                    {event.venueCity && ` · ${event.venueCity}`}
-                    {event.venueCountry && `, ${event.venueCountry}`}
-                    {event.applicationCloseDate &&
-                      ` · Deadline: ${event.applicationCloseDate}`}
-                  </CardDescription>
-                </CardHeader>
-              </Card>
-            </Link>
-          ))}
+          {openEvents.map((event) => {
+            const statusInfo = EVENT_STATUS_BADGE[event.status] ?? {
+              label: event.status,
+              variant: "secondary" as const,
+            };
+
+            return (
+              <Link
+                key={event.id}
+                href={`/events/${event.id}`}
+                className="block"
+              >
+                <Card className="transition-colors hover:bg-muted/50">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <CardTitle className="text-lg">{event.name}</CardTitle>
+                      <Badge variant={statusInfo.variant} className="text-xs">
+                        {statusInfo.label}
+                      </Badge>
+                    </div>
+                    <CardDescription>
+                      {event.eventStartDate}
+                      {event.eventEndDate && ` — ${event.eventEndDate}`}
+                      {event.venueCity && ` · ${event.venueCity}`}
+                      {event.venueCountry && `, ${event.venueCountry}`}
+                      {event.status === "published" &&
+                        event.applicationOpenDate &&
+                        ` · Opens: ${event.applicationOpenDate}`}
+                      {event.status === "accepting_applications" &&
+                        event.applicationCloseDate &&
+                        ` · Deadline: ${event.applicationCloseDate}`}
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              </Link>
+            );
+          })}
         </div>
       )}
     </div>

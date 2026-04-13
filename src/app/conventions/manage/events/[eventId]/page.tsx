@@ -9,6 +9,7 @@ import {
   updateEvent,
   openApplications,
   closeApplications,
+  publishEvent,
 } from "@/app/conventions/manage/events/actions";
 import { EventForm } from "@/components/conventions/event-form";
 import { EventStatusControls } from "@/components/conventions/event-status-controls";
@@ -69,6 +70,7 @@ export default async function EventDetailPage({
         <EventStatusControls
           eventId={event.id}
           currentStatus={event.status}
+          publishAction={publishEvent}
           openAction={openApplications}
           closeAction={closeApplications}
         />

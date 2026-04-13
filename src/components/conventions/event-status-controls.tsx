@@ -10,6 +10,7 @@ const STATUS_DISPLAY: Record<
   { label: string; variant: "default" | "secondary" | "outline" }
 > = {
   draft: { label: "Draft", variant: "secondary" },
+  published: { label: "Published", variant: "default" },
   accepting_applications: {
     label: "Accepting Applications",
     variant: "default",
@@ -21,6 +22,10 @@ const STATUS_DISPLAY: Record<
 interface EventStatusControlsProps {
   eventId: string;
   currentStatus: string;
+  publishAction: (
+    prevState: ActionState,
+    formData: FormData
+  ) => Promise<ActionState>;
   openAction: (
     prevState: ActionState,
     formData: FormData
@@ -34,9 +39,14 @@ interface EventStatusControlsProps {
 export function EventStatusControls({
   eventId,
   currentStatus,
+  publishAction,
   openAction,
   closeAction,
 }: EventStatusControlsProps) {
+  const [publishState, publishFormAction, publishPending] = useActionState(
+    publishAction,
+    {}
+  );
   const [openState, openFormAction, openPending] = useActionState(
     openAction,
     {}
@@ -51,7 +61,7 @@ export function EventStatusControls({
     variant: "secondary" as const,
   };
 
-  const error = openState.error || closeState.error;
+  const error = publishState.error || openState.error || closeState.error;
 
   return (
     <div className="flex items-center gap-4">
@@ -63,10 +73,19 @@ export function EventStatusControls({
       </div>
 
       {currentStatus === "draft" && (
+        <form action={publishFormAction}>
+          <input type="hidden" name="eventId" value={eventId} />
+          <Button type="submit" size="sm" disabled={publishPending}>
+            {publishPending ? "Publishing..." : "Publish Event"}
+          </Button>
+        </form>
+      )}
+
+      {currentStatus === "published" && (
         <form action={openFormAction}>
           <input type="hidden" name="eventId" value={eventId} />
           <Button type="submit" size="sm" disabled={openPending}>
-            {openPending ? "Opening..." : "Open Applications"}
+            {openPending ? "Opening..." : "Open Applications Now"}
           </Button>
         </form>
       )}
@@ -80,7 +99,7 @@ export function EventStatusControls({
             variant="outline"
             disabled={closePending}
           >
-            {closePending ? "Closing..." : "Close Applications"}
+            {closePending ? "Closing..." : "Close Applications Now"}
           </Button>
         </form>
       )}

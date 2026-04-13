@@ -7,6 +7,7 @@ import { auth } from "@/lib/auth";
 import { type ActionState } from "@/lib/validations/auth";
 
 const ARTIST_TYPES = [
+  "event_published",
   "event_opened",
   "new_event",
   "results_published",

@@ -9,6 +9,7 @@ import { users } from "@/lib/db/schema/auth";
 import { emailAdapter } from "@/lib/email";
 
 type NotificationType =
+  | "event_published"
   | "event_opened"
   | "new_event"
   | "results_published"
@@ -137,6 +138,7 @@ export async function getEmailPreference(
 
 function formatSubject(type: NotificationType): string {
   const subjects: Record<NotificationType, string> = {
+    event_published: "A new event has been published",
     event_opened: "Applications are now open",
     new_event: "A new event is accepting applications",
     results_published: "Application results are in",

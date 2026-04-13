@@ -12,6 +12,7 @@ import { conventions } from "./conventions";
 
 export const eventStatusEnum = pgEnum("event_status", [
   "draft",
+  "published",
   "accepting_applications",
   "reviewing",
   "results_published",

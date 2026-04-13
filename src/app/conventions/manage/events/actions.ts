@@ -13,7 +13,10 @@ import {
   getOrganizerEvent,
   buildDefaultFieldRequirements,
 } from "@/lib/conventions/queries";
-import { notifyEventOpened } from "@/lib/notifications/triggers";
+import {
+  notifyEventOpened,
+  notifyEventPublished,
+} from "@/lib/notifications/triggers";
 
 function extractAmenities(data: {
   amenities_electricity: boolean;
@@ -198,8 +201,8 @@ export async function openApplications(
     return { error: "Event not found" };
   }
 
-  if (event.status !== "draft") {
-    return { error: "Applications can only be opened for events in draft status" };
+  if (event.status !== "draft" && event.status !== "published") {
+    return { error: "Applications can only be opened for events in draft or published status" };
   }
 
   try {
@@ -265,5 +268,62 @@ export async function closeApplications(
 
   revalidatePath("/conventions/manage");
   revalidatePath(`/conventions/manage/events/${event.id}`);
+  return { success: true };
+}
+
+export async function publishEvent(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const session = await auth();
+  if (!session?.user?.id || session.user.role !== "organizer") {
+    return { error: "Unauthorized" };
+  }
+
+  const profileId = session.user.profileId;
+  if (!profileId) {
+    return { error: "Profile not found" };
+  }
+
+  const eventId = formData.get("eventId")?.toString();
+  if (!eventId) {
+    return { error: "Event ID is required" };
+  }
+
+  const event = await getOrganizerEvent(profileId, eventId);
+  if (!event) {
+    return { error: "Event not found" };
+  }
+
+  if (event.status !== "draft") {
+    return { error: "Only draft events can be published" };
+  }
+
+  if (!event.applicationOpenDate || !event.applicationCloseDate) {
+    return {
+      error:
+        "Both application open date and close date are required before publishing",
+    };
+  }
+
+  try {
+    await db
+      .update(events)
+      .set({ status: "published", updatedAt: new Date() })
+      .where(eq(events.id, event.id));
+  } catch {
+    return { error: "Failed to publish event. Please try again." };
+  }
+
+  try {
+    await notifyEventPublished(event.id, event.name, event.conventionId);
+  } catch (error) {
+    console.error("Failed to send event published notifications:", error);
+  }
+
+  revalidatePath("/conventions/manage");
+  revalidatePath(`/conventions/manage/events/${event.id}`);
+  revalidatePath("/events");
+  revalidatePath(`/conventions/${event.conventionId}`);
   return { success: true };
 }

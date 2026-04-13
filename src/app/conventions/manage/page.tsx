@@ -19,6 +19,7 @@ import { Separator } from "@/components/ui/separator";
 
 const STATUS_LABELS: Record<string, { label: string; variant: "default" | "secondary" | "outline" }> = {
   draft: { label: "Draft", variant: "secondary" },
+  published: { label: "Published", variant: "default" },
   accepting_applications: { label: "Accepting Applications", variant: "default" },
   reviewing: { label: "Reviewing", variant: "outline" },
   results_published: { label: "Results Published", variant: "default" },

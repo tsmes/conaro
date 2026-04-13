@@ -1,0 +1,2 @@
+ALTER TYPE "public"."event_status" ADD VALUE 'published' BEFORE 'accepting_applications';--> statement-breakpoint
+ALTER TYPE "public"."notification_type" ADD VALUE 'event_published' BEFORE 'event_opened';

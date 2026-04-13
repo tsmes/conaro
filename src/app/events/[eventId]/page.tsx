@@ -72,6 +72,12 @@ export default async function EventDetailPage({
     notFound();
   }
 
+  // Draft events are not visible to artists (only editable by the organizer
+  // via the manage UI)
+  if (event.status === "draft") {
+    notFound();
+  }
+
   const amenities = event.amenities as Amenities | null;
   const conventionLogoUrl = event.conventionLogoPath
     ? storage.getUrl(event.conventionLogoPath)
@@ -171,9 +177,19 @@ export default async function EventDetailPage({
           )}
         </div>
         <h1 className="mt-2 text-3xl font-bold">{event.name}</h1>
-        {!isAccepting && (
+        {event.status === "published" && event.applicationOpenDate && (
           <Badge variant="secondary" className="mt-2">
-            Not accepting applications
+            Applications open on {event.applicationOpenDate}
+          </Badge>
+        )}
+        {event.status === "reviewing" && (
+          <Badge variant="secondary" className="mt-2">
+            Applications closed — under review
+          </Badge>
+        )}
+        {event.status === "results_published" && (
+          <Badge variant="secondary" className="mt-2">
+            Results published
           </Badge>
         )}
       </div>

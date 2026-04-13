@@ -5,7 +5,7 @@ import { applications } from "@/lib/db/schema/applications";
 import { notificationPreferences } from "@/lib/db/schema/notifications";
 import { createNotifications } from "./service";
 
-export async function notifyEventOpened(
+export async function notifyEventPublished(
   eventId: string,
   eventName: string,
   conventionId: string
@@ -16,8 +16,7 @@ export async function notifyEventOpened(
     .from(conventionFollows)
     .where(eq(conventionFollows.conventionId, conventionId));
 
-  // Get artists with "any new event" email preference enabled
-  // (these also get an in-app notification)
+  // Get artists with "any new event" preference enabled
   const newEventSubscribers = await db
     .select({ profileId: notificationPreferences.profileId })
     .from(notificationPreferences)
@@ -32,14 +31,40 @@ export async function notifyEventOpened(
 
   if (allRecipientIds.size === 0) return;
 
-  const message = `Applications are now open for ${eventName}`;
   const link = `/events/${eventId}`;
 
   const inputs = Array.from(allRecipientIds).map((profileId) => ({
     recipientProfileId: profileId,
     type: followerIds.has(profileId)
-      ? ("event_opened" as const)
+      ? ("event_published" as const)
       : ("new_event" as const),
+    message: `New event: ${eventName}`,
+    link,
+  }));
+
+  await createNotifications(inputs);
+}
+
+export async function notifyEventOpened(
+  eventId: string,
+  eventName: string,
+  conventionId: string
+): Promise<void> {
+  // Notify only convention followers — any-new-event subscribers
+  // were notified at publish time.
+  const followers = await db
+    .select({ profileId: conventionFollows.profileId })
+    .from(conventionFollows)
+    .where(eq(conventionFollows.conventionId, conventionId));
+
+  if (followers.length === 0) return;
+
+  const message = `Applications are now open for ${eventName}`;
+  const link = `/events/${eventId}`;
+
+  const inputs = followers.map((f) => ({
+    recipientProfileId: f.profileId,
+    type: "event_opened" as const,
     message,
     link,
   }));
