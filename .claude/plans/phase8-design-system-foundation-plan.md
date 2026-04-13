@@ -95,7 +95,17 @@ Adds the theme switching mechanism without yet adding the toggle UI (that's Task
 
 ---
 
-### 4. Add new shadcn primitives via `npx shadcn add`
+### 4. Add new shadcn primitives via `npx shadcn add` ✅ DONE
+
+*Implementation notes:*
+- *All six primitives (sidebar, sheet, dropdown-menu, avatar, table, tooltip)
+  were available in the `base-nova` registry — no custom Base UI fallback was
+  needed. CLI also pulled bonus `skeleton` and a `use-mobile` hook that
+  sidebar depends on. All imports use `@base-ui/react`, no Radix
+  contamination.*
+- *`TooltipProvider` added to the Providers client component per CLI guidance.*
+- *jsdom's missing `window.matchMedia` required a shim in `__tests__/setup.ts`
+  — Sidebar's use-mobile hook calls it at mount.*
 
 Install the six primitives the spec mandates. Pure registry adds — no consumer code yet.
 
