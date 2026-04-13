@@ -23,6 +23,7 @@ export default defineConfig({
     },
   },
   test: {
+    globals: true,
     setupFiles: ["__tests__/setup.ts"],
     fileParallelism: false,
     testTimeout: 15000,

@@ -185,7 +185,11 @@ Filled-fill design with the signature 2px violet focus ring + 4px offset.
 
 ---
 
-### 7. Restyle Card and add `interactive` prop
+### 7. Restyle Card and add `interactive` prop ✅ DONE
+
+*Implementation note: also enabled vitest `globals: true` to activate RTL's
+auto-cleanup hook between tests — prevents testid collisions across cases in
+the same file.*
 
 Border-removed, `rounded-2xl`, ambient shadow by default. New optional `interactive` prop adds hover state for the dashboard quick-action cards.
 
