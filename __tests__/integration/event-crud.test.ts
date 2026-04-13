@@ -187,23 +187,39 @@ describe("event CRUD", () => {
   });
 
   describe("status transitions", () => {
-    async function createDraftEvent(profileId: string, conventionId: string) {
+    async function createPublishedEvent(
+      profileId: string,
+      conventionId: string
+    ) {
       mockAuth.mockResolvedValue({
         user: { id: "u", role: "organizer", profileId },
       });
 
+      // Create event and move it to published via direct DB update so these
+      // tests don't depend on the publishEvent action.
       await createEvent(
         {},
         buildFormData({ name: "Test Event", eventStartDate: "2026-07-01" })
       );
 
       const eventList = await findEventsByConventionId(conventionId);
-      return eventList[0];
+      const [event] = eventList;
+
+      await db
+        .update(events)
+        .set({
+          status: "published",
+          applicationOpenDate: "2026-06-01",
+          applicationCloseDate: "2026-06-30",
+        })
+        .where(eq(events.id, event.id));
+
+      return { ...event, status: "published" as const };
     }
 
-    it("transitions draft -> accepting_applications", async () => {
+    it("transitions published -> accepting_applications", async () => {
       const { profile, convention } = await createTestOrganizer();
-      const event = await createDraftEvent(profile.id, convention.id);
+      const event = await createPublishedEvent(profile.id, convention.id);
 
       const result = await openApplications(
         {},
@@ -218,9 +234,9 @@ describe("event CRUD", () => {
       expect(updated.status).toBe("accepting_applications");
     });
 
-    it("rejects opening applications when not in draft", async () => {
+    it("rejects opening applications when not in published", async () => {
       const { profile, convention } = await createTestOrganizer();
-      const event = await createDraftEvent(profile.id, convention.id);
+      const event = await createPublishedEvent(profile.id, convention.id);
 
       // Open first
       await openApplications({}, buildFormData({ eventId: event.id }));
@@ -230,12 +246,12 @@ describe("event CRUD", () => {
         {},
         buildFormData({ eventId: event.id })
       );
-      expect(result.error).toContain("draft");
+      expect(result.error).toContain("published");
     });
 
     it("transitions accepting_applications -> reviewing", async () => {
       const { profile, convention } = await createTestOrganizer();
-      const event = await createDraftEvent(profile.id, convention.id);
+      const event = await createPublishedEvent(profile.id, convention.id);
 
       await openApplications({}, buildFormData({ eventId: event.id }));
 
@@ -254,9 +270,9 @@ describe("event CRUD", () => {
 
     it("rejects closing applications when not accepting", async () => {
       const { profile, convention } = await createTestOrganizer();
-      const event = await createDraftEvent(profile.id, convention.id);
+      const event = await createPublishedEvent(profile.id, convention.id);
 
-      // Still in draft — can't close
+      // Still in published — can't close
       const result = await closeApplications(
         {},
         buildFormData({ eventId: event.id })

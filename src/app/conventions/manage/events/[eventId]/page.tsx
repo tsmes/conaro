@@ -4,6 +4,7 @@ import { eq, count } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { applications } from "@/lib/db/schema/applications";
+import type { Amenities } from "@/lib/db/schema/events";
 import { getOrganizerEvent } from "@/lib/conventions/queries";
 import {
   updateEvent,
@@ -47,13 +48,7 @@ export default async function EventDetailPage({
     applicationCount = value;
   }
 
-  const amenities = event.amenities as {
-    electricity?: boolean;
-    wifi?: boolean;
-    tables?: boolean;
-    chairs?: boolean;
-    other?: string;
-  } | null;
+  const amenities = event.amenities as Amenities | null;
 
   return (
     <div className="container mx-auto max-w-3xl px-4 py-8">

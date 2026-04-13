@@ -4,20 +4,7 @@ import { useActionState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { ActionState } from "@/lib/validations/auth";
-
-const STATUS_DISPLAY: Record<
-  string,
-  { label: string; variant: "default" | "secondary" | "outline" }
-> = {
-  draft: { label: "Draft", variant: "secondary" },
-  published: { label: "Published", variant: "default" },
-  accepting_applications: {
-    label: "Accepting Applications",
-    variant: "default",
-  },
-  reviewing: { label: "Reviewing", variant: "outline" },
-  results_published: { label: "Results Published", variant: "default" },
-};
+import { ORGANIZER_STATUS_LABELS } from "@/lib/events/status-display";
 
 interface EventStatusControlsProps {
   eventId: string;
@@ -56,7 +43,7 @@ export function EventStatusControls({
     {}
   );
 
-  const statusInfo = STATUS_DISPLAY[currentStatus] ?? {
+  const statusInfo = ORGANIZER_STATUS_LABELS[currentStatus] ?? {
     label: currentStatus,
     variant: "secondary" as const,
   };

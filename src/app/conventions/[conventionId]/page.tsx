@@ -17,19 +17,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-
-const EVENT_STATUS_BADGE: Record<
-  string,
-  { label: string; variant: "default" | "secondary" | "outline" }
-> = {
-  published: { label: "Upcoming", variant: "secondary" },
-  accepting_applications: {
-    label: "Accepting Applications",
-    variant: "default",
-  },
-  reviewing: { label: "Reviewing", variant: "outline" },
-  results_published: { label: "Results Published", variant: "outline" },
-};
+import { ARTIST_STATUS_LABELS } from "@/lib/events/status-display";
 
 interface ConventionDetailPageProps {
   params: Promise<{ conventionId: string }>;
@@ -149,7 +137,7 @@ export default async function ConventionDetailPage({
       ) : (
         <div className="mt-4 space-y-3">
           {openEvents.map((event) => {
-            const statusInfo = EVENT_STATUS_BADGE[event.status] ?? {
+            const statusInfo = ARTIST_STATUS_LABELS[event.status] ?? {
               label: event.status,
               variant: "secondary" as const,
             };

@@ -1,18 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
+import { timingSafeEqual } from "crypto";
 import { and, eq, lte, lt, isNotNull } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { events } from "@/lib/db/schema/events";
 import { notifyEventOpened } from "@/lib/notifications/triggers";
 
+export const dynamic = "force-dynamic";
+
+function secureCompare(a: string, b: string): boolean {
+  const ab = Buffer.from(a);
+  const bb = Buffer.from(b);
+  if (ab.length !== bb.length) return false;
+  return timingSafeEqual(ab, bb);
+}
+
 export async function GET(request: NextRequest) {
   const secret = process.env.CRON_SECRET;
   if (!secret) {
     console.error("CRON_SECRET not configured");
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(
+      { error: "Server misconfiguration" },
+      { status: 500 }
+    );
   }
 
-  const authHeader = request.headers.get("authorization");
-  if (authHeader !== `Bearer ${secret}`) {
+  const authHeader = request.headers.get("authorization") ?? "";
+  if (!secureCompare(authHeader, `Bearer ${secret}`)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -37,10 +50,19 @@ export async function GET(request: NextRequest) {
   let opened = 0;
   for (const event of toOpen) {
     try {
-      await db
+      // Guard against races: only update if still in published status
+      const updated = await db
         .update(events)
         .set({ status: "accepting_applications", updatedAt: new Date() })
-        .where(eq(events.id, event.id));
+        .where(
+          and(eq(events.id, event.id), eq(events.status, "published"))
+        )
+        .returning({ id: events.id });
+
+      if (updated.length === 0) {
+        // Another process transitioned this event — skip notification
+        continue;
+      }
 
       opened += 1;
 
@@ -72,11 +94,20 @@ export async function GET(request: NextRequest) {
   let closed = 0;
   for (const event of toClose) {
     try {
-      await db
+      const updated = await db
         .update(events)
         .set({ status: "reviewing", updatedAt: new Date() })
-        .where(eq(events.id, event.id));
-      closed += 1;
+        .where(
+          and(
+            eq(events.id, event.id),
+            eq(events.status, "accepting_applications")
+          )
+        )
+        .returning({ id: events.id });
+
+      if (updated.length > 0) {
+        closed += 1;
+      }
     } catch (error) {
       console.error(`Failed to close applications for event ${event.id}:`, error);
     }

@@ -53,11 +53,31 @@ describe("notification triggers", () => {
       expect(notifs[0].message).toContain(event.name);
     });
 
-    it("creates new_event notifications for 'any new event' subscribers", async () => {
+    it("creates new_event notifications for opted-in subscribers", async () => {
       const { convention } = await createTestOrganizer();
       const event = await createTestEvent(convention.id);
       const artist = await createTestArtist();
 
+      // Opt in via emailEnabled (the toggle users control)
+      await db.insert(notificationPreferences).values({
+        profileId: artist.profile.id,
+        notificationType: "new_event",
+        emailEnabled: true,
+      });
+
+      await notifyEventPublished(event.id, event.name, convention.id);
+
+      const notifs = await findNotificationsByProfileId(artist.profile.id);
+      expect(notifs).toHaveLength(1);
+      expect(notifs[0].type).toBe("new_event");
+    });
+
+    it("does not notify subscribers who opted out", async () => {
+      const { convention } = await createTestOrganizer();
+      const event = await createTestEvent(convention.id);
+      const artist = await createTestArtist();
+
+      // Row exists but emailEnabled=false → not opted in
       await db.insert(notificationPreferences).values({
         profileId: artist.profile.id,
         notificationType: "new_event",
@@ -67,8 +87,7 @@ describe("notification triggers", () => {
       await notifyEventPublished(event.id, event.name, convention.id);
 
       const notifs = await findNotificationsByProfileId(artist.profile.id);
-      expect(notifs).toHaveLength(1);
-      expect(notifs[0].type).toBe("new_event");
+      expect(notifs).toHaveLength(0);
     });
 
     it("deduplicates followers who also have 'any new event' preference", async () => {
@@ -83,7 +102,7 @@ describe("notification triggers", () => {
       await db.insert(notificationPreferences).values({
         profileId: artist.profile.id,
         notificationType: "new_event",
-        emailEnabled: false,
+        emailEnabled: true,
       });
 
       await notifyEventPublished(event.id, event.name, convention.id);
@@ -118,11 +137,11 @@ describe("notification triggers", () => {
       const event = await createTestEvent(convention.id);
       const artist = await createTestArtist();
 
-      // Subscriber but not a follower
+      // Opted-in subscriber but not a follower — should NOT get notification here
       await db.insert(notificationPreferences).values({
         profileId: artist.profile.id,
         notificationType: "new_event",
-        emailEnabled: false,
+        emailEnabled: true,
       });
 
       await notifyEventOpened(event.id, event.name, convention.id);

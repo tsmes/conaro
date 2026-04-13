@@ -16,14 +16,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-
-const STATUS_LABELS: Record<string, { label: string; variant: "default" | "secondary" | "outline" }> = {
-  draft: { label: "Draft", variant: "secondary" },
-  published: { label: "Published", variant: "default" },
-  accepting_applications: { label: "Accepting Applications", variant: "default" },
-  reviewing: { label: "Reviewing", variant: "outline" },
-  results_published: { label: "Results Published", variant: "default" },
-};
+import { ORGANIZER_STATUS_LABELS } from "@/lib/events/status-display";
 
 export default async function ConventionManagePage() {
   const session = await auth();
@@ -99,7 +92,7 @@ export default async function ConventionManagePage() {
       ) : (
         <div className="mt-4 space-y-3">
           {eventList.map((event) => {
-            const statusInfo = STATUS_LABELS[event.status] ?? {
+            const statusInfo = ORGANIZER_STATUS_LABELS[event.status] ?? {
               label: event.status,
               variant: "secondary" as const,
             };

@@ -10,23 +10,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { ARTIST_STATUS_LABELS } from "@/lib/events/status-display";
 
 interface EventsPageProps {
   searchParams: Promise<{ convention?: string }>;
 }
-
-const STATUS_BADGE: Record<
-  string,
-  { label: string; variant: "default" | "secondary" | "outline" }
-> = {
-  published: { label: "Upcoming", variant: "secondary" },
-  accepting_applications: {
-    label: "Accepting Applications",
-    variant: "default",
-  },
-  reviewing: { label: "Reviewing", variant: "outline" },
-  results_published: { label: "Results Published", variant: "outline" },
-};
 
 export default async function EventsPage({ searchParams }: EventsPageProps) {
   const { convention: filterConventionId } = await searchParams;
@@ -107,7 +95,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
       ) : (
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filteredEvents.map((event) => {
-            const statusInfo = STATUS_BADGE[event.status] ?? {
+            const statusInfo = ARTIST_STATUS_LABELS[event.status] ?? {
               label: event.status,
               variant: "secondary" as const,
             };

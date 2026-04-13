@@ -201,8 +201,8 @@ export async function openApplications(
     return { error: "Event not found" };
   }
 
-  if (event.status !== "draft" && event.status !== "published") {
-    return { error: "Applications can only be opened for events in draft or published status" };
+  if (event.status !== "published") {
+    return { error: "Applications can only be opened for published events. Publish the event first." };
   }
 
   try {
@@ -214,7 +214,7 @@ export async function openApplications(
     return { error: "Failed to open applications. Please try again." };
   }
 
-  // Notify followers and "any new event" subscribers
+  // Notify convention followers that applications are now open
   try {
     await notifyEventOpened(event.id, event.name, event.conventionId);
   } catch (error) {

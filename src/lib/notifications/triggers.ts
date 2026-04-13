@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { conventionFollows } from "@/lib/db/schema/convention-follows";
 import { applications } from "@/lib/db/schema/applications";
@@ -16,11 +16,17 @@ export async function notifyEventPublished(
     .from(conventionFollows)
     .where(eq(conventionFollows.conventionId, conventionId));
 
-  // Get artists with "any new event" preference enabled
+  // Get artists who opted in to "any new event" notifications.
+  // emailEnabled = true is the opt-in signal (it's the only toggle the UI exposes).
   const newEventSubscribers = await db
     .select({ profileId: notificationPreferences.profileId })
     .from(notificationPreferences)
-    .where(eq(notificationPreferences.notificationType, "new_event"));
+    .where(
+      and(
+        eq(notificationPreferences.notificationType, "new_event"),
+        eq(notificationPreferences.emailEnabled, true)
+      )
+    );
 
   // Deduplicate: combine followers and new_event subscribers
   const followerIds = new Set(followers.map((f) => f.profileId));
