@@ -67,7 +67,12 @@ Enable React component tests so subsequent tasks can ship with proper coverage p
 
 ---
 
-### 3. Install `next-themes` and wire `ThemeProvider`
+### 3. Install `next-themes` and wire `ThemeProvider` ✅ DONE
+
+*Implementation note: ThemeProvider was added inside the existing `<Providers>`
+client component rather than creating a separate `theme-provider.tsx` file —
+Providers is already a client component that wraps SessionProvider, so the
+extra file would have been redundant.*
 
 Adds the theme switching mechanism without yet adding the toggle UI (that's Task 10). After this commit, OS preference is respected and `.dark` class is applied to `<html>`.
 
