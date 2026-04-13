@@ -4,6 +4,9 @@ import { useActionState, useState } from "react";
 import { updateResponseTemplates } from "@/app/(authenticated)/conventions/manage/events/[eventId]/applications/actions";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+
+const LABEL_CLASS =
+  "text-[11px] font-bold uppercase tracking-wider text-muted-foreground";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Card,
@@ -96,7 +99,7 @@ export function ResponseTemplatesForm({
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="acceptanceMessage">Acceptance Message</Label>
+            <Label htmlFor="acceptanceMessage" className={LABEL_CLASS}>Acceptance Message</Label>
             <Textarea
               id="acceptanceMessage"
               name="acceptanceMessage"
@@ -109,7 +112,7 @@ export function ResponseTemplatesForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="rejectionMessage">Rejection Message</Label>
+            <Label htmlFor="rejectionMessage" className={LABEL_CLASS}>Rejection Message</Label>
             <Textarea
               id="rejectionMessage"
               name="rejectionMessage"

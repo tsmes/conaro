@@ -5,6 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
+const LABEL_CLASS =
+  "text-[11px] font-bold uppercase tracking-wider text-muted-foreground";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Card,
@@ -91,7 +94,7 @@ export function EventForm({ action, defaultValues, submitLabel }: EventFormProps
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Event Name *</Label>
+            <Label htmlFor="name" className={LABEL_CLASS}>Event Name *</Label>
             <Input
               id="name"
               name="name"
@@ -103,7 +106,7 @@ export function EventForm({ action, defaultValues, submitLabel }: EventFormProps
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description" className={LABEL_CLASS}>Description</Label>
             <Textarea
               id="description"
               name="description"
@@ -122,7 +125,7 @@ export function EventForm({ action, defaultValues, submitLabel }: EventFormProps
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="eventStartDate">Event Start Date *</Label>
+            <Label htmlFor="eventStartDate" className={LABEL_CLASS}>Event Start Date *</Label>
             <Input
               id="eventStartDate"
               name="eventStartDate"
@@ -139,7 +142,7 @@ export function EventForm({ action, defaultValues, submitLabel }: EventFormProps
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="eventEndDate">Event End Date</Label>
+            <Label htmlFor="eventEndDate" className={LABEL_CLASS}>Event End Date</Label>
             <Input
               id="eventEndDate"
               name="eventEndDate"
@@ -150,7 +153,7 @@ export function EventForm({ action, defaultValues, submitLabel }: EventFormProps
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="applicationOpenDate">Application Open Date</Label>
+            <Label htmlFor="applicationOpenDate" className={LABEL_CLASS}>Application Open Date</Label>
             <Input
               id="applicationOpenDate"
               name="applicationOpenDate"
@@ -161,7 +164,7 @@ export function EventForm({ action, defaultValues, submitLabel }: EventFormProps
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="applicationCloseDate">Application Close Date</Label>
+            <Label htmlFor="applicationCloseDate" className={LABEL_CLASS}>Application Close Date</Label>
             <Input
               id="applicationCloseDate"
               name="applicationCloseDate"
@@ -181,7 +184,7 @@ export function EventForm({ action, defaultValues, submitLabel }: EventFormProps
         <CardContent className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="venueName">Venue Name</Label>
+              <Label htmlFor="venueName" className={LABEL_CLASS}>Venue Name</Label>
               <Input
                 id="venueName"
                 name="venueName"
@@ -190,7 +193,7 @@ export function EventForm({ action, defaultValues, submitLabel }: EventFormProps
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="venueCity">City</Label>
+              <Label htmlFor="venueCity" className={LABEL_CLASS}>City</Label>
               <Input
                 id="venueCity"
                 name="venueCity"
@@ -200,7 +203,7 @@ export function EventForm({ action, defaultValues, submitLabel }: EventFormProps
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="venueAddress">Address</Label>
+            <Label htmlFor="venueAddress" className={LABEL_CLASS}>Address</Label>
             <Input
               id="venueAddress"
               name="venueAddress"
@@ -210,7 +213,7 @@ export function EventForm({ action, defaultValues, submitLabel }: EventFormProps
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="venueCountry">Country</Label>
+              <Label htmlFor="venueCountry" className={LABEL_CLASS}>Country</Label>
               <Input
                 id="venueCountry"
                 name="venueCountry"
@@ -219,7 +222,7 @@ export function EventForm({ action, defaultValues, submitLabel }: EventFormProps
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="mapEmbedUrl">Map Embed URL</Label>
+              <Label htmlFor="mapEmbedUrl" className={LABEL_CLASS}>Map Embed URL</Label>
               <Input
                 id="mapEmbedUrl"
                 name="mapEmbedUrl"
@@ -241,7 +244,7 @@ export function EventForm({ action, defaultValues, submitLabel }: EventFormProps
         <CardContent className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="availableStands">Available Stands</Label>
+              <Label htmlFor="availableStands" className={LABEL_CLASS}>Available Stands</Label>
               <Input
                 id="availableStands"
                 name="availableStands"
@@ -253,7 +256,7 @@ export function EventForm({ action, defaultValues, submitLabel }: EventFormProps
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="tableDimensions">Table Dimensions</Label>
+              <Label htmlFor="tableDimensions" className={LABEL_CLASS}>Table Dimensions</Label>
               <Input
                 id="tableDimensions"
                 name="tableDimensions"
@@ -264,7 +267,7 @@ export function EventForm({ action, defaultValues, submitLabel }: EventFormProps
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="priceInfo">Price Info</Label>
+            <Label htmlFor="priceInfo" className={LABEL_CLASS}>Price Info</Label>
             <Textarea
               id="priceInfo"
               name="priceInfo"
@@ -276,7 +279,7 @@ export function EventForm({ action, defaultValues, submitLabel }: EventFormProps
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="setupTime">Setup Time</Label>
+              <Label htmlFor="setupTime" className={LABEL_CLASS}>Setup Time</Label>
               <Input
                 id="setupTime"
                 name="setupTime"
@@ -286,7 +289,7 @@ export function EventForm({ action, defaultValues, submitLabel }: EventFormProps
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="teardownTime">Teardown Time</Label>
+              <Label htmlFor="teardownTime" className={LABEL_CLASS}>Teardown Time</Label>
               <Input
                 id="teardownTime"
                 name="teardownTime"
@@ -322,7 +325,7 @@ export function EventForm({ action, defaultValues, submitLabel }: EventFormProps
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="amenities_other">Other amenities</Label>
+              <Label htmlFor="amenities_other" className={LABEL_CLASS}>Other amenities</Label>
               <Input
                 id="amenities_other"
                 name="amenities_other"

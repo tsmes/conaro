@@ -5,6 +5,9 @@ import { updateBasicInfo } from "@/app/(authenticated)/dashboard/profile/actions
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
+const LABEL_CLASS =
+  "text-[11px] font-bold uppercase tracking-wider text-muted-foreground";
 import { Textarea } from "@/components/ui/textarea";
 
 interface BasicInfoFormProps {
@@ -46,7 +49,7 @@ export function BasicInfoForm({ defaultValues }: BasicInfoFormProps) {
       )}
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="displayName">Display name *</Label>
+          <Label htmlFor="displayName" className={LABEL_CLASS}>Display name *</Label>
           <Input
             id="displayName"
             name="displayName"
@@ -64,7 +67,7 @@ export function BasicInfoForm({ defaultValues }: BasicInfoFormProps) {
           )}
         </div>
         <div className="space-y-2">
-          <Label htmlFor="realName">Real name</Label>
+          <Label htmlFor="realName" className={LABEL_CLASS}>Real name</Label>
           <Input
             id="realName"
             name="realName"
@@ -74,7 +77,7 @@ export function BasicInfoForm({ defaultValues }: BasicInfoFormProps) {
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="contactEmail">Contact email *</Label>
+          <Label htmlFor="contactEmail" className={LABEL_CLASS}>Contact email *</Label>
           <Input
             id="contactEmail"
             name="contactEmail"
@@ -93,7 +96,7 @@ export function BasicInfoForm({ defaultValues }: BasicInfoFormProps) {
           )}
         </div>
         <div className="space-y-2">
-          <Label htmlFor="phone">Phone number</Label>
+          <Label htmlFor="phone" className={LABEL_CLASS}>Phone number</Label>
           <Input
             id="phone"
             name="phone"
@@ -103,7 +106,7 @@ export function BasicInfoForm({ defaultValues }: BasicInfoFormProps) {
         </div>
       </div>
       <div className="space-y-2">
-        <Label htmlFor="bio">Bio / description</Label>
+        <Label htmlFor="bio" className={LABEL_CLASS}>Bio / description</Label>
         <Textarea
           id="bio"
           name="bio"
@@ -114,7 +117,7 @@ export function BasicInfoForm({ defaultValues }: BasicInfoFormProps) {
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="websiteUrl">Website</Label>
+          <Label htmlFor="websiteUrl" className={LABEL_CLASS}>Website</Label>
           <Input
             id="websiteUrl"
             name="websiteUrl"
@@ -133,7 +136,7 @@ export function BasicInfoForm({ defaultValues }: BasicInfoFormProps) {
           )}
         </div>
         <div className="space-y-2">
-          <Label htmlFor="socialLinks">Social links</Label>
+          <Label htmlFor="socialLinks" className={LABEL_CLASS}>Social links</Label>
           <Input
             id="socialLinks"
             name="socialLinks"

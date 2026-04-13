@@ -5,6 +5,9 @@ import { updateConventionProfile } from "@/app/(authenticated)/conventions/manag
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
+const LABEL_CLASS =
+  "text-[11px] font-bold uppercase tracking-wider text-muted-foreground";
 import { Textarea } from "@/components/ui/textarea";
 
 interface ConventionProfileFormProps {
@@ -41,7 +44,7 @@ export function ConventionProfileForm({
       )}
 
       <div className="space-y-2">
-        <Label htmlFor="name">Convention Name</Label>
+        <Label htmlFor="name" className={LABEL_CLASS}>Convention Name</Label>
         <Input
           id="name"
           name="name"
@@ -57,7 +60,7 @@ export function ConventionProfileForm({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="description">Description</Label>
+        <Label htmlFor="description" className={LABEL_CLASS}>Description</Label>
         <Textarea
           id="description"
           name="description"
@@ -80,7 +83,7 @@ export function ConventionProfileForm({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="websiteUrl">Website URL</Label>
+        <Label htmlFor="websiteUrl" className={LABEL_CLASS}>Website URL</Label>
         <Input
           id="websiteUrl"
           name="websiteUrl"

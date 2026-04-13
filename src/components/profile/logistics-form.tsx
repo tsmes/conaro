@@ -5,6 +5,9 @@ import { updateLogistics } from "@/app/(authenticated)/dashboard/profile/actions
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
+const LABEL_CLASS =
+  "text-[11px] font-bold uppercase tracking-wider text-muted-foreground";
 import { Textarea } from "@/components/ui/textarea";
 
 interface LogisticsFormProps {
@@ -41,7 +44,7 @@ export function LogisticsForm({ defaultValues }: LogisticsFormProps) {
       )}
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="helpers">Number of helpers</Label>
+          <Label htmlFor="helpers" className={LABEL_CLASS}>Number of helpers</Label>
           <Input
             id="helpers"
             name="helpers"
@@ -61,7 +64,7 @@ export function LogisticsForm({ defaultValues }: LogisticsFormProps) {
           )}
         </div>
         <div className="space-y-2">
-          <Label htmlFor="tableSizePreference">Table size preference</Label>
+          <Label htmlFor="tableSizePreference" className={LABEL_CLASS}>Table size preference</Label>
           <Input
             id="tableSizePreference"
             name="tableSizePreference"
@@ -71,7 +74,7 @@ export function LogisticsForm({ defaultValues }: LogisticsFormProps) {
         </div>
       </div>
       <div className="space-y-2">
-        <Label htmlFor="accessibilityNeeds">Accessibility needs</Label>
+        <Label htmlFor="accessibilityNeeds" className={LABEL_CLASS}>Accessibility needs</Label>
         <Textarea
           id="accessibilityNeeds"
           name="accessibilityNeeds"
@@ -81,7 +84,7 @@ export function LogisticsForm({ defaultValues }: LogisticsFormProps) {
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="notes">Additional notes</Label>
+        <Label htmlFor="notes" className={LABEL_CLASS}>Additional notes</Label>
         <Textarea
           id="notes"
           name="notes"
