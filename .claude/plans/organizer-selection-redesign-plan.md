@@ -247,9 +247,11 @@ Returns applicants ready for display, with the fields the new UI needs.
 
 **Depends on:** tasks 1, 2.
 
-### 11. `SelectionProgress` + `SelectionSidebar` components
+### 11. `SelectionProgress` + `SelectionSidebar` components ✅
 
 Progress bar and filter rail.
+
+**Status**: Completed. Progress bar gracefully handles null/zero target. Sidebar is a client component that exposes filter selection, a genre summary, and bulk-mode toggle (hidden when canBulk=false, for post-publish).
 
 **Requirements:** REQ-4, REQ-5
 
