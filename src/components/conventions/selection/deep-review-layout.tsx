@@ -19,6 +19,13 @@ import { getStatusDisplay } from "./applicant-visuals";
 import { PortfolioCollage } from "./portfolio-collage";
 import type { SelectionApplicantView } from "./types";
 
+type EventStatus =
+  | "draft"
+  | "published"
+  | "accepting_applications"
+  | "reviewing"
+  | "results_published";
+
 interface DeepReviewLayoutProps {
   applicants: SelectionApplicantView[];
   index: number;
@@ -28,7 +35,7 @@ interface DeepReviewLayoutProps {
   onConfirmPayment: (id: string) => void;
   onRevoke: (id: string) => void;
   readOnly: boolean;
-  eventStatus: string;
+  eventStatus: EventStatus;
 }
 
 export function DeepReviewLayout({
@@ -64,6 +71,7 @@ export function DeepReviewLayout({
         <div className="relative bg-muted">
           <PortfolioCollage
             images={applicant.images}
+            displayName={applicant.displayName}
             className="aspect-[4/3]"
           />
           <div className="absolute left-3 top-3 flex gap-2">

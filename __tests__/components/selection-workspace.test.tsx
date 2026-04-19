@@ -101,8 +101,8 @@ describe("SelectionWorkspace", () => {
     expect(screen.getByText("Artist One")).toBeInTheDocument();
     expect(screen.getByText("Artist Two")).toBeInTheDocument();
     expect(
-      screen.getByRole("tab", { name: /gallery/i })
-    ).toHaveAttribute("aria-selected", "true");
+      screen.getByRole("radio", { name: /gallery/i })
+    ).toHaveAttribute("aria-checked", "true");
   });
 
   it("updates counts after accepting an applicant", async () => {

@@ -3,10 +3,15 @@ import { cn } from "@/lib/utils";
 
 interface PortfolioCollageProps {
   images: { id: string; url: string }[];
+  displayName: string;
   className?: string;
 }
 
-export function PortfolioCollage({ images, className }: PortfolioCollageProps) {
+export function PortfolioCollage({
+  images,
+  displayName,
+  className,
+}: PortfolioCollageProps) {
   const cells = images.slice(0, 6);
   return (
     <div
@@ -24,7 +29,7 @@ export function PortfolioCollage({ images, className }: PortfolioCollageProps) {
         <img
           key={image.id}
           src={image.url}
-          alt=""
+          alt={`Portfolio image ${index + 1} from ${displayName}`}
           loading="lazy"
           className={cn(
             "h-full w-full object-cover",

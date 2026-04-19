@@ -287,8 +287,8 @@ describe("application review", () => {
   });
 
   describe("getEventApplicants", () => {
-    it("returns applicants for the given event scoped to the convention", async () => {
-      const { convention } = await createTestOrganizer();
+    it("returns applicants for the given event scoped to the organizer's convention", async () => {
+      const { profile, convention } = await createTestOrganizer();
       const event = await createTestEvent(convention.id, { status: "reviewing" });
       const artistA = await createTestArtist("a@test.com", "Artist A");
       const artistB = await createTestArtist("b@test.com", "Artist B");
@@ -298,7 +298,7 @@ describe("application review", () => {
         status: "accepted",
       });
 
-      const applicants = await getEventApplicants(convention.id, event.id);
+      const applicants = await getEventApplicants(profile.id, event.id);
       expect(applicants).toHaveLength(2);
       expect(applicants.map((a) => a.profileId).sort()).toEqual(
         [artistA.profile.id, artistB.profile.id].sort()
@@ -311,7 +311,7 @@ describe("application review", () => {
       expect(submitted?.pinned).toBe(false);
     });
 
-    it("excludes applicants whose event belongs to another convention", async () => {
+    it("returns an empty list when called with another organizer's profileId", async () => {
       const a = await createTestOrganizer("orgA@test.com", "Conv A");
       const b = await createTestOrganizer("orgB@test.com", "Conv B");
       const eventA = await createTestEvent(a.convention.id, {
@@ -325,11 +325,11 @@ describe("application review", () => {
       await createTestApplication(eventA.id, artistA.profile.id);
       await createTestApplication(eventB.id, artistB.profile.id);
 
-      const applicantsB = await getEventApplicants(b.convention.id, eventB.id);
+      const applicantsB = await getEventApplicants(b.profile.id, eventB.id);
       expect(applicantsB).toHaveLength(1);
       expect(applicantsB[0].profileId).toBe(artistB.profile.id);
 
-      const wrongScope = await getEventApplicants(a.convention.id, eventB.id);
+      const wrongScope = await getEventApplicants(a.profile.id, eventB.id);
       expect(wrongScope).toHaveLength(0);
     });
   });

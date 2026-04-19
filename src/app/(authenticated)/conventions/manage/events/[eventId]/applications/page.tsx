@@ -10,6 +10,7 @@ import {
   getOrganizerConvention,
   getOrganizerEvent,
 } from "@/lib/conventions/queries";
+import type { SelectionApplicant } from "@/lib/conventions/queries";
 import { storage } from "@/lib/storage";
 import { PublishResultsButton } from "@/components/conventions/publish-results-button";
 import { ResponseTemplatesForm } from "@/components/conventions/response-templates-form";
@@ -42,7 +43,7 @@ export default async function ApplicationsPage({
     redirect("/login");
   }
 
-  const applicants = await getEventApplicants(convention.id, eventId);
+  const applicants = await getEventApplicants(session.user.profileId, eventId);
 
   const undecidedCount = applicants.filter(
     (a) =>
@@ -65,7 +66,7 @@ export default async function ApplicationsPage({
 
   const isPublished = event.status === "results_published";
 
-  const applicantsView: SelectionApplicantView[] = applicants.map((app) => ({
+  const applicantsView: SelectionApplicantView[] = applicants.map((app: SelectionApplicant) => ({
     id: app.id,
     profileId: app.profileId,
     status: app.status,

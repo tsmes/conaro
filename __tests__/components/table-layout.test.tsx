@@ -42,7 +42,7 @@ describe("TableLayout", () => {
     expect(screen.getByText("Small")).toBeInTheDocument();
   });
 
-  it("fires onOpenDeep when a row is clicked outside interactive children", async () => {
+  it("fires onOpenDeep when the applicant name button is clicked", async () => {
     const user = userEvent.setup();
     const onOpenDeep = vi.fn();
     render(
@@ -56,11 +56,11 @@ describe("TableLayout", () => {
         readOnly={false}
       />
     );
-    await user.click(screen.getByText("Artist One"));
+    await user.click(screen.getByRole("button", { name: /Artist One/ }));
     expect(onOpenDeep).toHaveBeenCalledWith("a1");
   });
 
-  it("does not trigger onOpenDeep when pin button is clicked", async () => {
+  it("triggers only onTogglePin when pin button is clicked", async () => {
     const user = userEvent.setup();
     const onOpenDeep = vi.fn();
     const onTogglePin = vi.fn();
@@ -80,9 +80,7 @@ describe("TableLayout", () => {
     expect(onOpenDeep).not.toHaveBeenCalled();
   });
 
-  it("shows a checkbox and does not open deep review when bulkMode is on", async () => {
-    const user = userEvent.setup();
-    const onOpenDeep = vi.fn();
+  it("disables the open-deep button when bulkMode is on so checkboxes are the primary interaction", () => {
     render(
       <TableLayout
         applicants={applicants}
@@ -90,12 +88,11 @@ describe("TableLayout", () => {
         selected={new Set()}
         onToggleSelect={() => {}}
         onTogglePin={() => {}}
-        onOpenDeep={onOpenDeep}
+        onOpenDeep={() => {}}
         readOnly={false}
       />
     );
     expect(screen.getByRole("checkbox")).toBeInTheDocument();
-    await user.click(screen.getByText("Artist One"));
-    expect(onOpenDeep).not.toHaveBeenCalled();
+    expect(screen.getByRole("button", { name: /Artist One/ })).toBeDisabled();
   });
 });

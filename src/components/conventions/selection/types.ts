@@ -1,3 +1,10 @@
+export type ApplicationStatus =
+  | "submitted"
+  | "under_review"
+  | "accepted"
+  | "rejected"
+  | "revoked";
+
 export type SelectionFilter =
   | "all"
   | "undecided"
@@ -21,7 +28,7 @@ export type SelectionLayout = "gallery" | "table" | "stacked";
 export interface SelectionApplicantView {
   id: string;
   profileId: string;
-  status: string;
+  status: ApplicationStatus;
   pinned: boolean;
   paymentConfirmed: boolean;
   createdAt: Date;

@@ -76,7 +76,10 @@ export function GalleryLayout({
               </button>
             )}
             <div className="relative">
-              <PortfolioCollage images={applicant.images} />
+              <PortfolioCollage
+                images={applicant.images}
+                displayName={applicant.displayName}
+              />
               <div
                 className={cn(
                   "absolute top-2.5 flex gap-1.5",

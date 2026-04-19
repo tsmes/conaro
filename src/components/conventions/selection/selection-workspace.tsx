@@ -23,9 +23,16 @@ import type {
   SelectionLayout,
 } from "./types";
 
+type EventStatus =
+  | "draft"
+  | "published"
+  | "accepting_applications"
+  | "reviewing"
+  | "results_published";
+
 interface SelectionWorkspaceProps {
   eventId: string;
-  eventStatus: string;
+  eventStatus: EventStatus;
   availableStands: number | null;
   applicants: SelectionApplicantView[];
 }
@@ -87,13 +94,6 @@ export function SelectionWorkspace({
     };
   }, [applicants]);
 
-  const progress = useMemo(() => {
-    return {
-      accepted: counts.accepted,
-      pinned: counts.pinned,
-    };
-  }, [counts]);
-
   const genresSummary = useMemo(() => {
     const set = new Set<string>();
     for (const applicant of applicants) {
@@ -134,8 +134,11 @@ export function SelectionWorkspace({
     update: (list: SelectionApplicantView[]) => SelectionApplicantView[],
     action: () => Promise<{ error?: string }>
   ) {
-    const previous = applicants;
-    setApplicants(update(applicants));
+    let previous: SelectionApplicantView[] = [];
+    setApplicants((current) => {
+      previous = current;
+      return update(current);
+    });
     setError(null);
     startTransition(async () => {
       const result = await action();
@@ -175,9 +178,9 @@ export function SelectionWorkspace({
   function handleBulkDecision(status: "accepted" | "rejected") {
     if (selected.size === 0) return;
     const ids = Array.from(selected);
+    const idSet = new Set(ids);
     applyOptimistic(
-      (list) =>
-        list.map((a) => (selected.has(a.id) ? { ...a, status } : a)),
+      (list) => list.map((a) => (idSet.has(a.id) ? { ...a, status } : a)),
       async () => {
         const formData = new FormData();
         formData.set("eventId", eventId);
@@ -234,8 +237,8 @@ export function SelectionWorkspace({
   return (
     <div className="space-y-5">
       <SelectionProgress
-        accepted={progress.accepted}
-        pinned={progress.pinned}
+        accepted={counts.accepted}
+        pinned={counts.pinned}
         target={availableStands}
       />
       <div className="flex flex-wrap items-center justify-between gap-3">

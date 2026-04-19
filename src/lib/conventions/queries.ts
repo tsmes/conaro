@@ -13,7 +13,7 @@ import type { FieldRequirements } from "@/lib/db/schema/events";
 export interface SelectionApplicant {
   id: string;
   profileId: string;
-  status: string;
+  status: (typeof applications.$inferSelect)["status"];
   pinned: boolean;
   paymentConfirmed: boolean;
   isBlockListed: boolean;
@@ -44,9 +44,12 @@ export async function getOrganizerEvent(
 }
 
 export async function getEventApplicants(
-  conventionId: string,
+  profileId: string,
   eventId: string
 ): Promise<SelectionApplicant[]> {
+  const convention = await getOrganizerConvention(profileId);
+  if (!convention) return [];
+
   const rows = await db
     .select({
       id: applications.id,
@@ -63,14 +66,14 @@ export async function getEventApplicants(
     .where(
       and(
         eq(applications.eventId, eventId),
-        eq(events.conventionId, conventionId)
+        eq(events.conventionId, convention.id)
       )
     )
     .orderBy(asc(applications.createdAt));
 
   return rows.map((row) => ({
     ...row,
-    snapshot: normalizeSnapshot(row.snapshot as ProfileSnapshot),
+    snapshot: normalizeSnapshot(row.snapshot),
   }));
 }
 

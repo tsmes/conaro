@@ -66,17 +66,8 @@ export function TableLayout({
           return (
             <div
               key={applicant.id}
-              role="button"
-              tabIndex={0}
-              onClick={() => !bulkMode && onOpenDeep(applicant.id)}
-              onKeyDown={(event) => {
-                if (!bulkMode && (event.key === "Enter" || event.key === " ")) {
-                  event.preventDefault();
-                  onOpenDeep(applicant.id);
-                }
-              }}
               className={cn(
-                "grid cursor-pointer items-center gap-3 border-b border-border px-5 py-3 text-left last:border-b-0 hover:bg-muted/60",
+                "grid items-center gap-3 border-b border-border px-5 py-3 last:border-b-0",
                 gridCols,
                 isSelected && "bg-primary-container/50"
               )}
@@ -84,7 +75,6 @@ export function TableLayout({
               {bulkMode && !readOnly && (
                 <input
                   type="checkbox"
-                  onClick={(event) => event.stopPropagation()}
                   onChange={() => onToggleSelect(applicant.id)}
                   checked={isSelected}
                   aria-label={`Select ${applicant.displayName}`}
@@ -92,8 +82,13 @@ export function TableLayout({
                 />
               )}
               {bulkMode && readOnly && <span />}
-              <div className="min-w-0">
-                <div className="flex items-center gap-1.5 truncate text-[13px] font-semibold">
+              <button
+                type="button"
+                onClick={() => onOpenDeep(applicant.id)}
+                disabled={bulkMode}
+                className="min-w-0 text-left disabled:cursor-default"
+              >
+                <div className="flex items-center gap-1.5 truncate text-[13px] font-semibold hover:underline">
                   {applicant.displayName}
                   {applicant.pinned && (
                     <Pin className="size-3 text-warning" />
@@ -104,7 +99,7 @@ export function TableLayout({
                     ? `${applicant.helpers} helper${applicant.helpers === 1 ? "" : "s"}`
                     : ""}
                 </div>
-              </div>
+              </button>
               <div className="min-w-0 truncate text-[11.5px]">
                 <div className="truncate">
                   {applicant.genres.slice(0, 2).join(" · ") || "—"}
@@ -121,10 +116,7 @@ export function TableLayout({
               </div>
               <Badge variant={status.variant}>{status.label}</Badge>
               {!readOnly ? (
-                <div
-                  className="flex justify-end"
-                  onClick={(event) => event.stopPropagation()}
-                >
+                <div className="flex justify-end">
                   <button
                     type="button"
                     onClick={() =>

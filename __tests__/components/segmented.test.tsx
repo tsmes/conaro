@@ -11,16 +11,16 @@ const OPTIONS = [
 ] as const;
 
 describe("Segmented", () => {
-  it("marks the active option with aria-selected", () => {
+  it("marks the active option with aria-checked", () => {
     render(
       <Segmented value="table" onChange={() => {}} options={OPTIONS} />
     );
-    expect(screen.getByRole("tab", { name: "Table" })).toHaveAttribute(
-      "aria-selected",
+    expect(screen.getByRole("radio", { name: "Table" })).toHaveAttribute(
+      "aria-checked",
       "true"
     );
-    expect(screen.getByRole("tab", { name: "Gallery" })).toHaveAttribute(
-      "aria-selected",
+    expect(screen.getByRole("radio", { name: "Gallery" })).toHaveAttribute(
+      "aria-checked",
       "false"
     );
   });
@@ -32,7 +32,7 @@ describe("Segmented", () => {
       <Segmented value="gallery" onChange={onChange} options={OPTIONS} />
     );
 
-    await user.click(screen.getByRole("tab", { name: "Deep review" }));
+    await user.click(screen.getByRole("radio", { name: "Deep review" }));
     expect(onChange).toHaveBeenCalledWith("stacked");
   });
 });
