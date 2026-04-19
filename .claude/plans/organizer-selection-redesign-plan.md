@@ -345,9 +345,11 @@ Single-applicant deep-dive with prev/next and decision actions.
 
 **Depends on:** tasks 6, 10, 11.
 
-### 15. `BulkBar`
+### 15. `BulkBar` ✅
 
 Sticky floating action bar for bulk operations.
+
+**Status**: Completed. Renders null when count is 0; otherwise shows "N selected" + Accept all / Reject all / clear.
 
 **Requirements:** REQ-6
 
