@@ -1,6 +1,6 @@
 "use server";
 
-import { and, eq, ne, count } from "drizzle-orm";
+import { and, eq, inArray, ne, count } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { events } from "@/lib/db/schema/events";
@@ -63,6 +63,126 @@ export async function setApplicationDecision(
   revalidatePath(
     `/conventions/manage/events/${eventId}/applications/${applicationId}`
   );
+  return { success: true };
+}
+
+export async function toggleApplicationPin(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const session = await auth();
+  if (!session?.user?.profileId || session.user.role !== "organizer") {
+    return { error: "Unauthorized" };
+  }
+
+  const applicationId = formData.get("applicationId")?.toString();
+  const eventId = formData.get("eventId")?.toString();
+  const pinnedRaw = formData.get("pinned")?.toString();
+
+  if (!applicationId || !eventId) {
+    return { error: "Application ID and Event ID are required" };
+  }
+
+  if (pinnedRaw !== "true" && pinnedRaw !== "false") {
+    return { error: "Pinned must be 'true' or 'false'" };
+  }
+
+  const event = await getOrganizerEvent(session.user.profileId, eventId);
+  if (!event) {
+    return { error: "Event not found" };
+  }
+
+  if (event.status !== "reviewing") {
+    return {
+      error: "Pinning is only available while the event is in reviewing status",
+    };
+  }
+
+  const [application] = await db
+    .select({ id: applications.id })
+    .from(applications)
+    .where(
+      and(eq(applications.id, applicationId), eq(applications.eventId, eventId))
+    );
+
+  if (!application) {
+    return { error: "Application not found" };
+  }
+
+  await db
+    .update(applications)
+    .set({ pinned: pinnedRaw === "true", updatedAt: new Date() })
+    .where(eq(applications.id, applicationId));
+
+  revalidatePath(`/conventions/manage/events/${eventId}/applications`);
+  return { success: true };
+}
+
+export async function setBulkDecision(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const session = await auth();
+  if (!session?.user?.profileId || session.user.role !== "organizer") {
+    return { error: "Unauthorized" };
+  }
+
+  const eventId = formData.get("eventId")?.toString();
+  const decision = formData.get("decision")?.toString();
+  const applicationIds = formData
+    .getAll("applicationIds")
+    .map((value) => value.toString())
+    .filter((value) => value.length > 0);
+
+  if (!eventId) {
+    return { error: "Event ID is required" };
+  }
+
+  if (decision !== "accepted" && decision !== "rejected") {
+    return { error: "Decision must be 'accepted' or 'rejected'" };
+  }
+
+  if (applicationIds.length === 0) {
+    return { error: "At least one application must be selected" };
+  }
+
+  const event = await getOrganizerEvent(session.user.profileId, eventId);
+  if (!event) {
+    return { error: "Event not found" };
+  }
+
+  if (event.status !== "reviewing") {
+    return {
+      error:
+        "Bulk decisions can only be made while the event is in reviewing status",
+    };
+  }
+
+  const matching = await db
+    .select({ id: applications.id })
+    .from(applications)
+    .where(
+      and(
+        eq(applications.eventId, eventId),
+        inArray(applications.id, applicationIds)
+      )
+    );
+
+  if (matching.length !== applicationIds.length) {
+    return { error: "One or more applications do not belong to this event" };
+  }
+
+  await db
+    .update(applications)
+    .set({ status: decision, updatedAt: new Date() })
+    .where(
+      and(
+        eq(applications.eventId, eventId),
+        inArray(applications.id, applicationIds)
+      )
+    );
+
+  revalidatePath(`/conventions/manage/events/${eventId}/applications`);
   return { success: true };
 }
 

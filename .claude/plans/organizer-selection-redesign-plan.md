@@ -178,9 +178,11 @@ Three-way layout toggle (`aria-selected`, keyboard-navigable).
 
 **Depends on:** none.
 
-### 8. Server action: `toggleApplicationPin`
+### 8. Server action: `toggleApplicationPin` ✅
 
 Persists pin state for a single application.
+
+**Status**: Completed. Action guarded to organizer + reviewing status; integration tests cover pin, unpin, wrong-status, wrong-role.
 
 **Requirements:** REQ-3
 
@@ -199,9 +201,11 @@ Persists pin state for a single application.
 
 **Depends on:** task 1.
 
-### 9. Server action: `setBulkDecision`
+### 9. Server action: `setBulkDecision` ✅
 
 Persists bulk accept/reject for multiple applications atomically.
+
+**Status**: Completed. Applies to all selected ids in a single UPDATE; validates they all belong to the event; integration tests cover happy path, mixed-event rejection, empty-selection rejection, wrong-status rejection.
 
 **Requirements:** REQ-6
 

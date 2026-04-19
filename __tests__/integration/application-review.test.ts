@@ -12,6 +12,8 @@ import {
   setApplicationDecision,
   confirmPayment,
   revokeApplication,
+  toggleApplicationPin,
+  setBulkDecision,
 } from "@/app/(authenticated)/conventions/manage/events/[eventId]/applications/actions";
 import { db } from "@/lib/db";
 import { applications } from "@/lib/db/schema/applications";
@@ -280,6 +282,216 @@ describe("application review", () => {
       );
 
       expect(result.error).toContain("accepted");
+    });
+  });
+
+  describe("toggleApplicationPin", () => {
+    it("pins an application when event is in reviewing status", async () => {
+      const { profile, convention } = await createTestOrganizer();
+      const event = await createTestEvent(convention.id, { status: "reviewing" });
+      const artist = await createTestArtist();
+      const application = await createTestApplication(event.id, artist.profile.id);
+
+      mockAuth.mockResolvedValue({
+        user: { id: "u", role: "organizer", profileId: profile.id },
+      });
+
+      const result = await toggleApplicationPin(
+        {},
+        buildFormData({
+          applicationId: application.id,
+          eventId: event.id,
+          pinned: "true",
+        })
+      );
+
+      expect(result.success).toBe(true);
+      const [updated] = await db
+        .select()
+        .from(applications)
+        .where(eq(applications.id, application.id));
+      expect(updated.pinned).toBe(true);
+    });
+
+    it("unpins when passed 'false'", async () => {
+      const { profile, convention } = await createTestOrganizer();
+      const event = await createTestEvent(convention.id, { status: "reviewing" });
+      const artist = await createTestArtist();
+      const application = await createTestApplication(event.id, artist.profile.id, {
+        pinned: true,
+      });
+
+      mockAuth.mockResolvedValue({
+        user: { id: "u", role: "organizer", profileId: profile.id },
+      });
+
+      await toggleApplicationPin(
+        {},
+        buildFormData({
+          applicationId: application.id,
+          eventId: event.id,
+          pinned: "false",
+        })
+      );
+
+      const [updated] = await db
+        .select()
+        .from(applications)
+        .where(eq(applications.id, application.id));
+      expect(updated.pinned).toBe(false);
+    });
+
+    it("refuses to pin when event is not in reviewing status", async () => {
+      const { profile, convention } = await createTestOrganizer();
+      const event = await createTestEvent(convention.id, {
+        status: "results_published",
+      });
+      const artist = await createTestArtist();
+      const application = await createTestApplication(event.id, artist.profile.id);
+
+      mockAuth.mockResolvedValue({
+        user: { id: "u", role: "organizer", profileId: profile.id },
+      });
+
+      const result = await toggleApplicationPin(
+        {},
+        buildFormData({
+          applicationId: application.id,
+          eventId: event.id,
+          pinned: "true",
+        })
+      );
+
+      expect(result.error).toContain("reviewing");
+    });
+
+    it("refuses non-organizer callers", async () => {
+      const { convention } = await createTestOrganizer();
+      const event = await createTestEvent(convention.id, { status: "reviewing" });
+      const artist = await createTestArtist();
+      const application = await createTestApplication(event.id, artist.profile.id);
+
+      mockAuth.mockResolvedValue({
+        user: { id: "u", role: "artist", profileId: artist.profile.id },
+      });
+
+      const result = await toggleApplicationPin(
+        {},
+        buildFormData({
+          applicationId: application.id,
+          eventId: event.id,
+          pinned: "true",
+        })
+      );
+
+      expect(result.error).toBe("Unauthorized");
+    });
+  });
+
+  describe("setBulkDecision", () => {
+    it("accepts multiple applications in one call", async () => {
+      const { profile, convention } = await createTestOrganizer();
+      const event = await createTestEvent(convention.id, { status: "reviewing" });
+      const artistA = await createTestArtist("a@test.com", "Artist A");
+      const artistB = await createTestArtist("b@test.com", "Artist B");
+      const appA = await createTestApplication(event.id, artistA.profile.id);
+      const appB = await createTestApplication(event.id, artistB.profile.id);
+
+      mockAuth.mockResolvedValue({
+        user: { id: "u", role: "organizer", profileId: profile.id },
+      });
+
+      const formData = new FormData();
+      formData.set("eventId", event.id);
+      formData.set("decision", "accepted");
+      formData.append("applicationIds", appA.id);
+      formData.append("applicationIds", appB.id);
+
+      const result = await setBulkDecision({}, formData);
+      expect(result.success).toBe(true);
+
+      const [updatedA] = await db
+        .select()
+        .from(applications)
+        .where(eq(applications.id, appA.id));
+      const [updatedB] = await db
+        .select()
+        .from(applications)
+        .where(eq(applications.id, appB.id));
+      expect(updatedA.status).toBe("accepted");
+      expect(updatedB.status).toBe("accepted");
+    });
+
+    it("rejects when any applicationId does not belong to the event", async () => {
+      const { profile, convention } = await createTestOrganizer();
+      const eventA = await createTestEvent(convention.id, { status: "reviewing" });
+      const eventB = await createTestEvent(convention.id, {
+        status: "reviewing",
+        name: "Other Event",
+      });
+      const artistA = await createTestArtist("a@test.com", "Artist A");
+      const artistB = await createTestArtist("b@test.com", "Artist B");
+      const appA = await createTestApplication(eventA.id, artistA.profile.id);
+      const appOtherEvent = await createTestApplication(
+        eventB.id,
+        artistB.profile.id
+      );
+
+      mockAuth.mockResolvedValue({
+        user: { id: "u", role: "organizer", profileId: profile.id },
+      });
+
+      const formData = new FormData();
+      formData.set("eventId", eventA.id);
+      formData.set("decision", "rejected");
+      formData.append("applicationIds", appA.id);
+      formData.append("applicationIds", appOtherEvent.id);
+
+      const result = await setBulkDecision({}, formData);
+      expect(result.error).toMatch(/do not belong/);
+
+      const [untouched] = await db
+        .select()
+        .from(applications)
+        .where(eq(applications.id, appA.id));
+      expect(untouched.status).toBe("submitted");
+    });
+
+    it("requires at least one applicationId", async () => {
+      const { profile, convention } = await createTestOrganizer();
+      const event = await createTestEvent(convention.id, { status: "reviewing" });
+
+      mockAuth.mockResolvedValue({
+        user: { id: "u", role: "organizer", profileId: profile.id },
+      });
+
+      const formData = new FormData();
+      formData.set("eventId", event.id);
+      formData.set("decision", "accepted");
+
+      const result = await setBulkDecision({}, formData);
+      expect(result.error).toMatch(/at least one/i);
+    });
+
+    it("refuses when event is not in reviewing status", async () => {
+      const { profile, convention } = await createTestOrganizer();
+      const event = await createTestEvent(convention.id, {
+        status: "results_published",
+      });
+      const artist = await createTestArtist();
+      const application = await createTestApplication(event.id, artist.profile.id);
+
+      mockAuth.mockResolvedValue({
+        user: { id: "u", role: "organizer", profileId: profile.id },
+      });
+
+      const formData = new FormData();
+      formData.set("eventId", event.id);
+      formData.set("decision", "accepted");
+      formData.append("applicationIds", application.id);
+
+      const result = await setBulkDecision({}, formData);
+      expect(result.error).toContain("reviewing");
     });
   });
 });
