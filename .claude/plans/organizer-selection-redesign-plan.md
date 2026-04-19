@@ -320,9 +320,11 @@ Dense row-per-applicant view.
 
 **Depends on:** tasks 6, 10, 11.
 
-### 14. `DeepReviewLayout`
+### 14. `DeepReviewLayout` ✅
 
 Single-applicant deep-dive with prev/next and decision actions.
+
+**Status**: Completed. Two-column layout (collage + detail panel), Prev/Next with clamp, pin/accept/reject during reviewing, `Mark paid` / `Revoke` buttons when eventStatus=results_published (accepted only). Post-publish pin/accept/reject hidden.
 
 **Requirements:** REQ-9, Post-publish confirmPayment/revoke
 
