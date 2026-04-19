@@ -366,9 +366,11 @@ Sticky floating action bar for bulk operations.
 
 **Depends on:** none.
 
-### 16. `SelectionWorkspace` container
+### 16. `SelectionWorkspace` container ✅
 
 Wires state, filtering, mutations, and layouts together.
+
+**Status**: Completed. Client container owns filter/layout/bulk state, computes counts, drives optimistic updates with server-action dispatch (pin, decision, bulk, confirmPayment, revoke). Reverts + surfaces inline error if the server rejects the action. Hosts the layout segmented control above the sidebar+content grid.
 
 **Requirements:** REQ-2, REQ-3, REQ-4, REQ-6, REQ-9, REQ-14
 
