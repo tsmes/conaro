@@ -416,9 +416,11 @@ Updates the Selection page to host the workspace, page header, and Finalize butt
 
 **Depends on:** task 16.
 
-### 18. Remove `/applications/[applicationId]` page and clean up
+### 18. Remove `/applications/[applicationId]` page and clean up ✅
 
 Removes the dead route and every reference to it.
+
+**Status**: Completed. Deleted the detail route page and the no-longer-used `ApplicantList` and `ApplicationDecisionControls` components. Removed the `revalidatePath` call targeting the dead route from `setApplicationDecision`. Build clean with no unresolved imports.
 
 **Requirements:** REQ-12
 

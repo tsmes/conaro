@@ -60,9 +60,6 @@ export async function setApplicationDecision(
     .where(eq(applications.id, applicationId));
 
   revalidatePath(`/conventions/manage/events/${eventId}/applications`);
-  revalidatePath(
-    `/conventions/manage/events/${eventId}/applications/${applicationId}`
-  );
   return { success: true };
 }
 
