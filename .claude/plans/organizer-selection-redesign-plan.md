@@ -297,9 +297,11 @@ Card grid over filtered applicants.
 
 **Depends on:** tasks 6, 10, 11.
 
-### 13. `TableLayout`
+### 13. `TableLayout` ✅
 
 Dense row-per-applicant view.
+
+**Status**: Completed. CSS-grid table with responsive columns. Row click / keyboard Enter opens Deep review; pin button stops propagation; bulk mode swaps first column for a checkbox. Empty state mirrors Gallery.
 
 **Requirements:** REQ-8
 
