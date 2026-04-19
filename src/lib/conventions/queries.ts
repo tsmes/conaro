@@ -1,12 +1,25 @@
-import { and, eq } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { conventions } from "@/lib/db/schema/conventions";
 import { events } from "@/lib/db/schema/events";
+import { applications } from "@/lib/db/schema/applications";
+import type { ProfileSnapshot } from "@/lib/db/schema/applications";
 import {
   FIELD_REGISTRY,
   type FieldKey,
 } from "@/lib/db/field-registry";
 import type { FieldRequirements } from "@/lib/db/schema/events";
+
+export interface SelectionApplicant {
+  id: string;
+  profileId: string;
+  status: string;
+  pinned: boolean;
+  paymentConfirmed: boolean;
+  isBlockListed: boolean;
+  createdAt: Date;
+  snapshot: ProfileSnapshot;
+}
 
 export async function getOrganizerConvention(profileId: string) {
   const [convention] = await db
@@ -28,6 +41,46 @@ export async function getOrganizerEvent(
     .from(events)
     .where(and(eq(events.id, eventId), eq(events.conventionId, convention.id)));
   return event ?? null;
+}
+
+export async function getEventApplicants(
+  conventionId: string,
+  eventId: string
+): Promise<SelectionApplicant[]> {
+  const rows = await db
+    .select({
+      id: applications.id,
+      profileId: applications.profileId,
+      status: applications.status,
+      pinned: applications.pinned,
+      paymentConfirmed: applications.paymentConfirmed,
+      isBlockListed: applications.isBlockListed,
+      createdAt: applications.createdAt,
+      snapshot: applications.profileSnapshot,
+    })
+    .from(applications)
+    .innerJoin(events, eq(events.id, applications.eventId))
+    .where(
+      and(
+        eq(applications.eventId, eventId),
+        eq(events.conventionId, conventionId)
+      )
+    )
+    .orderBy(asc(applications.createdAt));
+
+  return rows.map((row) => ({
+    ...row,
+    snapshot: normalizeSnapshot(row.snapshot as ProfileSnapshot),
+  }));
+}
+
+function normalizeSnapshot(snapshot: ProfileSnapshot): ProfileSnapshot {
+  return {
+    ...snapshot,
+    genres: snapshot.genres ?? [],
+    mediums: snapshot.mediums ?? [],
+    images: snapshot.images ?? [],
+  };
 }
 
 export function buildDefaultFieldRequirements(): FieldRequirements {

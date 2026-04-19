@@ -225,9 +225,11 @@ Persists bulk accept/reject for multiple applications atomically.
 
 **Depends on:** task 1.
 
-### 10. Query helper for Selection page
+### 10. Query helper for Selection page ✅
 
 Returns applicants ready for display, with the fields the new UI needs.
+
+**Status**: Completed. `getEventApplicants(conventionId, eventId)` joins `applications` with `events` to enforce ownership; normalizes snapshot arrays so old rows without genres/mediums render safely.
 
 **Requirements:** Infrastructure (for REQ-4, REQ-5, REQ-7, REQ-8, REQ-9)
 

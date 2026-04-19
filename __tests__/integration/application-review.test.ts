@@ -18,6 +18,7 @@ import {
 import { db } from "@/lib/db";
 import { applications } from "@/lib/db/schema/applications";
 import { events } from "@/lib/db/schema/events";
+import { getEventApplicants } from "@/lib/conventions/queries";
 
 const mockAuth = vi.fn();
 
@@ -282,6 +283,54 @@ describe("application review", () => {
       );
 
       expect(result.error).toContain("accepted");
+    });
+  });
+
+  describe("getEventApplicants", () => {
+    it("returns applicants for the given event scoped to the convention", async () => {
+      const { convention } = await createTestOrganizer();
+      const event = await createTestEvent(convention.id, { status: "reviewing" });
+      const artistA = await createTestArtist("a@test.com", "Artist A");
+      const artistB = await createTestArtist("b@test.com", "Artist B");
+      await createTestApplication(event.id, artistA.profile.id);
+      await createTestApplication(event.id, artistB.profile.id, {
+        pinned: true,
+        status: "accepted",
+      });
+
+      const applicants = await getEventApplicants(convention.id, event.id);
+      expect(applicants).toHaveLength(2);
+      expect(applicants.map((a) => a.profileId).sort()).toEqual(
+        [artistA.profile.id, artistB.profile.id].sort()
+      );
+
+      const accepted = applicants.find((a) => a.status === "accepted");
+      expect(accepted?.pinned).toBe(true);
+
+      const submitted = applicants.find((a) => a.status === "submitted");
+      expect(submitted?.pinned).toBe(false);
+    });
+
+    it("excludes applicants whose event belongs to another convention", async () => {
+      const a = await createTestOrganizer("orgA@test.com", "Conv A");
+      const b = await createTestOrganizer("orgB@test.com", "Conv B");
+      const eventA = await createTestEvent(a.convention.id, {
+        status: "reviewing",
+      });
+      const eventB = await createTestEvent(b.convention.id, {
+        status: "reviewing",
+      });
+      const artistA = await createTestArtist("a@test.com");
+      const artistB = await createTestArtist("b@test.com");
+      await createTestApplication(eventA.id, artistA.profile.id);
+      await createTestApplication(eventB.id, artistB.profile.id);
+
+      const applicantsB = await getEventApplicants(b.convention.id, eventB.id);
+      expect(applicantsB).toHaveLength(1);
+      expect(applicantsB[0].profileId).toBe(artistB.profile.id);
+
+      const wrongScope = await getEventApplicants(a.convention.id, eventB.id);
+      expect(wrongScope).toHaveLength(0);
     });
   });
 
