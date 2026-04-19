@@ -19,6 +19,8 @@ export const artistProfiles = pgTable("artist_profiles", {
   accessibilityNeeds: text("accessibility_needs"),
   tableSizePreference: text("table_size_preference"),
   notes: text("notes"),
+  genres: text("genres").array().notNull().default([]),
+  mediums: text("mediums").array().notNull().default([]),
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
 });

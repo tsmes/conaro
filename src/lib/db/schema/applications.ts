@@ -61,6 +61,7 @@ export const applications = pgTable(
       .$type<ProfileSnapshot>(),
     isBlockListed: boolean("is_block_listed").notNull().default(false),
     paymentConfirmed: boolean("payment_confirmed").notNull().default(false),
+    pinned: boolean("pinned").notNull().default(false),
     responseMessage: text("response_message"),
     createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
