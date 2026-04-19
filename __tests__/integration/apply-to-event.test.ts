@@ -69,6 +69,30 @@ describe("applyToEvent", () => {
     const snapshot = apps[0].profileSnapshot as ProfileSnapshot;
     expect(snapshot.displayName).toBe("Test Artist");
     expect(snapshot.contactEmail).toBe("artist@test.com");
+    expect(snapshot.genres).toEqual([]);
+    expect(snapshot.mediums).toEqual([]);
+  });
+
+  it("captures genres and mediums in the profile snapshot", async () => {
+    const { convention } = await createTestOrganizer();
+    const event = await createTestEvent(convention.id);
+    const artist = await setupArtistWithProfile();
+    await db
+      .update(artistProfiles)
+      .set({ genres: ["Comics", "Zines"], mediums: ["Ink", "Risograph"] })
+      .where(eq(artistProfiles.profileId, artist.profile.id));
+
+    mockAuth.mockResolvedValue({
+      user: { id: "u", role: "artist", profileId: artist.profile.id },
+    });
+
+    const result = await applyToEvent({}, buildFormData({ eventId: event.id }));
+    expect(result.success).toBe(true);
+
+    const apps = await findApplicationsByEventId(event.id);
+    const snapshot = apps[0].profileSnapshot as ProfileSnapshot;
+    expect(snapshot.genres).toEqual(["Comics", "Zines"]);
+    expect(snapshot.mediums).toEqual(["Ink", "Risograph"]);
   });
 
   it("rejects when event is not accepting applications", async () => {

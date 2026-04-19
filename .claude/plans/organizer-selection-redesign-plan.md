@@ -19,9 +19,11 @@ Spec: `.claude/plans/organizer-selection-redesign-spec.md`
 
 ## Tasks
 
-### 1. Add schema columns and migration
+### 1. Add schema columns and migration ✅
 
 Adds the new storage: `applications.pinned`, `artist_profiles.genres`, `artist_profiles.mediums`.
+
+**Status**: Completed (commit `d0ba6686`). Migration `0007_puzzling_blockbuster.sql` applied to both dev and test DBs.
 
 **Requirements:** REQ-3, REQ-10
 
@@ -40,9 +42,11 @@ Adds the new storage: `applications.pinned`, `artist_profiles.genres`, `artist_p
 
 **Depends on:** none.
 
-### 2. Extend `ProfileSnapshot` and application submission
+### 2. Extend `ProfileSnapshot` and application submission ✅
 
 Widens the snapshot type and writes genres/mediums into it when an artist applies.
+
+**Status**: Completed. Snapshot type extended; `applyToEvent` captures both arrays; integration test covers empty and populated cases.
 
 **Requirements:** REQ-10, Infrastructure (for REQ-7, REQ-8, REQ-9)
 

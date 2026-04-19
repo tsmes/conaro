@@ -142,6 +142,8 @@ export async function applyToEvent(
     accessibilityNeeds: artistProfile.accessibilityNeeds,
     tableSizePreference: artistProfile.tableSizePreference,
     notes: artistProfile.notes,
+    genres: artistProfile.genres ?? [],
+    mediums: artistProfile.mediums ?? [],
     images: snapshotImages,
   };
 

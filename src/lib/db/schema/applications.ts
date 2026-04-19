@@ -40,6 +40,8 @@ export interface ProfileSnapshot {
   accessibilityNeeds: string | null;
   tableSizePreference: string | null;
   notes: string | null;
+  genres: string[];
+  mediums: string[];
   images: SnapshotImage[];
 }
 

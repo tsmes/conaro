@@ -186,6 +186,8 @@ export async function createTestApplication(
         accessibilityNeeds: null,
         tableSizePreference: null,
         notes: null,
+        genres: [],
+        mediums: [],
         images: [],
       },
       ...overrides,
