@@ -157,9 +157,11 @@ Introduces semantic `--success` / `--warning` tokens aligned with the design, an
 
 **Depends on:** none.
 
-### 7. `Segmented` UI primitive
+### 7. `Segmented` UI primitive ✅
 
 Three-way layout toggle (`aria-selected`, keyboard-navigable).
+
+**Status**: Completed at `src/components/ui/segmented.tsx`; tab role + aria-selected.
 
 **Requirements:** Infrastructure (for REQ-2)
 
