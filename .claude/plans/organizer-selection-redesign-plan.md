@@ -88,9 +88,11 @@ Introduces the fixed tag registries and validation.
 
 **Depends on:** task 1.
 
-### 4. `ChipSelect` UI primitive
+### 4. `ChipSelect` UI primitive ✅
 
 A multi-select chip component that toggles values from a fixed registry and emits hidden inputs for FormData submission.
+
+**Status**: Completed at `src/components/ui/chip-select.tsx`; jsdom tests cover defaultValues, toggling, max constraint, option-filtering.
 
 **Requirements:** Infrastructure (for REQ-10)
 
