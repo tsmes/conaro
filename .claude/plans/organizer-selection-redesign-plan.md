@@ -272,9 +272,11 @@ Progress bar and filter rail.
 
 **Depends on:** task 6 (for variants/tokens).
 
-### 12. `GalleryLayout`
+### 12. `GalleryLayout` ✅
 
 Card grid over filtered applicants.
+
+**Status**: Completed. Card per applicant with portfolio collage, name, genres+mediums badges, pin button, Accept/Not-this-year shortcuts, bulk-mode overlay, empty state. Shares `PortfolioCollage` and `getStatusDisplay` with other layouts.
 
 **Requirements:** REQ-7
 
