@@ -439,9 +439,11 @@ Removes the dead route and every reference to it.
 
 **Depends on:** task 17.
 
-### 19. Integration tests: decision flow end-to-end
+### 19. Integration tests: decision flow end-to-end ✅
 
 Locks down the new actions + existing review flow in the new UI's terms.
+
+**Status**: Completed alongside T8/T9/T10. application-review.test.ts now covers pin (reviewing ok, wrong-status rejected, wrong-role rejected, unpin), bulk decision (happy path, mixed-event rejection, empty selection, wrong-status), and getEventApplicants scope.
 
 **Requirements:** REQ-3, REQ-6 (already partially covered by tasks 8/9 tests), REQ-14
 
@@ -457,9 +459,11 @@ Locks down the new actions + existing review flow in the new UI's terms.
 
 **Depends on:** tasks 8, 9.
 
-### 20. Full test sweep
+### 20. Full test sweep ✅
 
 Run all checks before considering the feature done.
+
+**Status**: Completed. `npm run build` clean; `npm run lint` clean in new code (pre-existing warnings unchanged); `npm test` → 253/253 passing. Had to realign `dashboard-view.test.tsx` with the new Badge `success` tokens.
 
 **Requirements:** Infrastructure (gate before review).
 

@@ -115,7 +115,7 @@ describe("DashboardView", () => {
     );
     const badge = screen.getAllByText("Accepted")[0];
     expect(badge).toBeInTheDocument();
-    expect(badge.className).toMatch(/bg-emerald-100/);
+    expect(badge.className).toMatch(/bg-success-container/);
   });
 
   it("masks decisions while the event is in review state", () => {
