@@ -4,14 +4,17 @@ import { ArrowLeft } from "lucide-react";
 import { eq, and, ne } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { applications } from "@/lib/db/schema/applications";
-import type { ProfileSnapshot } from "@/lib/db/schema/applications";
 import { events } from "@/lib/db/schema/events";
-import { conventionArtistLists } from "@/lib/db/schema/convention-artist-lists";
-import { getOrganizerEvent, getOrganizerConvention } from "@/lib/conventions/queries";
-import { ApplicantList } from "@/components/conventions/applicant-list";
+import {
+  getEventApplicants,
+  getOrganizerConvention,
+  getOrganizerEvent,
+} from "@/lib/conventions/queries";
+import { storage } from "@/lib/storage";
 import { PublishResultsButton } from "@/components/conventions/publish-results-button";
 import { ResponseTemplatesForm } from "@/components/conventions/response-templates-form";
+import { SelectionWorkspace } from "@/components/conventions/selection/selection-workspace";
+import type { SelectionApplicantView } from "@/components/conventions/selection/types";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
@@ -39,44 +42,7 @@ export default async function ApplicationsPage({
     redirect("/login");
   }
 
-  const appRows = await db
-    .select({
-      id: applications.id,
-      profileId: applications.profileId,
-      status: applications.status,
-      paymentConfirmed: applications.paymentConfirmed,
-      profileSnapshot: applications.profileSnapshot,
-      isBlockListed: applications.isBlockListed,
-      createdAt: applications.createdAt,
-    })
-    .from(applications)
-    .where(eq(applications.eventId, eventId));
-
-  const allowEntries = await db
-    .select({ profileId: conventionArtistLists.profileId })
-    .from(conventionArtistLists)
-    .where(
-      and(
-        eq(conventionArtistLists.conventionId, convention.id),
-        eq(conventionArtistLists.listType, "allow")
-      )
-    );
-
-  const allowSet = new Set(allowEntries.map((e) => e.profileId));
-
-  const applicants = appRows.map((app) => {
-    const snapshot = app.profileSnapshot as ProfileSnapshot;
-    return {
-      id: app.id,
-      profileId: app.profileId,
-      displayName: snapshot.displayName,
-      status: app.status,
-      paymentConfirmed: app.paymentConfirmed,
-      createdAt: app.createdAt,
-      isAllowListed: allowSet.has(app.profileId),
-      isBlockListed: app.isBlockListed,
-    };
-  });
+  const applicants = await getEventApplicants(convention.id, eventId);
 
   const undecidedCount = applicants.filter(
     (a) =>
@@ -94,16 +60,36 @@ export default async function ApplicationsPage({
     })
     .from(events)
     .where(
-      and(
-        eq(events.conventionId, convention.id),
-        ne(events.id, eventId)
-      )
+      and(eq(events.conventionId, convention.id), ne(events.id, eventId))
     );
 
   const isPublished = event.status === "results_published";
 
+  const applicantsView: SelectionApplicantView[] = applicants.map((app) => ({
+    id: app.id,
+    profileId: app.profileId,
+    status: app.status,
+    pinned: app.pinned,
+    paymentConfirmed: app.paymentConfirmed,
+    createdAt: app.createdAt,
+    displayName: app.snapshot.displayName,
+    bio: app.snapshot.bio,
+    helpers: app.snapshot.helpers,
+    accessibilityNeeds: app.snapshot.accessibilityNeeds,
+    tableSizePreference: app.snapshot.tableSizePreference,
+    genres: app.snapshot.genres ?? [],
+    mediums: app.snapshot.mediums ?? [],
+    images: [...app.snapshot.images]
+      .sort((a, b) => a.sortOrder - b.sortOrder)
+      .map((image) => ({
+        id: image.id,
+        url: storage.getUrl(image.storagePath),
+        sortOrder: image.sortOrder,
+      })),
+  }));
+
   return (
-    <div className="mx-auto max-w-5xl space-y-10 px-6 py-10 md:px-8">
+    <div className="mx-auto max-w-[1400px] space-y-10 px-6 py-10 md:px-8">
       <div>
         <Button
           variant="ghost"
@@ -121,18 +107,35 @@ export default async function ApplicationsPage({
         />
       </div>
 
-      <header>
+      <header className="space-y-2">
         <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
-          {event.name}
+          Selection · {event.name}
         </p>
-        <h1 className="mt-3 font-heading text-4xl font-extrabold tracking-tight">
-          Review applications
+        <h1 className="font-heading text-display-md font-extrabold leading-[1.05] tracking-tight">
+          Pick your artists
         </h1>
-        <p className="mt-3 text-muted-foreground">
-          {applicants.length} application{applicants.length === 1 ? "" : "s"} in
-          the pile.
+        <p className="max-w-2xl text-muted-foreground">
+          {applicants.length === 0
+            ? "No applicants yet. Once artists submit, you'll curate them here."
+            : `${undecidedCount} still undecided. Pin favourites as you browse; accept when you're ready.`}
         </p>
       </header>
+
+      <div className="flex flex-wrap items-center justify-end gap-3">
+        <PublishResultsButton
+          eventId={event.id}
+          eventStatus={event.status}
+          undecidedCount={undecidedCount}
+          totalCount={applicants.length}
+        />
+      </div>
+
+      <SelectionWorkspace
+        eventId={event.id}
+        eventStatus={event.status}
+        availableStands={event.availableStands}
+        applicants={applicantsView}
+      />
 
       <Card className="p-8 md:p-10">
         <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
@@ -142,8 +145,8 @@ export default async function ApplicationsPage({
           Default acceptance &amp; rejection messages
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          These are the defaults each applicant receives. Individual messages
-          can override them from the single-applicant view.
+          These are the defaults each applicant receives. Override them per
+          applicant from Deep review if needed.
         </p>
         <div className="mt-8">
           <ResponseTemplatesForm
@@ -159,25 +162,6 @@ export default async function ApplicationsPage({
           />
         </div>
       </Card>
-
-      <section className="space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="font-heading text-2xl font-bold tracking-tight">
-            Applicants
-          </h2>
-          <PublishResultsButton
-            eventId={event.id}
-            eventStatus={event.status}
-            undecidedCount={undecidedCount}
-            totalCount={applicants.length}
-          />
-        </div>
-        <ApplicantList
-          eventId={event.id}
-          eventStatus={event.status}
-          applicants={applicants}
-        />
-      </section>
     </div>
   );
 }

@@ -393,9 +393,11 @@ Wires state, filtering, mutations, and layouts together.
 
 **Depends on:** tasks 7, 8, 9, 10, 11, 12, 13, 14, 15.
 
-### 17. Page header and layout toggle placement
+### 17. Page header and layout toggle placement ✅
 
 Updates the Selection page to host the workspace, page header, and Finalize button.
+
+**Status**: Completed. Page fetches applicants via `getEventApplicants`, resolves portfolio image URLs via storage, and mounts `SelectionWorkspace`. `PublishResultsButton` is repositioned above the workspace as the Finalize affordance; `ResponseTemplatesForm` stays in an editorial Card below.
 
 **Requirements:** REQ-1, REQ-2, REQ-11, REQ-14
 
