@@ -64,9 +64,11 @@ Widens the snapshot type and writes genres/mediums into it when an artist applie
 
 **Depends on:** task 1.
 
-### 3. Genre + medium registries and Zod schemas
+### 3. Genre + medium registries and Zod schemas ✅
 
 Introduces the fixed tag registries and validation.
+
+**Status**: Completed. Registries live at `src/lib/artist-profile/tags.ts`; `basicInfoSchema` validates both arrays.
 
 **Requirements:** REQ-10
 

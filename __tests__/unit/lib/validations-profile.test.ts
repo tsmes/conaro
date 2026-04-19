@@ -79,6 +79,48 @@ describe("basicInfoSchema", () => {
     });
     expect(result.success).toBe(true);
   });
+
+  it("defaults genres and mediums to empty arrays", () => {
+    const result = basicInfoSchema.safeParse(validInput);
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.genres).toEqual([]);
+      expect(result.data.mediums).toEqual([]);
+    }
+  });
+
+  it("accepts genres from the registry", () => {
+    const result = basicInfoSchema.safeParse({
+      ...validInput,
+      genres: ["Comics", "Zines"],
+      mediums: ["Ink", "Risograph"],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects a genre outside the registry", () => {
+    const result = basicInfoSchema.safeParse({
+      ...validInput,
+      genres: ["Comics", "Not-A-Real-Genre"],
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects a medium outside the registry", () => {
+    const result = basicInfoSchema.safeParse({
+      ...validInput,
+      mediums: ["Crayons"],
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects duplicate genres", () => {
+    const result = basicInfoSchema.safeParse({
+      ...validInput,
+      genres: ["Comics", "Comics"],
+    });
+    expect(result.success).toBe(false);
+  });
 });
 
 describe("logisticsSchema", () => {

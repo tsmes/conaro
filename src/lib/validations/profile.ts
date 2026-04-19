@@ -1,4 +1,17 @@
 import { z } from "zod";
+import { GENRES, MEDIUMS } from "@/lib/artist-profile/tags";
+
+const genresSchema = z
+  .array(z.enum(GENRES))
+  .max(GENRES.length, "Too many genres selected")
+  .refine((arr) => new Set(arr).size === arr.length, "Duplicate genres selected")
+  .default([]);
+
+const mediumsSchema = z
+  .array(z.enum(MEDIUMS))
+  .max(MEDIUMS.length, "Too many mediums selected")
+  .refine((arr) => new Set(arr).size === arr.length, "Duplicate mediums selected")
+  .default([]);
 
 export const basicInfoSchema = z.object({
   displayName: z
@@ -27,6 +40,8 @@ export const basicInfoSchema = z.object({
     .max(500, "Social links is too long")
     .optional()
     .default(""),
+  genres: genresSchema,
+  mediums: mediumsSchema,
 });
 
 export type BasicInfoInput = z.infer<typeof basicInfoSchema>;
