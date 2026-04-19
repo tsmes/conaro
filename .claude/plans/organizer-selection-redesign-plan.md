@@ -112,9 +112,11 @@ A multi-select chip component that toggles values from a fixed registry and emit
 
 **Depends on:** none.
 
-### 5. Artist profile editor — add genres + mediums sections
+### 5. Artist profile editor — add genres + mediums sections ✅
 
 Lets artists set their genres and mediums from the editor.
+
+**Status**: Completed. Two new sections in the basic-info form wired via `ChipSelect`; `updateBasicInfo` persists both arrays.
 
 **Requirements:** REQ-10
 

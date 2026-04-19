@@ -96,6 +96,8 @@ export default async function ProfilePage() {
             bio: artistProfile?.bio ?? "",
             websiteUrl: artistProfile?.websiteUrl ?? "",
             socialLinks: artistProfile?.socialLinks ?? "",
+            genres: artistProfile?.genres ?? [],
+            mediums: artistProfile?.mediums ?? [],
           }}
         />
       </SectionShell>

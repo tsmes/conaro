@@ -26,6 +26,8 @@ export async function updateBasicInfo(
     bio: (formData.get("bio") ?? "").toString(),
     websiteUrl: (formData.get("websiteUrl") ?? "").toString(),
     socialLinks: (formData.get("socialLinks") ?? "").toString(),
+    genres: formData.getAll("genres").map((v) => v.toString()),
+    mediums: formData.getAll("mediums").map((v) => v.toString()),
   };
 
   const result = basicInfoSchema.safeParse(raw);
@@ -33,8 +35,17 @@ export async function updateBasicInfo(
     return { fieldErrors: result.error.flatten().fieldErrors };
   }
 
-  const { displayName, realName, contactEmail, phone, bio, websiteUrl, socialLinks } =
-    result.data;
+  const {
+    displayName,
+    realName,
+    contactEmail,
+    phone,
+    bio,
+    websiteUrl,
+    socialLinks,
+    genres,
+    mediums,
+  } = result.data;
 
   const profileId = session.user.profileId;
   if (!profileId) {
@@ -57,6 +68,8 @@ export async function updateBasicInfo(
           bio: bio || null,
           websiteUrl: websiteUrl || null,
           socialLinks: socialLinks || null,
+          genres,
+          mediums,
           updatedAt: new Date(),
         })
         .where(eq(artistProfiles.profileId, profileId));

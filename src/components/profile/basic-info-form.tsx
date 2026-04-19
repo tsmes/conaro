@@ -3,8 +3,10 @@
 import { useActionState } from "react";
 import { updateBasicInfo } from "@/app/(authenticated)/dashboard/profile/actions";
 import { Button } from "@/components/ui/button";
+import { ChipSelect } from "@/components/ui/chip-select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { GENRES, MEDIUMS } from "@/lib/artist-profile/tags";
 
 const LABEL_CLASS =
   "text-[11px] font-bold uppercase tracking-wider text-muted-foreground";
@@ -19,6 +21,8 @@ interface BasicInfoFormProps {
     bio: string;
     websiteUrl: string;
     socialLinks: string;
+    genres: string[];
+    mediums: string[];
   };
 }
 
@@ -144,6 +148,30 @@ export function BasicInfoForm({ defaultValues }: BasicInfoFormProps) {
             placeholder="Instagram, Twitter, etc."
           />
         </div>
+      </div>
+      <div className="space-y-2">
+        <span className={LABEL_CLASS}>Genres</span>
+        <p className="text-sm text-muted-foreground">
+          Pick the genres your work lives in. Helps organizers filter their pool.
+        </p>
+        <ChipSelect
+          name="genres"
+          options={GENRES}
+          defaultValues={defaultValues.genres}
+          aria-label="Genres"
+        />
+      </div>
+      <div className="space-y-2">
+        <span className={LABEL_CLASS}>Mediums</span>
+        <p className="text-sm text-muted-foreground">
+          What you make with. Select all that apply.
+        </p>
+        <ChipSelect
+          name="mediums"
+          options={MEDIUMS}
+          defaultValues={defaultValues.mediums}
+          aria-label="Mediums"
+        />
       </div>
       <Button type="submit" disabled={pending}>
         {pending ? "Saving..." : "Save basic info"}
