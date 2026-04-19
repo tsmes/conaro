@@ -47,6 +47,12 @@
   --color-tertiary-container: var(--tertiary-container);
   --color-on-tertiary-container: var(--on-tertiary-container);
   --color-surface-bright: var(--surface-bright);
+  --color-success: var(--success);
+  --color-success-container: var(--success-container);
+  --color-on-success-container: var(--on-success-container);
+  --color-warning: var(--warning);
+  --color-warning-container: var(--warning-container);
+  --color-on-warning-container: var(--on-warning-container);
 
   /* Fonts */
   --font-sans: var(--font-inter);
@@ -118,6 +124,12 @@
   --tertiary-container: #ff8eb0;
   --on-tertiary-container: #640430;
   --surface-bright: #ffffff;
+  --success: #0a8f5a;
+  --success-container: #d8f4e4;
+  --on-success-container: #063a25;
+  --warning: #b06b00;
+  --warning-container: #ffe7b3;
+  --on-warning-container: #3b2300;
 
   /* Charts (kept neutral; tuned later if charts are added) */
   --chart-1: #6a37d4;
@@ -168,6 +180,12 @@
   --tertiary-container: #701039;
   --on-tertiary-container: #ff8eb0;
   --surface-bright: #222226;
+  --success: #58d49a;
+  --success-container: #0f3b28;
+  --on-success-container: #c6f3da;
+  --warning: #f0b94a;
+  --warning-container: #3a2808;
+  --on-warning-container: #ffe0a8;
 
   --chart-1: #a078ff;
   --chart-2: #ae8dff;

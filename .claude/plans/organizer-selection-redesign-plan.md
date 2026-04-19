@@ -135,9 +135,11 @@ Lets artists set their genres and mediums from the editor.
 
 **Depends on:** tasks 3, 4.
 
-### 6. Design tokens + `warning` Badge variant
+### 6. Design tokens + `warning` Badge variant ✅
 
 Introduces semantic `--success` / `--warning` tokens aligned with the design, and a proper Badge variant.
+
+**Status**: Completed. `--success*` and `--warning*` tokens added (light+dark); Badge `success` reroutes to the new container tokens and new `warning` variant added.
 
 **Requirements:** Infrastructure (for REQ-5, REQ-7, REQ-9)
 

@@ -17,12 +17,14 @@ describe("Badge", () => {
         <Badge variant="default">a</Badge>
         <Badge variant="secondary">b</Badge>
         <Badge variant="success">c</Badge>
-        <Badge variant="destructive">d</Badge>
+        <Badge variant="warning">d</Badge>
+        <Badge variant="destructive">e</Badge>
       </>
     );
     expect(screen.getByText("a").className).toMatch(/bg-primary\/10/);
     expect(screen.getByText("b").className).toMatch(/bg-amber-100/);
-    expect(screen.getByText("c").className).toMatch(/bg-emerald-100/);
-    expect(screen.getByText("d").className).toMatch(/bg-tertiary-container/);
+    expect(screen.getByText("c").className).toMatch(/bg-success-container/);
+    expect(screen.getByText("d").className).toMatch(/bg-warning-container/);
+    expect(screen.getByText("e").className).toMatch(/bg-tertiary-container/);
   });
 });

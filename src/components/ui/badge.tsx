@@ -18,7 +18,9 @@ const badgeVariants = cva(
         secondary:
           "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300 [a]:hover:bg-amber-200",
         success:
-          "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 [a]:hover:bg-emerald-200",
+          "bg-success-container text-on-success-container [a]:hover:brightness-95",
+        warning:
+          "bg-warning-container text-on-warning-container [a]:hover:brightness-95",
         destructive:
           "bg-tertiary-container text-on-tertiary-container [a]:hover:brightness-95",
         outline:
