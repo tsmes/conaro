@@ -272,7 +272,8 @@ export default async function EventDetailPage({
           </SectionCard>
         )}
 
-        {(event.availableStands || event.tableDimensions || event.priceInfo) && (
+        {session?.user &&
+          (event.availableStands || event.tableDimensions || event.priceInfo) && (
           <SectionCard label="Artist Logistics">
             <div className="grid gap-4 sm:grid-cols-2">
               {event.availableStands && (
@@ -300,7 +301,7 @@ export default async function EventDetailPage({
           </SectionCard>
         )}
 
-        {amenities && (
+        {session?.user && amenities && (
           <SectionCard label="Provided Amenities">
             <div className="space-y-3">
               <div className="flex flex-wrap gap-2">
