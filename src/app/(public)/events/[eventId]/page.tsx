@@ -23,6 +23,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { formatDateNo, formatDateRangeNo } from "@/lib/utils/format-date-no";
 
 interface EventDetailPageProps {
   params: Promise<{ eventId: string }>;
@@ -211,7 +212,7 @@ export default async function EventDetailPage({
           </h1>
           {event.status === "published" && event.applicationOpenDate && (
             <Badge variant="outline">
-              Applications open {event.applicationOpenDate}
+              Applications open {formatDateNo(event.applicationOpenDate)}
             </Badge>
           )}
           {event.status === "reviewing" && (
@@ -239,13 +240,12 @@ export default async function EventDetailPage({
         <SectionCard label="Dates">
           <div className="grid gap-4 sm:grid-cols-2">
             <DetailField label="Event">
-              {event.eventStartDate}
-              {event.eventEndDate && ` – ${event.eventEndDate}`}
+              {formatDateRangeNo(event.eventStartDate, event.eventEndDate)}
             </DetailField>
             {event.applicationCloseDate && (
               <DetailField label="Application deadline">
                 <span className="font-semibold text-destructive">
-                  {event.applicationCloseDate}
+                  {formatDateNo(event.applicationCloseDate)}
                 </span>
               </DetailField>
             )}

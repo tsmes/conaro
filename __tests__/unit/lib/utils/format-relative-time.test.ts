@@ -28,9 +28,9 @@ describe("formatRelativeTime", () => {
     );
   });
 
-  it("returns an ISO date once the event is a week or more old", () => {
+  it("returns a Norwegian date once the event is a week or more old", () => {
     expect(formatRelativeTime(new Date("2026-04-10T12:00:00Z"), REF)).toBe(
-      "2026-04-10"
+      "10. April 2026"
     );
   });
 

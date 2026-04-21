@@ -1,6 +1,8 @@
+import { formatDateNo } from "./format-date-no";
+
 // Compact relative-time formatter used for notification timestamps and any
 // other UI that needs a "Xm ago / Xh ago / Xd ago" treatment. Falls back to
-// an ISO date once the event is a week or more in the past.
+// a Norwegian absolute date once the event is a week or more in the past.
 export function formatRelativeTime(
   input: string | Date,
   now: Date = new Date()
@@ -15,5 +17,5 @@ export function formatRelativeTime(
   if (diffMins < 60) return `${diffMins}m ago`;
   if (diffHours < 24) return `${diffHours}h ago`;
   if (diffDays < 7) return `${diffDays}d ago`;
-  return date.toISOString().slice(0, 10);
+  return formatDateNo(date.toISOString().slice(0, 10));
 }

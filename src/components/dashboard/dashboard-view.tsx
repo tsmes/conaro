@@ -18,6 +18,7 @@ import { CompletenessIndicator } from "@/components/profile/completeness-indicat
 import { styleForStatus } from "@/lib/applications/status-styles";
 import type { CompletenessResult } from "@/lib/profile/completeness";
 import { cn } from "@/lib/utils";
+import { formatDateNo } from "@/lib/utils/format-date-no";
 
 export interface DashboardApplication {
   id: string;
@@ -56,12 +57,9 @@ function displayStatusFor(app: DashboardApplication) {
 }
 
 function formatDate(iso: string): string {
-  const d = new Date(iso);
-  return d.toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
+  // Application createdAt is a full ISO timestamp; extract the date component
+  // so the Norwegian formatter sees YYYY-MM-DD.
+  return formatDateNo(iso.slice(0, 10));
 }
 
 function conventionInitials(name: string): string {

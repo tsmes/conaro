@@ -45,7 +45,7 @@ describe("EventCard", () => {
     render(<EventCard event={baseEvent} viewer="public" />);
     expect(screen.getByText("Kawaiicon")).toBeInTheDocument();
     expect(screen.getByText("Kawaiicon 2026")).toBeInTheDocument();
-    expect(screen.getByText("Sep 15–16")).toBeInTheDocument();
+    expect(screen.getByText("15. - 16. September 2026")).toBeInTheDocument();
     expect(screen.getByText("Oslo, NO")).toBeInTheDocument();
   });
 

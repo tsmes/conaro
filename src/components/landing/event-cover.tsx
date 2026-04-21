@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { pickCoverGradient } from "@/lib/landing/cover-gradient";
+import { monthAbbrNo } from "@/lib/utils/format-date-no";
 import { storage } from "@/lib/storage";
 
 export interface EventCoverProps {
@@ -16,27 +17,11 @@ function initialsFor(name: string): string {
   return parts.map((p) => p[0]?.toUpperCase() ?? "").join("") || "?";
 }
 
-const MONTHS = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
-];
-
 function dateStamp(iso: string): { month: string; day: string } {
   // Parse the date component directly so we don't shift across time zones.
-  const [, monthStr, dayStr] = iso.split("-");
-  const monthIdx = Number.parseInt(monthStr ?? "1", 10) - 1;
+  const [, , dayStr] = iso.split("-");
   return {
-    month: MONTHS[monthIdx] ?? "",
+    month: monthAbbrNo(iso),
     day: String(Number.parseInt(dayStr ?? "1", 10)),
   };
 }

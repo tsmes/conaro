@@ -7,32 +7,9 @@ import type {
   ApplicationStatus,
   LandingEvent,
 } from "@/lib/landing/data";
+import { formatDateRangeNo } from "@/lib/utils/format-date-no";
 import { EventCover } from "./event-cover";
 import type { ArtistEventContext } from "./event-card";
-
-const MONTHS = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
-];
-
-function formatDateRange(start: string, end: string | null): string {
-  const [, sm, sd] = start.split("-").map((p) => Number.parseInt(p, 10));
-  const sMonth = MONTHS[(sm ?? 1) - 1];
-  if (!end || start === end) return `${sMonth} ${sd}`;
-  const [, em, ed] = end.split("-").map((p) => Number.parseInt(p, 10));
-  if (sm === em) return `${sMonth} ${sd}–${ed}`;
-  return `${sMonth} ${sd} – ${MONTHS[(em ?? 1) - 1]} ${ed}`;
-}
 
 function daysUntil(targetIso: string, today: Date): number {
   const target = new Date(`${targetIso}T00:00:00Z`);
@@ -96,7 +73,8 @@ export function FeaturedEvent({
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                {event.conventionName} · {formatDateRange(event.eventStartDate, event.eventEndDate)}
+                {event.conventionName} ·{" "}
+                {formatDateRangeNo(event.eventStartDate, event.eventEndDate)}
               </p>
               <h2 className="mt-2 font-heading text-2xl font-extrabold tracking-tight md:text-3xl">
                 {event.name}

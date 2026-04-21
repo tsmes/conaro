@@ -12,15 +12,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ORGANIZER_STATUS_LABELS } from "@/lib/events/status-display";
+import { formatDateRangeNo } from "@/lib/utils/format-date-no";
 
 function conventionInitials(name: string): string {
   const parts = name.trim().split(/\s+/).slice(0, 2);
   return parts.map((p) => p[0]?.toUpperCase() ?? "").join("") || "?";
-}
-
-function formatRange(start: string, end: string | null): string {
-  if (!end || start === end) return start;
-  return `${start} – ${end}`;
 }
 
 export default async function ConventionManagePage() {
@@ -155,7 +151,7 @@ export default async function ConventionManagePage() {
                       <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                         <span className="inline-flex items-center gap-1.5">
                           <CalendarDays className="size-4" />
-                          {formatRange(
+                          {formatDateRangeNo(
                             event.eventStartDate,
                             event.eventEndDate
                           )}

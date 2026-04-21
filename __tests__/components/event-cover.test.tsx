@@ -55,6 +55,19 @@ describe("EventCover", () => {
     expect(screen.getByText("3")).toBeInTheDocument();
   });
 
+  it("uses Norwegian month abbreviations (Mai, not May)", () => {
+    render(
+      <EventCover
+        conventionId="kc"
+        conventionName="K"
+        logoPath={null}
+        eventStartDate="2026-05-03"
+        variant="card"
+      />
+    );
+    expect(screen.getByText("Mai")).toBeInTheDocument();
+  });
+
   it("shows the 'Next up' badge in hero variant only", () => {
     const { rerender } = render(
       <EventCover

@@ -9,14 +9,10 @@ import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { storage } from "@/lib/storage";
 import { ARTIST_STATUS_LABELS } from "@/lib/events/status-display";
+import { formatDateNo, formatDateRangeNo } from "@/lib/utils/format-date-no";
 
 interface EventsPageProps {
   searchParams: Promise<{ convention?: string }>;
-}
-
-function formatRange(start: string, end: string | null): string {
-  if (!end || start === end) return start;
-  return `${start} – ${end}`;
 }
 
 function conventionInitials(name: string): string {
@@ -142,7 +138,10 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
                     <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                       <span className="inline-flex items-center gap-1.5">
                         <CalendarDays className="size-4" />
-                        {formatRange(event.eventStartDate, event.eventEndDate)}
+                        {formatDateRangeNo(
+                          event.eventStartDate,
+                          event.eventEndDate
+                        )}
                       </span>
                       {(event.venueCity || event.venueCountry) && (
                         <span className="inline-flex items-center gap-1.5">
@@ -168,7 +167,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
                             Deadline
                           </p>
                           <p className="font-heading text-base font-bold text-destructive">
-                            {event.applicationCloseDate}
+                            {formatDateNo(event.applicationCloseDate)}
                           </p>
                         </div>
                       )}
@@ -179,7 +178,7 @@ export default async function EventsPage({ searchParams }: EventsPageProps) {
                             Opens
                           </p>
                           <p className="font-heading text-base font-bold">
-                            {event.applicationOpenDate}
+                            {formatDateNo(event.applicationOpenDate)}
                           </p>
                         </div>
                       )}

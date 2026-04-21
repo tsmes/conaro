@@ -7,6 +7,7 @@ import {
   type ApplicationStatus,
   type LandingEvent,
 } from "@/lib/landing/data";
+import { formatDateRangeNo } from "@/lib/utils/format-date-no";
 import { EventCover } from "./event-cover";
 import { EventContextStrip } from "./event-context-strip";
 import { FollowButton } from "./follow-button";
@@ -21,30 +22,6 @@ export interface EventCardProps {
   event: LandingEvent;
   viewer: "public" | "artist" | "organizer";
   artistContext?: ArtistEventContext;
-}
-
-const MONTHS = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
-];
-
-function formatDateRange(start: string, end: string | null): string {
-  const [, sm, sd] = start.split("-").map((p) => Number.parseInt(p, 10));
-  const sMonth = MONTHS[(sm ?? 1) - 1];
-  if (!end || start === end) return `${sMonth} ${sd}`;
-  const [, em, ed] = end.split("-").map((p) => Number.parseInt(p, 10));
-  if (sm === em) return `${sMonth} ${sd}–${ed}`;
-  return `${sMonth} ${sd} – ${MONTHS[(em ?? 1) - 1]} ${ed}`;
 }
 
 function statusBadgeForArtist(status: ApplicationStatus): React.ReactNode {
@@ -122,7 +99,7 @@ export function EventCard({ event, viewer, artistContext }: EventCardProps) {
               <span className="inline-flex items-center gap-1.5">
                 <CalendarDays className="size-3.5" />
                 <span className="font-semibold">
-                  {formatDateRange(event.eventStartDate, event.eventEndDate)}
+                  {formatDateRangeNo(event.eventStartDate, event.eventEndDate)}
                 </span>
               </span>
               <span className="inline-flex items-center gap-1.5 text-muted-foreground">

@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ARTIST_STATUS_LABELS } from "@/lib/events/status-display";
+import { formatDateNo, formatDateRangeNo } from "@/lib/utils/format-date-no";
 
 interface ConventionDetailPageProps {
   params: Promise<{ conventionId: string }>;
@@ -22,11 +23,6 @@ interface ConventionDetailPageProps {
 function conventionInitials(name: string): string {
   const parts = name.trim().split(/\s+/).slice(0, 2);
   return parts.map((p) => p[0]?.toUpperCase() ?? "").join("") || "?";
-}
-
-function formatRange(start: string, end: string | null): string {
-  if (!end || start === end) return start;
-  return `${start} – ${end}`;
 }
 
 export default async function ConventionDetailPage({
@@ -180,7 +176,7 @@ export default async function ConventionDetailPage({
                       <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                         <span className="inline-flex items-center gap-1.5">
                           <CalendarDays className="size-4" />
-                          {formatRange(
+                          {formatDateRangeNo(
                             event.eventStartDate,
                             event.eventEndDate
                           )}
@@ -195,12 +191,15 @@ export default async function ConventionDetailPage({
                         )}
                         {event.status === "published" &&
                           event.applicationOpenDate && (
-                            <span>Opens {event.applicationOpenDate}</span>
+                            <span>
+                              Opens {formatDateNo(event.applicationOpenDate)}
+                            </span>
                           )}
                         {event.status === "accepting_applications" &&
                           event.applicationCloseDate && (
                             <span className="font-semibold text-destructive">
-                              Deadline {event.applicationCloseDate}
+                              Deadline{" "}
+                              {formatDateNo(event.applicationCloseDate)}
                             </span>
                           )}
                       </div>
