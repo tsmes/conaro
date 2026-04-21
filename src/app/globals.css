@@ -243,4 +243,55 @@
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
   }
+
+  /* Event-card cover rails. Six deterministic gradients used as fallback
+     when a convention has no logo. Chosen via pickCoverGradient. */
+  .cover-a {
+    background-image: radial-gradient(
+      120% 120% at 10% 10%,
+      #ae8dff 0%,
+      #6a37d4 45%,
+      #281050 100%
+    );
+  }
+  .cover-b {
+    background-image: radial-gradient(
+      120% 120% at 90% 10%,
+      #ff8eb0 0%,
+      #b41340 55%,
+      #3a0a1b 100%
+    );
+  }
+  .cover-c {
+    background-image: radial-gradient(
+      120% 120% at 50% 10%,
+      #58d49a 0%,
+      #0a8f5a 55%,
+      #053221 100%
+    );
+  }
+  .cover-d {
+    background-image: radial-gradient(
+      120% 120% at 10% 90%,
+      #ffd27a 0%,
+      #b06b00 55%,
+      #3b2300 100%
+    );
+  }
+  .cover-e {
+    background-image: radial-gradient(
+      120% 120% at 90% 90%,
+      #6fa8ff 0%,
+      #1960c7 55%,
+      #0a2a5e 100%
+    );
+  }
+  .cover-f {
+    background-image: radial-gradient(
+      120% 120% at 50% 50%,
+      #dfdce0 0%,
+      #9e9c9f 55%,
+      #2f2e31 100%
+    );
+  }
 }
