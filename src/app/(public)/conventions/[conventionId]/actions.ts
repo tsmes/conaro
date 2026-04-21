@@ -57,5 +57,6 @@ export async function toggleFollow(
 
   revalidatePath(`/conventions/${conventionId}`);
   revalidatePath("/dashboard");
+  revalidatePath("/");
   return { success: true };
 }
