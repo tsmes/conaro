@@ -13,7 +13,9 @@ Spec: `.claude/plans/landing-page-redesign-spec.md`
 
 ## Tasks
 
-### 1. Cover gradient utilities and picker
+> All tasks below were implemented in commits 6b1f68ec..HEAD. Each task was committed individually after passing its own tests; the final integration commit also runs the full test suite (296 passing) and `next build` (clean).
+
+### 1. Cover gradient utilities and picker — DONE
 
 Add the six CSS utility classes for event-card cover rails and a deterministic picker keyed by convention id.
 

@@ -10,7 +10,7 @@ export interface ProfileCompletenessCardProps {
 export function ProfileCompletenessCard({
   completeness,
 }: ProfileCompletenessCardProps) {
-  const isComplete = completeness.overall.complete;
+  const isComplete = completeness.overall >= 100;
   return (
     <Card>
       <CardHeader>
