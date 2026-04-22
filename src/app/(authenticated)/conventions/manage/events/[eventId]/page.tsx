@@ -18,6 +18,8 @@ import {
 } from "@/app/(authenticated)/conventions/manage/events/actions";
 import { EventForm } from "@/components/conventions/event-form";
 import { EventStatusControls } from "@/components/conventions/event-status-controls";
+import { AnnouncementsEditor } from "@/components/conventions/announcements-editor";
+import { getEventAnnouncements } from "@/app/(authenticated)/conventions/manage/events/[eventId]/announcements/actions";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
@@ -58,6 +60,7 @@ export default async function EventDetailPage({
   }
 
   const amenities = event.amenities as Amenities | null;
+  const announcements = await getEventAnnouncements(event.id);
 
   return (
     <div className="mx-auto max-w-4xl space-y-10 px-6 py-10 md:px-8">
@@ -179,6 +182,25 @@ export default async function EventDetailPage({
               conventionRejectionMessage: convention.rejectionMessage,
             }}
             submitLabel="Save changes"
+          />
+        </div>
+      </Card>
+
+      <Card className="p-6 md:p-8">
+        <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+          Announcements
+        </p>
+        <h2 className="mt-2 font-heading text-2xl font-bold tracking-tight">
+          Messages to accepted artists
+        </h2>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Use this for pre-event logistics, day-of updates, and anything
+          else accepted artists need before or during the event.
+        </p>
+        <div className="mt-6">
+          <AnnouncementsEditor
+            eventId={event.id}
+            announcements={announcements}
           />
         </div>
       </Card>
