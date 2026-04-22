@@ -12,7 +12,6 @@ const baseArtistProfile = {
   socialLinks: null,
   helpers: 0,
   accessibilityNeeds: null,
-  tableSizePreference: null,
   notes: null,
 };
 
@@ -26,7 +25,6 @@ const allNotRequested: FieldRequirements = {
   socialLinks: "not_requested",
   helpers: "not_requested",
   accessibilityNeeds: "not_requested",
-  tableSizePreference: "not_requested",
   notes: "not_requested",
   portfolioImages: "not_requested",
 };

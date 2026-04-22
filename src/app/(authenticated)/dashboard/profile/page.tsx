@@ -106,13 +106,12 @@ export default async function ProfilePage() {
         id="logistics"
         label="Section 2"
         title="Logistics"
-        description="Table preferences and accessibility needs for conventions."
+        description="Helpers and accessibility needs you carry across every event."
       >
         <LogisticsForm
           defaultValues={{
             helpers: artistProfile?.helpers ?? 0,
             accessibilityNeeds: artistProfile?.accessibilityNeeds ?? "",
-            tableSizePreference: artistProfile?.tableSizePreference ?? "",
             notes: artistProfile?.notes ?? "",
           }}
         />

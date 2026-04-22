@@ -74,13 +74,6 @@ export const FIELD_REGISTRY = [
     required: false,
   },
   {
-    key: "tableSizePreference",
-    label: "Table size preference",
-    section: "logistics",
-    type: "text",
-    required: false,
-  },
-  {
     key: "notes",
     label: "Additional notes",
     section: "logistics",

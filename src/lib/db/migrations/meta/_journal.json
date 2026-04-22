@@ -64,6 +64,13 @@
       "when": 1776839473597,
       "tag": "0008_mighty_jackpot",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1776840027926,
+      "tag": "0009_serious_silverclaw",
+      "breakpoints": true
     }
   ]
 }

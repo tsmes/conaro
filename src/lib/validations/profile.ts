@@ -58,11 +58,6 @@ export const logisticsSchema = z.object({
     .max(1000, "Accessibility needs is too long")
     .optional()
     .default(""),
-  tableSizePreference: z
-    .string()
-    .max(200, "Table size preference is too long")
-    .optional()
-    .default(""),
   notes: z
     .string()
     .max(2000, "Notes must be at most 2000 characters")

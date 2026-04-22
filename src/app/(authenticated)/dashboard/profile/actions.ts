@@ -95,7 +95,6 @@ export async function updateLogistics(
   const raw = {
     helpers: (formData.get("helpers") ?? "0").toString(),
     accessibilityNeeds: (formData.get("accessibilityNeeds") ?? "").toString(),
-    tableSizePreference: (formData.get("tableSizePreference") ?? "").toString(),
     notes: (formData.get("notes") ?? "").toString(),
   };
 
@@ -104,7 +103,7 @@ export async function updateLogistics(
     return { fieldErrors: result.error.flatten().fieldErrors };
   }
 
-  const { helpers, accessibilityNeeds, tableSizePreference, notes } = result.data;
+  const { helpers, accessibilityNeeds, notes } = result.data;
 
   const profileId = session.user.profileId;
   if (!profileId) {
@@ -117,7 +116,6 @@ export async function updateLogistics(
       .set({
         helpers,
         accessibilityNeeds: accessibilityNeeds || null,
-        tableSizePreference: tableSizePreference || null,
         notes: notes || null,
         updatedAt: new Date(),
       })

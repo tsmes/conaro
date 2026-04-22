@@ -13,7 +13,6 @@ describe("FIELD_REGISTRY", () => {
     expect(keys).toContain("socialLinks");
     expect(keys).toContain("helpers");
     expect(keys).toContain("accessibilityNeeds");
-    expect(keys).toContain("tableSizePreference");
     expect(keys).toContain("notes");
     expect(keys).toContain("portfolioImages");
   });

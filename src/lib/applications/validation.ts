@@ -27,7 +27,6 @@ interface ArtistProfileData {
   socialLinks: string | null;
   helpers: number | null;
   accessibilityNeeds: string | null;
-  tableSizePreference: string | null;
   notes: string | null;
 }
 

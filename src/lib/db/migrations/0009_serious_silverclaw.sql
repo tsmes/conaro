@@ -1,0 +1,1 @@
+ALTER TABLE "artist_profiles" DROP COLUMN "table_size_preference";

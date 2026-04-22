@@ -138,7 +138,6 @@ describe("applyToEvent", () => {
         socialLinks: "not_requested",
         helpers: "not_requested",
         accessibilityNeeds: "not_requested",
-        tableSizePreference: "not_requested",
         notes: "not_requested",
         portfolioImages: "not_requested",
       },

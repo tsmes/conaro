@@ -38,7 +38,6 @@ export interface ProfileSnapshot {
   socialLinks: string | null;
   helpers: number | null;
   accessibilityNeeds: string | null;
-  tableSizePreference: string | null;
   notes: string | null;
   genres?: string[];
   mediums?: string[];

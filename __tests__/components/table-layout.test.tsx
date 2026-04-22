@@ -17,7 +17,6 @@ const applicants: SelectionApplicantView[] = [
     bio: null,
     helpers: 1,
     accessibilityNeeds: null,
-    tableSizePreference: "Small",
     genres: ["Comics", "Zines"],
     mediums: ["Ink"],
     images: [],
@@ -39,7 +38,6 @@ describe("TableLayout", () => {
     );
     expect(screen.getByText("Artist One")).toBeInTheDocument();
     expect(screen.getByText("Undecided")).toBeInTheDocument();
-    expect(screen.getByText("Small")).toBeInTheDocument();
   });
 
   it("fires onOpenDeep when the applicant name button is clicked", async () => {

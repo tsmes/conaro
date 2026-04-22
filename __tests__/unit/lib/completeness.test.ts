@@ -14,7 +14,6 @@ describe("computeCompleteness", () => {
     socialLinks: null,
     helpers: null,
     accessibilityNeeds: null,
-    tableSizePreference: null,
     notes: null,
   };
 
@@ -43,7 +42,7 @@ describe("computeCompleteness", () => {
   it("marks logistics complete when any field has a value", () => {
     const result = computeCompleteness(filledProfile, {
       ...emptyArtistProfile,
-      tableSizePreference: "2m x 1m",
+      accessibilityNeeds: "Step-free access please",
     }, 0);
     expect(result.logistics.complete).toBe(true);
     expect(result.logistics.filled).toBe(1);
@@ -68,20 +67,20 @@ describe("computeCompleteness", () => {
   });
 
   it("computes overall percentage based on total fields filled", () => {
-    // Total fields: 7 basic + 4 logistics + 1 portfolio = 12
-    // displayName(1) + contactEmail(1) + helpers(1) + image(1) = 4/12 = 33%
+    // Total fields: 7 basic + 3 logistics + 1 portfolio = 11
+    // displayName(1) + contactEmail(1) + helpers(1) + image(1) = 4/11 = 36%
     const partial = computeCompleteness(filledProfile, {
       ...emptyArtistProfile,
       contactEmail: "test@example.com",
       helpers: 2,
     }, 1);
-    expect(partial.overall).toBe(33);
+    expect(partial.overall).toBe(36);
 
-    // Empty profile = 0/12 = 0%
+    // Empty profile = 0/11 = 0%
     const empty = computeCompleteness(emptyProfile, emptyArtistProfile, 0);
     expect(empty.overall).toBe(0);
 
-    // All fields filled = 12/12 = 100%
+    // All fields filled = 11/11 = 100%
     const full = computeCompleteness(filledProfile, {
       contactEmail: "test@example.com",
       realName: "Real Name",
@@ -91,7 +90,6 @@ describe("computeCompleteness", () => {
       socialLinks: "@artist",
       helpers: 2,
       accessibilityNeeds: "Needs",
-      tableSizePreference: "2m",
       notes: "Notes",
     }, 1);
     expect(full.overall).toBe(100);

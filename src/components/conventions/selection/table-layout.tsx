@@ -40,8 +40,8 @@ export function TableLayout({
   }
 
   const gridCols = bulkMode
-    ? "grid-cols-[28px_1.4fr_0.9fr_0.7fr_0.7fr_120px_44px]"
-    : "grid-cols-[1.4fr_0.9fr_0.7fr_0.7fr_120px_44px]";
+    ? "grid-cols-[28px_1.4fr_0.9fr_0.7fr_120px_44px]"
+    : "grid-cols-[1.4fr_0.9fr_0.7fr_120px_44px]";
 
   return (
     <Card className="shadow-gallery overflow-hidden p-0">
@@ -55,7 +55,6 @@ export function TableLayout({
         <span>Artist</span>
         <span>Genres · medium</span>
         <span>Submitted</span>
-        <span>Table req.</span>
         <span>Status</span>
         <span />
       </div>
@@ -110,9 +109,6 @@ export function TableLayout({
               </div>
               <div className="font-mono text-[11.5px] text-muted-foreground">
                 {formatDate(applicant.createdAt)}
-              </div>
-              <div className="font-mono text-[11.5px]">
-                {applicant.tableSizePreference ?? "—"}
               </div>
               <Badge variant={status.variant}>{status.label}</Badge>
               {!readOnly ? (

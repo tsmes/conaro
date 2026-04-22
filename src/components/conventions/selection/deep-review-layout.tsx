@@ -141,15 +141,7 @@ export function DeepReviewLayout({
             </div>
           )}
 
-          <div className="grid grid-cols-3 gap-2 rounded-[12px] bg-muted p-3">
-            <div>
-              <div className="text-[10.5px] font-bold uppercase tracking-wider text-muted-foreground">
-                Table
-              </div>
-              <div className="font-mono text-[13px] font-semibold capitalize">
-                {applicant.tableSizePreference ?? "—"}
-              </div>
-            </div>
+          <div className="grid grid-cols-2 gap-2 rounded-[12px] bg-muted p-3">
             <div>
               <div className="text-[10.5px] font-bold uppercase tracking-wider text-muted-foreground">
                 Helpers

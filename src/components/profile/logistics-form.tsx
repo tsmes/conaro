@@ -14,7 +14,6 @@ interface LogisticsFormProps {
   defaultValues: {
     helpers: number;
     accessibilityNeeds: string;
-    tableSizePreference: string;
     notes: string;
   };
 }
@@ -42,36 +41,26 @@ export function LogisticsForm({ defaultValues }: LogisticsFormProps) {
           Logistics updated successfully
         </p>
       )}
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="helpers" className={LABEL_CLASS}>Number of helpers</Label>
-          <Input
-            id="helpers"
-            name="helpers"
-            type="number"
-            min={0}
-            max={5}
-            defaultValue={defaultValues.helpers}
-            aria-describedby={
-              state.fieldErrors?.helpers ? "helpers-error" : undefined
-            }
-            aria-invalid={!!state.fieldErrors?.helpers}
-          />
-          {state.fieldErrors?.helpers && (
-            <p id="helpers-error" role="alert" className="text-sm text-destructive">
-              {state.fieldErrors.helpers[0]}
-            </p>
-          )}
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="tableSizePreference" className={LABEL_CLASS}>Table size preference</Label>
-          <Input
-            id="tableSizePreference"
-            name="tableSizePreference"
-            defaultValue={defaultValues.tableSizePreference}
-            placeholder="e.g., 2m x 1m"
-          />
-        </div>
+      <div className="space-y-2">
+        <Label htmlFor="helpers" className={LABEL_CLASS}>Number of helpers</Label>
+        <Input
+          id="helpers"
+          name="helpers"
+          type="number"
+          min={0}
+          max={5}
+          defaultValue={defaultValues.helpers}
+          aria-describedby={
+            state.fieldErrors?.helpers ? "helpers-error" : undefined
+          }
+          aria-invalid={!!state.fieldErrors?.helpers}
+          className="max-w-[180px]"
+        />
+        {state.fieldErrors?.helpers && (
+          <p id="helpers-error" role="alert" className="text-sm text-destructive">
+            {state.fieldErrors.helpers[0]}
+          </p>
+        )}
       </div>
       <div className="space-y-2">
         <Label htmlFor="accessibilityNeeds" className={LABEL_CLASS}>Accessibility needs</Label>

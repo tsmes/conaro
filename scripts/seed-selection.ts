@@ -250,7 +250,6 @@ async function run() {
       bio: plan.bio,
       contactEmail: plan.email,
       helpers: plan.helpers,
-      tableSizePreference: plan.tableSize,
       genres: plan.genres,
       mediums: plan.mediums,
     });
@@ -265,7 +264,6 @@ async function run() {
       socialLinks: null,
       helpers: plan.helpers,
       accessibilityNeeds: null,
-      tableSizePreference: plan.tableSize,
       notes: null,
       genres: plan.genres,
       mediums: plan.mediums,

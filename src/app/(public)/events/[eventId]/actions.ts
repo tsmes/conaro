@@ -140,7 +140,6 @@ export async function applyToEvent(
     socialLinks: artistProfile.socialLinks,
     helpers: artistProfile.helpers,
     accessibilityNeeds: artistProfile.accessibilityNeeds,
-    tableSizePreference: artistProfile.tableSizePreference,
     notes: artistProfile.notes,
     genres: artistProfile.genres ?? [],
     mediums: artistProfile.mediums ?? [],

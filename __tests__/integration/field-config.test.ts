@@ -57,7 +57,6 @@ describe("updateFieldConfig", () => {
       socialLinks: "not_requested",
       helpers: "optional",
       accessibilityNeeds: "not_requested",
-      tableSizePreference: "not_requested",
       notes: "not_requested",
       portfolioImages: "required",
       minPortfolioImages: "3",

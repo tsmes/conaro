@@ -77,7 +77,6 @@ export default async function ApplicationsPage({
     bio: app.snapshot.bio,
     helpers: app.snapshot.helpers,
     accessibilityNeeds: app.snapshot.accessibilityNeeds,
-    tableSizePreference: app.snapshot.tableSizePreference,
     genres: app.snapshot.genres ?? [],
     mediums: app.snapshot.mediums ?? [],
     images: [...app.snapshot.images]

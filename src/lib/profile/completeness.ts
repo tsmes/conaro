@@ -11,7 +11,6 @@ interface ArtistProfileData {
   socialLinks: string | null;
   helpers: number | null;
   accessibilityNeeds: string | null;
-  tableSizePreference: string | null;
   notes: string | null;
 }
 
@@ -55,7 +54,6 @@ export function computeCompleteness(
       artistProfile?.helpers !== undefined &&
       artistProfile.helpers > 0,
     !!artistProfile?.accessibilityNeeds,
-    !!artistProfile?.tableSizePreference,
     !!artistProfile?.notes,
   ];
 

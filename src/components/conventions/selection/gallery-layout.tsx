@@ -115,11 +115,6 @@ export function GalleryLayout({
                   <div className="truncate font-heading text-[14px] font-extrabold leading-tight">
                     {applicant.displayName}
                   </div>
-                  {applicant.tableSizePreference && (
-                    <div className="truncate font-mono text-[11.5px] text-muted-foreground">
-                      Table: {applicant.tableSizePreference}
-                    </div>
-                  )}
                 </div>
               </div>
               <div className="mt-2.5 flex flex-wrap gap-1">

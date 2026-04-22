@@ -17,7 +17,6 @@ export const artistProfiles = pgTable("artist_profiles", {
   socialLinks: text("social_links"),
   helpers: integer("helpers").default(0),
   accessibilityNeeds: text("accessibility_needs"),
-  tableSizePreference: text("table_size_preference"),
   notes: text("notes"),
   genres: text("genres").array().notNull().default([]),
   mediums: text("mediums").array().notNull().default([]),

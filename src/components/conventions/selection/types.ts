@@ -36,7 +36,6 @@ export interface SelectionApplicantView {
   bio: string | null;
   helpers: number | null;
   accessibilityNeeds: string | null;
-  tableSizePreference: string | null;
   genres: string[];
   mediums: string[];
   images: { id: string; url: string; sortOrder: number }[];
