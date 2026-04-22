@@ -80,6 +80,9 @@ export function SelectionWorkspace({
   // Organizers can act on applications while they're still coming in, too —
   // only lock the workspace once results have been published.
   const readOnly = eventStatus === "results_published";
+  // Deep review shows one applicant at a time, so bulk-select has nothing
+  // to act on. Hide bulk controls for that layout.
+  const canBulk = !readOnly && layout !== "stacked";
 
   const filtered = useMemo(
     () => applicants.filter((a) => matchesFilter(a, filter)),
@@ -113,6 +116,12 @@ export function SelectionWorkspace({
 
   function handleLayoutChange(next: SelectionLayout) {
     setLayout(next);
+    // Bulk mode is meaningless in the single-applicant deep-review layout.
+    // Exit it (and clear the selection) when switching in.
+    if (next === "stacked" && bulkMode) {
+      setBulkMode(false);
+      setSelected(new Set());
+    }
   }
 
   function handleToggleSelect(id: string) {
@@ -272,11 +281,11 @@ export function SelectionWorkspace({
             genresSummary={genresSummary}
             bulkMode={bulkMode}
             onToggleBulkMode={handleToggleBulkMode}
-            canBulk={!readOnly}
+            canBulk={canBulk}
           />
         </aside>
         <div className="min-w-0 space-y-4">
-          {!readOnly && bulkMode && (
+          {canBulk && bulkMode && (
             <BulkBar
               count={selected.size}
               onAccept={() => handleBulkDecision("accepted")}
