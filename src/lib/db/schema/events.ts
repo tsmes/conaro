@@ -61,6 +61,7 @@ export const events = pgTable(
     minPortfolioImages: integer("min_portfolio_images"),
     acceptanceMessage: text("acceptance_message"),
     rejectionMessage: text("rejection_message"),
+    guidelinesOverride: text("guidelines_override"),
     createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
   },
