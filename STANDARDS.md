@@ -93,9 +93,27 @@ src/
 
 ### Field Registry
 
-- Toggleable application fields defined as a typed constant array in `lib/db/field-registry.ts`
-- Adding a new field means: add to the registry array + add the form field in the artist profile UI
-- Event field requirements stored as JSONB referencing registry field keys
+- Toggleable fields defined as a typed constant array in `lib/db/field-registry.ts`.
+- Each entry has a `source`:
+  - `"profile"` — pulled from the artist profile at apply time and snapshotted into `applications.profileSnapshot`.
+  - `"application"` — filled in by the artist on the application form and stored in `applications.answers`.
+- Event field requirements are a JSONB map (`required | optional | not_requested`) keyed by registry field keys.
+
+#### Invariant — the field registry must match the artist profile
+
+**Every profile-source field in the artist profile UI MUST have a corresponding entry in `FIELD_REGISTRY`, and every profile-source registry entry MUST map to data actually present on the profile.** The organizer's per-event field toggle screen iterates the registry; anything missing there can't be required of applicants, and anything in the registry that doesn't exist on the profile produces an un-satisfiable requirement.
+
+When you add, rename, or remove an editable field on the artist profile:
+
+1. Update the schema (`lib/db/schema/artist-profiles.ts` or related) and generate a migration.
+2. Add / rename / remove the matching entry in `FIELD_REGISTRY`.
+3. Update `lib/applications/validation.ts` — both the `ArtistProfileData` interface and the `isFieldFilled` helper (special-case for multi-column fields like `priceRange`).
+4. Update `lib/db/schema/applications.ts` `ProfileSnapshot` so organizers see the new value on submitted applications.
+5. Update the snapshot build in `app/(public)/events/[eventId]/actions.ts` `applyToEvent`.
+6. Update `lib/validations/profile.ts` so the save action validates the new input.
+7. Extend the mapping in `__tests__/unit/lib/field-registry-profile-match.test.ts` (this test exists specifically to fail when the registry and the profile drift apart).
+
+Application-source registry entries don't have a corresponding profile column; they live in `applications.answers` and are validated by `buildApplicationAnswersSchema` in `lib/validations/application.ts`.
 
 ## Testing
 

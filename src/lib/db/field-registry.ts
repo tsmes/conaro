@@ -74,6 +74,41 @@ export const FIELD_REGISTRY = [
     type: "textarea",
     required: false,
   },
+  {
+    key: "pronouns",
+    label: "Pronouns",
+    section: "basic",
+    source: "profile",
+    type: "text",
+    required: false,
+  },
+  {
+    key: "priceRange",
+    label: "Typical price range",
+    section: "basic",
+    source: "profile",
+    type: "number",
+    required: false,
+    helpText: "Requires both min and max price on the artist profile.",
+  },
+  {
+    key: "genres",
+    label: "Genres",
+    section: "basic",
+    source: "profile",
+    type: "text",
+    required: false,
+    helpText: "Requires at least one genre tag on the artist profile.",
+  },
+  {
+    key: "mediums",
+    label: "Mediums",
+    section: "basic",
+    source: "profile",
+    type: "text",
+    required: false,
+    helpText: "Requires at least one medium tag on the artist profile.",
+  },
 
   // -------- Profile-source: Logistics --------
   {

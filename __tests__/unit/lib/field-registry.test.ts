@@ -15,6 +15,10 @@ describe("FIELD_REGISTRY", () => {
     expect(keys).toContain("accessibilityNeeds");
     expect(keys).toContain("notes");
     expect(keys).toContain("portfolioImages");
+    expect(keys).toContain("pronouns");
+    expect(keys).toContain("priceRange");
+    expect(keys).toContain("genres");
+    expect(keys).toContain("mediums");
   });
 
   it("has no duplicate keys", () => {

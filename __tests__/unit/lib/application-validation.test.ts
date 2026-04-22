@@ -5,6 +5,7 @@ import type { FieldRequirements } from "@/lib/db/schema/events";
 const baseProfile = { displayName: "Artist" };
 const baseArtistProfile = {
   realName: null,
+  pronouns: null,
   contactEmail: "artist@test.com",
   phone: null,
   bio: null,
@@ -13,11 +14,16 @@ const baseArtistProfile = {
   helpers: 0,
   accessibilityNeeds: null,
   notes: null,
+  priceRangeMinNok: null,
+  priceRangeMaxNok: null,
+  genres: [],
+  mediums: [],
 };
 
 const allNotRequested: FieldRequirements = {
   displayName: "not_requested",
   realName: "not_requested",
+  pronouns: "not_requested",
   contactEmail: "not_requested",
   phone: "not_requested",
   bio: "not_requested",
@@ -27,6 +33,9 @@ const allNotRequested: FieldRequirements = {
   accessibilityNeeds: "not_requested",
   notes: "not_requested",
   portfolioImages: "not_requested",
+  priceRange: "not_requested",
+  genres: "not_requested",
+  mediums: "not_requested",
 };
 
 describe("validateProfileForEvent", () => {
@@ -161,6 +170,66 @@ describe("validateProfileForEvent", () => {
     );
 
     expect(result.valid).toBe(true);
+  });
+
+  it("treats priceRange as filled only when both min and max are set", () => {
+    const requirements: FieldRequirements = {
+      ...allNotRequested,
+      priceRange: "required",
+    };
+
+    const bothMissing = validateProfileForEvent(
+      requirements,
+      0,
+      baseProfile,
+      baseArtistProfile,
+      0
+    );
+    expect(bothMissing.valid).toBe(false);
+
+    const onlyMin = validateProfileForEvent(
+      requirements,
+      0,
+      baseProfile,
+      { ...baseArtistProfile, priceRangeMinNok: 100 },
+      0
+    );
+    expect(onlyMin.valid).toBe(false);
+
+    const both = validateProfileForEvent(
+      requirements,
+      0,
+      baseProfile,
+      { ...baseArtistProfile, priceRangeMinNok: 100, priceRangeMaxNok: 500 },
+      0
+    );
+    expect(both.valid).toBe(true);
+  });
+
+  it("treats genres/mediums as filled when at least one tag is set", () => {
+    const requirements: FieldRequirements = {
+      ...allNotRequested,
+      genres: "required",
+      mediums: "required",
+    };
+
+    const empty = validateProfileForEvent(
+      requirements,
+      0,
+      baseProfile,
+      baseArtistProfile,
+      0
+    );
+    expect(empty.valid).toBe(false);
+
+    const oneEach = validateProfileForEvent(
+      requirements,
+      0,
+      baseProfile,
+      { ...baseArtistProfile, genres: ["Comics"], mediums: ["Ink"] },
+      0
+    );
+    expect(oneEach.valid).toBe(true);
   });
 
   it("returns valid when fieldRequirements is null", () => {

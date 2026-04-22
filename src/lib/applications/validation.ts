@@ -32,6 +32,8 @@ interface ArtistProfileData {
   notes: string | null;
   priceRangeMinNok: number | null;
   priceRangeMaxNok: number | null;
+  genres?: string[] | null;
+  mediums?: string[] | null;
 }
 
 function isFieldFilled(
@@ -46,6 +48,23 @@ function isFieldFilled(
 
   if (field.key === "portfolioImages") {
     return imageCount > 0;
+  }
+
+  // Multi-column / array fields need per-key checks rather than reading
+  // a single column by name.
+  if (field.key === "priceRange") {
+    return (
+      artistProfile.priceRangeMinNok !== null &&
+      artistProfile.priceRangeMinNok !== undefined &&
+      artistProfile.priceRangeMaxNok !== null &&
+      artistProfile.priceRangeMaxNok !== undefined
+    );
+  }
+  if (field.key === "genres") {
+    return (artistProfile.genres?.length ?? 0) > 0;
+  }
+  if (field.key === "mediums") {
+    return (artistProfile.mediums?.length ?? 0) > 0;
   }
 
   // Guard against field keys not present on the artist profile interface
