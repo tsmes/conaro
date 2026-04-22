@@ -19,7 +19,9 @@ describe("basicInfoSchema", () => {
       phone: "+1234567890",
       bio: "A short bio",
       websiteUrl: "https://example.com",
-      socialLinks: "@artist on instagram",
+      socialLinks: JSON.stringify([
+        { type: "Instagram", url: "https://instagram.com/wsp" },
+      ]),
     });
     expect(result.success).toBe(true);
   });
@@ -98,26 +100,44 @@ describe("basicInfoSchema", () => {
     expect(result.success).toBe(true);
   });
 
-  it("rejects a genre outside the registry", () => {
+  it("accepts custom genres outside the suggestion list", () => {
     const result = basicInfoSchema.safeParse({
       ...validInput,
-      genres: ["Comics", "Not-A-Real-Genre"],
+      genres: ["Comics", "Cottagecore"],
     });
-    expect(result.success).toBe(false);
+    expect(result.success).toBe(true);
   });
 
-  it("rejects a medium outside the registry", () => {
+  it("accepts custom mediums outside the suggestion list", () => {
     const result = basicInfoSchema.safeParse({
       ...validInput,
       mediums: ["Crayons"],
     });
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects duplicate genres (case-insensitive)", () => {
+    const result = basicInfoSchema.safeParse({
+      ...validInput,
+      genres: ["Comics", "comics"],
+    });
     expect(result.success).toBe(false);
   });
 
-  it("rejects duplicate genres", () => {
+  it("rejects social links that aren't a JSON array", () => {
     const result = basicInfoSchema.safeParse({
       ...validInput,
-      genres: ["Comics", "Comics"],
+      socialLinks: "@artist on instagram",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects social link URLs without http(s)://", () => {
+    const result = basicInfoSchema.safeParse({
+      ...validInput,
+      socialLinks: JSON.stringify([
+        { type: "Instagram", url: "instagram.com/wsp" },
+      ]),
     });
     expect(result.success).toBe(false);
   });
@@ -128,7 +148,6 @@ describe("logisticsSchema", () => {
     const result = logisticsSchema.safeParse({
       helpers: 2,
       accessibilityNeeds: "Wheelchair access",
-      tableSizePreference: "2m x 1m",
       notes: "Some notes",
     });
     expect(result.success).toBe(true);

@@ -7,6 +7,8 @@ import { ChipSelect } from "@/components/ui/chip-select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { GENRES, MEDIUMS } from "@/lib/artist-profile/tags";
+import type { SocialLink } from "@/lib/artist-profile/social-links";
+import { SocialLinksEditor } from "./social-links-editor";
 
 const LABEL_CLASS =
   "text-[11px] font-bold uppercase tracking-wider text-muted-foreground";
@@ -20,7 +22,7 @@ interface BasicInfoFormProps {
     phone: string;
     bio: string;
     websiteUrl: string;
-    socialLinks: string;
+    socialLinks: SocialLink[];
     genres: string[];
     mediums: string[];
   };
@@ -139,15 +141,16 @@ export function BasicInfoForm({ defaultValues }: BasicInfoFormProps) {
             </p>
           )}
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="socialLinks" className={LABEL_CLASS}>Social links</Label>
-          <Input
-            id="socialLinks"
-            name="socialLinks"
-            defaultValue={defaultValues.socialLinks}
-            placeholder="Instagram, Twitter, etc."
-          />
-        </div>
+      </div>
+      <div className="space-y-2">
+        <span className={LABEL_CLASS}>Social links</span>
+        <p className="text-sm text-muted-foreground">
+          Pick a platform for each link so organizers can render them cleanly.
+        </p>
+        <SocialLinksEditor
+          name="socialLinks"
+          defaultValues={defaultValues.socialLinks}
+        />
       </div>
       <div className="space-y-2">
         <span className={LABEL_CLASS}>Genres</span>
@@ -158,18 +161,24 @@ export function BasicInfoForm({ defaultValues }: BasicInfoFormProps) {
           name="genres"
           options={GENRES}
           defaultValues={defaultValues.genres}
+          allowCustom
+          addLabel="Add your own genre…"
+          max={25}
           aria-label="Genres"
         />
       </div>
       <div className="space-y-2">
         <span className={LABEL_CLASS}>Mediums</span>
         <p className="text-sm text-muted-foreground">
-          What you make with. Select all that apply.
+          What you make with. Select all that apply, or add your own.
         </p>
         <ChipSelect
           name="mediums"
           options={MEDIUMS}
           defaultValues={defaultValues.mediums}
+          allowCustom
+          addLabel="Add your own medium…"
+          max={25}
           aria-label="Mediums"
         />
       </div>

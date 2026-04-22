@@ -6,73 +6,74 @@ import { ChipSelect } from "@/components/ui/chip-select";
 
 const OPTIONS = ["Ink", "Digital", "Gouache"] as const;
 
+function hiddenValues(container: HTMLElement): string[] {
+  return Array.from(
+    container.querySelectorAll<HTMLInputElement>("input[type=hidden]")
+  ).map((input) => input.value);
+}
+
 describe("ChipSelect", () => {
-  it("marks defaultValues as pressed", () => {
+  it("renders a removable chip per default value", () => {
     render(
       <ChipSelect name="mediums" options={OPTIONS} defaultValues={["Ink"]} />
     );
-    expect(screen.getByRole("button", { name: "Ink" })).toHaveAttribute(
-      "aria-pressed",
-      "true"
-    );
-    expect(screen.getByRole("button", { name: "Digital" })).toHaveAttribute(
-      "aria-pressed",
-      "false"
-    );
+    // Selected chip surfaces as a remove button
+    expect(
+      screen.getByRole("button", { name: "Remove Ink" })
+    ).toBeInTheDocument();
+    // Unselected option shows as an add button
+    expect(
+      screen.getByRole("button", { name: /\+ Digital/ })
+    ).toBeInTheDocument();
   });
 
-  it("toggles selection when clicked", async () => {
+  it("adds and removes selections when chips are clicked", async () => {
     const user = userEvent.setup();
     const { container } = render(
       <ChipSelect name="mediums" options={OPTIONS} defaultValues={["Ink"]} />
     );
 
-    await user.click(screen.getByRole("button", { name: "Digital" }));
-    expect(screen.getByRole("button", { name: "Digital" })).toHaveAttribute(
-      "aria-pressed",
-      "true"
-    );
+    await user.click(screen.getByRole("button", { name: /\+ Digital/ }));
+    expect(hiddenValues(container)).toEqual(["Ink", "Digital"]);
 
-    const hiddenValues = Array.from(
-      container.querySelectorAll<HTMLInputElement>("input[type=hidden]")
-    ).map((input) => input.value);
-    expect(hiddenValues).toEqual(["Ink", "Digital"]);
-
-    await user.click(screen.getByRole("button", { name: "Ink" }));
-    expect(screen.getByRole("button", { name: "Ink" })).toHaveAttribute(
-      "aria-pressed",
-      "false"
-    );
+    await user.click(screen.getByRole("button", { name: "Remove Ink" }));
+    expect(hiddenValues(container)).toEqual(["Digital"]);
   });
 
   it("enforces max selections", async () => {
     const user = userEvent.setup();
-    render(<ChipSelect name="mediums" options={OPTIONS} max={1} />);
-
-    await user.click(screen.getByRole("button", { name: "Ink" }));
-    await user.click(screen.getByRole("button", { name: "Digital" }));
-
-    expect(screen.getByRole("button", { name: "Ink" })).toHaveAttribute(
-      "aria-pressed",
-      "true"
+    const { container } = render(
+      <ChipSelect name="mediums" options={OPTIONS} max={1} />
     );
-    expect(screen.getByRole("button", { name: "Digital" })).toHaveAttribute(
-      "aria-pressed",
-      "false"
-    );
+
+    await user.click(screen.getByRole("button", { name: /\+ Ink/ }));
+    // Once max is reached, remaining option chips are disabled
+    expect(screen.getByRole("button", { name: /\+ Digital/ })).toBeDisabled();
+    expect(hiddenValues(container)).toEqual(["Ink"]);
   });
 
-  it("ignores defaultValues that are not in the options", () => {
+  it("preserves custom defaultValues outside the options list", () => {
     const { container } = render(
       <ChipSelect
         name="mediums"
         options={OPTIONS}
-        defaultValues={["Ink", "Not-a-real-medium"]}
+        defaultValues={["Ink", "Glitter glue"]}
       />
     );
-    const hiddenValues = Array.from(
-      container.querySelectorAll<HTMLInputElement>("input[type=hidden]")
-    ).map((input) => input.value);
-    expect(hiddenValues).toEqual(["Ink"]);
+    expect(hiddenValues(container)).toEqual(["Ink", "Glitter glue"]);
+    expect(
+      screen.getByRole("button", { name: "Remove Glitter glue" })
+    ).toBeInTheDocument();
+    expect(screen.getByText(/Custom:/)).toBeInTheDocument();
+  });
+
+  it("lets the artist add a custom value via the input when allowCustom is on", async () => {
+    const user = userEvent.setup();
+    const { container } = render(
+      <ChipSelect name="mediums" options={OPTIONS} allowCustom />
+    );
+    const input = screen.getByPlaceholderText("Add your own");
+    await user.type(input, "Woodcut{Enter}");
+    expect(hiddenValues(container)).toEqual(["Woodcut"]);
   });
 });

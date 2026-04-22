@@ -10,6 +10,7 @@ import { Card } from "@/components/ui/card";
 import { BasicInfoForm } from "@/components/profile/basic-info-form";
 import { LogisticsForm } from "@/components/profile/logistics-form";
 import { PortfolioGallery } from "@/components/profile/portfolio-gallery";
+import { parseSocialLinks } from "@/lib/artist-profile/social-links";
 
 function SectionShell({
   id,
@@ -102,7 +103,7 @@ export default async function ProfilePage() {
             phone: artistProfile?.phone ?? "",
             bio: artistProfile?.bio ?? "",
             websiteUrl: artistProfile?.websiteUrl ?? "",
-            socialLinks: artistProfile?.socialLinks ?? "",
+            socialLinks: parseSocialLinks(artistProfile?.socialLinks),
             genres: artistProfile?.genres ?? [],
             mediums: artistProfile?.mediums ?? [],
           }}

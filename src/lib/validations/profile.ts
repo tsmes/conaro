@@ -1,17 +1,19 @@
 import { z } from "zod";
-import { GENRES, MEDIUMS } from "@/lib/artist-profile/tags";
 
-const genresSchema = z
-  .array(z.enum(GENRES))
-  .max(GENRES.length, "Too many genres selected")
-  .refine((arr) => new Set(arr).size === arr.length, "Duplicate genres selected")
-  .default([]);
+// Genres and mediums accept free-form tags (not limited to the suggested
+// list), with sane caps on count, length, and duplicates.
+const tagArraySchema = (label: string) =>
+  z
+    .array(z.string().trim().min(1).max(40))
+    .max(25, `Too many ${label} selected`)
+    .refine(
+      (arr) => new Set(arr.map((v) => v.toLowerCase())).size === arr.length,
+      `Duplicate ${label} selected`
+    )
+    .default([]);
 
-const mediumsSchema = z
-  .array(z.enum(MEDIUMS))
-  .max(MEDIUMS.length, "Too many mediums selected")
-  .refine((arr) => new Set(arr).size === arr.length, "Duplicate mediums selected")
-  .default([]);
+const genresSchema = tagArraySchema("genres");
+const mediumsSchema = tagArraySchema("mediums");
 
 export const basicInfoSchema = z.object({
   displayName: z
@@ -35,11 +37,57 @@ export const basicInfoSchema = z.object({
     )
     .optional()
     .default(""),
+  // socialLinks arrives as a JSON-encoded array of { type, url }. We accept
+  // the JSON string here so the server action can round-trip it to the text
+  // column without a new DB migration. Shape is validated after parsing.
   socialLinks: z
     .string()
-    .max(500, "Social links is too long")
+    .max(10_000, "Social links is too long")
     .optional()
-    .default(""),
+    .default("")
+    .transform((val, ctx) => {
+      if (!val.trim()) return "";
+      try {
+        const parsed = JSON.parse(val);
+        if (!Array.isArray(parsed)) throw new Error();
+        const cleaned: Array<{ type: string; url: string }> = [];
+        for (const item of parsed) {
+          if (
+            !item ||
+            typeof item !== "object" ||
+            typeof item.type !== "string" ||
+            typeof item.url !== "string"
+          ) {
+            continue;
+          }
+          const type = item.type.trim().slice(0, 40);
+          const url = item.url.trim().slice(0, 500);
+          if (!type || !url) continue;
+          if (!/^https?:\/\/.+/i.test(url)) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `URL must start with http(s):// — check your ${type} link.`,
+            });
+            return z.NEVER;
+          }
+          cleaned.push({ type, url });
+        }
+        if (cleaned.length > 20) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Too many social links (max 20).",
+          });
+          return z.NEVER;
+        }
+        return cleaned.length === 0 ? "" : JSON.stringify(cleaned);
+      } catch {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Could not read your social links.",
+        });
+        return z.NEVER;
+      }
+    }),
   genres: genresSchema,
   mediums: mediumsSchema,
 });
