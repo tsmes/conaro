@@ -99,16 +99,17 @@ export function SelectionWorkspace({
     };
   }, [applicants]);
 
-  // Per-tag representation summary: how many applicants applied with each
-  // tag and how many of those have been accepted. Feeds the sidebar's
-  // RepresentationCloud so organizers can spot over/under representation.
+  // Per-tag representation summary computed from the *filtered* applicant
+  // list so the sidebar cloud reflects the current view. When the filter is
+  // 'accepted', organizers see what they've actually accepted of each tag;
+  // when it's 'undecided', they see what's still in the queue.
   const { genresSummary, mediumsSummary } = useMemo(() => {
     const genreApplied = new Map<string, number>();
     const genreAccepted = new Map<string, number>();
     const mediumApplied = new Map<string, number>();
     const mediumAccepted = new Map<string, number>();
 
-    for (const applicant of applicants) {
+    for (const applicant of filtered) {
       const isAccepted = applicant.status === "accepted";
       for (const g of applicant.genres) {
         genreApplied.set(g, (genreApplied.get(g) ?? 0) + 1);
