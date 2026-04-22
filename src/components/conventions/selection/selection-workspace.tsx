@@ -77,7 +77,9 @@ export function SelectionWorkspace({
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
-  const readOnly = eventStatus !== "reviewing";
+  // Organizers can act on applications while they're still coming in, too —
+  // only lock the workspace once results have been published.
+  const readOnly = eventStatus === "results_published";
 
   const filtered = useMemo(
     () => applicants.filter((a) => matchesFilter(a, filter)),
@@ -237,6 +239,7 @@ export function SelectionWorkspace({
   return (
     <div className="space-y-5">
       <SelectionProgress
+        applied={counts.all}
         accepted={counts.accepted}
         pinned={counts.pinned}
         target={availableStands}

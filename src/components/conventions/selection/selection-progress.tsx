@@ -1,12 +1,14 @@
 import { Card } from "@/components/ui/card";
 
 interface SelectionProgressProps {
+  applied: number;
   accepted: number;
   pinned: number;
   target: number | null;
 }
 
 export function SelectionProgress({
+  applied,
   accepted,
   pinned,
   target,
@@ -26,7 +28,7 @@ export function SelectionProgress({
             Selection progress
           </p>
           <h2 className="font-heading text-[20px] font-extrabold tracking-tight whitespace-nowrap">
-            {accepted} accepted · {pinned} pinned
+            {applied} applied · {accepted} accepted · {pinned} pinned
             {hasTarget ? ` · ${remaining} open` : ""}
           </h2>
         </div>

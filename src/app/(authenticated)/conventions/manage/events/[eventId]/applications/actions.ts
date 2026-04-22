@@ -39,8 +39,13 @@ export async function setApplicationDecision(
     return { error: "Event not found" };
   }
 
-  if (event.status !== "reviewing") {
-    return { error: "Decisions can only be made while the event is in reviewing status" };
+  if (
+    event.status !== "reviewing" &&
+    event.status !== "accepting_applications"
+  ) {
+    return {
+      error: "Decisions can only be made before results are published",
+    };
   }
 
   const [application] = await db
@@ -89,9 +94,12 @@ export async function toggleApplicationPin(
     return { error: "Event not found" };
   }
 
-  if (event.status !== "reviewing") {
+  if (
+    event.status !== "reviewing" &&
+    event.status !== "accepting_applications"
+  ) {
     return {
-      error: "Pinning is only available while the event is in reviewing status",
+      error: "Pinning is only available before results are published",
     };
   }
 
@@ -148,10 +156,12 @@ export async function setBulkDecision(
     return { error: "Event not found" };
   }
 
-  if (event.status !== "reviewing") {
+  if (
+    event.status !== "reviewing" &&
+    event.status !== "accepting_applications"
+  ) {
     return {
-      error:
-        "Bulk decisions can only be made while the event is in reviewing status",
+      error: "Bulk decisions can only be made before results are published",
     };
   }
 

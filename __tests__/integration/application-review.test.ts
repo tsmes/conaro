@@ -143,7 +143,34 @@ describe("application review", () => {
       expect(updated.status).toBe("rejected");
     });
 
-    it("rejects when event is not in reviewing status", async () => {
+    it("rejects when results are already published", async () => {
+      const { profile, convention } = await createTestOrganizer();
+      const event = await createTestEvent(convention.id, {
+        status: "results_published",
+      });
+      const artist = await createTestArtist();
+      const application = await createTestApplication(
+        event.id,
+        artist.profile.id
+      );
+
+      mockAuth.mockResolvedValue({
+        user: { id: "u", role: "organizer", profileId: profile.id },
+      });
+
+      const result = await setApplicationDecision(
+        {},
+        buildFormData({
+          applicationId: application.id,
+          eventId: event.id,
+          decision: "accepted",
+        })
+      );
+
+      expect(result.error).toContain("published");
+    });
+
+    it("allows decisions while the event is still accepting applications", async () => {
       const { profile, convention } = await createTestOrganizer();
       const event = await createTestEvent(convention.id, {
         status: "accepting_applications",
@@ -167,7 +194,12 @@ describe("application review", () => {
         })
       );
 
-      expect(result.error).toContain("reviewing");
+      expect(result.success).toBe(true);
+      const [updated] = await db
+        .select()
+        .from(applications)
+        .where(eq(applications.id, application.id));
+      expect(updated.status).toBe("accepted");
     });
   });
 
@@ -390,7 +422,7 @@ describe("application review", () => {
       expect(updated.pinned).toBe(false);
     });
 
-    it("refuses to pin when event is not in reviewing status", async () => {
+    it("refuses to pin once results are published", async () => {
       const { profile, convention } = await createTestOrganizer();
       const event = await createTestEvent(convention.id, {
         status: "results_published",
@@ -411,7 +443,7 @@ describe("application review", () => {
         })
       );
 
-      expect(result.error).toContain("reviewing");
+      expect(result.error).toContain("published");
     });
 
     it("refuses non-organizer callers", async () => {
@@ -522,7 +554,7 @@ describe("application review", () => {
       expect(result.error).toMatch(/at least one/i);
     });
 
-    it("refuses when event is not in reviewing status", async () => {
+    it("refuses once results are published", async () => {
       const { profile, convention } = await createTestOrganizer();
       const event = await createTestEvent(convention.id, {
         status: "results_published",
@@ -540,7 +572,7 @@ describe("application review", () => {
       formData.append("applicationIds", application.id);
 
       const result = await setBulkDecision({}, formData);
-      expect(result.error).toContain("reviewing");
+      expect(result.error).toContain("published");
     });
   });
 });
