@@ -24,6 +24,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { formatDateNo, formatDateRangeNo } from "@/lib/utils/format-date-no";
+import { getEventAnnouncements } from "@/app/(authenticated)/conventions/manage/events/[eventId]/announcements/actions";
 
 interface EventDetailPageProps {
   params: Promise<{ eventId: string }>;
@@ -127,6 +128,7 @@ export default async function EventDetailPage({
     session?.user?.profileId && session.user.role === "artist";
 
   let hasExistingApplication = false;
+  let isAcceptedToEvent = false;
   let isFollowingConvention = false;
   let validationResult: ValidationResult = { valid: true };
 
@@ -145,7 +147,7 @@ export default async function EventDetailPage({
           .from(portfolioImages)
           .where(eq(portfolioImages.profileId, profileId)),
         db
-          .select({ id: applications.id })
+          .select({ id: applications.id, status: applications.status })
           .from(applications)
           .where(
             and(
@@ -165,6 +167,7 @@ export default async function EventDetailPage({
       ]);
 
     hasExistingApplication = !!existingApp;
+    isAcceptedToEvent = existingApp?.status === "accepted";
     isFollowingConvention = !!follow;
 
     if (profile && artistProfile) {
@@ -179,6 +182,10 @@ export default async function EventDetailPage({
   }
 
   const isAccepting = event.status === "accepting_applications";
+
+  const announcements = isAcceptedToEvent
+    ? await getEventAnnouncements(event.id)
+    : [];
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-12 md:px-8">
@@ -234,6 +241,39 @@ export default async function EventDetailPage({
           />
         )}
       </header>
+
+      {isAcceptedToEvent && announcements.length > 0 && (
+        <section className="mt-10 space-y-4">
+          <div className="flex items-center gap-2">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
+              Organizer updates
+            </p>
+            <span className="font-mono text-[11px] text-muted-foreground">
+              {announcements.length}
+            </span>
+          </div>
+          <div className="space-y-3">
+            {announcements.map((a) => {
+              const edited =
+                a.updatedAt.getTime() - a.createdAt.getTime() > 1000;
+              return (
+                <Card key={a.id} className="p-5">
+                  <h3 className="font-heading text-lg font-bold leading-tight">
+                    {a.subject}
+                  </h3>
+                  <p className="mt-1 font-mono text-[11px] text-muted-foreground">
+                    {formatDateNo(a.createdAt.toISOString().slice(0, 10))}
+                    {edited && " \u00b7 edited"}
+                  </p>
+                  <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-foreground">
+                    {a.body}
+                  </p>
+                </Card>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {event.description && (
         <div className="mt-8 max-w-3xl whitespace-pre-line text-base leading-relaxed text-muted-foreground">
