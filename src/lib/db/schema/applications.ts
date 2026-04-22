@@ -44,6 +44,18 @@ export interface ProfileSnapshot {
   images: SnapshotImage[];
 }
 
+// Per-application answers entered at apply time (separate from profile data
+// snapshotted into profileSnapshot). Each key is optional so the field
+// registry controls whether the input is presented.
+export interface ApplicationAnswers {
+  tableSizeOptionId?: string;
+  assistants?: { count: number; names: string[] };
+  sharingStand?: { sharing: boolean; with?: string };
+  placementPreference?: string;
+  additionalComments?: string;
+  promotionConsent?: boolean;
+}
+
 export const applications = pgTable(
   "applications",
   {
@@ -60,6 +72,13 @@ export const applications = pgTable(
     profileSnapshot: jsonb("profile_snapshot")
       .notNull()
       .$type<ProfileSnapshot>(),
+    answers: jsonb("answers")
+      .$type<ApplicationAnswers>()
+      .notNull()
+      .default({}),
+    guidelinesAcknowledgedAt: timestamp("guidelines_acknowledged_at", {
+      mode: "date",
+    }),
     isBlockListed: boolean("is_block_listed").notNull().default(false),
     paymentConfirmed: boolean("payment_confirmed").notNull().default(false),
     pinned: boolean("pinned").notNull().default(false),
