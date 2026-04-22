@@ -23,7 +23,7 @@ describe("FIELD_REGISTRY", () => {
   });
 
   it("uses only valid sections", () => {
-    const validSections = ["basic", "logistics", "portfolio"];
+    const validSections = ["basic", "logistics", "portfolio", "application"];
     for (const field of FIELD_REGISTRY) {
       expect(validSections).toContain(field.section);
     }
@@ -36,10 +36,29 @@ describe("FIELD_REGISTRY", () => {
     expect(contactEmail?.required).toBe(true);
   });
 
-  it("has basic, logistics, and portfolio sections", () => {
+  it("has basic, logistics, portfolio, and application sections", () => {
     const sections = new Set(FIELD_REGISTRY.map((f) => f.section));
     expect(sections.has("basic")).toBe(true);
     expect(sections.has("logistics")).toBe(true);
     expect(sections.has("portfolio")).toBe(true);
+    expect(sections.has("application")).toBe(true);
+  });
+
+  it("annotates each field with a source (profile or application)", () => {
+    for (const field of FIELD_REGISTRY) {
+      expect(["profile", "application"]).toContain(field.source);
+    }
+  });
+
+  it("registers exactly six application-source fields", () => {
+    const appFields = FIELD_REGISTRY.filter((f) => f.source === "application");
+    expect(appFields.map((f) => f.key)).toEqual([
+      "tableSize",
+      "assistants",
+      "sharingStand",
+      "placementPreference",
+      "additionalComments",
+      "promotionConsent",
+    ]);
   });
 });

@@ -1,13 +1,14 @@
 import {
   FIELD_REGISTRY,
   type FieldDefinition,
+  type FieldSection,
 } from "@/lib/db/field-registry";
 import type { FieldRequirements } from "@/lib/db/schema/events";
 
 export interface MissingField {
   key: string;
   label: string;
-  section: "basic" | "logistics" | "portfolio";
+  section: FieldSection;
 }
 
 export type ValidationResult =
@@ -72,6 +73,9 @@ export function validateProfileForEvent(
   const missingFields: MissingField[] = [];
 
   for (const field of FIELD_REGISTRY) {
+    // This validator only checks profile-source fields. Application-source
+    // fields are validated by applicationAnswersSchema in the apply action.
+    if (field.source !== "profile") continue;
     const requirement = fieldRequirements[field.key];
     if (requirement !== "required") continue;
 
