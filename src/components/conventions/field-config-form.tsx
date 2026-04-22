@@ -29,9 +29,26 @@ interface FieldConfigFormProps {
 }
 
 const SECTIONS = [
-  { key: "basic", label: "Basic Info" },
-  { key: "logistics", label: "Logistics" },
-  { key: "portfolio", label: "Portfolio" },
+  {
+    key: "basic",
+    label: "Basic Info",
+    description: "Pulled from the artist's profile when they apply.",
+  },
+  {
+    key: "logistics",
+    label: "Logistics",
+    description: "Pulled from the artist's profile when they apply.",
+  },
+  {
+    key: "portfolio",
+    label: "Portfolio",
+    description: "Pulled from the artist's profile when they apply.",
+  },
+  {
+    key: "application",
+    label: "Application Form",
+    description: "Filled in by the artist on the application form itself.",
+  },
 ] as const;
 
 const STATE_OPTIONS = [
@@ -134,16 +151,26 @@ export function FieldConfigForm({
           <Card key={section.key}>
             <CardHeader>
               <CardTitle className="text-base">{section.label}</CardTitle>
+              <p className="text-xs text-muted-foreground">
+                {section.description}
+              </p>
             </CardHeader>
             <CardContent className="space-y-3">
               {fields.map((field) => (
                 <div
                   key={field.key}
-                  className="flex items-center justify-between gap-4"
+                  className="flex items-start justify-between gap-4"
                 >
-                  <Label htmlFor={field.key} className="font-normal">
-                    {field.label}
-                  </Label>
+                  <div className="min-w-0">
+                    <Label htmlFor={field.key} className="font-normal">
+                      {field.label}
+                    </Label>
+                    {"helpText" in field && field.helpText && (
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {field.helpText}
+                      </p>
+                    )}
+                  </div>
                   <select
                     id={field.key}
                     name={field.key}
@@ -154,7 +181,7 @@ export function FieldConfigForm({
                         [field.key]: e.target.value,
                       }))
                     }
-                    className="flex h-9 w-40 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs"
+                    className="flex h-9 w-40 shrink-0 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs"
                   >
                     {STATE_OPTIONS.map((opt) => (
                       <option key={opt.value} value={opt.value}>
