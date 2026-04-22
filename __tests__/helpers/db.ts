@@ -176,6 +176,7 @@ export async function createTestApplication(
       profileSnapshot: {
         displayName: "Test Artist",
         realName: null,
+        pronouns: null,
         contactEmail: "artist@test.com",
         phone: null,
         bio: null,
@@ -184,6 +185,8 @@ export async function createTestApplication(
         helpers: null,
         accessibilityNeeds: null,
         notes: null,
+        priceRangeMinNok: null,
+        priceRangeMaxNok: null,
         genres: [],
         mediums: [],
         images: [],

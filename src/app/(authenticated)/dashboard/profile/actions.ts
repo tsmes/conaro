@@ -21,11 +21,14 @@ export async function updateBasicInfo(
   const raw = {
     displayName: (formData.get("displayName") ?? "").toString(),
     realName: (formData.get("realName") ?? "").toString(),
+    pronouns: (formData.get("pronouns") ?? "").toString(),
     contactEmail: (formData.get("contactEmail") ?? "").toString(),
     phone: (formData.get("phone") ?? "").toString(),
     bio: (formData.get("bio") ?? "").toString(),
     websiteUrl: (formData.get("websiteUrl") ?? "").toString(),
     socialLinks: (formData.get("socialLinks") ?? "").toString(),
+    priceRangeMinNok: (formData.get("priceRangeMinNok") ?? "").toString(),
+    priceRangeMaxNok: (formData.get("priceRangeMaxNok") ?? "").toString(),
     genres: formData.getAll("genres").map((v) => v.toString()),
     mediums: formData.getAll("mediums").map((v) => v.toString()),
   };
@@ -38,11 +41,14 @@ export async function updateBasicInfo(
   const {
     displayName,
     realName,
+    pronouns,
     contactEmail,
     phone,
     bio,
     websiteUrl,
     socialLinks,
+    priceRangeMinNok,
+    priceRangeMaxNok,
     genres,
     mediums,
   } = result.data;
@@ -63,11 +69,14 @@ export async function updateBasicInfo(
         .update(artistProfiles)
         .set({
           realName: realName || null,
+          pronouns: pronouns || null,
           contactEmail,
           phone: phone || null,
           bio: bio || null,
           websiteUrl: websiteUrl || null,
           socialLinks: socialLinks || null,
+          priceRangeMinNok,
+          priceRangeMaxNok,
           genres,
           mediums,
           updatedAt: new Date(),

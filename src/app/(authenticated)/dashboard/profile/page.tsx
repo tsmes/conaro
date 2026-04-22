@@ -106,6 +106,9 @@ export default async function ProfilePage() {
             socialLinks: parseSocialLinks(artistProfile?.socialLinks),
             genres: artistProfile?.genres ?? [],
             mediums: artistProfile?.mediums ?? [],
+            pronouns: artistProfile?.pronouns ?? "",
+            priceRangeMinNok: artistProfile?.priceRangeMinNok ?? null,
+            priceRangeMaxNok: artistProfile?.priceRangeMaxNok ?? null,
           }}
         />
       </SectionShell>

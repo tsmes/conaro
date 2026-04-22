@@ -21,6 +21,7 @@ interface ProfileData {
 
 interface ArtistProfileData {
   realName: string | null;
+  pronouns: string | null;
   contactEmail: string | null;
   phone: string | null;
   bio: string | null;
@@ -29,6 +30,8 @@ interface ArtistProfileData {
   helpers: number | null;
   accessibilityNeeds: string | null;
   notes: string | null;
+  priceRangeMinNok: number | null;
+  priceRangeMaxNok: number | null;
 }
 
 function isFieldFilled(

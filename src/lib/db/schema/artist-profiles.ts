@@ -10,9 +10,12 @@ export const artistProfiles = pgTable("artist_profiles", {
     .unique()
     .references(() => profiles.id, { onDelete: "cascade" }),
   realName: text("real_name"),
+  pronouns: text("pronouns"),
   contactEmail: text("contact_email"),
   phone: text("phone"),
   bio: text("bio"),
+  priceRangeMinNok: integer("price_range_min_nok"),
+  priceRangeMaxNok: integer("price_range_max_nok"),
   websiteUrl: text("website_url"),
   socialLinks: text("social_links"),
   helpers: integer("helpers").default(0),

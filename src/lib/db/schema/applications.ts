@@ -31,6 +31,7 @@ export interface SnapshotImage {
 export interface ProfileSnapshot {
   displayName: string;
   realName: string | null;
+  pronouns: string | null;
   contactEmail: string | null;
   phone: string | null;
   bio: string | null;
@@ -39,6 +40,8 @@ export interface ProfileSnapshot {
   helpers: number | null;
   accessibilityNeeds: string | null;
   notes: string | null;
+  priceRangeMinNok: number | null;
+  priceRangeMaxNok: number | null;
   genres?: string[];
   mediums?: string[];
   images: SnapshotImage[];

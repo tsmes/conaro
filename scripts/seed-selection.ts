@@ -257,6 +257,7 @@ async function run() {
     const snapshot: ProfileSnapshot = {
       displayName: plan.name,
       realName: null,
+      pronouns: null,
       contactEmail: plan.email,
       phone: null,
       bio: plan.bio,
@@ -265,6 +266,8 @@ async function run() {
       helpers: plan.helpers,
       accessibilityNeeds: null,
       notes: null,
+      priceRangeMinNok: null,
+      priceRangeMaxNok: null,
       genres: plan.genres,
       mediums: plan.mediums,
       images: [],

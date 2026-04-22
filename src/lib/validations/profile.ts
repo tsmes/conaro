@@ -21,6 +21,11 @@ export const basicInfoSchema = z.object({
     .min(1, "Display name is required")
     .max(100, "Display name is too long"),
   realName: z.string().max(100, "Real name is too long").optional().default(""),
+  pronouns: z
+    .string()
+    .max(30, "Pronouns is too long")
+    .optional()
+    .default(""),
   contactEmail: z.string().email("Please enter a valid contact email"),
   phone: z.string().max(30, "Phone number is too long").optional().default(""),
   bio: z
@@ -28,6 +33,26 @@ export const basicInfoSchema = z.object({
     .max(2000, "Bio must be at most 2000 characters")
     .optional()
     .default(""),
+  priceRangeMinNok: z
+    .string()
+    .optional()
+    .default("")
+    .transform((val) => (val === "" ? null : Number(val)))
+    .refine(
+      (val) =>
+        val === null || (Number.isInteger(val) && val >= 0 && val <= 1_000_000),
+      "Minimum price must be a non-negative whole number"
+    ),
+  priceRangeMaxNok: z
+    .string()
+    .optional()
+    .default("")
+    .transform((val) => (val === "" ? null : Number(val)))
+    .refine(
+      (val) =>
+        val === null || (Number.isInteger(val) && val >= 0 && val <= 1_000_000),
+      "Maximum price must be a non-negative whole number"
+    ),
   websiteUrl: z
     .string()
     .max(500, "URL is too long")
@@ -90,7 +115,18 @@ export const basicInfoSchema = z.object({
     }),
   genres: genresSchema,
   mediums: mediumsSchema,
-});
+}).refine(
+  (data) => {
+    if (data.priceRangeMinNok === null || data.priceRangeMaxNok === null) {
+      return true;
+    }
+    return data.priceRangeMinNok <= data.priceRangeMaxNok;
+  },
+  {
+    message: "Minimum price must be less than or equal to maximum price",
+    path: ["priceRangeMaxNok"],
+  }
+);
 
 export type BasicInfoInput = z.infer<typeof basicInfoSchema>;
 

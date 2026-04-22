@@ -169,6 +169,7 @@ export async function applyToEvent(
   const profileSnapshot: ProfileSnapshot = {
     displayName: profile.displayName,
     realName: artistProfile.realName,
+    pronouns: artistProfile.pronouns,
     contactEmail: artistProfile.contactEmail,
     phone: artistProfile.phone,
     bio: artistProfile.bio,
@@ -177,6 +178,8 @@ export async function applyToEvent(
     helpers: artistProfile.helpers,
     accessibilityNeeds: artistProfile.accessibilityNeeds,
     notes: artistProfile.notes,
+    priceRangeMinNok: artistProfile.priceRangeMinNok,
+    priceRangeMaxNok: artistProfile.priceRangeMaxNok,
     genres: artistProfile.genres ?? [],
     mediums: artistProfile.mediums ?? [],
     images: snapshotImages,

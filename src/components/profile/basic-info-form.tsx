@@ -18,6 +18,7 @@ interface BasicInfoFormProps {
   defaultValues: {
     displayName: string;
     realName: string;
+    pronouns: string;
     contactEmail: string;
     phone: string;
     bio: string;
@@ -25,6 +26,8 @@ interface BasicInfoFormProps {
     socialLinks: SocialLink[];
     genres: string[];
     mediums: string[];
+    priceRangeMinNok: number | null;
+    priceRangeMaxNok: number | null;
   };
 }
 
@@ -80,6 +83,33 @@ export function BasicInfoForm({ defaultValues }: BasicInfoFormProps) {
             defaultValue={defaultValues.realName}
           />
         </div>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-2">
+          <Label htmlFor="pronouns" className={LABEL_CLASS}>
+            Pronouns
+          </Label>
+          <Input
+            id="pronouns"
+            name="pronouns"
+            defaultValue={defaultValues.pronouns}
+            placeholder="e.g. she/her, they/them"
+            aria-describedby={
+              state.fieldErrors?.pronouns ? "pronouns-error" : undefined
+            }
+            aria-invalid={!!state.fieldErrors?.pronouns}
+          />
+          {state.fieldErrors?.pronouns && (
+            <p
+              id="pronouns-error"
+              role="alert"
+              className="text-sm text-destructive"
+            >
+              {state.fieldErrors.pronouns[0]}
+            </p>
+          )}
+        </div>
+        <div />
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
@@ -151,6 +181,64 @@ export function BasicInfoForm({ defaultValues }: BasicInfoFormProps) {
           name="socialLinks"
           defaultValues={defaultValues.socialLinks}
         />
+      </div>
+      <div className="space-y-2">
+        <span className={LABEL_CLASS}>Typical price range (NOK)</span>
+        <p className="text-sm text-muted-foreground">
+          Rough low and high prices of what you sell. Helps organizers plan
+          a varied marketplace.
+        </p>
+        <div className="flex items-center gap-2">
+          <Input
+            id="priceRangeMinNok"
+            name="priceRangeMinNok"
+            type="number"
+            min={0}
+            placeholder="Min"
+            defaultValue={defaultValues.priceRangeMinNok ?? ""}
+            className="w-32"
+            aria-describedby={
+              state.fieldErrors?.priceRangeMinNok
+                ? "priceRangeMinNok-error"
+                : undefined
+            }
+            aria-invalid={!!state.fieldErrors?.priceRangeMinNok}
+          />
+          <span className="text-sm text-muted-foreground">to</span>
+          <Input
+            id="priceRangeMaxNok"
+            name="priceRangeMaxNok"
+            type="number"
+            min={0}
+            placeholder="Max"
+            defaultValue={defaultValues.priceRangeMaxNok ?? ""}
+            className="w-32"
+            aria-describedby={
+              state.fieldErrors?.priceRangeMaxNok
+                ? "priceRangeMaxNok-error"
+                : undefined
+            }
+            aria-invalid={!!state.fieldErrors?.priceRangeMaxNok}
+          />
+        </div>
+        {state.fieldErrors?.priceRangeMinNok && (
+          <p
+            id="priceRangeMinNok-error"
+            role="alert"
+            className="text-sm text-destructive"
+          >
+            {state.fieldErrors.priceRangeMinNok[0]}
+          </p>
+        )}
+        {state.fieldErrors?.priceRangeMaxNok && (
+          <p
+            id="priceRangeMaxNok-error"
+            role="alert"
+            className="text-sm text-destructive"
+          >
+            {state.fieldErrors.priceRangeMaxNok[0]}
+          </p>
+        )}
       </div>
       <div className="space-y-2">
         <span className={LABEL_CLASS}>Genres</span>
