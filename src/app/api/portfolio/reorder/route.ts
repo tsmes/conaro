@@ -3,10 +3,14 @@ import { eq, and, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { portfolioImages } from "@/lib/db/schema/portfolio-images";
+import {
+  portfolioImages,
+  portfolioSectionEnum,
+} from "@/lib/db/schema/portfolio-images";
 
 const reorderSchema = z.object({
   imageIds: z.array(z.string().min(1)).min(1),
+  section: z.enum(portfolioSectionEnum.enumValues),
 });
 
 export async function PUT(request: NextRequest) {
@@ -33,7 +37,7 @@ export async function PUT(request: NextRequest) {
     );
   }
 
-  const { imageIds } = parsed.data;
+  const { imageIds, section } = parsed.data;
 
   if (new Set(imageIds).size !== imageIds.length) {
     return NextResponse.json(
@@ -44,13 +48,14 @@ export async function PUT(request: NextRequest) {
 
   const profileId = session.user.profileId;
 
-  // Verify all images belong to this artist
+  // Verify all images belong to this artist AND live in the named section.
   const images = await db
     .select({ id: portfolioImages.id })
     .from(portfolioImages)
     .where(
       and(
         eq(portfolioImages.profileId, profileId),
+        eq(portfolioImages.section, section),
         inArray(portfolioImages.id, imageIds)
       )
     );

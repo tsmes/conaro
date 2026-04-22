@@ -66,6 +66,13 @@ export default async function ProfilePage() {
     url: storage.getUrl(img.storagePath),
   }));
 
+  const promoImages = imagesWithUrls.filter((i) => i.section === "promo");
+  const productImages = imagesWithUrls.filter((i) => i.section === "product");
+  const previousStandImages = imagesWithUrls.filter(
+    (i) => i.section === "previous_stand"
+  );
+  const totalUsed = imagesWithUrls.length;
+
   return (
     <div className="mx-auto max-w-4xl space-y-12 px-6 py-10 md:px-8">
       <header>
@@ -118,12 +125,46 @@ export default async function ProfilePage() {
       </SectionShell>
 
       <SectionShell
-        id="portfolio"
+        id="promo"
         label="Section 3"
-        title="Portfolio"
-        description="Up to 20 images, max 10 MB each. Reviewers see this curated set when you apply."
+        title="Promo"
+        description="Logos, banners, and key visuals organizers can use to promote your stand."
       >
-        <PortfolioGallery images={imagesWithUrls} />
+        <PortfolioGallery
+          section="promo"
+          images={promoImages}
+          totalCap={20}
+          totalUsed={totalUsed}
+        />
+      </SectionShell>
+
+      <SectionShell
+        id="products"
+        label="Section 4"
+        title="Products"
+        description="Examples of what you'll be selling. Up to 20 images across all sections."
+      >
+        <PortfolioGallery
+          section="product"
+          images={productImages}
+          totalCap={20}
+          totalUsed={totalUsed}
+        />
+      </SectionShell>
+
+      <SectionShell
+        id="previous-stands"
+        label="Section 5"
+        title="Previous Stands"
+        description="Photos from past conventions. Add an optional caption per image (e.g. convention + year)."
+      >
+        <PortfolioGallery
+          section="previous_stand"
+          images={previousStandImages}
+          totalCap={20}
+          totalUsed={totalUsed}
+          allowCaption
+        />
       </SectionShell>
     </div>
   );

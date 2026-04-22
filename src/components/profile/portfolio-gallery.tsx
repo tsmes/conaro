@@ -19,26 +19,38 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import type { PortfolioSection } from "@/lib/db/schema/portfolio-images";
 import { ImageUploadZone } from "./image-upload-zone";
 
-interface PortfolioImage {
+export interface PortfolioImage {
   id: string;
   filename: string;
   url: string;
   width: number | null;
   height: number | null;
+  caption: string | null;
 }
 
 interface PortfolioGalleryProps {
+  section: PortfolioSection;
   images: PortfolioImage[];
+  // Maximum images allowed across ALL sections (shared cap).
+  totalCap: number;
+  totalUsed: number;
+  allowCaption?: boolean;
 }
 
 function SortableImage({
   image,
   onDelete,
+  onCaptionChange,
+  allowCaption,
 }: {
   image: PortfolioImage;
   onDelete: (id: string) => void;
+  onCaptionChange: (id: string, caption: string) => void;
+  allowCaption: boolean;
 }) {
   const {
     attributes,
@@ -56,41 +68,52 @@ function SortableImage({
   };
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className="group relative aspect-square overflow-hidden rounded-lg border bg-muted"
-    >
-      <div
-        {...attributes}
-        {...listeners}
-        className="absolute inset-0 cursor-grab active:cursor-grabbing"
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={image.url}
-          alt={image.filename}
-          className="h-full w-full object-cover"
-        />
+    <div ref={setNodeRef} style={style} className="space-y-2">
+      <div className="group relative aspect-square overflow-hidden rounded-lg border bg-muted">
+        <div
+          {...attributes}
+          {...listeners}
+          className="absolute inset-0 cursor-grab active:cursor-grabbing"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={image.url}
+            alt={image.filename}
+            className="h-full w-full object-cover"
+          />
+        </div>
+        <Button
+          variant="destructive"
+          size="icon-xs"
+          className="absolute right-1 top-1 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 focus:opacity-100"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(image.id);
+          }}
+        >
+          <span className="sr-only">Delete {image.filename}</span>
+          &times;
+        </Button>
       </div>
-      <Button
-        variant="destructive"
-        size="icon-xs"
-        className="absolute right-1 top-1 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 focus:opacity-100"
-        onClick={(e) => {
-          e.stopPropagation();
-          onDelete(image.id);
-        }}
-      >
-        <span className="sr-only">Delete {image.filename}</span>
-        &times;
-      </Button>
+      {allowCaption && (
+        <Input
+          aria-label={`Caption for ${image.filename}`}
+          defaultValue={image.caption ?? ""}
+          placeholder="Convention name + year (optional)"
+          className="h-8 text-[12.5px]"
+          onBlur={(e) => onCaptionChange(image.id, e.target.value)}
+        />
+      )}
     </div>
   );
 }
 
 export function PortfolioGallery({
+  section,
   images: initialImages,
+  totalCap,
+  totalUsed,
+  allowCaption = false,
 }: PortfolioGalleryProps) {
   const [images, setImages] = useState(initialImages);
   const [error, setError] = useState<string | null>(null);
@@ -102,24 +125,35 @@ export function PortfolioGallery({
     })
   );
 
-  const handleUpload = useCallback(async (file: File) => {
-    setError(null);
-    const formData = new FormData();
-    formData.append("file", file);
+  const sectionUsed = images.length;
+  const totalReached = totalUsed + (sectionUsed - initialImages.length);
+  const disableUpload = totalReached >= totalCap;
 
-    const response = await fetch("/api/portfolio", {
-      method: "POST",
-      body: formData,
-    });
+  const handleUpload = useCallback(
+    async (file: File) => {
+      setError(null);
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("section", section);
 
-    if (!response.ok) {
-      const data = await response.json();
-      throw new Error(data.error || "Upload failed");
-    }
+      const response = await fetch("/api/portfolio", {
+        method: "POST",
+        body: formData,
+      });
 
-    const newImage = await response.json();
-    setImages((prev) => [...prev, newImage]);
-  }, []);
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Upload failed");
+      }
+
+      const newImage = await response.json();
+      setImages((prev) => [
+        ...prev,
+        { ...newImage, caption: newImage.caption ?? null },
+      ]);
+    },
+    [section]
+  );
 
   const handleDelete = useCallback(async (imageId: string) => {
     if (!window.confirm("Delete this image? This cannot be undone.")) return;
@@ -144,6 +178,28 @@ export function PortfolioGallery({
     }
   }, []);
 
+  const handleCaptionChange = useCallback(
+    async (imageId: string, caption: string) => {
+      try {
+        await fetch("/api/portfolio", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ imageId, caption }),
+        });
+        setImages((prev) =>
+          prev.map((img) =>
+            img.id === imageId
+              ? { ...img, caption: caption.trim() || null }
+              : img
+          )
+        );
+      } catch {
+        setError("Failed to save caption.");
+      }
+    },
+    []
+  );
+
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
       const { active, over } = event;
@@ -161,7 +217,10 @@ export function PortfolioGallery({
       fetch("/api/portfolio/reorder", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ imageIds: reordered.map((img) => img.id) }),
+        body: JSON.stringify({
+          imageIds: reordered.map((img) => img.id),
+          section,
+        }),
       })
         .then((response) => {
           if (!response.ok) {
@@ -174,13 +233,14 @@ export function PortfolioGallery({
           setImages(initialImages);
         });
     },
-    [initialImages]
+    [initialImages, section]
   );
 
   return (
     <div className="space-y-4">
       <p className="text-sm text-muted-foreground">
-        {images.length} / 20 images. Drag to reorder.
+        {sectionUsed} image{sectionUsed === 1 ? "" : "s"} in this section ·{" "}
+        {totalReached} / {totalCap} total. Drag to reorder.
       </p>
 
       {error && (
@@ -205,6 +265,8 @@ export function PortfolioGallery({
                   key={image.id}
                   image={image}
                   onDelete={handleDelete}
+                  onCaptionChange={handleCaptionChange}
+                  allowCaption={allowCaption}
                 />
               ))}
             </div>
@@ -212,10 +274,7 @@ export function PortfolioGallery({
         </DndContext>
       )}
 
-      <ImageUploadZone
-        disabled={images.length >= 20}
-        onUpload={handleUpload}
-      />
+      <ImageUploadZone disabled={disableUpload} onUpload={handleUpload} />
     </div>
   );
 }
