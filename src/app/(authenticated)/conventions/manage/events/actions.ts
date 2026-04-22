@@ -60,6 +60,8 @@ const EVENT_FIELD_NAMES = [
   "tableSizeOptions",
   "maxAssistants",
   "assistantFeeNok",
+  "acceptanceMessage",
+  "rejectionMessage",
 ] as const;
 
 function extractEventFormData(formData: FormData): Record<string, string> {
@@ -93,6 +95,8 @@ function buildEventColumns(data: EventInput) {
     tableSizeOptions: data.tableSizeOptions as TableSizeOption[],
     maxAssistants: data.maxAssistants,
     assistantFeeNok: data.assistantFeeNok,
+    acceptanceMessage: data.acceptanceMessage || null,
+    rejectionMessage: data.rejectionMessage || null,
   };
 }
 

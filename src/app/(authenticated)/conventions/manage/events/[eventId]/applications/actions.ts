@@ -4,6 +4,7 @@ import { and, eq, inArray, ne, count } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { events } from "@/lib/db/schema/events";
+import { conventions } from "@/lib/db/schema/conventions";
 import { applications } from "@/lib/db/schema/applications";
 import { auth } from "@/lib/auth";
 import { type ActionState } from "@/lib/validations/auth";
@@ -234,13 +235,29 @@ export async function publishResults(
     };
   }
 
+  // Resolve decision templates: fall back to the convention default when
+  // the event hasn't set its own.
+  const [convention] = await db
+    .select({
+      acceptanceMessage: conventions.acceptanceMessage,
+      rejectionMessage: conventions.rejectionMessage,
+    })
+    .from(conventions)
+    .where(eq(conventions.id, event.conventionId));
+
+  const resolvedAcceptance =
+    event.acceptanceMessage ?? convention?.acceptanceMessage ?? null;
+  const resolvedRejection =
+    event.rejectionMessage ?? convention?.rejectionMessage ?? null;
+
   try {
     await db.transaction(async (tx) => {
-      // Set response messages from templates
-      if (event.acceptanceMessage) {
+      // Stamp the resolved template onto each application so it stays with
+      // the row even if the organizer edits the template later.
+      if (resolvedAcceptance) {
         await tx
           .update(applications)
-          .set({ responseMessage: event.acceptanceMessage, updatedAt: new Date() })
+          .set({ responseMessage: resolvedAcceptance, updatedAt: new Date() })
           .where(
             and(
               eq(applications.eventId, eventId),
@@ -249,10 +266,10 @@ export async function publishResults(
           );
       }
 
-      if (event.rejectionMessage) {
+      if (resolvedRejection) {
         await tx
           .update(applications)
-          .set({ responseMessage: event.rejectionMessage, updatedAt: new Date() })
+          .set({ responseMessage: resolvedRejection, updatedAt: new Date() })
           .where(
             and(
               eq(applications.eventId, eventId),

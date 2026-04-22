@@ -69,6 +69,8 @@ export default async function EditConventionPage() {
               description: convention.description ?? "",
               websiteUrl: convention.websiteUrl ?? "",
               guidelines: convention.guidelines ?? "",
+              acceptanceMessage: convention.acceptanceMessage ?? "",
+              rejectionMessage: convention.rejectionMessage ?? "",
             }}
           />
         </div>

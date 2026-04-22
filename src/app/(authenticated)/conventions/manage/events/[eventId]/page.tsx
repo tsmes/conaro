@@ -6,7 +6,10 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { applications } from "@/lib/db/schema/applications";
 import type { Amenities } from "@/lib/db/schema/events";
-import { getOrganizerEvent } from "@/lib/conventions/queries";
+import {
+  getOrganizerConvention,
+  getOrganizerEvent,
+} from "@/lib/conventions/queries";
 import {
   updateEvent,
   openApplications,
@@ -33,7 +36,8 @@ export default async function EventDetailPage({
   }
 
   const event = await getOrganizerEvent(session.user.profileId, eventId);
-  if (!event) {
+  const convention = await getOrganizerConvention(session.user.profileId);
+  if (!event || !convention) {
     notFound();
   }
 
@@ -169,6 +173,10 @@ export default async function EventDetailPage({
               tableSizeOptions: event.tableSizeOptions ?? [],
               maxAssistants: event.maxAssistants ?? 0,
               assistantFeeNok: event.assistantFeeNok ?? null,
+              acceptanceMessage: event.acceptanceMessage ?? "",
+              rejectionMessage: event.rejectionMessage ?? "",
+              conventionAcceptanceMessage: convention.acceptanceMessage,
+              conventionRejectionMessage: convention.rejectionMessage,
             }}
             submitLabel="Save changes"
           />

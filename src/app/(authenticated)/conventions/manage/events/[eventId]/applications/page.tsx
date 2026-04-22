@@ -1,23 +1,17 @@
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { eq, and, ne } from "drizzle-orm";
 import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
-import { events } from "@/lib/db/schema/events";
 import {
   getEventApplicants,
-  getOrganizerConvention,
   getOrganizerEvent,
 } from "@/lib/conventions/queries";
 import type { SelectionApplicant } from "@/lib/conventions/queries";
 import { storage } from "@/lib/storage";
 import { PublishResultsButton } from "@/components/conventions/publish-results-button";
-import { ResponseTemplatesForm } from "@/components/conventions/response-templates-form";
 import { SelectionWorkspace } from "@/components/conventions/selection/selection-workspace";
 import type { SelectionApplicantView } from "@/components/conventions/selection/types";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 
 interface ApplicationsPageProps {
   params: Promise<{ eventId: string }>;
@@ -38,11 +32,6 @@ export default async function ApplicationsPage({
     notFound();
   }
 
-  const convention = await getOrganizerConvention(session.user.profileId);
-  if (!convention) {
-    redirect("/login");
-  }
-
   const applicants = await getEventApplicants(session.user.profileId, eventId);
 
   const undecidedCount = applicants.filter(
@@ -51,20 +40,6 @@ export default async function ApplicationsPage({
       a.status !== "rejected" &&
       a.status !== "revoked"
   ).length;
-
-  const otherEvents = await db
-    .select({
-      id: events.id,
-      name: events.name,
-      acceptanceMessage: events.acceptanceMessage,
-      rejectionMessage: events.rejectionMessage,
-    })
-    .from(events)
-    .where(
-      and(eq(events.conventionId, convention.id), ne(events.id, eventId))
-    );
-
-  const isPublished = event.status === "results_published";
 
   const tableSizeMap = new Map(
     (event.tableSizeOptions ?? []).map((o) => [o.id, o])
@@ -163,68 +138,12 @@ export default async function ApplicationsPage({
         </div>
       )}
 
-      {isPublished && (
-        <Card className="border-2 border-primary/30 p-8 shadow-gallery md:p-10">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
-            Messaging \u00b7 Published
-          </p>
-          <h2 className="mt-2 font-heading text-2xl font-bold tracking-tight">
-            Acceptance &amp; rejection messages
-          </h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            These went out to applicants when you published results. You can
-            still override them per applicant from Deep review.
-          </p>
-          <div className="mt-8">
-            <ResponseTemplatesForm
-              eventId={event.id}
-              acceptanceMessage={event.acceptanceMessage ?? ""}
-              rejectionMessage={event.rejectionMessage ?? ""}
-              otherEvents={otherEvents.map((e) => ({
-                ...e,
-                acceptanceMessage: e.acceptanceMessage,
-                rejectionMessage: e.rejectionMessage,
-              }))}
-              readOnly={isPublished}
-            />
-          </div>
-        </Card>
-      )}
-
       <SelectionWorkspace
         eventId={event.id}
         eventStatus={event.status}
         availableStands={event.availableStands}
         applicants={applicantsView}
       />
-
-      {!isPublished && (
-        <Card className="p-8 md:p-10">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
-            Response templates
-          </p>
-          <h2 className="mt-2 font-heading text-xl font-bold tracking-tight">
-            Default acceptance &amp; rejection messages
-          </h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            These are the defaults each applicant receives. Override them per
-            applicant from Deep review if needed.
-          </p>
-          <div className="mt-8">
-            <ResponseTemplatesForm
-              eventId={event.id}
-              acceptanceMessage={event.acceptanceMessage ?? ""}
-              rejectionMessage={event.rejectionMessage ?? ""}
-              otherEvents={otherEvents.map((e) => ({
-                ...e,
-                acceptanceMessage: e.acceptanceMessage,
-                rejectionMessage: e.rejectionMessage,
-              }))}
-              readOnly={isPublished}
-            />
-          </div>
-        </Card>
-      )}
     </div>
   );
 }

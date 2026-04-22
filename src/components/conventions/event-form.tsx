@@ -47,6 +47,12 @@ interface EventFormProps {
     tableSizeOptions?: TableSizeOption[];
     maxAssistants?: number;
     assistantFeeNok?: number | null;
+    acceptanceMessage?: string;
+    rejectionMessage?: string;
+    // Convention defaults shown as placeholder text so the organizer can
+    // see what will be used when the event-level field is left blank.
+    conventionAcceptanceMessage?: string | null;
+    conventionRejectionMessage?: string | null;
   };
   submitLabel: string;
 }
@@ -482,6 +488,53 @@ export function EventForm({ action, defaultValues, submitLabel }: EventFormProps
                 defaultValue={dv.assistantFeeNok ?? ""}
               />
             </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Decision messaging: event-level accept/reject templates. Blank =
+          inherit the convention default shown in the placeholder. */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Messaging</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="acceptanceMessage" className={LABEL_CLASS}>
+              Acceptance message
+            </Label>
+            <Textarea
+              id="acceptanceMessage"
+              name="acceptanceMessage"
+              rows={5}
+              defaultValue={dv.acceptanceMessage ?? ""}
+              placeholder={
+                dv.conventionAcceptanceMessage
+                  ? `(uses convention default)\n\u2014\n${dv.conventionAcceptanceMessage}`
+                  : "Message sent to accepted artists when results are published. Leave blank to use the convention default."
+              }
+            />
+            <p className="text-xs text-muted-foreground">
+              {dv.conventionAcceptanceMessage
+                ? "Leave blank to use the convention default shown in the placeholder."
+                : "No convention-level default set \u2014 leaving this blank will send an empty message."}
+            </p>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="rejectionMessage" className={LABEL_CLASS}>
+              Rejection message
+            </Label>
+            <Textarea
+              id="rejectionMessage"
+              name="rejectionMessage"
+              rows={5}
+              defaultValue={dv.rejectionMessage ?? ""}
+              placeholder={
+                dv.conventionRejectionMessage
+                  ? `(uses convention default)\n\u2014\n${dv.conventionRejectionMessage}`
+                  : "Message sent to rejected artists. Leave blank to use the convention default."
+              }
+            />
           </div>
         </CardContent>
       </Card>

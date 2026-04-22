@@ -16,6 +16,8 @@ interface ConventionProfileFormProps {
     description: string;
     websiteUrl: string;
     guidelines: string;
+    acceptanceMessage: string;
+    rejectionMessage: string;
   };
 }
 
@@ -134,6 +136,35 @@ export function ConventionProfileForm({
             {state.fieldErrors.guidelines[0]}
           </p>
         )}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="acceptanceMessage" className={LABEL_CLASS}>
+          Default acceptance message
+        </Label>
+        <Textarea
+          id="acceptanceMessage"
+          name="acceptanceMessage"
+          rows={5}
+          defaultValue={defaultValues.acceptanceMessage}
+          placeholder="The default message each event sends to accepted artists when results are published. Events can override this."
+        />
+        <p className="text-xs text-muted-foreground">
+          Used for every event unless the event sets its own.
+        </p>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="rejectionMessage" className={LABEL_CLASS}>
+          Default rejection message
+        </Label>
+        <Textarea
+          id="rejectionMessage"
+          name="rejectionMessage"
+          rows={5}
+          defaultValue={defaultValues.rejectionMessage}
+          placeholder="Default message sent to rejected artists. Events can override this."
+        />
       </div>
 
       <Button type="submit" disabled={pending}>

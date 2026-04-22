@@ -28,6 +28,8 @@ export async function updateConventionProfile(
     description: (formData.get("description") ?? "").toString(),
     websiteUrl: (formData.get("websiteUrl") ?? "").toString(),
     guidelines: (formData.get("guidelines") ?? "").toString(),
+    acceptanceMessage: (formData.get("acceptanceMessage") ?? "").toString(),
+    rejectionMessage: (formData.get("rejectionMessage") ?? "").toString(),
   };
 
   const result = conventionProfileSchema.safeParse(raw);
@@ -40,7 +42,14 @@ export async function updateConventionProfile(
     return { error: "Convention not found" };
   }
 
-  const { name, description, websiteUrl, guidelines } = result.data;
+  const {
+    name,
+    description,
+    websiteUrl,
+    guidelines,
+    acceptanceMessage,
+    rejectionMessage,
+  } = result.data;
 
   try {
     await db
@@ -50,6 +59,8 @@ export async function updateConventionProfile(
         description: description || null,
         websiteUrl: websiteUrl || null,
         guidelines: guidelines || null,
+        acceptanceMessage: acceptanceMessage || null,
+        rejectionMessage: rejectionMessage || null,
         updatedAt: new Date(),
       })
       .where(eq(conventions.id, convention.id));

@@ -27,6 +27,16 @@ export const conventionProfileSchema = z.object({
     .max(10_000, "Guidelines are too long")
     .optional()
     .default(""),
+  acceptanceMessage: z
+    .string()
+    .max(5000, "Acceptance message is too long")
+    .optional()
+    .default(""),
+  rejectionMessage: z
+    .string()
+    .max(5000, "Rejection message is too long")
+    .optional()
+    .default(""),
 });
 
 export type ConventionProfileInput = z.infer<typeof conventionProfileSchema>;
@@ -188,6 +198,16 @@ export const eventSchema = z
           )
           .max(10)
       ),
+    acceptanceMessage: z
+      .string()
+      .max(5000, "Acceptance message is too long")
+      .optional()
+      .default(""),
+    rejectionMessage: z
+      .string()
+      .max(5000, "Rejection message is too long")
+      .optional()
+      .default(""),
     maxAssistants: z
       .string()
       .optional()
