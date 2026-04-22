@@ -25,6 +25,22 @@ export const SELECTION_FILTERS: {
 
 export type SelectionLayout = "gallery" | "table" | "stacked";
 
+// Resolved per-application answers for organizer review. Table size is
+// looked up against the event's tableSizeOptions at page-load time so the
+// label stays meaningful even if the option is later renamed.
+export interface ApplicationAnswersView {
+  tableSizeLabel: string | null;
+  tableSizeDimensions: string | null;
+  tableSizePriceNok: number | null;
+  assistantsCount: number | null;
+  assistantsNames: string[];
+  sharingStand: { sharing: boolean; with: string | null } | null;
+  placementPreference: string | null;
+  additionalComments: string | null;
+  promotionConsent: boolean | null;
+  guidelinesAcknowledgedAt: Date | null;
+}
+
 export interface SelectionApplicantView {
   id: string;
   profileId: string;
@@ -39,4 +55,5 @@ export interface SelectionApplicantView {
   genres: string[];
   mediums: string[];
   images: { id: string; url: string; sortOrder: number }[];
+  answers: ApplicationAnswersView;
 }

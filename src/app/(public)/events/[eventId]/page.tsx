@@ -326,6 +326,15 @@ export default async function EventDetailPage({
           </SectionCard>
         )}
 
+        {session?.user &&
+          (event.guidelinesOverride || event.conventionGuidelines) && (
+            <SectionCard label="Guidelines">
+              <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
+                {event.guidelinesOverride ?? event.conventionGuidelines}
+              </p>
+            </SectionCard>
+          )}
+
         {isAccepting && (
           <SectionCard label="Apply">
             {isArtist ? (

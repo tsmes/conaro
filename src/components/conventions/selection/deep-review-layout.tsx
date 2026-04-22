@@ -15,9 +15,115 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { formatDateNo } from "@/lib/utils/format-date-no";
 import { getStatusDisplay } from "./applicant-visuals";
 import { PortfolioCollage } from "./portfolio-collage";
-import type { SelectionApplicantView } from "./types";
+import type {
+  ApplicationAnswersView,
+  SelectionApplicantView,
+} from "./types";
+
+function ApplicationAnswersPanel({
+  answers,
+}: {
+  answers: ApplicationAnswersView;
+}) {
+  const hasAny =
+    answers.tableSizeLabel ||
+    answers.assistantsCount !== null ||
+    answers.sharingStand ||
+    answers.placementPreference ||
+    answers.additionalComments ||
+    answers.promotionConsent !== null;
+
+  if (!hasAny && !answers.guidelinesAcknowledgedAt) return null;
+
+  return (
+    <div className="space-y-3 rounded-md border border-border p-3">
+      <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
+        Application answers
+      </p>
+      <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-[13px]">
+        {answers.tableSizeLabel && (
+          <div className="col-span-2">
+            <dt className="text-[11px] font-semibold uppercase text-muted-foreground">
+              Table size
+            </dt>
+            <dd className="font-mono">
+              {answers.tableSizeLabel}
+              {answers.tableSizeDimensions
+                ? ` · ${answers.tableSizeDimensions}`
+                : ""}
+              {answers.tableSizePriceNok !== null
+                ? ` · ${answers.tableSizePriceNok} NOK`
+                : ""}
+            </dd>
+          </div>
+        )}
+        {answers.assistantsCount !== null && (
+          <div className="col-span-2">
+            <dt className="text-[11px] font-semibold uppercase text-muted-foreground">
+              Assistants
+            </dt>
+            <dd>
+              {answers.assistantsCount === 0
+                ? "None"
+                : `${answers.assistantsCount} (${answers.assistantsNames.join(", ")})`}
+            </dd>
+          </div>
+        )}
+        {answers.sharingStand && (
+          <div className="col-span-2">
+            <dt className="text-[11px] font-semibold uppercase text-muted-foreground">
+              Sharing stand
+            </dt>
+            <dd>
+              {answers.sharingStand.sharing
+                ? `Yes${answers.sharingStand.with ? ` — ${answers.sharingStand.with}` : ""}`
+                : "No"}
+            </dd>
+          </div>
+        )}
+        {answers.placementPreference && (
+          <div className="col-span-2">
+            <dt className="text-[11px] font-semibold uppercase text-muted-foreground">
+              Placement preference
+            </dt>
+            <dd>{answers.placementPreference}</dd>
+          </div>
+        )}
+        {answers.additionalComments && (
+          <div className="col-span-2">
+            <dt className="text-[11px] font-semibold uppercase text-muted-foreground">
+              Additional comments
+            </dt>
+            <dd>{answers.additionalComments}</dd>
+          </div>
+        )}
+        {answers.promotionConsent !== null && (
+          <div>
+            <dt className="text-[11px] font-semibold uppercase text-muted-foreground">
+              Promotion
+            </dt>
+            <dd>{answers.promotionConsent ? "Consented" : "Declined"}</dd>
+          </div>
+        )}
+        {answers.guidelinesAcknowledgedAt && (
+          <div>
+            <dt className="text-[11px] font-semibold uppercase text-muted-foreground">
+              Guidelines ack
+            </dt>
+            <dd className="font-mono">
+              {formatDateNo(
+                answers.guidelinesAcknowledgedAt.toISOString().slice(0, 10)
+              )}
+            </dd>
+          </div>
+        )}
+      </dl>
+    </div>
+  );
+}
 
 type EventStatus =
   | "draft"
@@ -170,6 +276,8 @@ export function DeepReviewLayout({
               </p>
             </div>
           )}
+
+          <ApplicationAnswersPanel answers={applicant.answers} />
 
           <div className="mt-auto flex flex-wrap items-center gap-2 border-t border-border pt-4">
             <Button

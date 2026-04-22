@@ -66,27 +66,56 @@ export default async function ApplicationsPage({
 
   const isPublished = event.status === "results_published";
 
-  const applicantsView: SelectionApplicantView[] = applicants.map((app: SelectionApplicant) => ({
-    id: app.id,
-    profileId: app.profileId,
-    status: app.status,
-    pinned: app.pinned,
-    paymentConfirmed: app.paymentConfirmed,
-    createdAt: app.createdAt,
-    displayName: app.snapshot.displayName,
-    bio: app.snapshot.bio,
-    helpers: app.snapshot.helpers,
-    accessibilityNeeds: app.snapshot.accessibilityNeeds,
-    genres: app.snapshot.genres ?? [],
-    mediums: app.snapshot.mediums ?? [],
-    images: [...app.snapshot.images]
-      .sort((a, b) => a.sortOrder - b.sortOrder)
-      .map((image) => ({
-        id: image.id,
-        url: storage.getUrl(image.storagePath),
-        sortOrder: image.sortOrder,
-      })),
-  }));
+  const tableSizeMap = new Map(
+    (event.tableSizeOptions ?? []).map((o) => [o.id, o])
+  );
+
+  const applicantsView: SelectionApplicantView[] = applicants.map(
+    (app: SelectionApplicant) => {
+      const ans = app.answers;
+      const tableSize = ans.tableSizeOptionId
+        ? tableSizeMap.get(ans.tableSizeOptionId) ?? null
+        : null;
+      return {
+        id: app.id,
+        profileId: app.profileId,
+        status: app.status,
+        pinned: app.pinned,
+        paymentConfirmed: app.paymentConfirmed,
+        createdAt: app.createdAt,
+        displayName: app.snapshot.displayName,
+        bio: app.snapshot.bio,
+        helpers: app.snapshot.helpers,
+        accessibilityNeeds: app.snapshot.accessibilityNeeds,
+        genres: app.snapshot.genres ?? [],
+        mediums: app.snapshot.mediums ?? [],
+        images: [...app.snapshot.images]
+          .sort((a, b) => a.sortOrder - b.sortOrder)
+          .map((image) => ({
+            id: image.id,
+            url: storage.getUrl(image.storagePath),
+            sortOrder: image.sortOrder,
+          })),
+        answers: {
+          tableSizeLabel: tableSize?.label ?? null,
+          tableSizeDimensions: tableSize?.dimensions ?? null,
+          tableSizePriceNok: tableSize?.priceNok ?? null,
+          assistantsCount: ans.assistants?.count ?? null,
+          assistantsNames: ans.assistants?.names ?? [],
+          sharingStand: ans.sharingStand
+            ? {
+                sharing: ans.sharingStand.sharing,
+                with: ans.sharingStand.with ?? null,
+              }
+            : null,
+          placementPreference: ans.placementPreference ?? null,
+          additionalComments: ans.additionalComments ?? null,
+          promotionConsent: ans.promotionConsent ?? null,
+          guidelinesAcknowledgedAt: app.guidelinesAcknowledgedAt,
+        },
+      };
+    }
+  );
 
   return (
     <div className="mx-auto max-w-[1400px] space-y-10 px-6 py-10 md:px-8">

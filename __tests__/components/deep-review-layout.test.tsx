@@ -19,10 +19,21 @@ function makeApplicant(
     bio: "A short statement",
     helpers: 1,
     accessibilityNeeds: null,
-    tableSizePreference: "Small",
     genres: ["Comics"],
     mediums: ["Ink"],
     images: [],
+    answers: {
+      tableSizeLabel: null,
+      tableSizeDimensions: null,
+      tableSizePriceNok: null,
+      assistantsCount: null,
+      assistantsNames: [],
+      sharingStand: null,
+      placementPreference: null,
+      additionalComments: null,
+      promotionConsent: null,
+      guidelinesAcknowledgedAt: null,
+    },
     ...overrides,
   };
 }

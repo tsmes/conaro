@@ -3,7 +3,10 @@ import { db } from "@/lib/db";
 import { conventions } from "@/lib/db/schema/conventions";
 import { events } from "@/lib/db/schema/events";
 import { applications } from "@/lib/db/schema/applications";
-import type { ProfileSnapshot } from "@/lib/db/schema/applications";
+import type {
+  ApplicationAnswers,
+  ProfileSnapshot,
+} from "@/lib/db/schema/applications";
 import {
   FIELD_REGISTRY,
   type FieldKey,
@@ -19,6 +22,8 @@ export interface SelectionApplicant {
   isBlockListed: boolean;
   createdAt: Date;
   snapshot: ProfileSnapshot;
+  answers: ApplicationAnswers;
+  guidelinesAcknowledgedAt: Date | null;
 }
 
 export async function getOrganizerConvention(profileId: string) {
@@ -60,6 +65,8 @@ export async function getEventApplicants(
       isBlockListed: applications.isBlockListed,
       createdAt: applications.createdAt,
       snapshot: applications.profileSnapshot,
+      answers: applications.answers,
+      guidelinesAcknowledgedAt: applications.guidelinesAcknowledgedAt,
     })
     .from(applications)
     .innerJoin(events, eq(events.id, applications.eventId))
@@ -74,6 +81,7 @@ export async function getEventApplicants(
   return rows.map((row) => ({
     ...row,
     snapshot: normalizeSnapshot(row.snapshot),
+    answers: row.answers ?? {},
   }));
 }
 
