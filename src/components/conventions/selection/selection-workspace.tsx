@@ -69,7 +69,11 @@ export function SelectionWorkspace({
 }: SelectionWorkspaceProps) {
   const [applicants, setApplicants] =
     useState<SelectionApplicantView[]>(initialApplicants);
-  const [filter, setFilter] = useState<SelectionFilter>("all");
+  // After results are published the selection is final; lead with the
+  // accepted roster since that's what the organizer is acting on.
+  const [filter, setFilter] = useState<SelectionFilter>(
+    eventStatus === "results_published" ? "accepted" : "all"
+  );
   const [layout, setLayout] = useState<SelectionLayout>("gallery");
   const [deepIndex, setDeepIndex] = useState(0);
   const [bulkMode, setBulkMode] = useState(false);

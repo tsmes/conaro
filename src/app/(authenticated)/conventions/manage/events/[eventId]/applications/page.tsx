@@ -163,6 +163,34 @@ export default async function ApplicationsPage({
         </div>
       )}
 
+      {isPublished && (
+        <Card className="border-2 border-primary/30 p-8 shadow-gallery md:p-10">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
+            Messaging \u00b7 Published
+          </p>
+          <h2 className="mt-2 font-heading text-2xl font-bold tracking-tight">
+            Acceptance &amp; rejection messages
+          </h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            These went out to applicants when you published results. You can
+            still override them per applicant from Deep review.
+          </p>
+          <div className="mt-8">
+            <ResponseTemplatesForm
+              eventId={event.id}
+              acceptanceMessage={event.acceptanceMessage ?? ""}
+              rejectionMessage={event.rejectionMessage ?? ""}
+              otherEvents={otherEvents.map((e) => ({
+                ...e,
+                acceptanceMessage: e.acceptanceMessage,
+                rejectionMessage: e.rejectionMessage,
+              }))}
+              readOnly={isPublished}
+            />
+          </div>
+        </Card>
+      )}
+
       <SelectionWorkspace
         eventId={event.id}
         eventStatus={event.status}
@@ -170,31 +198,33 @@ export default async function ApplicationsPage({
         applicants={applicantsView}
       />
 
-      <Card className="p-8 md:p-10">
-        <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
-          Response templates
-        </p>
-        <h2 className="mt-2 font-heading text-xl font-bold tracking-tight">
-          Default acceptance &amp; rejection messages
-        </h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          These are the defaults each applicant receives. Override them per
-          applicant from Deep review if needed.
-        </p>
-        <div className="mt-8">
-          <ResponseTemplatesForm
-            eventId={event.id}
-            acceptanceMessage={event.acceptanceMessage ?? ""}
-            rejectionMessage={event.rejectionMessage ?? ""}
-            otherEvents={otherEvents.map((e) => ({
-              ...e,
-              acceptanceMessage: e.acceptanceMessage,
-              rejectionMessage: e.rejectionMessage,
-            }))}
-            readOnly={isPublished}
-          />
-        </div>
-      </Card>
+      {!isPublished && (
+        <Card className="p-8 md:p-10">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
+            Response templates
+          </p>
+          <h2 className="mt-2 font-heading text-xl font-bold tracking-tight">
+            Default acceptance &amp; rejection messages
+          </h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            These are the defaults each applicant receives. Override them per
+            applicant from Deep review if needed.
+          </p>
+          <div className="mt-8">
+            <ResponseTemplatesForm
+              eventId={event.id}
+              acceptanceMessage={event.acceptanceMessage ?? ""}
+              rejectionMessage={event.rejectionMessage ?? ""}
+              otherEvents={otherEvents.map((e) => ({
+                ...e,
+                acceptanceMessage: e.acceptanceMessage,
+                rejectionMessage: e.rejectionMessage,
+              }))}
+              readOnly={isPublished}
+            />
+          </div>
+        </Card>
+      )}
     </div>
   );
 }
