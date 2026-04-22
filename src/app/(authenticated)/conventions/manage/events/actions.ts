@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { events } from "@/lib/db/schema/events";
-import type { Amenities } from "@/lib/db/schema/events";
+import type { Amenities, TableSizeOption } from "@/lib/db/schema/events";
 import { auth } from "@/lib/auth";
 import { type ActionState } from "@/lib/validations/auth";
 import { eventSchema, type EventInput } from "@/lib/validations/convention";
@@ -56,6 +56,10 @@ const EVENT_FIELD_NAMES = [
   "amenities_tables",
   "amenities_chairs",
   "amenities_other",
+  "guidelinesOverride",
+  "tableSizeOptions",
+  "maxAssistants",
+  "assistantFeeNok",
 ] as const;
 
 function extractEventFormData(formData: FormData): Record<string, string> {
@@ -85,6 +89,10 @@ function buildEventColumns(data: EventInput) {
     setupTime: data.setupTime || null,
     teardownTime: data.teardownTime || null,
     amenities: extractAmenities(data),
+    guidelinesOverride: data.guidelinesOverride || null,
+    tableSizeOptions: data.tableSizeOptions as TableSizeOption[],
+    maxAssistants: data.maxAssistants,
+    assistantFeeNok: data.assistantFeeNok,
   };
 }
 

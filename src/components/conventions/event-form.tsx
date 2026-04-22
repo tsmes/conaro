@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import type { ActionState } from "@/lib/validations/auth";
+import type { TableSizeOption } from "@/lib/db/schema/events";
 
 interface EventFormProps {
   action: (prevState: ActionState, formData: FormData) => Promise<ActionState>;
@@ -42,8 +43,90 @@ interface EventFormProps {
     amenities_tables?: boolean;
     amenities_chairs?: boolean;
     amenities_other?: string;
+    guidelinesOverride?: string;
+    tableSizeOptions?: TableSizeOption[];
+    maxAssistants?: number;
+    assistantFeeNok?: number | null;
   };
   submitLabel: string;
+}
+
+function TableSizeOptionsEditor({
+  initial,
+}: {
+  initial: TableSizeOption[];
+}) {
+  const [options, setOptions] = useState<TableSizeOption[]>(initial);
+
+  const add = () =>
+    setOptions((prev) => [
+      ...prev,
+      { id: crypto.randomUUID(), label: "", dimensions: "", priceNok: null },
+    ]);
+  const remove = (id: string) =>
+    setOptions((prev) => prev.filter((o) => o.id !== id));
+  const update = (id: string, patch: Partial<TableSizeOption>) =>
+    setOptions((prev) =>
+      prev.map((o) => (o.id === id ? { ...o, ...patch } : o))
+    );
+
+  return (
+    <div className="space-y-3">
+      <input
+        type="hidden"
+        name="tableSizeOptions"
+        value={JSON.stringify(options)}
+      />
+      {options.length === 0 && (
+        <p className="text-sm text-muted-foreground">
+          No structured options yet. Add one to let artists pick a table size
+          and price at apply time.
+        </p>
+      )}
+      {options.map((opt) => (
+        <div
+          key={opt.id}
+          className="grid gap-2 rounded-md border border-border p-3 sm:grid-cols-[1fr_1fr_120px_auto]"
+        >
+          <Input
+            aria-label="Label"
+            placeholder="Standard"
+            value={opt.label}
+            onChange={(e) => update(opt.id, { label: e.target.value })}
+          />
+          <Input
+            aria-label="Dimensions"
+            placeholder="90 x 120 cm"
+            value={opt.dimensions}
+            onChange={(e) => update(opt.id, { dimensions: e.target.value })}
+          />
+          <Input
+            aria-label="Price (NOK)"
+            type="number"
+            min={0}
+            placeholder="280"
+            value={opt.priceNok ?? ""}
+            onChange={(e) =>
+              update(opt.id, {
+                priceNok: e.target.value === "" ? null : Number(e.target.value),
+              })
+            }
+          />
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => remove(opt.id)}
+          >
+            Remove
+          </Button>
+        </div>
+      ))}
+      <Button type="button" variant="outline" size="sm" onClick={add}>
+        Add table size
+      </Button>
+    </div>
+  );
 }
 
 function FieldError({
@@ -331,6 +414,72 @@ export function EventForm({ action, defaultValues, submitLabel }: EventFormProps
                 name="amenities_other"
                 placeholder="e.g., Display racks, lighting"
                 defaultValue={dv.amenities_other ?? ""}
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Application offering: structured table sizes, assistants, guidelines */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Application Form</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="guidelinesOverride" className={LABEL_CLASS}>
+              Guidelines (event override)
+            </Label>
+            <Textarea
+              id="guidelinesOverride"
+              name="guidelinesOverride"
+              rows={6}
+              defaultValue={dv.guidelinesOverride ?? ""}
+              placeholder="Leave blank to use the convention's guidelines."
+            />
+            <p className="text-xs text-muted-foreground">
+              Artists must check &ldquo;I have read and understood the
+              guidelines&rdquo; before submitting.
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label className={LABEL_CLASS}>Table sizes</Label>
+            <p className="text-xs text-muted-foreground">
+              Define one or more table sizes the artist can pick from at
+              apply time.
+            </p>
+            <TableSizeOptionsEditor initial={dv.tableSizeOptions ?? []} />
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="maxAssistants" className={LABEL_CLASS}>
+                Max assistants per stand
+              </Label>
+              <Input
+                id="maxAssistants"
+                name="maxAssistants"
+                type="number"
+                min={0}
+                max={5}
+                defaultValue={dv.maxAssistants ?? 0}
+              />
+              <p className="text-xs text-muted-foreground">
+                0 disables the assistants question on the application form.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="assistantFeeNok" className={LABEL_CLASS}>
+                Fee per assistant (NOK)
+              </Label>
+              <Input
+                id="assistantFeeNok"
+                name="assistantFeeNok"
+                type="number"
+                min={0}
+                placeholder="e.g., 300"
+                defaultValue={dv.assistantFeeNok ?? ""}
               />
             </div>
           </div>

@@ -160,6 +160,10 @@ export default async function EventDetailPage({
               amenities_tables: amenities?.tables ?? false,
               amenities_chairs: amenities?.chairs ?? false,
               amenities_other: amenities?.other ?? "",
+              guidelinesOverride: event.guidelinesOverride ?? "",
+              tableSizeOptions: event.tableSizeOptions ?? [],
+              maxAssistants: event.maxAssistants ?? 0,
+              assistantFeeNok: event.assistantFeeNok ?? null,
             }}
             submitLabel="Save changes"
           />

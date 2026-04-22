@@ -15,6 +15,7 @@ interface ConventionProfileFormProps {
     name: string;
     description: string;
     websiteUrl: string;
+    guidelines: string;
   };
 }
 
@@ -102,6 +103,35 @@ export function ConventionProfileForm({
             className="text-sm text-destructive"
           >
             {state.fieldErrors.websiteUrl[0]}
+          </p>
+        )}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="guidelines" className={LABEL_CLASS}>
+          Guidelines
+        </Label>
+        <Textarea
+          id="guidelines"
+          name="guidelines"
+          rows={8}
+          defaultValue={defaultValues.guidelines}
+          placeholder="Convention-wide guidelines artists must read and acknowledge before applying. Each event can override this text."
+          aria-describedby={
+            state.fieldErrors?.guidelines ? "guidelines-error" : undefined
+          }
+          aria-invalid={!!state.fieldErrors?.guidelines}
+        />
+        <p className="text-xs text-muted-foreground">
+          Shown on every application form unless an event overrides it.
+        </p>
+        {state.fieldErrors?.guidelines && (
+          <p
+            id="guidelines-error"
+            role="alert"
+            className="text-sm text-destructive"
+          >
+            {state.fieldErrors.guidelines[0]}
           </p>
         )}
       </div>

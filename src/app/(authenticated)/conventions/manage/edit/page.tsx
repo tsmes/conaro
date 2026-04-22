@@ -68,6 +68,7 @@ export default async function EditConventionPage() {
               name: convention.name,
               description: convention.description ?? "",
               websiteUrl: convention.websiteUrl ?? "",
+              guidelines: convention.guidelines ?? "",
             }}
           />
         </div>

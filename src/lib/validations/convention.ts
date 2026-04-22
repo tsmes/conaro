@@ -22,6 +22,11 @@ export const conventionProfileSchema = z.object({
     )
     .optional()
     .default(""),
+  guidelines: z
+    .string()
+    .max(10_000, "Guidelines are too long")
+    .optional()
+    .default(""),
 });
 
 export type ConventionProfileInput = z.infer<typeof conventionProfileSchema>;
@@ -146,6 +151,62 @@ export const eventSchema = z
       .max(500, "Amenities notes is too long")
       .optional()
       .default(""),
+    guidelinesOverride: z
+      .string()
+      .max(10_000, "Guidelines override is too long")
+      .optional()
+      .default(""),
+    tableSizeOptions: z
+      .string()
+      .optional()
+      .default("[]")
+      .transform((val, ctx) => {
+        try {
+          const parsed = JSON.parse(val || "[]");
+          if (!Array.isArray(parsed)) throw new Error();
+          return parsed;
+        } catch {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Invalid table size options",
+          });
+          return z.NEVER;
+        }
+      })
+      .pipe(
+        z
+          .array(
+            z.object({
+              id: z.string().min(1),
+              label: z.string().min(1, "Label is required").max(100),
+              dimensions: z.string().max(100).optional().default(""),
+              priceNok: z
+                .union([z.number().int().min(0), z.null()])
+                .nullable()
+                .optional(),
+            })
+          )
+          .max(10)
+      ),
+    maxAssistants: z
+      .string()
+      .optional()
+      .default("0")
+      .transform((val) => Number(val))
+      .refine(
+        (n) => Number.isInteger(n) && n >= 0 && n <= 5,
+        "Max assistants must be between 0 and 5"
+      ),
+    assistantFeeNok: z
+      .string()
+      .optional()
+      .default("")
+      .transform((val) => (val === "" ? null : Number(val)))
+      .refine(
+        (val) =>
+          val === null || (Number.isInteger(val) && val >= 0 && val <= 100_000),
+        "Fee must be a non-negative whole number"
+      ),
   })
   .refine(
     (data) => {

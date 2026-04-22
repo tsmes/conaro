@@ -27,6 +27,7 @@ export async function updateConventionProfile(
     name: (formData.get("name") ?? "").toString(),
     description: (formData.get("description") ?? "").toString(),
     websiteUrl: (formData.get("websiteUrl") ?? "").toString(),
+    guidelines: (formData.get("guidelines") ?? "").toString(),
   };
 
   const result = conventionProfileSchema.safeParse(raw);
@@ -39,7 +40,7 @@ export async function updateConventionProfile(
     return { error: "Convention not found" };
   }
 
-  const { name, description, websiteUrl } = result.data;
+  const { name, description, websiteUrl, guidelines } = result.data;
 
   try {
     await db
@@ -48,6 +49,7 @@ export async function updateConventionProfile(
         name,
         description: description || null,
         websiteUrl: websiteUrl || null,
+        guidelines: guidelines || null,
         updatedAt: new Date(),
       })
       .where(eq(conventions.id, convention.id));
