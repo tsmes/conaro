@@ -141,7 +141,7 @@ export function SelectionWorkspace({
       genresSummary: toSummary(genreApplied, genreAccepted),
       mediumsSummary: toSummary(mediumApplied, mediumAccepted),
     };
-  }, [applicants]);
+  }, [filtered]);
 
   function handleFilterChange(next: SelectionFilter) {
     setFilter(next);
