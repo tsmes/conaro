@@ -78,6 +78,13 @@
       "when": 1776840445318,
       "tag": "0010_curvy_tyrannus",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1776840580829,
+      "tag": "0011_public_blob",
+      "breakpoints": true
     }
   ]
 }

@@ -30,6 +30,15 @@ export type FieldRequirementState = "required" | "optional" | "not_requested";
 
 export type FieldRequirements = Record<string, FieldRequirementState>;
 
+// Structured table-size offering chosen at apply time. Each option carries a
+// stable `id` so applications referencing it remain valid across edits.
+export interface TableSizeOption {
+  id: string;
+  label: string;
+  dimensions: string;
+  priceNok: number | null;
+}
+
 export const events = pgTable(
   "events",
   {
@@ -62,6 +71,12 @@ export const events = pgTable(
     acceptanceMessage: text("acceptance_message"),
     rejectionMessage: text("rejection_message"),
     guidelinesOverride: text("guidelines_override"),
+    tableSizeOptions: jsonb("table_size_options")
+      .$type<TableSizeOption[]>()
+      .notNull()
+      .default([]),
+    maxAssistants: integer("max_assistants").notNull().default(0),
+    assistantFeeNok: integer("assistant_fee_nok"),
     createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
   },
