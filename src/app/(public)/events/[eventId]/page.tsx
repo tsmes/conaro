@@ -96,9 +96,14 @@ export default async function EventDetailPage({
       amenities: events.amenities,
       fieldRequirements: events.fieldRequirements,
       minPortfolioImages: events.minPortfolioImages,
+      guidelinesOverride: events.guidelinesOverride,
+      tableSizeOptions: events.tableSizeOptions,
+      maxAssistants: events.maxAssistants,
+      assistantFeeNok: events.assistantFeeNok,
       conventionId: events.conventionId,
       conventionName: conventions.name,
       conventionLogoPath: conventions.logoPath,
+      conventionGuidelines: conventions.guidelines,
     })
     .from(events)
     .innerJoin(conventions, eq(conventions.id, events.conventionId))
@@ -328,6 +333,13 @@ export default async function EventDetailPage({
                 eventId={event.id}
                 hasExistingApplication={hasExistingApplication}
                 validationResult={validationResult}
+                guidelines={
+                  event.guidelinesOverride ?? event.conventionGuidelines ?? null
+                }
+                fieldRequirements={event.fieldRequirements}
+                tableSizeOptions={event.tableSizeOptions ?? []}
+                maxAssistants={event.maxAssistants ?? 0}
+                assistantFeeNok={event.assistantFeeNok ?? null}
               />
             ) : session?.user ? (
               <p className="text-sm text-muted-foreground">

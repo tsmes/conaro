@@ -4,12 +4,20 @@ import { and, eq, asc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { events } from "@/lib/db/schema/events";
-import type { FieldRequirements } from "@/lib/db/schema/events";
+import type {
+  FieldRequirements,
+  TableSizeOption,
+} from "@/lib/db/schema/events";
 import { profiles } from "@/lib/db/schema/profiles";
 import { artistProfiles } from "@/lib/db/schema/artist-profiles";
 import { portfolioImages } from "@/lib/db/schema/portfolio-images";
 import { applications } from "@/lib/db/schema/applications";
-import type { ProfileSnapshot, SnapshotImage } from "@/lib/db/schema/applications";
+import type {
+  ApplicationAnswers,
+  ProfileSnapshot,
+  SnapshotImage,
+} from "@/lib/db/schema/applications";
+import { buildApplicationAnswersSchema } from "@/lib/validations/application";
 import { conventions } from "@/lib/db/schema/conventions";
 import { conventionArtistLists } from "@/lib/db/schema/convention-artist-lists";
 import { auth } from "@/lib/auth";
@@ -54,6 +62,34 @@ export async function applyToEvent(
   if (event.status !== "accepting_applications") {
     return { error: "This event is not currently accepting applications" };
   }
+
+  // Mandatory guidelines acknowledgment gate.
+  const guidelinesAcknowledged =
+    formData.get("guidelinesAcknowledged")?.toString() === "true";
+  if (!guidelinesAcknowledged) {
+    return { error: "Please confirm you have read and understood the guidelines." };
+  }
+
+  // Parse and validate the artist's per-application answers against the
+  // event's field requirements.
+  const rawAnswers = formData.get("answers")?.toString() || "{}";
+  let parsedRaw: unknown;
+  try {
+    parsedRaw = JSON.parse(rawAnswers);
+  } catch {
+    return { error: "Could not read your application answers." };
+  }
+  const answersSchema = buildApplicationAnswersSchema({
+    fieldRequirements: event.fieldRequirements as FieldRequirements | null,
+    tableSizeOptions: (event.tableSizeOptions ?? []) as TableSizeOption[],
+    maxAssistants: event.maxAssistants ?? 0,
+  });
+  const answersResult = answersSchema.safeParse(parsedRaw);
+  if (!answersResult.success) {
+    const first = answersResult.error.issues[0];
+    return { error: first?.message ?? "Some answers are invalid." };
+  }
+  const answers: ApplicationAnswers = answersResult.data;
 
   // Fetch artist data
   const [[profile], [artistProfile], images] = await Promise.all([
@@ -153,6 +189,8 @@ export async function applyToEvent(
       eventId,
       profileId,
       profileSnapshot,
+      answers,
+      guidelinesAcknowledgedAt: new Date(),
       isBlockListed,
     });
   } catch (error: unknown) {

@@ -58,7 +58,7 @@ describe("applyToEvent", () => {
       user: { id: "u", role: "artist", profileId: artist.profile.id },
     });
 
-    const result = await applyToEvent({}, buildFormData({ eventId: event.id }));
+    const result = await applyToEvent({}, buildFormData({ eventId: event.id, guidelinesAcknowledged: "true" }));
     expect(result.success).toBe(true);
 
     const apps = await findApplicationsByEventId(event.id);
@@ -86,7 +86,7 @@ describe("applyToEvent", () => {
       user: { id: "u", role: "artist", profileId: artist.profile.id },
     });
 
-    const result = await applyToEvent({}, buildFormData({ eventId: event.id }));
+    const result = await applyToEvent({}, buildFormData({ eventId: event.id, guidelinesAcknowledged: "true" }));
     expect(result.success).toBe(true);
 
     const apps = await findApplicationsByEventId(event.id);
@@ -104,7 +104,7 @@ describe("applyToEvent", () => {
       user: { id: "u", role: "artist", profileId: artist.profile.id },
     });
 
-    const result = await applyToEvent({}, buildFormData({ eventId: event.id }));
+    const result = await applyToEvent({}, buildFormData({ eventId: event.id, guidelinesAcknowledged: "true" }));
     expect(result.error).toContain("not currently accepting");
   });
 
@@ -117,10 +117,10 @@ describe("applyToEvent", () => {
       user: { id: "u", role: "artist", profileId: artist.profile.id },
     });
 
-    await applyToEvent({}, buildFormData({ eventId: event.id }));
+    await applyToEvent({}, buildFormData({ eventId: event.id, guidelinesAcknowledged: "true" }));
     const result = await applyToEvent(
       {},
-      buildFormData({ eventId: event.id })
+      buildFormData({ eventId: event.id, guidelinesAcknowledged: "true" })
     );
     expect(result.error).toContain("already applied");
   });
@@ -148,7 +148,7 @@ describe("applyToEvent", () => {
       user: { id: "u", role: "artist", profileId: artist.profile.id },
     });
 
-    const result = await applyToEvent({}, buildFormData({ eventId: event.id }));
+    const result = await applyToEvent({}, buildFormData({ eventId: event.id, guidelinesAcknowledged: "true" }));
     expect(result.error).toBe("missing_fields");
     expect(result.missingFields).toBeDefined();
     expect(result.missingFields!.some((f) => f.key === "bio")).toBe(true);
@@ -170,11 +170,134 @@ describe("applyToEvent", () => {
       user: { id: "u", role: "artist", profileId: artist.profile.id },
     });
 
-    const result = await applyToEvent({}, buildFormData({ eventId: event.id }));
+    const result = await applyToEvent({}, buildFormData({ eventId: event.id, guidelinesAcknowledged: "true" }));
     expect(result.success).toBe(true);
 
     const apps = await findApplicationsByEventId(event.id);
     expect(apps[0].isBlockListed).toBe(true);
+  });
+
+  it("blocks submission when guidelines are not acknowledged", async () => {
+    const { convention } = await createTestOrganizer();
+    const event = await createTestEvent(convention.id);
+    const artist = await setupArtistWithProfile();
+
+    mockAuth.mockResolvedValue({
+      user: { id: "u", role: "artist", profileId: artist.profile.id },
+    });
+
+    const result = await applyToEvent(
+      {},
+      buildFormData({ eventId: event.id })
+    );
+    expect(result.error).toContain("read and understood");
+
+    const apps = await findApplicationsByEventId(event.id);
+    expect(apps).toHaveLength(0);
+  });
+
+  it("persists application answers and the acknowledgment timestamp", async () => {
+    const { convention } = await createTestOrganizer();
+    const event = await createTestEvent(convention.id, {
+      tableSizeOptions: [
+        { id: "size-a", label: "Standard", dimensions: "90x120", priceNok: 280 },
+      ],
+      maxAssistants: 1,
+      assistantFeeNok: 300,
+      fieldRequirements: {
+        displayName: "required",
+        contactEmail: "required",
+        realName: "not_requested",
+        phone: "not_requested",
+        bio: "not_requested",
+        websiteUrl: "not_requested",
+        socialLinks: "not_requested",
+        helpers: "not_requested",
+        accessibilityNeeds: "not_requested",
+        notes: "not_requested",
+        portfolioImages: "not_requested",
+        tableSize: "required",
+        assistants: "optional",
+        sharingStand: "optional",
+        placementPreference: "optional",
+        additionalComments: "optional",
+        promotionConsent: "optional",
+      },
+    });
+    const artist = await setupArtistWithProfile();
+
+    mockAuth.mockResolvedValue({
+      user: { id: "u", role: "artist", profileId: artist.profile.id },
+    });
+
+    const result = await applyToEvent(
+      {},
+      buildFormData({
+        eventId: event.id,
+        guidelinesAcknowledged: "true",
+        answers: JSON.stringify({
+          tableSizeOptionId: "size-a",
+          assistants: { count: 1, names: ["Sofie"] },
+          sharingStand: { sharing: false },
+          placementPreference: "Next to Bizziton",
+          additionalComments: "Looking forward!",
+          promotionConsent: true,
+        }),
+      })
+    );
+    expect(result.success).toBe(true);
+
+    const apps = await findApplicationsByEventId(event.id);
+    expect(apps).toHaveLength(1);
+    const stored = apps[0];
+    expect(stored.guidelinesAcknowledgedAt).toBeInstanceOf(Date);
+    expect(stored.answers).toEqual({
+      tableSizeOptionId: "size-a",
+      assistants: { count: 1, names: ["Sofie"] },
+      sharingStand: { sharing: false },
+      placementPreference: "Next to Bizziton",
+      additionalComments: "Looking forward!",
+      promotionConsent: true,
+    });
+  });
+
+  it("rejects an invalid table size option id", async () => {
+    const { convention } = await createTestOrganizer();
+    const event = await createTestEvent(convention.id, {
+      tableSizeOptions: [
+        { id: "size-a", label: "Standard", dimensions: "90x120", priceNok: 280 },
+      ],
+      maxAssistants: 0,
+      fieldRequirements: {
+        displayName: "required",
+        contactEmail: "required",
+        realName: "not_requested",
+        phone: "not_requested",
+        bio: "not_requested",
+        websiteUrl: "not_requested",
+        socialLinks: "not_requested",
+        helpers: "not_requested",
+        accessibilityNeeds: "not_requested",
+        notes: "not_requested",
+        portfolioImages: "not_requested",
+        tableSize: "required",
+      },
+    });
+    const artist = await setupArtistWithProfile();
+
+    mockAuth.mockResolvedValue({
+      user: { id: "u", role: "artist", profileId: artist.profile.id },
+    });
+
+    const result = await applyToEvent(
+      {},
+      buildFormData({
+        eventId: event.id,
+        guidelinesAcknowledged: "true",
+        answers: JSON.stringify({ tableSizeOptionId: "bogus" }),
+      })
+    );
+    expect(result.error).toContain("no longer available");
   });
 
   it("rejects non-artist role", async () => {
