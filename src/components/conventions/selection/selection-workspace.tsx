@@ -99,14 +99,47 @@ export function SelectionWorkspace({
     };
   }, [applicants]);
 
-  const genresSummary = useMemo(() => {
-    const set = new Set<string>();
+  // Per-tag representation summary: how many applicants applied with each
+  // tag and how many of those have been accepted. Feeds the sidebar's
+  // RepresentationCloud so organizers can spot over/under representation.
+  const { genresSummary, mediumsSummary } = useMemo(() => {
+    const genreApplied = new Map<string, number>();
+    const genreAccepted = new Map<string, number>();
+    const mediumApplied = new Map<string, number>();
+    const mediumAccepted = new Map<string, number>();
+
     for (const applicant of applicants) {
-      for (const genre of applicant.genres) {
-        set.add(genre);
+      const isAccepted = applicant.status === "accepted";
+      for (const g of applicant.genres) {
+        genreApplied.set(g, (genreApplied.get(g) ?? 0) + 1);
+        if (isAccepted) {
+          genreAccepted.set(g, (genreAccepted.get(g) ?? 0) + 1);
+        }
+      }
+      for (const m of applicant.mediums) {
+        mediumApplied.set(m, (mediumApplied.get(m) ?? 0) + 1);
+        if (isAccepted) {
+          mediumAccepted.set(m, (mediumAccepted.get(m) ?? 0) + 1);
+        }
       }
     }
-    return Array.from(set).sort();
+
+    const toSummary = (
+      appliedMap: Map<string, number>,
+      acceptedMap: Map<string, number>
+    ) =>
+      Array.from(appliedMap.entries())
+        .map(([tag, applied]) => ({
+          tag,
+          applied,
+          accepted: acceptedMap.get(tag) ?? 0,
+        }))
+        .sort((a, b) => b.applied - a.applied);
+
+    return {
+      genresSummary: toSummary(genreApplied, genreAccepted),
+      mediumsSummary: toSummary(mediumApplied, mediumAccepted),
+    };
   }, [applicants]);
 
   function handleFilterChange(next: SelectionFilter) {
@@ -279,6 +312,7 @@ export function SelectionWorkspace({
             active={filter}
             onChange={handleFilterChange}
             genresSummary={genresSummary}
+            mediumsSummary={mediumsSummary}
             bulkMode={bulkMode}
             onToggleBulkMode={handleToggleBulkMode}
             canBulk={canBulk}

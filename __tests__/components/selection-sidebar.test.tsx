@@ -20,19 +20,19 @@ describe("SelectionSidebar", () => {
         active="pinned"
         onChange={() => {}}
         genresSummary={[]}
+        mediumsSummary={[]}
         bulkMode={false}
         onToggleBulkMode={() => {}}
         canBulk={true}
       />
     );
-    expect(screen.getByRole("button", { name: /all applicants/i })).toHaveAttribute(
-      "aria-pressed",
-      "false"
-    );
-    expect(screen.getByRole("button", { name: /^pinned/i })).toHaveAttribute(
-      "aria-pressed",
-      "true"
-    );
+    expect(
+      screen.getByRole("button", { name: /all applicants/i })
+    ).toHaveAttribute("aria-pressed", "false");
+    expect(
+      screen.getByRole("button", { name: "Pinned3" })
+    ).toHaveAttribute("aria-pressed", "true");
+    // counts appear as siblings of each button label
     expect(screen.getByText("12")).toBeInTheDocument();
     expect(screen.getByText("5")).toBeInTheDocument();
   });
@@ -46,6 +46,7 @@ describe("SelectionSidebar", () => {
         active="all"
         onChange={onChange}
         genresSummary={[]}
+        mediumsSummary={[]}
         bulkMode={false}
         onToggleBulkMode={() => {}}
         canBulk={true}
@@ -62,6 +63,7 @@ describe("SelectionSidebar", () => {
         active="all"
         onChange={() => {}}
         genresSummary={[]}
+        mediumsSummary={[]}
         bulkMode={false}
         onToggleBulkMode={() => {}}
         canBulk={false}
@@ -70,19 +72,39 @@ describe("SelectionSidebar", () => {
     expect(screen.queryByRole("button", { name: /bulk/i })).toBeNull();
   });
 
-  it("shows genres summary when provided", () => {
+  it("shows genre and medium tags with per-tag applied/accepted counts", () => {
     render(
       <SelectionSidebar
         counts={counts}
         active="all"
         onChange={() => {}}
-        genresSummary={["Comics", "Zines"]}
+        genresSummary={[{ tag: "Comics", applied: 5, accepted: 2 }]}
+        mediumsSummary={[{ tag: "Ink", applied: 3, accepted: 1 }]}
         bulkMode={false}
         onToggleBulkMode={() => {}}
         canBulk={true}
       />
     );
     expect(screen.getByText("Comics")).toBeInTheDocument();
-    expect(screen.getByText("Zines")).toBeInTheDocument();
+    expect(screen.getByText("Ink")).toBeInTheDocument();
+  });
+
+  it("collapses the tag section when the header toggle is clicked", async () => {
+    const user = userEvent.setup();
+    render(
+      <SelectionSidebar
+        counts={counts}
+        active="all"
+        onChange={() => {}}
+        genresSummary={[{ tag: "Comics", applied: 5, accepted: 2 }]}
+        mediumsSummary={[]}
+        bulkMode={false}
+        onToggleBulkMode={() => {}}
+        canBulk={true}
+      />
+    );
+    expect(screen.getByText("Comics")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: /Genres/i }));
+    expect(screen.queryByText("Comics")).toBeNull();
   });
 });

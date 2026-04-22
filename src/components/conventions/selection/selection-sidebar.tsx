@@ -1,19 +1,64 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { SelectionFilter } from "./types";
 import { SELECTION_FILTERS } from "./types";
+import {
+  RepresentationCloud,
+  type TagSummary,
+} from "./representation-cloud";
 
 interface SelectionSidebarProps {
   counts: Record<SelectionFilter, number>;
   active: SelectionFilter;
   onChange: (filter: SelectionFilter) => void;
-  genresSummary: string[];
+  genresSummary: TagSummary[];
+  mediumsSummary: TagSummary[];
   bulkMode: boolean;
   onToggleBulkMode: () => void;
   canBulk: boolean;
+}
+
+interface CollapsibleSectionProps {
+  label: string;
+  count: number;
+  defaultOpen?: boolean;
+  children: React.ReactNode;
+}
+
+function CollapsibleSection({
+  label,
+  count,
+  defaultOpen = true,
+  children,
+}: CollapsibleSectionProps) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div className="mt-4 border-t border-border pt-4">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="flex w-full items-center justify-between gap-2 text-[11px] font-bold uppercase tracking-wider text-primary hover:text-foreground"
+      >
+        <span className="inline-flex items-center gap-1">
+          {open ? (
+            <ChevronDown className="size-3" />
+          ) : (
+            <ChevronRight className="size-3" />
+          )}
+          {label}
+        </span>
+        <span className="font-mono text-[10px] text-muted-foreground">
+          {count}
+        </span>
+      </button>
+      {open && <div className="mt-2">{children}</div>}
+    </div>
+  );
 }
 
 export function SelectionSidebar({
@@ -21,6 +66,7 @@ export function SelectionSidebar({
   active,
   onChange,
   genresSummary,
+  mediumsSummary,
   bulkMode,
   onToggleBulkMode,
   canBulk,
@@ -53,20 +99,13 @@ export function SelectionSidebar({
         })}
       </nav>
 
-      {genresSummary.length > 0 && (
-        <div className="mt-4 border-t border-border pt-4">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
-            Genres in pool
-          </p>
-          <div className="mt-2 flex flex-wrap gap-1">
-            {genresSummary.slice(0, 8).map((genre) => (
-              <Badge key={genre} variant="outline">
-                {genre}
-              </Badge>
-            ))}
-          </div>
-        </div>
-      )}
+      <CollapsibleSection label="Genres" count={genresSummary.length}>
+        <RepresentationCloud tags={genresSummary} />
+      </CollapsibleSection>
+
+      <CollapsibleSection label="Mediums" count={mediumsSummary.length}>
+        <RepresentationCloud tags={mediumsSummary} />
+      </CollapsibleSection>
 
       {canBulk && (
         <div className="mt-4 border-t border-border pt-4">
