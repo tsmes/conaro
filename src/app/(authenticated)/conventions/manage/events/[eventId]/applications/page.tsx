@@ -141,23 +141,29 @@ export default async function ApplicationsPage({
           Selection · {event.name}
         </p>
         <h1 className="font-heading text-display-md font-extrabold leading-[1.05] tracking-tight">
-          Pick your artists
+          {event.status === "accepting_applications"
+            ? "Incoming applications"
+            : "Pick your artists"}
         </h1>
         <p className="max-w-2xl text-muted-foreground">
           {applicants.length === 0
-            ? "No applicants yet. Once artists submit, you'll curate them here."
-            : `${undecidedCount} still undecided. Pin favourites as you browse; accept when you're ready.`}
+            ? "No applicants yet. Once artists submit, you'll see them here."
+            : event.status === "accepting_applications"
+              ? `${applicants.length} artist${applicants.length === 1 ? " has" : "s have"} applied so far. Close applications to start the selection round.`
+              : `${undecidedCount} still undecided. Pin favourites as you browse; accept when you're ready.`}
         </p>
       </header>
 
-      <div className="flex flex-wrap items-center justify-end gap-3">
-        <PublishResultsButton
-          eventId={event.id}
-          eventStatus={event.status}
-          undecidedCount={undecidedCount}
-          totalCount={applicants.length}
-        />
-      </div>
+      {event.status === "reviewing" && (
+        <div className="flex flex-wrap items-center justify-end gap-3">
+          <PublishResultsButton
+            eventId={event.id}
+            eventStatus={event.status}
+            undecidedCount={undecidedCount}
+            totalCount={applicants.length}
+          />
+        </div>
+      )}
 
       <SelectionWorkspace
         eventId={event.id}

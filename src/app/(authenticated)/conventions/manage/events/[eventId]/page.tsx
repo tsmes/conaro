@@ -37,8 +37,13 @@ export default async function EventDetailPage({
     notFound();
   }
 
+  // Organizers can view the applications list in any status from
+  // accepting_applications onwards — before reviewing it's read-only, which
+  // is enforced inside SelectionWorkspace via eventStatus.
   const showReviewLink =
-    event.status === "reviewing" || event.status === "results_published";
+    event.status === "accepting_applications" ||
+    event.status === "reviewing" ||
+    event.status === "results_published";
   let applicationCount = 0;
   if (showReviewLink) {
     const [{ value }] = await db
