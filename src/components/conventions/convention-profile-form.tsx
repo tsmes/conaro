@@ -5,6 +5,7 @@ import { updateConventionProfile } from "@/app/(authenticated)/conventions/manag
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { TemplateTokenReference } from "./template-token-reference";
 
 const LABEL_CLASS =
   "text-[11px] font-bold uppercase tracking-wider text-muted-foreground";
@@ -166,6 +167,12 @@ export function ConventionProfileForm({
           placeholder="Default message sent to rejected artists. Events can override this."
         />
       </div>
+
+      <TemplateTokenReference />
+      <p className="text-xs text-muted-foreground">
+        These placeholders work in either message. They're substituted with
+        each applicant's details when results are published.
+      </p>
 
       <Button type="submit" disabled={pending}>
         {pending ? "Saving..." : "Save Changes"}

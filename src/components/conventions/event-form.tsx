@@ -17,6 +17,11 @@ import {
 } from "@/components/ui/card";
 import type { ActionState } from "@/lib/validations/auth";
 import type { TableSizeOption } from "@/lib/db/schema/events";
+import { TemplateTokenReference } from "./template-token-reference";
+import {
+  buildTemplateContext,
+  TEMPLATE_TOKENS,
+} from "@/lib/messaging/template";
 
 interface EventFormProps {
   action: (prevState: ActionState, formData: FormData) => Promise<ActionState>;
@@ -53,6 +58,9 @@ interface EventFormProps {
     // see what will be used when the event-level field is left blank.
     conventionAcceptanceMessage?: string | null;
     conventionRejectionMessage?: string | null;
+    // Used by the messaging section's live placeholder preview.
+    conventionName?: string;
+    organizerName?: string;
   };
   submitLabel: string;
 }
@@ -536,6 +544,30 @@ export function EventForm({ action, defaultValues, submitLabel }: EventFormProps
               }
             />
           </div>
+
+          <TemplateTokenReference
+            preview={(() => {
+              const ctx = buildTemplateContext({
+                artistDisplayName: "Maya Kleven",
+                artistPronouns: "she/her",
+                eventName: dv.name ?? "This event",
+                eventStartDate: dv.eventStartDate ?? "2026-06-20",
+                eventEndDate: dv.eventEndDate || null,
+                venueName: dv.venueName ?? null,
+                venueCity: dv.venueCity ?? null,
+                venueCountry: dv.venueCountry ?? null,
+                conventionName: dv.conventionName ?? "Your convention",
+                organizerName: dv.organizerName ?? "Organizer",
+              });
+              return Object.fromEntries(
+                TEMPLATE_TOKENS.map((t) => [t.token, t.getValue(ctx)])
+              );
+            })()}
+          />
+          <p className="text-xs text-muted-foreground">
+            Sample artist values shown for preview; actual substitutions
+            use each applicant's profile.
+          </p>
         </CardContent>
       </Card>
 

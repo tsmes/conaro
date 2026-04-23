@@ -180,6 +180,8 @@ export default async function EventDetailPage({
               rejectionMessage: event.rejectionMessage ?? "",
               conventionAcceptanceMessage: convention.acceptanceMessage,
               conventionRejectionMessage: convention.rejectionMessage,
+              conventionName: convention.name,
+              organizerName: session.user.name ?? undefined,
             }}
             submitLabel="Save changes"
           />

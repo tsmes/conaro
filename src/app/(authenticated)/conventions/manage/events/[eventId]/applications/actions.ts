@@ -1,14 +1,20 @@
 "use server";
 
-import { and, eq, inArray, ne, count } from "drizzle-orm";
+import { and, eq, inArray, ne, count, or } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { events } from "@/lib/db/schema/events";
 import { conventions } from "@/lib/db/schema/conventions";
 import { applications } from "@/lib/db/schema/applications";
+import { profiles } from "@/lib/db/schema/profiles";
+import { artistProfiles } from "@/lib/db/schema/artist-profiles";
 import { auth } from "@/lib/auth";
 import { type ActionState } from "@/lib/validations/auth";
 import { getOrganizerEvent } from "@/lib/conventions/queries";
+import {
+  buildTemplateContext,
+  renderTemplate,
+} from "@/lib/messaging/template";
 import {
   notifyResultsPublished,
   notifyApplicationRevoked,
@@ -236,9 +242,13 @@ export async function publishResults(
   }
 
   // Resolve decision templates: fall back to the convention default when
-  // the event hasn't set its own.
+  // the event hasn't set its own. Also load the organizer-side data the
+  // template renderer needs.
   const [convention] = await db
     .select({
+      id: conventions.id,
+      name: conventions.name,
+      organizerId: conventions.organizerId,
       acceptanceMessage: conventions.acceptanceMessage,
       rejectionMessage: conventions.rejectionMessage,
     })
@@ -250,32 +260,67 @@ export async function publishResults(
   const resolvedRejection =
     event.rejectionMessage ?? convention?.rejectionMessage ?? null;
 
+  const [organizerProfile] = convention
+    ? await db
+        .select({ displayName: profiles.displayName })
+        .from(profiles)
+        .where(eq(profiles.id, convention.organizerId))
+    : [undefined];
+
+  // Pull every accepted/rejected applicant so we can render the resolved
+  // template against each one's context (displayName, pronouns, etc.).
+  const artistProfileColumns = {
+    applicationId: applications.id,
+    status: applications.status,
+    profileDisplayName: profiles.displayName,
+    artistPronouns: artistProfiles.pronouns,
+  };
+
+  const decidedApplicants = await db
+    .select(artistProfileColumns)
+    .from(applications)
+    .innerJoin(profiles, eq(profiles.id, applications.profileId))
+    .leftJoin(
+      artistProfiles,
+      eq(artistProfiles.profileId, applications.profileId)
+    )
+    .where(
+      and(
+        eq(applications.eventId, eventId),
+        or(
+          eq(applications.status, "accepted"),
+          eq(applications.status, "rejected")
+        )
+      )
+    );
+
   try {
     await db.transaction(async (tx) => {
-      // Stamp the resolved template onto each application so it stays with
-      // the row even if the organizer edits the template later.
-      if (resolvedAcceptance) {
-        await tx
-          .update(applications)
-          .set({ responseMessage: resolvedAcceptance, updatedAt: new Date() })
-          .where(
-            and(
-              eq(applications.eventId, eventId),
-              eq(applications.status, "accepted")
-            )
-          );
-      }
+      // Render the template per-applicant so placeholders like
+      // {{ artist_name }} are substituted with that applicant's data.
+      for (const app of decidedApplicants) {
+        const template =
+          app.status === "accepted" ? resolvedAcceptance : resolvedRejection;
+        if (!template) continue;
 
-      if (resolvedRejection) {
+        const ctx = buildTemplateContext({
+          artistDisplayName: app.profileDisplayName,
+          artistPronouns: app.artistPronouns ?? null,
+          eventName: event.name,
+          eventStartDate: event.eventStartDate,
+          eventEndDate: event.eventEndDate,
+          venueName: event.venueName,
+          venueCity: event.venueCity,
+          venueCountry: event.venueCountry,
+          conventionName: convention?.name ?? "",
+          organizerName: organizerProfile?.displayName ?? "",
+        });
+        const rendered = renderTemplate(template, ctx);
+
         await tx
           .update(applications)
-          .set({ responseMessage: resolvedRejection, updatedAt: new Date() })
-          .where(
-            and(
-              eq(applications.eventId, eventId),
-              eq(applications.status, "rejected")
-            )
-          );
+          .set({ responseMessage: rendered, updatedAt: new Date() })
+          .where(eq(applications.id, app.applicationId));
       }
 
       // Update event status
