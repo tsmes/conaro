@@ -9,6 +9,7 @@ const counts = {
   undecided: 5,
   pinned: 3,
   accepted: 4,
+  waitlisted: 0,
   rejected: 0,
 } as const;
 
@@ -21,9 +22,6 @@ describe("SelectionSidebar", () => {
         onChange={() => {}}
         genresSummary={[]}
         mediumsSummary={[]}
-        bulkMode={false}
-        onToggleBulkMode={() => {}}
-        canBulk={true}
       />
     );
     expect(
@@ -32,7 +30,6 @@ describe("SelectionSidebar", () => {
     expect(
       screen.getByRole("button", { name: "Pinned3" })
     ).toHaveAttribute("aria-pressed", "true");
-    // counts appear as siblings of each button label
     expect(screen.getByText("12")).toBeInTheDocument();
     expect(screen.getByText("5")).toBeInTheDocument();
   });
@@ -47,29 +44,10 @@ describe("SelectionSidebar", () => {
         onChange={onChange}
         genresSummary={[]}
         mediumsSummary={[]}
-        bulkMode={false}
-        onToggleBulkMode={() => {}}
-        canBulk={true}
       />
     );
     await user.click(screen.getByRole("button", { name: /accepted/i }));
     expect(onChange).toHaveBeenCalledWith("accepted");
-  });
-
-  it("hides the bulk-mode button when canBulk is false", () => {
-    render(
-      <SelectionSidebar
-        counts={counts}
-        active="all"
-        onChange={() => {}}
-        genresSummary={[]}
-        mediumsSummary={[]}
-        bulkMode={false}
-        onToggleBulkMode={() => {}}
-        canBulk={false}
-      />
-    );
-    expect(screen.queryByRole("button", { name: /bulk/i })).toBeNull();
   });
 
   it("shows genre and medium tags with per-tag applied/accepted counts", () => {
@@ -80,9 +58,6 @@ describe("SelectionSidebar", () => {
         onChange={() => {}}
         genresSummary={[{ tag: "Comics", applied: 5, accepted: 2 }]}
         mediumsSummary={[{ tag: "Ink", applied: 3, accepted: 1 }]}
-        bulkMode={false}
-        onToggleBulkMode={() => {}}
-        canBulk={true}
       />
     );
     expect(screen.getByText("Comics")).toBeInTheDocument();
@@ -98,9 +73,6 @@ describe("SelectionSidebar", () => {
         onChange={() => {}}
         genresSummary={[{ tag: "Comics", applied: 5, accepted: 2 }]}
         mediumsSummary={[]}
-        bulkMode={false}
-        onToggleBulkMode={() => {}}
-        canBulk={true}
       />
     );
     expect(screen.getByText("Comics")).toBeInTheDocument();

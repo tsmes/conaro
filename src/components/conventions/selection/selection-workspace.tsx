@@ -4,6 +4,8 @@ import { useMemo, useState, useTransition } from "react";
 import { Eye, Grid3x3, List } from "lucide-react";
 
 import { Segmented } from "@/components/ui/segmented";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   setApplicationDecision,
   setBulkDecision,
@@ -84,6 +86,7 @@ export function SelectionWorkspace({
   const [selected, setSelected] = useState<Set<string>>(() => new Set());
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const [search, setSearch] = useState("");
 
   // Organizers can act on applications while they're still coming in, too —
   // only lock the workspace once results have been published.
@@ -92,10 +95,20 @@ export function SelectionWorkspace({
   // to act on. Hide bulk controls for that layout.
   const canBulk = !readOnly && layout !== "stacked";
 
-  const filtered = useMemo(
-    () => applicants.filter((a) => matchesFilter(a, filter)),
-    [applicants, filter]
-  );
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return applicants.filter((a) => {
+      if (!matchesFilter(a, filter)) return false;
+      if (!q) return true;
+      const haystacks = [
+        a.displayName,
+        a.bio ?? "",
+        ...(a.genres ?? []),
+        ...(a.mediums ?? []),
+      ];
+      return haystacks.some((h) => h.toLowerCase().includes(q));
+    });
+  }, [applicants, filter, search]);
 
   const counts = useMemo<Record<SelectionFilter, number>>(() => {
     return {
@@ -296,15 +309,34 @@ export function SelectionWorkspace({
         pinned={counts.pinned}
         target={availableStands}
       />
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <Segmented
           value={layout}
           onChange={handleLayoutChange}
           options={LAYOUT_OPTIONS}
           aria-label="Layout"
         />
+        <Input
+          type="search"
+          placeholder="Search name, bio, genres, mediums\u2026"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          aria-label="Search applicants"
+          className="h-8 w-full sm:max-w-xs"
+        />
+        {canBulk && (
+          <Button
+            type="button"
+            variant={bulkMode ? "secondary" : "outline"}
+            size="sm"
+            aria-pressed={bulkMode}
+            onClick={handleToggleBulkMode}
+          >
+            {bulkMode ? "Exit bulk mode" : "Bulk actions"}
+          </Button>
+        )}
         {pending && (
-          <span className="text-xs text-muted-foreground">Saving…</span>
+          <span className="text-xs text-muted-foreground">Saving\u2026</span>
         )}
       </div>
       {error && (
@@ -323,9 +355,6 @@ export function SelectionWorkspace({
             onChange={handleFilterChange}
             genresSummary={genresSummary}
             mediumsSummary={mediumsSummary}
-            bulkMode={bulkMode}
-            onToggleBulkMode={handleToggleBulkMode}
-            canBulk={canBulk}
           />
         </aside>
         <div className="min-w-0 space-y-4">

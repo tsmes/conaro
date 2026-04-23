@@ -17,9 +17,6 @@ interface SelectionSidebarProps {
   onChange: (filter: SelectionFilter) => void;
   genresSummary: TagSummary[];
   mediumsSummary: TagSummary[];
-  bulkMode: boolean;
-  onToggleBulkMode: () => void;
-  canBulk: boolean;
 }
 
 interface CollapsibleSectionProps {
@@ -67,9 +64,6 @@ export function SelectionSidebar({
   onChange,
   genresSummary,
   mediumsSummary,
-  bulkMode,
-  onToggleBulkMode,
-  canBulk,
 }: SelectionSidebarProps) {
   return (
     <Card className="shadow-gallery p-4">
@@ -106,24 +100,6 @@ export function SelectionSidebar({
       <CollapsibleSection label="Mediums" count={mediumsSummary.length}>
         <RepresentationCloud tags={mediumsSummary} />
       </CollapsibleSection>
-
-      {canBulk && (
-        <div className="mt-4 border-t border-border pt-4">
-          <button
-            type="button"
-            onClick={onToggleBulkMode}
-            aria-pressed={bulkMode}
-            className={cn(
-              "h-9 w-full rounded-lg text-[12.5px] font-semibold transition-colors",
-              bulkMode
-                ? "bg-primary-container text-on-primary-container"
-                : "border border-border text-muted-foreground hover:bg-muted hover:text-foreground"
-            )}
-          >
-            {bulkMode ? "Exit bulk mode" : "Bulk actions"}
-          </button>
-        </div>
-      )}
     </Card>
   );
 }
