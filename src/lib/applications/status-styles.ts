@@ -7,9 +7,16 @@ export type ApplicationStatus =
   | "under_review"
   | "accepted"
   | "rejected"
-  | "revoked";
+  | "revoked"
+  | "waitlisted"
+  | "pending";
 
-export type StatusBadgeVariant = "default" | "secondary" | "success" | "destructive";
+export type StatusBadgeVariant =
+  | "default"
+  | "secondary"
+  | "success"
+  | "warning"
+  | "destructive";
 
 export interface StatusStyle {
   label: string;
@@ -22,6 +29,8 @@ export const STATUS_STYLES: Record<ApplicationStatus, StatusStyle> = {
   accepted: { label: "Accepted", variant: "success" },
   rejected: { label: "Rejected", variant: "destructive" },
   revoked: { label: "Revoked", variant: "destructive" },
+  waitlisted: { label: "Waitlisted", variant: "secondary" },
+  pending: { label: "Pending", variant: "warning" },
 };
 
 // Fallback used when a status comes through that the map hasn't been updated

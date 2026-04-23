@@ -78,7 +78,7 @@ describe("EventCard", () => {
   it("artist viewer with an application sees the status badge and View application button", () => {
     render(
       <EventCard
-        event={baseEvent}
+        event={{ ...baseEvent, status: "results_published" }}
         viewer="artist"
         artistContext={{
           applicationStatus: "accepted",

@@ -45,13 +45,18 @@ export interface DashboardViewProps {
   follows: DashboardFollow[];
 }
 
-// Collapse the masking logic that used to live inline on the page: while an
-// event is in "reviewing" status the artist sees "Under Review" for any
-// status other than plain "submitted", so pending decisions aren't leaked
-// before the results are published.
+// Any concrete decision (accepted / rejected / waitlisted) is hidden from
+// the artist until the event publishes results \u2014 they see 'Pending' until
+// then, even if the organizer has already flipped their row internally.
 function displayStatusFor(app: DashboardApplication) {
-  if (app.eventStatus === "reviewing" && app.status !== "submitted") {
-    return "under_review";
+  if (app.eventStatus !== "results_published") {
+    if (
+      app.status === "accepted" ||
+      app.status === "rejected" ||
+      app.status === "waitlisted"
+    ) {
+      return "pending";
+    }
   }
   return app.status;
 }

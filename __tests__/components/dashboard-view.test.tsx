@@ -103,13 +103,15 @@ describe("DashboardView", () => {
     expect(screen.getAllByText("Browse Events").length).toBeGreaterThan(0);
   });
 
-  it("renders applications and maps 'Accepted' to the success variant", () => {
+  it("renders applications and maps 'Accepted' to the success variant when results are published", () => {
     render(
       <DashboardView
         firstName="E"
         unreadNotifications={0}
         completeness={baseCompleteness()}
-        applications={[app({ status: "accepted" })]}
+        applications={[
+          app({ status: "accepted", eventStatus: "results_published" }),
+        ]}
         follows={[]}
       />
     );
@@ -118,7 +120,7 @@ describe("DashboardView", () => {
     expect(badge.className).toMatch(/bg-success-container/);
   });
 
-  it("masks decisions while the event is in review state", () => {
+  it("masks decisions as 'Pending' until the event publishes results", () => {
     render(
       <DashboardView
         firstName="E"
@@ -130,9 +132,8 @@ describe("DashboardView", () => {
         follows={[]}
       />
     );
-    // 'Accepted' should NOT show; the mask renders as 'Under Review'
     expect(screen.queryAllByText("Accepted")).toHaveLength(0);
-    expect(screen.getAllByText("Under Review").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Pending").length).toBeGreaterThan(0);
   });
 
   it("still shows 'Submitted' for submitted apps during review", () => {

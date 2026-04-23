@@ -1,5 +1,6 @@
 import { Palette } from "lucide-react";
 import type { ApplicationStatus, LandingEvent } from "@/lib/landing/data";
+import { artistVisibleStatus } from "@/lib/applications/artist-visible-status";
 
 export interface EventContextStripProps {
   event: LandingEvent;
@@ -26,12 +27,18 @@ export function EventContextStrip({
   isOpenCallToFollowedConvention,
 }: EventContextStripProps) {
   let message: React.ReactNode = null;
+  const visible =
+    applicationStatus === null
+      ? null
+      : artistVisibleStatus(applicationStatus, event.status);
 
-  if (applicationStatus === "accepted") {
+  if (visible === "pending") {
+    message = <>Application sent. Decision pending \u2014 results coming soon.</>;
+  } else if (visible === "accepted") {
     message = <>You&apos;re in the show. View details.</>;
-  } else if (applicationStatus === "under_review") {
+  } else if (visible === "under_review") {
     message = <>Your application is under review.</>;
-  } else if (applicationStatus === "submitted") {
+  } else if (visible === "submitted") {
     const daysUntilClose = daysBetween(event.applicationCloseDate, new Date());
     if (daysUntilClose !== null && daysUntilClose >= 0) {
       message = (
@@ -43,9 +50,11 @@ export function EventContextStrip({
     } else {
       message = <>Application sent.</>;
     }
-  } else if (applicationStatus === "rejected") {
+  } else if (visible === "rejected") {
     message = <>Not selected this year.</>;
-  } else if (applicationStatus === "revoked") {
+  } else if (visible === "waitlisted") {
+    message = <>You&apos;re on the waitlist.</>;
+  } else if (visible === "revoked") {
     message = <>Application revoked.</>;
   } else if (isOpenCallToFollowedConvention) {
     message = <>Open call · Apply now.</>;

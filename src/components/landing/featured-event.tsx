@@ -8,6 +8,7 @@ import type {
   LandingEvent,
 } from "@/lib/landing/data";
 import { formatDateRangeNo } from "@/lib/utils/format-date-no";
+import { artistVisibleStatus } from "@/lib/applications/artist-visible-status";
 import { EventCover } from "./event-cover";
 import type { ArtistEventContext } from "./event-card";
 
@@ -21,8 +22,14 @@ function daysUntil(targetIso: string, today: Date): number {
   return Math.ceil((target.getTime() - utcToday) / 86_400_000);
 }
 
-function statusBadgeForArtist(status: ApplicationStatus): React.ReactNode {
-  switch (status) {
+function statusBadgeForArtist(
+  status: ApplicationStatus,
+  eventStatus: LandingEvent["status"]
+): React.ReactNode {
+  const visible = artistVisibleStatus(status, eventStatus);
+  switch (visible) {
+    case "pending":
+      return <Badge variant="warning">Pending</Badge>;
     case "accepted":
       return <Badge variant="success">Accepted</Badge>;
     case "under_review":
@@ -31,6 +38,8 @@ function statusBadgeForArtist(status: ApplicationStatus): React.ReactNode {
       return <Badge variant="default">Submitted</Badge>;
     case "rejected":
       return <Badge variant="destructive">Not selected</Badge>;
+    case "waitlisted":
+      return <Badge variant="secondary">Waitlisted</Badge>;
     case "revoked":
       return <Badge variant="outline">Revoked</Badge>;
   }
@@ -82,7 +91,10 @@ export function FeaturedEvent({
             </div>
             {isArtist &&
               artistContext?.applicationStatus &&
-              statusBadgeForArtist(artistContext.applicationStatus)}
+              statusBadgeForArtist(
+                artistContext.applicationStatus,
+                event.status
+              )}
           </div>
 
           <div>

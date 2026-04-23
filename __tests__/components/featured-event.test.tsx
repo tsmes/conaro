@@ -81,10 +81,10 @@ describe("FeaturedEvent", () => {
     expect(screen.queryByText("Accepted")).not.toBeInTheDocument();
   });
 
-  it("shows the artist status badge when viewer is artist with an accepted application", () => {
+  it("shows the artist status badge when viewer is artist with an accepted application after publish", () => {
     render(
       <FeaturedEvent
-        event={baseEvent}
+        event={{ ...baseEvent, status: "results_published" }}
         viewer="artist"
         artistContext={{
           applicationStatus: "accepted",
@@ -93,6 +93,21 @@ describe("FeaturedEvent", () => {
       />
     );
     expect(screen.getByText("Accepted")).toBeInTheDocument();
+  });
+
+  it("masks a pre-publish decision as 'Pending' for the artist", () => {
+    render(
+      <FeaturedEvent
+        event={{ ...baseEvent, status: "reviewing" }}
+        viewer="artist"
+        artistContext={{
+          applicationStatus: "accepted",
+          isFollowingConvention: true,
+        }}
+      />
+    );
+    expect(screen.queryByText("Accepted")).not.toBeInTheDocument();
+    expect(screen.getByText("Pending")).toBeInTheDocument();
   });
 
   it("renders the View event CTA", () => {

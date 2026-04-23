@@ -9,7 +9,10 @@ const baseEvent: LandingEvent = {
   conventionName: "Kawaiicon",
   conventionLogoPath: null,
   name: "Kawaiicon 2026",
-  status: "accepting_applications",
+  // Results-published so a concrete 'accepted' / 'rejected' status is
+  // visible to the artist. The 'masked as pending' path is covered in a
+  // dedicated test below.
+  status: "results_published",
   eventStartDate: "2026-09-01",
   eventEndDate: "2026-09-02",
   applicationOpenDate: "2026-04-01",
@@ -83,6 +86,18 @@ describe("EventContextStrip", () => {
       />
     );
     expect(screen.getByText(/Not selected/i)).toBeInTheDocument();
+  });
+
+  it("masks a pre-publish decision as a pending message", () => {
+    render(
+      <EventContextStrip
+        event={{ ...baseEvent, status: "reviewing" }}
+        applicationStatus="accepted"
+        isOpenCallToFollowedConvention={false}
+      />
+    );
+    expect(screen.queryByText(/in the show/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/Decision pending/i)).toBeInTheDocument();
   });
 
   it("shows the open-call message when artist follows the convention and hasn't applied", () => {

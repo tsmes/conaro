@@ -8,6 +8,7 @@ import {
   type LandingEvent,
 } from "@/lib/landing/data";
 import { formatDateRangeNo } from "@/lib/utils/format-date-no";
+import { artistVisibleStatus } from "@/lib/applications/artist-visible-status";
 import { EventCover } from "./event-cover";
 import { EventContextStrip } from "./event-context-strip";
 import { FollowButton } from "./follow-button";
@@ -24,8 +25,14 @@ export interface EventCardProps {
   artistContext?: ArtistEventContext;
 }
 
-function statusBadgeForArtist(status: ApplicationStatus): React.ReactNode {
-  switch (status) {
+function statusBadgeForArtist(
+  status: ApplicationStatus,
+  eventStatus: LandingEvent["status"]
+): React.ReactNode {
+  const visible = artistVisibleStatus(status, eventStatus);
+  switch (visible) {
+    case "pending":
+      return <Badge variant="warning">Pending</Badge>;
     case "accepted":
       return <Badge variant="success">Accepted</Badge>;
     case "under_review":
@@ -34,6 +41,8 @@ function statusBadgeForArtist(status: ApplicationStatus): React.ReactNode {
       return <Badge variant="default">Submitted</Badge>;
     case "rejected":
       return <Badge variant="destructive">Not selected</Badge>;
+    case "waitlisted":
+      return <Badge variant="secondary">Waitlisted</Badge>;
     case "revoked":
       return <Badge variant="outline">Revoked</Badge>;
   }
@@ -89,7 +98,10 @@ export function EventCard({ event, viewer, artistContext }: EventCardProps) {
               <div className="flex shrink-0 items-center gap-1.5">
                 {isArtist &&
                   artistContext?.applicationStatus &&
-                  statusBadgeForArtist(artistContext.applicationStatus)}
+                  statusBadgeForArtist(
+                    artistContext.applicationStatus,
+                    event.status
+                  )}
                 {!hasApplication && open && (
                   <Badge variant="default">Applications open</Badge>
                 )}
