@@ -17,6 +17,7 @@ export const applicationStatusEnum = pgEnum("application_status", [
   "accepted",
   "rejected",
   "revoked",
+  "waitlisted",
 ]);
 
 export interface SnapshotImage {

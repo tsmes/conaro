@@ -30,6 +30,7 @@ export async function updateConventionProfile(
     guidelines: (formData.get("guidelines") ?? "").toString(),
     acceptanceMessage: (formData.get("acceptanceMessage") ?? "").toString(),
     rejectionMessage: (formData.get("rejectionMessage") ?? "").toString(),
+    waitlistEnabled: (formData.get("waitlistEnabled") ?? "").toString(),
   };
 
   const result = conventionProfileSchema.safeParse(raw);
@@ -49,6 +50,7 @@ export async function updateConventionProfile(
     guidelines,
     acceptanceMessage,
     rejectionMessage,
+    waitlistEnabled,
   } = result.data;
 
   try {
@@ -61,6 +63,7 @@ export async function updateConventionProfile(
         guidelines: guidelines || null,
         acceptanceMessage: acceptanceMessage || null,
         rejectionMessage: rejectionMessage || null,
+        waitlistEnabled,
         updatedAt: new Date(),
       })
       .where(eq(conventions.id, convention.id));

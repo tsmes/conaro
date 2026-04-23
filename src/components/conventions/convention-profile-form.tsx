@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { updateConventionProfile } from "@/app/(authenticated)/conventions/manage/actions";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { TemplateTokenReference } from "./template-token-reference";
@@ -19,6 +20,7 @@ interface ConventionProfileFormProps {
     guidelines: string;
     acceptanceMessage: string;
     rejectionMessage: string;
+    waitlistEnabled: boolean;
   };
 }
 
@@ -173,6 +175,23 @@ export function ConventionProfileForm({
         These placeholders work in either message. They're substituted with
         each applicant's details when results are published.
       </p>
+
+      <div className="flex items-start gap-3 rounded-md border border-border p-3">
+        <Checkbox
+          id="waitlistEnabled"
+          name="waitlistEnabled"
+          value="on"
+          defaultChecked={defaultValues.waitlistEnabled}
+        />
+        <div className="space-y-1">
+          <Label htmlFor="waitlistEnabled">Enable waitlist</Label>
+          <p className="text-xs text-muted-foreground">
+            When on, rejected artists can opt in to a waitlist after
+            results are published, and you can promote them to accepted
+            from the selection workspace.
+          </p>
+        </div>
+      </div>
 
       <Button type="submit" disabled={pending}>
         {pending ? "Saving..." : "Save Changes"}

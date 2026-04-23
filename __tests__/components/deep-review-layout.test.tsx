@@ -2,6 +2,15 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
+vi.mock(
+  "@/app/(authenticated)/conventions/manage/events/[eventId]/applications/waitlist-actions",
+  () => ({
+    promoteFromWaitlist: vi.fn(),
+    demoteToWaitlist: vi.fn(),
+    removeFromWaitlist: vi.fn(),
+  })
+);
+
 import { DeepReviewLayout } from "@/components/conventions/selection/deep-review-layout";
 import type { SelectionApplicantView } from "@/components/conventions/selection/types";
 
@@ -55,6 +64,8 @@ describe("DeepReviewLayout", () => {
         onRevoke={() => {}}
         readOnly={false}
         eventStatus="reviewing"
+        eventId="e1"
+        waitlistEnabled={false}
       />
     );
     expect(screen.getByText("Two")).toBeInTheDocument();
@@ -77,6 +88,8 @@ describe("DeepReviewLayout", () => {
         onRevoke={() => {}}
         readOnly={false}
         eventStatus="reviewing"
+        eventId="e1"
+        waitlistEnabled={false}
       />
     );
     expect(screen.getByRole("button", { name: /prev/i })).toBeDisabled();
@@ -93,6 +106,8 @@ describe("DeepReviewLayout", () => {
         onRevoke={() => {}}
         readOnly={false}
         eventStatus="reviewing"
+        eventId="e1"
+        waitlistEnabled={false}
       />
     );
     expect(screen.getByRole("button", { name: /prev/i })).not.toBeDisabled();
@@ -113,6 +128,8 @@ describe("DeepReviewLayout", () => {
         onRevoke={() => {}}
         readOnly={false}
         eventStatus="reviewing"
+        eventId="e1"
+        waitlistEnabled={false}
       />
     );
     await user.click(screen.getByRole("button", { name: /^accept$/i }));
@@ -133,6 +150,8 @@ describe("DeepReviewLayout", () => {
         onRevoke={() => {}}
         readOnly={true}
         eventStatus="results_published"
+        eventId="e1"
+        waitlistEnabled={false}
       />
     );
     expect(screen.queryByRole("button", { name: /^accept$/i })).toBeNull();
@@ -156,6 +175,8 @@ describe("DeepReviewLayout", () => {
         onRevoke={() => {}}
         readOnly={false}
         eventStatus="reviewing"
+        eventId="e1"
+        waitlistEnabled={false}
       />
     );
     expect(screen.getByText(/Nothing matches/)).toBeInTheDocument();

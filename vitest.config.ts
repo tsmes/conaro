@@ -12,6 +12,10 @@ const sharedAlias = {
     __dirname,
     "__tests__/mocks/next-auth-react.ts"
   ),
+  "next-auth/providers/credentials": path.resolve(
+    __dirname,
+    "__tests__/mocks/next-auth-credentials.ts"
+  ),
   "next-auth": path.resolve(__dirname, "__tests__/mocks/next-auth.ts"),
   "next/navigation": path.resolve(
     __dirname,

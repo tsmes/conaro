@@ -4,6 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { auth } from "@/lib/auth";
 import {
   getEventApplicants,
+  getOrganizerConvention,
   getOrganizerEvent,
 } from "@/lib/conventions/queries";
 import type { SelectionApplicant } from "@/lib/conventions/queries";
@@ -28,7 +29,8 @@ export default async function ApplicationsPage({
   }
 
   const event = await getOrganizerEvent(session.user.profileId, eventId);
-  if (!event) {
+  const convention = await getOrganizerConvention(session.user.profileId);
+  if (!event || !convention) {
     notFound();
   }
 
@@ -143,6 +145,7 @@ export default async function ApplicationsPage({
         eventStatus={event.status}
         availableStands={event.availableStands}
         applicants={applicantsView}
+        waitlistEnabled={convention.waitlistEnabled}
       />
     </div>
   );

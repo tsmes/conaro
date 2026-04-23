@@ -37,6 +37,11 @@ export const conventionProfileSchema = z.object({
     .max(5000, "Rejection message is too long")
     .optional()
     .default(""),
+  waitlistEnabled: z
+    .string()
+    .optional()
+    .default("")
+    .transform((val) => val === "on"),
 });
 
 export type ConventionProfileInput = z.infer<typeof conventionProfileSchema>;

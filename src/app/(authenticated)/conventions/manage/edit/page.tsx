@@ -71,6 +71,7 @@ export default async function EditConventionPage() {
               guidelines: convention.guidelines ?? "",
               acceptanceMessage: convention.acceptanceMessage ?? "",
               rejectionMessage: convention.rejectionMessage ?? "",
+              waitlistEnabled: convention.waitlistEnabled,
             }}
           />
         </div>

@@ -20,6 +20,8 @@ export function getStatusDisplay(
       return { label: "Not this year", variant: "destructive" };
     case "revoked":
       return { label: "Revoked", variant: "destructive" };
+    case "waitlisted":
+      return { label: "Waitlisted", variant: "secondary" };
     case "submitted":
     case "under_review":
       return pinned

@@ -18,6 +18,7 @@ import {
   type ValidationResult,
 } from "@/lib/applications/validation";
 import { ApplyButton } from "@/components/events/apply-button";
+import { JoinWaitlistButton } from "@/components/events/join-waitlist-button";
 import { FollowButton } from "@/components/conventions/follow-button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -106,6 +107,7 @@ export default async function EventDetailPage({
       conventionLogoPath: conventions.logoPath,
       conventionGuidelines: conventions.guidelines,
       conventionDescription: conventions.description,
+      waitlistEnabled: conventions.waitlistEnabled,
     })
     .from(events)
     .innerJoin(conventions, eq(conventions.id, events.conventionId))
@@ -132,6 +134,15 @@ export default async function EventDetailPage({
   let isAcceptedToEvent = false;
   let isFollowingConvention = false;
   let validationResult: ValidationResult = { valid: true };
+  let ownApplicationStatus:
+    | "submitted"
+    | "under_review"
+    | "accepted"
+    | "rejected"
+    | "revoked"
+    | "waitlisted"
+    | null = null;
+  let ownResponseMessage: string | null = null;
 
   if (isArtist) {
     const profileId = session.user.profileId!;
@@ -148,7 +159,11 @@ export default async function EventDetailPage({
           .from(portfolioImages)
           .where(eq(portfolioImages.profileId, profileId)),
         db
-          .select({ id: applications.id, status: applications.status })
+          .select({
+            id: applications.id,
+            status: applications.status,
+            responseMessage: applications.responseMessage,
+          })
           .from(applications)
           .where(
             and(
@@ -169,6 +184,8 @@ export default async function EventDetailPage({
 
     hasExistingApplication = !!existingApp;
     isAcceptedToEvent = existingApp?.status === "accepted";
+    ownApplicationStatus = existingApp?.status ?? null;
+    ownResponseMessage = existingApp?.responseMessage ?? null;
     isFollowingConvention = !!follow;
 
     if (profile && artistProfile) {
@@ -276,13 +293,14 @@ export default async function EventDetailPage({
         </section>
       )}
 
-      {event.description && (
-        <div className="mt-8 max-w-3xl whitespace-pre-line text-base leading-relaxed text-muted-foreground">
-          {event.description}
-        </div>
-      )}
-
       <div className="mt-12 space-y-6">
+        {event.description && (
+          <SectionCard label="About this event">
+            <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
+              {event.description}
+            </p>
+          </SectionCard>
+        )}
         <SectionCard label="Dates">
           <div className="grid gap-4 sm:grid-cols-2">
             <DetailField label="Event">
@@ -374,6 +392,39 @@ export default async function EventDetailPage({
             </p>
           </SectionCard>
         )}
+
+        {isArtist &&
+          event.status === "results_published" &&
+          ownApplicationStatus &&
+          ownApplicationStatus !== "revoked" && (
+            <SectionCard
+              label={
+                ownApplicationStatus === "accepted"
+                  ? "You're in"
+                  : ownApplicationStatus === "rejected"
+                    ? "Results"
+                    : ownApplicationStatus === "waitlisted"
+                      ? "You're on the waitlist"
+                      : "Your application"
+              }
+            >
+              {ownResponseMessage && (
+                <p className="whitespace-pre-line text-sm leading-relaxed text-foreground">
+                  {ownResponseMessage}
+                </p>
+              )}
+              {ownApplicationStatus === "rejected" &&
+                event.waitlistEnabled && (
+                  <div className="mt-5 border-t border-border pt-5">
+                    <p className="mb-3 text-sm text-muted-foreground">
+                      If a spot opens up, the organizer may offer it to
+                      you \u2014 join the waitlist to opt in.
+                    </p>
+                    <JoinWaitlistButton eventId={event.id} />
+                  </div>
+                )}
+            </SectionCard>
+          )}
 
         {isAccepting && (
           <SectionCard label="Apply">

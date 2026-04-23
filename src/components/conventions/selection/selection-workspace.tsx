@@ -35,6 +35,7 @@ interface SelectionWorkspaceProps {
   eventStatus: EventStatus;
   availableStands: number | null;
   applicants: SelectionApplicantView[];
+  waitlistEnabled: boolean;
 }
 
 const LAYOUT_OPTIONS = [
@@ -56,6 +57,8 @@ function matchesFilter(
       return applicant.pinned;
     case "accepted":
       return applicant.status === "accepted";
+    case "waitlisted":
+      return applicant.status === "waitlisted";
     case "rejected":
       return applicant.status === "rejected" || applicant.status === "revoked";
   }
@@ -66,6 +69,7 @@ export function SelectionWorkspace({
   eventStatus,
   availableStands,
   applicants: initialApplicants,
+  waitlistEnabled,
 }: SelectionWorkspaceProps) {
   const [applicants, setApplicants] =
     useState<SelectionApplicantView[]>(initialApplicants);
@@ -99,6 +103,7 @@ export function SelectionWorkspace({
       undecided: applicants.filter((a) => matchesFilter(a, "undecided")).length,
       pinned: applicants.filter((a) => a.pinned).length,
       accepted: applicants.filter((a) => a.status === "accepted").length,
+      waitlisted: applicants.filter((a) => a.status === "waitlisted").length,
       rejected: applicants.filter((a) => matchesFilter(a, "rejected")).length,
     };
   }, [applicants]);
@@ -366,6 +371,8 @@ export function SelectionWorkspace({
               onRevoke={handleRevoke}
               readOnly={readOnly}
               eventStatus={eventStatus}
+              eventId={eventId}
+              waitlistEnabled={waitlistEnabled}
             />
           )}
         </div>

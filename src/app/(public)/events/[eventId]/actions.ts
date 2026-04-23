@@ -34,6 +34,66 @@ export interface ApplyResult extends ActionState {
   missingFields?: MissingField[];
 }
 
+// Self-service waitlist opt-in for a rejected applicant. Only available
+// when the event's convention has waitlistEnabled and results have been
+// published. Flips the artist's own application status from 'rejected'
+// to 'waitlisted'.
+export async function joinWaitlist(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const session = await auth();
+  if (!session?.user?.profileId || session.user.role !== "artist") {
+    return { error: "Unauthorized" };
+  }
+  const profileId = session.user.profileId;
+
+  const eventId = formData.get("eventId")?.toString();
+  if (!eventId) return { error: "Event ID is required" };
+
+  const [event] = await db
+    .select({
+      id: events.id,
+      status: events.status,
+      conventionId: events.conventionId,
+    })
+    .from(events)
+    .where(eq(events.id, eventId));
+  if (!event) return { error: "Event not found" };
+  if (event.status !== "results_published") {
+    return { error: "Waitlist is only available once results are published" };
+  }
+
+  const [convention] = await db
+    .select({ waitlistEnabled: conventions.waitlistEnabled })
+    .from(conventions)
+    .where(eq(conventions.id, event.conventionId));
+  if (!convention?.waitlistEnabled) {
+    return { error: "This convention doesn't have a waitlist" };
+  }
+
+  const result = await db
+    .update(applications)
+    .set({ status: "waitlisted", updatedAt: new Date() })
+    .where(
+      and(
+        eq(applications.eventId, eventId),
+        eq(applications.profileId, profileId),
+        eq(applications.status, "rejected")
+      )
+    )
+    .returning({ id: applications.id });
+
+  if (result.length === 0) {
+    return {
+      error: "You can only join the waitlist from a rejected application",
+    };
+  }
+
+  revalidatePath(`/events/${eventId}`);
+  return { success: true };
+}
+
 export async function applyToEvent(
   _prevState: ApplyResult,
   formData: FormData

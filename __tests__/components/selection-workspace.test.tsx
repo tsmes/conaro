@@ -12,6 +12,15 @@ const confirmMock = vi.fn();
 const revokeMock = vi.fn();
 
 vi.mock(
+  "@/app/(authenticated)/conventions/manage/events/[eventId]/applications/waitlist-actions",
+  () => ({
+    promoteFromWaitlist: vi.fn(),
+    demoteToWaitlist: vi.fn(),
+    removeFromWaitlist: vi.fn(),
+  })
+);
+
+vi.mock(
   "@/app/(authenticated)/conventions/manage/events/[eventId]/applications/actions",
   () => ({
     toggleApplicationPin: (
@@ -96,6 +105,7 @@ describe("SelectionWorkspace", () => {
         eventStatus="reviewing"
         availableStands={10}
         applicants={buildApplicants()}
+        waitlistEnabled={false}
       />
     );
     expect(screen.getByText("Artist One")).toBeInTheDocument();
@@ -113,6 +123,7 @@ describe("SelectionWorkspace", () => {
         eventStatus="reviewing"
         availableStands={10}
         applicants={buildApplicants()}
+        waitlistEnabled={false}
       />
     );
     const acceptButtons = screen.getAllByRole("button", { name: "Accept" });
@@ -135,6 +146,7 @@ describe("SelectionWorkspace", () => {
         eventStatus="reviewing"
         availableStands={10}
         applicants={buildApplicants()}
+        waitlistEnabled={false}
       />
     );
 
@@ -163,6 +175,7 @@ describe("SelectionWorkspace", () => {
         eventStatus="results_published"
         availableStands={10}
         applicants={buildApplicants()}
+        waitlistEnabled={false}
       />
     );
     expect(

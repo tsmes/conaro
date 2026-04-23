@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { profiles } from "./profiles";
 
 export const conventions = pgTable("conventions", {
@@ -16,6 +16,7 @@ export const conventions = pgTable("conventions", {
   guidelines: text("guidelines"),
   acceptanceMessage: text("acceptance_message"),
   rejectionMessage: text("rejection_message"),
+  waitlistEnabled: boolean("waitlist_enabled").notNull().default(false),
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
 });

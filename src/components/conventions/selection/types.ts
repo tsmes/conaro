@@ -3,13 +3,15 @@ export type ApplicationStatus =
   | "under_review"
   | "accepted"
   | "rejected"
-  | "revoked";
+  | "revoked"
+  | "waitlisted";
 
 export type SelectionFilter =
   | "all"
   | "undecided"
   | "pinned"
   | "accepted"
+  | "waitlisted"
   | "rejected";
 
 export const SELECTION_FILTERS: {
@@ -20,6 +22,7 @@ export const SELECTION_FILTERS: {
   { value: "undecided", label: "Undecided" },
   { value: "pinned", label: "Pinned" },
   { value: "accepted", label: "Accepted" },
+  { value: "waitlisted", label: "Waitlisted" },
   { value: "rejected", label: "Not this year" },
 ];
 

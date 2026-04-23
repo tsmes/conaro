@@ -27,7 +27,8 @@ export type ApplicationStatus =
   | "under_review"
   | "accepted"
   | "rejected"
-  | "revoked";
+  | "revoked"
+  | "waitlisted";
 
 export interface ArtistApplicationRef {
   applicationId: string;

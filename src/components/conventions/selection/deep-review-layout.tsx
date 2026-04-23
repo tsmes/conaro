@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { formatDateNo } from "@/lib/utils/format-date-no";
 import { getStatusDisplay } from "./applicant-visuals";
 import { PortfolioCollage } from "./portfolio-collage";
+import { WaitlistControls } from "./waitlist-controls";
 import type {
   ApplicationAnswersView,
   SelectionApplicantView,
@@ -142,6 +143,8 @@ interface DeepReviewLayoutProps {
   onRevoke: (id: string) => void;
   readOnly: boolean;
   eventStatus: EventStatus;
+  eventId: string;
+  waitlistEnabled: boolean;
 }
 
 export function DeepReviewLayout({
@@ -154,6 +157,8 @@ export function DeepReviewLayout({
   onRevoke,
   readOnly,
   eventStatus,
+  eventId,
+  waitlistEnabled,
 }: DeepReviewLayoutProps) {
   if (applicants.length === 0) {
     return (
@@ -278,6 +283,14 @@ export function DeepReviewLayout({
           )}
 
           <ApplicationAnswersPanel answers={applicant.answers} />
+
+          {waitlistEnabled && eventStatus === "results_published" && (
+            <WaitlistControls
+              applicationId={applicant.id}
+              eventId={eventId}
+              status={applicant.status}
+            />
+          )}
 
           <div className="mt-auto flex flex-wrap items-center gap-2 border-t border-border pt-4">
             <Button
