@@ -213,7 +213,7 @@ export default async function EventDetailPage({
           size="sm"
           nativeButton={false}
           render={
-            <Link href="/events" className="inline-flex items-center gap-1">
+            <Link href="/events">
               <ArrowLeft className="size-4" />
               All events
             </Link>

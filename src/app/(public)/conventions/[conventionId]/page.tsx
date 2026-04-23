@@ -90,7 +90,7 @@ export default async function ConventionDetailPage({
           size="sm"
           nativeButton={false}
           render={
-            <Link href="/conventions" className="inline-flex items-center gap-1">
+            <Link href="/conventions">
               <ArrowLeft className="size-4" />
               All conventions
             </Link>
