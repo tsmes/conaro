@@ -95,6 +95,10 @@
 }
 
 :root {
+  /* Hint to the browser so native form controls (select popups,
+     scrollbars, date pickers) render in the matching theme. */
+  color-scheme: light;
+
   /* Light mode — Curator's Canvas */
   --background: #f9f5f8;
   --foreground: #2f2e31;
@@ -152,6 +156,8 @@
 }
 
 .dark {
+  color-scheme: dark;
+
   /* Dark mode — Curator's Canvas */
   --background: #0e0e10;
   --foreground: #dfdce0;
