@@ -105,6 +105,7 @@ export default async function EventDetailPage({
       conventionName: conventions.name,
       conventionLogoPath: conventions.logoPath,
       conventionGuidelines: conventions.guidelines,
+      conventionDescription: conventions.description,
     })
     .from(events)
     .innerJoin(conventions, eq(conventions.id, events.conventionId))
@@ -366,14 +367,13 @@ export default async function EventDetailPage({
           </SectionCard>
         )}
 
-        {session?.user &&
-          (event.guidelinesOverride || event.conventionGuidelines) && (
-            <SectionCard label="Guidelines">
-              <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
-                {event.guidelinesOverride ?? event.conventionGuidelines}
-              </p>
-            </SectionCard>
-          )}
+        {event.conventionDescription && (
+          <SectionCard label="About the convention">
+            <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
+              {event.conventionDescription}
+            </p>
+          </SectionCard>
+        )}
 
         {isAccepting && (
           <SectionCard label="Apply">
