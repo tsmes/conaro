@@ -222,6 +222,15 @@
   h1, h2, h3, h4, h5, h6 {
     @apply font-heading;
   }
+  /* Native <select> and <option>: color-scheme alone isn't reliable
+     across browsers for the dropdown popup (Firefox in particular
+     ignores it for option elements). Force semantic tokens so the
+     dropdown list renders in the current theme. */
+  select,
+  option {
+    background-color: var(--card);
+    color: var(--foreground);
+  }
 }
 
 @layer utilities {
