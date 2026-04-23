@@ -210,6 +210,7 @@ export async function publishResults(
   }
 
   const eventId = formData.get("eventId")?.toString();
+  const rejectUndecided = formData.get("rejectUndecided")?.toString() === "true";
   if (!eventId) {
     return { error: "Event ID is required" };
   }
@@ -223,22 +224,36 @@ export async function publishResults(
     return { error: "Results can only be published for events in reviewing status" };
   }
 
-  // Check for undecided applications
-  const [{ value: undecidedCount }] = await db
-    .select({ value: count() })
-    .from(applications)
-    .where(
-      and(
-        eq(applications.eventId, eventId),
-        ne(applications.status, "accepted"),
-        ne(applications.status, "rejected")
-      )
-    );
+  // Check for undecided applications. Any status other than accepted/rejected
+  // counts as undecided here — submitted, under_review, waitlisted, etc.
+  if (rejectUndecided) {
+    await db
+      .update(applications)
+      .set({ status: "rejected", updatedAt: new Date() })
+      .where(
+        and(
+          eq(applications.eventId, eventId),
+          ne(applications.status, "accepted"),
+          ne(applications.status, "rejected")
+        )
+      );
+  } else {
+    const [{ value: undecidedCount }] = await db
+      .select({ value: count() })
+      .from(applications)
+      .where(
+        and(
+          eq(applications.eventId, eventId),
+          ne(applications.status, "accepted"),
+          ne(applications.status, "rejected")
+        )
+      );
 
-  if (undecidedCount > 0) {
-    return {
-      error: `Cannot publish: ${undecidedCount} application(s) still need a decision`,
-    };
+    if (undecidedCount > 0) {
+      return {
+        error: `Cannot publish: ${undecidedCount} application(s) still need a decision`,
+      };
+    }
   }
 
   // Resolve decision templates: fall back to the convention default when

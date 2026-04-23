@@ -42,6 +42,7 @@ export default async function ApplicationsPage({
       a.status !== "rejected" &&
       a.status !== "revoked"
   ).length;
+  const acceptedCount = applicants.filter((a) => a.status === "accepted").length;
 
   const tableSizeMap = new Map(
     (event.tableSizeOptions ?? []).map((o) => [o.id, o])
@@ -135,7 +136,9 @@ export default async function ApplicationsPage({
             eventId={event.id}
             eventStatus={event.status}
             undecidedCount={undecidedCount}
+            acceptedCount={acceptedCount}
             totalCount={applicants.length}
+            availableStands={event.availableStands}
           />
         </div>
       )}
