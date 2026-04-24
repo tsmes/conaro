@@ -14,8 +14,6 @@ const COLORS = {
   backdrop: "#f6f7f9",
   roomFill: "#ffffff",
   roomStroke: "#cbd5e1",
-  roomLabelBg: "#1f2937",
-  roomLabelText: "#ffffff",
   gridLine: "#e6e8ec",
   gridOrigin: "#d1d5db",
   tableUnassignedFill: "#f1f5f9",
@@ -228,23 +226,6 @@ export function FloorPlanCanvas({
               offsetX={PADDING_PX}
               offsetY={PADDING_PX}
             />
-            {/* Room label pill */}
-            <Group x={PADDING_PX + 10} y={PADDING_PX + 10}>
-              <Rect
-                width={Math.max(120, activeRoom.name.length * 7 + 32)}
-                height={22}
-                fill={COLORS.roomLabelBg}
-                cornerRadius={11}
-              />
-              <Text
-                x={12}
-                y={5}
-                text={`${activeRoom.name}  ·  ${(activeRoom.widthCm / 100).toFixed(1)} × ${(activeRoom.heightCm / 100).toFixed(1)} m`}
-                fontSize={11}
-                fontStyle="600"
-                fill={COLORS.roomLabelText}
-              />
-            </Group>
           </Layer>
 
           {/* Layer 2: labels (drawn beneath tables so a table on top of a
