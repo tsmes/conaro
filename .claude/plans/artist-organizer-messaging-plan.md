@@ -91,7 +91,7 @@ Pure read helpers used by both artist-facing and organizer-facing pages. No muta
 
 **Depends on:** 1.
 
-### 5. Artist-facing server actions
+### 5. Artist-facing server actions ✅
 
 Post a message, mark the thread read. These are the actions the public event page mounts.
 
