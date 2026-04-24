@@ -42,6 +42,8 @@ interface FloorPlanCanvasProps {
   onSelectTable?: (id: string | null) => void;
 }
 
+type EdgeKey = "left" | "right" | "top" | "bottom";
+
 export function FloorPlanCanvas({
   plan,
   activeRoomId,
@@ -54,6 +56,12 @@ export function FloorPlanCanvas({
 }: FloorPlanCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(800);
+  // Per-table "last violated edge" memory. On the first drag that
+  // crosses an edge we clamp the table back in and remember which
+  // edge was hit; a second drag past the *same* edge is allowed
+  // through (for overflow areas like hallways). Dragging back inside
+  // — or crossing a different edge — resets the memory.
+  const edgeMemoryRef = useRef<Map<string, EdgeKey>>(new Map());
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -102,16 +110,54 @@ export function FloorPlanCanvas({
     const effDepthCm = rotated ? sizeWidthCm : sizeDepthCm;
     const centerXCm = (centerStageXPx - PADDING_PX) / scale;
     const centerYCm = (centerStageYPx - PADDING_PX) / scale;
-    const clampedCenterX = Math.max(
-      effWidthCm / 2,
-      Math.min(activeRoom.widthCm - effWidthCm / 2, centerXCm)
+
+    // Unclamped centre expressed as how far it's past each edge
+    // (positive → outside, zero or negative → inside).
+    const overLeft = effWidthCm / 2 - centerXCm;
+    const overRight = centerXCm - (activeRoom.widthCm - effWidthCm / 2);
+    const overTop = effDepthCm / 2 - centerYCm;
+    const overBottom = centerYCm - (activeRoom.heightCm - effDepthCm / 2);
+
+    // Pick the single dominant violated edge (largest overshoot).
+    // Corner drags still pick one edge; the other is silently clamped.
+    const overshoots: Array<[EdgeKey, number]> = [
+      ["left", overLeft],
+      ["right", overRight],
+      ["top", overTop],
+      ["bottom", overBottom],
+    ];
+    const [dominantEdge, dominantAmount] = overshoots.reduce(
+      (acc, cur) => (cur[1] > acc[1] ? cur : acc),
+      ["left", -Infinity] as [EdgeKey, number]
     );
-    const clampedCenterY = Math.max(
-      effDepthCm / 2,
-      Math.min(activeRoom.heightCm - effDepthCm / 2, centerYCm)
-    );
-    const newXCm = Math.round(clampedCenterX - sizeWidthCm / 2);
-    const newYCm = Math.round(clampedCenterY - sizeDepthCm / 2);
+    const violated = dominantAmount > 0;
+    const rememberedEdge = edgeMemoryRef.current.get(tableId);
+    const allowOutside = violated && rememberedEdge === dominantEdge;
+
+    let finalCenterX = centerXCm;
+    let finalCenterY = centerYCm;
+    if (!allowOutside) {
+      finalCenterX = Math.max(
+        effWidthCm / 2,
+        Math.min(activeRoom.widthCm - effWidthCm / 2, centerXCm)
+      );
+      finalCenterY = Math.max(
+        effDepthCm / 2,
+        Math.min(activeRoom.heightCm - effDepthCm / 2, centerYCm)
+      );
+    }
+
+    // Update edge memory:
+    //   - violated: remember this edge (so next drag past it is allowed)
+    //   - not violated: table is back inside, forget any prior edge
+    if (violated) {
+      edgeMemoryRef.current.set(tableId, dominantEdge);
+    } else {
+      edgeMemoryRef.current.delete(tableId);
+    }
+
+    const newXCm = Math.round(finalCenterX - sizeWidthCm / 2);
+    const newYCm = Math.round(finalCenterY - sizeDepthCm / 2);
     const nextTables = plan.tables.map((t) => {
       const raw = {
         id: t.id,
