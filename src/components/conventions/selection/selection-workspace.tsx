@@ -377,7 +377,12 @@ export function SelectionWorkspace({
               onToggleSelect={handleToggleSelect}
               onTogglePin={handleTogglePin}
               onSetStatus={handleSetStatus}
+              onConfirmPayment={handleConfirmPayment}
+              onRevoke={handleRevoke}
               readOnly={readOnly}
+              eventStatus={eventStatus}
+              eventId={eventId}
+              waitlistEnabled={waitlistEnabled}
             />
           )}
           {layout === "table" && (
@@ -388,7 +393,12 @@ export function SelectionWorkspace({
               onToggleSelect={handleToggleSelect}
               onTogglePin={handleTogglePin}
               onOpenDeep={handleOpenDeep}
+              onConfirmPayment={handleConfirmPayment}
+              onRevoke={handleRevoke}
               readOnly={readOnly}
+              eventStatus={eventStatus}
+              eventId={eventId}
+              waitlistEnabled={waitlistEnabled}
             />
           )}
           {layout === "stacked" && (

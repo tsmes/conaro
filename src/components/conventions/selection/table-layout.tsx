@@ -1,12 +1,20 @@
 "use client";
 
-import { Pin, PinOff } from "lucide-react";
+import { Pin, PinOff, Undo2, Wallet } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { getStatusDisplay } from "./applicant-visuals";
+import { WaitlistControls } from "./waitlist-controls";
 import type { SelectionApplicantView } from "./types";
+
+type EventStatus =
+  | "draft"
+  | "published"
+  | "accepting_applications"
+  | "reviewing"
+  | "results_published";
 
 interface TableLayoutProps {
   applicants: SelectionApplicantView[];
@@ -15,7 +23,12 @@ interface TableLayoutProps {
   onToggleSelect: (id: string) => void;
   onTogglePin: (id: string, pinned: boolean) => void;
   onOpenDeep: (id: string) => void;
+  onConfirmPayment: (id: string) => void;
+  onRevoke: (id: string) => void;
   readOnly: boolean;
+  eventStatus: EventStatus;
+  eventId: string;
+  waitlistEnabled: boolean;
 }
 
 function formatDate(date: Date): string {
@@ -29,7 +42,12 @@ export function TableLayout({
   onToggleSelect,
   onTogglePin,
   onOpenDeep,
+  onConfirmPayment,
+  onRevoke,
   readOnly,
+  eventStatus,
+  eventId,
+  waitlistEnabled,
 }: TableLayoutProps) {
   if (applicants.length === 0) {
     return (
@@ -39,9 +57,19 @@ export function TableLayout({
     );
   }
 
-  const gridCols = bulkMode
-    ? "grid-cols-[28px_1.4fr_0.9fr_0.7fr_120px_44px]"
-    : "grid-cols-[1.4fr_0.9fr_0.7fr_120px_44px]";
+  const isPublished = eventStatus === "results_published";
+  // Post-publish needs a wider trailing column to fit mark-paid, revoke,
+  // and waitlist controls alongside the pin toggle.
+  const gridCols = (() => {
+    if (isPublished) {
+      return bulkMode
+        ? "grid-cols-[28px_1.4fr_0.9fr_0.7fr_120px_minmax(220px,auto)]"
+        : "grid-cols-[1.4fr_0.9fr_0.7fr_120px_minmax(220px,auto)]";
+    }
+    return bulkMode
+      ? "grid-cols-[28px_1.4fr_0.9fr_0.7fr_120px_44px]"
+      : "grid-cols-[1.4fr_0.9fr_0.7fr_120px_44px]";
+  })();
 
   return (
     <Card className="shadow-gallery overflow-hidden p-0">
@@ -111,7 +139,52 @@ export function TableLayout({
                 {formatDate(applicant.createdAt)}
               </div>
               <Badge variant={status.variant}>{status.label}</Badge>
-              {!readOnly ? (
+              {isPublished ? (
+                <div className="flex flex-wrap items-center justify-end gap-1.5">
+                  {applicant.status === "accepted" && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => onConfirmPayment(applicant.id)}
+                        title={
+                          applicant.paymentConfirmed
+                            ? "Mark unpaid"
+                            : "Mark paid"
+                        }
+                        aria-label={
+                          applicant.paymentConfirmed
+                            ? "Mark unpaid"
+                            : "Mark paid"
+                        }
+                        className={cn(
+                          "grid size-8 place-items-center rounded-lg",
+                          applicant.paymentConfirmed
+                            ? "bg-success-container text-on-success-container"
+                            : "text-muted-foreground hover:bg-muted"
+                        )}
+                      >
+                        <Wallet className="size-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onRevoke(applicant.id)}
+                        title="Revoke acceptance"
+                        aria-label="Revoke acceptance"
+                        className="grid size-8 place-items-center rounded-lg text-destructive hover:bg-destructive/10"
+                      >
+                        <Undo2 className="size-3.5" />
+                      </button>
+                    </>
+                  )}
+                  {waitlistEnabled && (
+                    <WaitlistControls
+                      applicationId={applicant.id}
+                      eventId={eventId}
+                      status={applicant.status}
+                    />
+                  )}
+                </div>
+              ) : !readOnly ? (
                 <div className="flex justify-end">
                   <button
                     type="button"

@@ -1,13 +1,21 @@
 "use client";
 
-import { Pin, PinOff, Check, X } from "lucide-react";
+import { Pin, PinOff, Check, X, Undo2, Wallet } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { getStatusDisplay } from "./applicant-visuals";
 import { PortfolioCollage } from "./portfolio-collage";
+import { WaitlistControls } from "./waitlist-controls";
 import type { SelectionApplicantView } from "./types";
+
+type EventStatus =
+  | "draft"
+  | "published"
+  | "accepting_applications"
+  | "reviewing"
+  | "results_published";
 
 interface GalleryLayoutProps {
   applicants: SelectionApplicantView[];
@@ -16,7 +24,12 @@ interface GalleryLayoutProps {
   onToggleSelect: (id: string) => void;
   onTogglePin: (id: string, pinned: boolean) => void;
   onSetStatus: (id: string, status: "accepted" | "rejected") => void;
+  onConfirmPayment: (id: string) => void;
+  onRevoke: (id: string) => void;
   readOnly: boolean;
+  eventStatus: EventStatus;
+  eventId: string;
+  waitlistEnabled: boolean;
 }
 
 export function GalleryLayout({
@@ -26,8 +39,14 @@ export function GalleryLayout({
   onToggleSelect,
   onTogglePin,
   onSetStatus,
+  onConfirmPayment,
+  onRevoke,
   readOnly,
+  eventStatus,
+  eventId,
+  waitlistEnabled,
 }: GalleryLayoutProps) {
+  const isPublished = eventStatus === "results_published";
   if (applicants.length === 0) {
     return (
       <Card className="shadow-gallery p-12 text-center">
@@ -157,6 +176,40 @@ export function GalleryLayout({
                     <Check className="size-3" />
                     Accept
                   </button>
+                </div>
+              )}
+              {isPublished && applicant.status === "accepted" && (
+                <div className="mt-2.5 flex gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => onConfirmPayment(applicant.id)}
+                    className={cn(
+                      "flex h-8 flex-1 items-center justify-center gap-1 rounded-lg border text-[11.5px] font-semibold transition-colors",
+                      applicant.paymentConfirmed
+                        ? "border-success/40 bg-success-container text-on-success-container"
+                        : "border-border text-muted-foreground hover:bg-muted hover:text-foreground"
+                    )}
+                  >
+                    <Wallet className="size-3" />
+                    {applicant.paymentConfirmed ? "Paid" : "Mark paid"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onRevoke(applicant.id)}
+                    className="flex h-8 flex-1 items-center justify-center gap-1 rounded-lg border border-destructive/40 text-[11.5px] font-semibold text-destructive transition-colors hover:bg-destructive/10"
+                  >
+                    <Undo2 className="size-3" />
+                    Revoke
+                  </button>
+                </div>
+              )}
+              {isPublished && waitlistEnabled && (
+                <div className="mt-2.5">
+                  <WaitlistControls
+                    applicationId={applicant.id}
+                    eventId={eventId}
+                    status={applicant.status}
+                  />
                 </div>
               )}
             </div>
