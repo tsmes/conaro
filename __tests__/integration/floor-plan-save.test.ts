@@ -86,6 +86,7 @@ describe("saveFloorPlan", () => {
             id: "t-1",
             label: "T1",
             tableSizeOptionId: "ts-std",
+            roomId: "r-1",
             x: 100,
             y: 100,
             assignedApplicationId: null,
@@ -115,12 +116,22 @@ describe("saveFloorPlan", () => {
     const result = await submit({
       eventId: event.id,
       plan: {
-        rooms: [],
+        rooms: [
+          {
+            id: "r-1",
+            name: "Main",
+            x: 0,
+            y: 0,
+            widthCm: 500,
+            heightCm: 500,
+          },
+        ],
         tables: [
           {
             id: "t-1",
             label: "T1",
             tableSizeOptionId: "ts-ghost",
+            roomId: "r-1",
             x: 0,
             y: 0,
             assignedApplicationId: null,
@@ -143,12 +154,22 @@ describe("saveFloorPlan", () => {
     const result = await submit({
       eventId: event.id,
       plan: {
-        rooms: [],
+        rooms: [
+          {
+            id: "r-1",
+            name: "Main",
+            x: 0,
+            y: 0,
+            widthCm: 500,
+            heightCm: 500,
+          },
+        ],
         tables: [
           {
             id: "t-1",
             label: "T1",
             tableSizeOptionId: "ts-nodims",
+            roomId: "r-1",
             x: 0,
             y: 0,
             assignedApplicationId: null,
@@ -178,12 +199,22 @@ describe("saveFloorPlan", () => {
     const result = await submit({
       eventId: event.id,
       plan: {
-        rooms: [],
+        rooms: [
+          {
+            id: "r-1",
+            name: "Main",
+            x: 0,
+            y: 0,
+            widthCm: 500,
+            heightCm: 500,
+          },
+        ],
         tables: [
           {
             id: "t-1",
             label: "T1",
             tableSizeOptionId: "ts-std",
+            roomId: "r-1",
             x: 0,
             y: 0,
             assignedApplicationId: app.id,
@@ -216,12 +247,22 @@ describe("saveFloorPlan", () => {
     const result = await submit({
       eventId: eventA.id,
       plan: {
-        rooms: [],
+        rooms: [
+          {
+            id: "r-1",
+            name: "Main",
+            x: 0,
+            y: 0,
+            widthCm: 500,
+            heightCm: 500,
+          },
+        ],
         tables: [
           {
             id: "t-1",
             label: "T1",
             tableSizeOptionId: "ts-std",
+            roomId: "r-1",
             x: 0,
             y: 0,
             assignedApplicationId: app.id,
@@ -251,12 +292,22 @@ describe("saveFloorPlan", () => {
     const result = await submit({
       eventId: event.id,
       plan: {
-        rooms: [],
+        rooms: [
+          {
+            id: "r-1",
+            name: "Main",
+            x: 0,
+            y: 0,
+            widthCm: 500,
+            heightCm: 500,
+          },
+        ],
         tables: [
           {
             id: "t-1",
             label: "T1",
             tableSizeOptionId: "ts-std",
+            roomId: "r-1",
             x: 0,
             y: 0,
             assignedApplicationId: app.id,
@@ -265,6 +316,7 @@ describe("saveFloorPlan", () => {
             id: "t-2",
             label: "T2",
             tableSizeOptionId: "ts-std",
+            roomId: "r-1",
             x: 200,
             y: 0,
             assignedApplicationId: app.id,
@@ -273,6 +325,44 @@ describe("saveFloorPlan", () => {
       },
     });
     expect(result.error).toContain("more than one table");
+  });
+
+  it("rejects a table whose roomId does not match any room", async () => {
+    const { profile, convention } = await createTestOrganizer();
+    const event = await createTestEvent(convention.id, {
+      tableSizeOptions: [sizeWithDims],
+    });
+    mockAuth.mockResolvedValue({
+      user: { id: "u", role: "organizer", profileId: profile.id },
+    });
+
+    const result = await submit({
+      eventId: event.id,
+      plan: {
+        rooms: [
+          {
+            id: "r-1",
+            name: "Main",
+            x: 0,
+            y: 0,
+            widthCm: 500,
+            heightCm: 500,
+          },
+        ],
+        tables: [
+          {
+            id: "t-1",
+            label: "T1",
+            tableSizeOptionId: "ts-std",
+            roomId: "r-ghost",
+            x: 0,
+            y: 0,
+            assignedApplicationId: null,
+          },
+        ],
+      },
+    });
+    expect(result.error).toContain("not assigned to a room");
   });
 
   it("rejects a non-owner organizer", async () => {

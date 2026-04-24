@@ -58,10 +58,15 @@ export interface FloorPlanRoom {
   heightCm: number;
 }
 
+// Tables are scoped to a room — `x`/`y` are room-local coordinates in cm
+// (0,0 = top-left of the containing room). `roomId` must reference a
+// `FloorPlan.rooms[].id`. Legacy plans without `roomId` get auto-assigned
+// to the first available room in `getFloorPlanForEvent`.
 export interface FloorPlanTable {
   id: string;
   label: string;
   tableSizeOptionId: string;
+  roomId: string;
   x: number;
   y: number;
   assignedApplicationId: string | null;

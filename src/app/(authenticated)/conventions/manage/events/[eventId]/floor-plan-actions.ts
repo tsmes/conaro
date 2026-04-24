@@ -24,6 +24,7 @@ const tableSchema = z.object({
   id: z.string().min(1),
   label: z.string().trim().min(1, "Table label is required").max(10),
   tableSizeOptionId: z.string().min(1),
+  roomId: z.string().min(1),
   x: z.number().int().min(0),
   y: z.number().int().min(0),
   assignedApplicationId: z.string().min(1).nullable(),
@@ -70,6 +71,16 @@ export async function saveFloorPlan(
 
   const event = await getOrganizerEvent(session.user.profileId, eventId);
   if (!event) return { error: "Event not found" };
+
+  // Every table must live in a room that's part of the same plan.
+  const roomIds = new Set(plan.rooms.map((r) => r.id));
+  for (const table of plan.tables) {
+    if (!roomIds.has(table.roomId)) {
+      return {
+        error: `Table ${table.label} is not assigned to a room`,
+      };
+    }
+  }
 
   // Every referenced tableSizeOptionId must live on this event + have
   // numeric width/depth.

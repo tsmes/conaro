@@ -18,6 +18,26 @@ export interface ResolvedFloorPlanTable extends FloorPlanTable {
   assignment: ResolvedAssignment | null;
 }
 
+// Reads a plan out of storage and backfills `roomId` on any legacy
+// table that predates the room-scoping change. Tables without a valid
+// roomId get pinned to the first room; if the plan has no rooms, such
+// tables are dropped (they can't render anywhere meaningful).
+function migrateLegacyPlan(stored: FloorPlan): FloorPlan {
+  const roomIds = new Set(stored.rooms.map((r) => r.id));
+  const fallbackRoomId = stored.rooms[0]?.id ?? null;
+  const tables: FloorPlanTable[] = [];
+  for (const t of stored.tables) {
+    const hasValidRoom = t.roomId && roomIds.has(t.roomId);
+    if (hasValidRoom) {
+      tables.push(t);
+      continue;
+    }
+    if (!fallbackRoomId) continue;
+    tables.push({ ...t, roomId: fallbackRoomId });
+  }
+  return { rooms: stored.rooms, tables };
+}
+
 export interface ResolvedFloorPlan {
   rooms: FloorPlan["rooms"];
   tables: ResolvedFloorPlanTable[];
@@ -37,7 +57,7 @@ export async function getFloorPlanForEvent(
     .from(events)
     .where(eq(events.id, eventId));
   if (!row || !row.floorPlan) return null;
-  const plan = row.floorPlan;
+  const plan = migrateLegacyPlan(row.floorPlan);
 
   const assignedIds = plan.tables
     .map((t) => t.assignedApplicationId)
