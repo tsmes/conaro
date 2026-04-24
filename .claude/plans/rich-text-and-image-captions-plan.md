@@ -184,7 +184,7 @@ Make the public convention page + the convention list teaser show formatted outp
 **Verification:** Manual smoke: write bold/list/link in a convention description, visit public convention page — rendered. Visit conventions list — teaser shows stripped plain text.
 **Depends on:** 1, 2.
 
-### 10. Render Markdown on the public event page + event-form placeholders
+### 10. Render Markdown on the public event page + event-form placeholders ✅
 
 Covers "About this event", "About the convention", and — importantly — the event-form's `placeholder` that currently shows the convention-level default acceptance/rejection.
 

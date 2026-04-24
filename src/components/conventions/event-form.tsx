@@ -10,6 +10,7 @@ const LABEL_CLASS =
   "text-[11px] font-bold uppercase tracking-wider text-muted-foreground";
 import { Textarea } from "@/components/ui/textarea";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { markdownToText } from "@/lib/utils/markdown-to-text";
 import {
   Card,
   CardContent,
@@ -517,7 +518,7 @@ export function EventForm({ action, defaultValues, submitLabel }: EventFormProps
               defaultValue={dv.acceptanceMessage ?? ""}
               placeholder={
                 dv.conventionAcceptanceMessage
-                  ? `(uses convention default)\n\u2014\n${dv.conventionAcceptanceMessage}`
+                  ? `(uses convention default) \u2014 ${markdownToText(dv.conventionAcceptanceMessage)}`
                   : "Message sent to accepted artists when results are published. Leave blank to use the convention default."
               }
             />
@@ -537,7 +538,7 @@ export function EventForm({ action, defaultValues, submitLabel }: EventFormProps
               defaultValue={dv.rejectionMessage ?? ""}
               placeholder={
                 dv.conventionRejectionMessage
-                  ? `(uses convention default)\n\u2014\n${dv.conventionRejectionMessage}`
+                  ? `(uses convention default) \u2014 ${markdownToText(dv.conventionRejectionMessage)}`
                   : "Message sent to rejected artists. Leave blank to use the convention default."
               }
             />

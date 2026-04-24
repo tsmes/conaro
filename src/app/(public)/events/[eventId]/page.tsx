@@ -24,6 +24,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { Markdown } from "@/components/ui/markdown";
 import { formatDateNo, formatDateRangeNo } from "@/lib/utils/format-date-no";
 import { getEventAnnouncements } from "@/app/(authenticated)/conventions/manage/events/[eventId]/announcements/actions";
 
@@ -296,9 +297,10 @@ export default async function EventDetailPage({
       <div className="mt-12 space-y-6">
         {event.description && (
           <SectionCard label="About this event">
-            <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
-              {event.description}
-            </p>
+            <Markdown
+              source={event.description}
+              className="text-muted-foreground"
+            />
           </SectionCard>
         )}
         <SectionCard label="Dates">
@@ -387,9 +389,10 @@ export default async function EventDetailPage({
 
         {event.conventionDescription && (
           <SectionCard label="About the convention">
-            <p className="whitespace-pre-line text-sm leading-relaxed text-muted-foreground">
-              {event.conventionDescription}
-            </p>
+            <Markdown
+              source={event.conventionDescription}
+              className="text-muted-foreground"
+            />
           </SectionCard>
         )}
 
