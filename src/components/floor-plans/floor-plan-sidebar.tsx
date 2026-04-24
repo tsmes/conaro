@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Plus, RotateCw, Trash2, UserRound } from "lucide-react";
+import { Pencil, Plus, RotateCw, Trash2, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { FloorPlan, TableSizeOption } from "@/lib/db/schema/events";
 import type { AcceptedArtistEntry } from "./assign-artist-dialog";
@@ -15,6 +15,7 @@ interface FloorPlanSidebarProps {
   acceptedArtists: AcceptedArtistEntry[];
   onChange: (next: FloorPlan) => void;
   onSelectTable: (tableId: string) => void;
+  onEditTable: (tableId: string) => void;
 }
 
 function hasDims(size: TableSizeOption): boolean {
@@ -41,6 +42,7 @@ export function FloorPlanSidebar({
   acceptedArtists,
   onChange,
   onSelectTable,
+  onEditTable,
 }: FloorPlanSidebarProps) {
   const [selectedSizeId, setSelectedSizeId] = useState<string>("");
 
@@ -225,6 +227,15 @@ export function FloorPlanSidebar({
                     </p>
                   </button>
                   <div className="flex shrink-0 items-center">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      aria-label={`Edit ${table.label}`}
+                      onClick={() => onEditTable(table.id)}
+                    >
+                      <Pencil className="size-4" />
+                    </Button>
                     <Button
                       type="button"
                       variant="ghost"

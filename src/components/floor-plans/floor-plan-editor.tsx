@@ -9,6 +9,7 @@ import {
   AssignArtistDialog,
   type AcceptedArtistEntry,
 } from "./assign-artist-dialog";
+import { EditTableDialog } from "./edit-table-dialog";
 import type {
   FloorPlan,
   FloorPlanTable,
@@ -81,6 +82,7 @@ export function FloorPlanEditor({
     return rooms[0]?.id ?? null;
   });
   const [assignTableId, setAssignTableId] = useState<string | null>(null);
+  const [editTableId, setEditTableId] = useState<string | null>(null);
   const [status, setStatus] = useState<SaveStatus>("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -178,9 +180,28 @@ export function FloorPlanEditor({
     });
   }
 
+  function handleEditTable(next: { label: string; tableSizeOptionId: string }) {
+    if (!editTableId) return;
+    handlePlanChange({
+      ...plan,
+      tables: plan.tables.map((t) =>
+        t.id === editTableId
+          ? {
+              ...t,
+              label: next.label,
+              tableSizeOptionId: next.tableSizeOptionId,
+            }
+          : t
+      ),
+    });
+  }
+
   const resolvedForCanvas = resolvePlan(plan, acceptedArtists);
   const dialogTable: FloorPlanTable | null = assignTableId
     ? plan.tables.find((t) => t.id === assignTableId) ?? null
+    : null;
+  const editingTable: FloorPlanTable | null = editTableId
+    ? plan.tables.find((t) => t.id === editTableId) ?? null
     : null;
 
   return (
@@ -217,6 +238,7 @@ export function FloorPlanEditor({
             acceptedArtists={acceptedArtists}
             onChange={handlePlanChange}
             onSelectTable={(id) => setAssignTableId(id)}
+            onEditTable={(id) => setEditTableId(id)}
           />
         </div>
       </div>
@@ -230,6 +252,15 @@ export function FloorPlanEditor({
         tableSizeOptions={tableSizeOptions}
         plan={plan}
         onAssign={handleAssign}
+      />
+      <EditTableDialog
+        open={editingTable !== null}
+        onOpenChange={(open) => {
+          if (!open) setEditTableId(null);
+        }}
+        table={editingTable}
+        tableSizeOptions={tableSizeOptions}
+        onSave={handleEditTable}
       />
     </div>
   );

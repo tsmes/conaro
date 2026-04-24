@@ -63,6 +63,7 @@ describe("FloorPlanSidebar", () => {
         acceptedArtists={[]}
         onChange={onChange}
         onSelectTable={() => {}}
+        onEditTable={() => {}}
       />
     );
     fireEvent.change(screen.getByLabelText(/Table size/i), {
@@ -87,6 +88,7 @@ describe("FloorPlanSidebar", () => {
         acceptedArtists={[]}
         onChange={() => {}}
         onSelectTable={() => {}}
+        onEditTable={() => {}}
       />
     );
     expect(screen.queryByLabelText(/Table size/i)).toBeNull();
@@ -103,6 +105,7 @@ describe("FloorPlanSidebar", () => {
         acceptedArtists={[]}
         onChange={() => {}}
         onSelectTable={() => {}}
+        onEditTable={() => {}}
       />
     );
     const option = screen
@@ -146,6 +149,7 @@ describe("FloorPlanSidebar", () => {
         acceptedArtists={acceptedArtists}
         onChange={() => {}}
         onSelectTable={() => {}}
+        onEditTable={() => {}}
       />
     );
     expect(screen.getByText(/^Unassigned \(\d+\)/i)).toBeInTheDocument();
@@ -178,6 +182,7 @@ describe("FloorPlanSidebar", () => {
         acceptedArtists={[]}
         onChange={() => {}}
         onSelectTable={onSelectTable}
+        onEditTable={() => {}}
       />
     );
     fireEvent.click(
@@ -208,6 +213,7 @@ describe("FloorPlanSidebar", () => {
         acceptedArtists={[]}
         onChange={onChange}
         onSelectTable={() => {}}
+        onEditTable={() => {}}
       />
     );
     fireEvent.click(screen.getByRole("button", { name: /Rotate T1/i }));
@@ -237,6 +243,7 @@ describe("FloorPlanSidebar", () => {
         acceptedArtists={[]}
         onChange={onChange}
         onSelectTable={() => {}}
+        onEditTable={() => {}}
       />
     );
     fireEvent.click(screen.getByRole("button", { name: /Delete T1/i }));

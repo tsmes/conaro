@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,13 +24,18 @@ interface RoomSwitcherProps {
   onChange: (next: FloorPlan) => void;
 }
 
+type RoomDialogMode =
+  | { kind: "closed" }
+  | { kind: "create" }
+  | { kind: "edit"; roomId: string };
+
 export function RoomSwitcher({
   plan,
   activeRoomId,
   onActiveRoomChange,
   onChange,
 }: RoomSwitcherProps) {
-  const [addOpen, setAddOpen] = useState(false);
+  const [dialog, setDialog] = useState<RoomDialogMode>({ kind: "closed" });
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [name, setName] = useState("");
   const [widthM, setWidthM] = useState("");
@@ -41,36 +46,57 @@ export function RoomSwitcher({
     ? plan.tables.filter((t) => t.roomId === activeRoomId).length
     : 0;
 
-  function resetForm() {
-    setName("");
-    setWidthM("");
-    setDepthM("");
-  }
+  // Prefill the form when the dialog opens in edit mode.
+  useEffect(() => {
+    if (dialog.kind === "edit") {
+      const room = plan.rooms.find((r) => r.id === dialog.roomId);
+      if (room) {
+        setName(room.name);
+        setWidthM((room.widthCm / 100).toString());
+        setDepthM((room.heightCm / 100).toString());
+      }
+    } else if (dialog.kind === "create") {
+      setName("");
+      setWidthM("");
+      setDepthM("");
+    }
+  }, [dialog, plan.rooms]);
 
-  function addRoom() {
+  function submit() {
     const widthCm = Math.round(parseFloat(widthM) * 100);
     const heightCm = Math.round(parseFloat(depthM) * 100);
     if (!name.trim() || !Number.isFinite(widthCm) || !Number.isFinite(heightCm))
       return;
     if (widthCm < 10 || heightCm < 10) return;
-    const id = crypto.randomUUID();
-    onChange({
-      ...plan,
-      rooms: [
-        ...plan.rooms,
-        {
-          id,
-          name: name.trim(),
-          x: 0,
-          y: 0,
-          widthCm,
-          heightCm,
-        },
-      ],
-    });
-    onActiveRoomChange(id);
-    resetForm();
-    setAddOpen(false);
+
+    if (dialog.kind === "create") {
+      const id = crypto.randomUUID();
+      onChange({
+        ...plan,
+        rooms: [
+          ...plan.rooms,
+          {
+            id,
+            name: name.trim(),
+            x: 0,
+            y: 0,
+            widthCm,
+            heightCm,
+          },
+        ],
+      });
+      onActiveRoomChange(id);
+    } else if (dialog.kind === "edit") {
+      onChange({
+        ...plan,
+        rooms: plan.rooms.map((r) =>
+          r.id === dialog.roomId
+            ? { ...r, name: name.trim(), widthCm, heightCm }
+            : r
+        ),
+      });
+    }
+    setDialog({ kind: "closed" });
   }
 
   function deleteActiveRoom() {
@@ -80,6 +106,8 @@ export function RoomSwitcher({
     onChange({ rooms: nextRooms, tables: nextTables });
     if (nextRooms.length > 0) onActiveRoomChange(nextRooms[0].id);
   }
+
+  const isEdit = dialog.kind === "edit";
 
   return (
     <div className="flex flex-wrap items-center gap-2">
@@ -108,21 +136,32 @@ export function RoomSwitcher({
         type="button"
         variant="outline"
         size="sm"
-        onClick={() => setAddOpen(true)}
+        onClick={() => setDialog({ kind: "create" })}
       >
         <Plus className="size-4" />
         New room
       </Button>
-      {activeRoomId && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => setConfirmDeleteOpen(true)}
-        >
-          <Trash2 className="size-4" />
-          Delete room
-        </Button>
+      {activeRoomId && activeRoom && (
+        <>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => setDialog({ kind: "edit", roomId: activeRoomId })}
+          >
+            <Pencil className="size-4" />
+            Edit room
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => setConfirmDeleteOpen(true)}
+          >
+            <Trash2 className="size-4" />
+            Delete room
+          </Button>
+        </>
       )}
 
       <ConfirmDialog
@@ -139,12 +178,19 @@ export function RoomSwitcher({
         onConfirm={deleteActiveRoom}
       />
 
-      <Dialog open={addOpen} onOpenChange={setAddOpen}>
+      <Dialog
+        open={dialog.kind !== "closed"}
+        onOpenChange={(open) => {
+          if (!open) setDialog({ kind: "closed" });
+        }}
+      >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Add room</DialogTitle>
+            <DialogTitle>{isEdit ? "Edit room" : "Add room"}</DialogTitle>
             <DialogDescription>
-              Give the room a name and its real-world dimensions.
+              {isEdit
+                ? "Update the room name or dimensions. Tables stay in place."
+                : "Give the room a name and its real-world dimensions."}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
@@ -192,8 +238,8 @@ export function RoomSwitcher({
             <DialogClose
               render={<Button type="button" variant="ghost">Cancel</Button>}
             />
-            <Button type="button" onClick={addRoom}>
-              Add room
+            <Button type="button" onClick={submit}>
+              {isEdit ? "Save room" : "Add room"}
             </Button>
           </DialogFooter>
         </DialogContent>
