@@ -11,6 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Markdown } from "@/components/ui/markdown";
 import type {
   FieldRequirements,
   TableSizeOption,
@@ -179,9 +180,7 @@ export function ApplicationForm({
       {guidelines && (
         <section className="space-y-3 rounded-md bg-muted p-4">
           <h3 className="font-heading text-base font-bold">Guidelines</h3>
-          <p className="whitespace-pre-line text-sm text-muted-foreground">
-            {guidelines}
-          </p>
+          <Markdown source={guidelines} className="text-muted-foreground" />
         </section>
       )}
 

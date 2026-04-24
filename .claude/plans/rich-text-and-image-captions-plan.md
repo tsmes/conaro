@@ -199,7 +199,7 @@ Covers "About this event", "About the convention", and — importantly — the e
 **Verification:** Manual: create an event with a bolded description; public event page shows bold. Convention editor → set a default acceptance message with bullets → event editor placeholder shows a clean single-line plain-text preview.
 **Depends on:** 1, 2.
 
-### 11. Render Markdown in the apply dialog guidelines block
+### 11. Render Markdown in the apply dialog guidelines block ✅
 
 **Requirements:** REQ-3.
 
