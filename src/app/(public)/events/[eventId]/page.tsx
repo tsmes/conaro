@@ -26,6 +26,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Markdown } from "@/components/ui/markdown";
 import { formatDateNo, formatDateRangeNo } from "@/lib/utils/format-date-no";
+import { cn } from "@/lib/utils";
 import { getEventAnnouncements } from "@/app/(authenticated)/conventions/manage/events/[eventId]/announcements/actions";
 
 interface EventDetailPageProps {
@@ -411,18 +412,34 @@ export default async function EventDetailPage({
                       : "Your application"
               }
             >
-              {ownResponseMessage && (
+              {ownResponseMessage ? (
                 <Markdown
                   source={ownResponseMessage}
                   className="text-foreground"
                 />
+              ) : (
+                <p className="text-sm leading-relaxed text-foreground">
+                  {ownApplicationStatus === "accepted"
+                    ? "Congratulations! Your application has been accepted."
+                    : ownApplicationStatus === "rejected"
+                      ? "Thank you for applying. Unfortunately, we can't offer you a spot at this event."
+                      : ownApplicationStatus === "waitlisted"
+                        ? "You're on the waitlist. If a spot opens up, the organizer may offer it to you."
+                        : "Your application has been reviewed."}
+                </p>
               )}
               {ownApplicationStatus === "rejected" &&
                 event.waitlistEnabled && (
-                  <div className="mt-5 border-t border-border pt-5">
+                  <div
+                    className={cn(
+                      "mt-5",
+                      ownResponseMessage &&
+                        "border-t border-border pt-5"
+                    )}
+                  >
                     <p className="mb-3 text-sm text-muted-foreground">
                       If a spot opens up, the organizer may offer it to
-                      you \u2014 join the waitlist to opt in.
+                      you — join the waitlist to opt in.
                     </p>
                     <JoinWaitlistButton eventId={event.id} />
                   </div>
