@@ -69,16 +69,31 @@ export function FloorPlanCanvas({
     centerStageXPx: number,
     centerStageYPx: number,
     sizeWidthCm: number,
-    sizeDepthCm: number
+    sizeDepthCm: number,
+    rotationDeg: number
   ) {
-    if (!plan || !onChange) return;
+    if (!plan || !onChange || !activeRoom) return;
     // Drag position is the Group's centre-of-rotation, which we've
-    // placed at the rect's geometric centre. Convert back to the
-    // un-rotated top-left coordinate we store.
+    // placed at the rect's geometric centre. For 90/270° rotations the
+    // visual footprint swaps width and depth, so clamping has to use
+    // the rotated half-extents — otherwise tables can half-vanish into
+    // a wall when nudged to the edge.
+    const rotated = rotationDeg === 90 || rotationDeg === 270;
+    const effWidthCm = rotated ? sizeDepthCm : sizeWidthCm;
+    const effDepthCm = rotated ? sizeWidthCm : sizeDepthCm;
     const centerXCm = centerStageXPx / scale;
     const centerYCm = centerStageYPx / scale;
-    const newXCm = Math.max(0, Math.round(centerXCm - sizeWidthCm / 2));
-    const newYCm = Math.max(0, Math.round(centerYCm - sizeDepthCm / 2));
+    const clampedCenterX = Math.max(
+      effWidthCm / 2,
+      Math.min(activeRoom.widthCm - effWidthCm / 2, centerXCm)
+    );
+    const clampedCenterY = Math.max(
+      effDepthCm / 2,
+      Math.min(activeRoom.heightCm - effDepthCm / 2, centerYCm)
+    );
+    // Convert back to the un-rotated top-left coordinate we store.
+    const newXCm = Math.round(clampedCenterX - sizeWidthCm / 2);
+    const newYCm = Math.round(clampedCenterY - sizeDepthCm / 2);
     const nextTables = plan.tables.map((t) => {
       const raw = {
         id: t.id,
@@ -112,7 +127,7 @@ export function FloorPlanCanvas({
           style={{ minHeight: 360 }}
         >
           {(plan?.rooms.length ?? 0) === 0
-            ? "Add your first room in the sidebar."
+            ? "Add your first room from the toolbar above."
             : "Select a room to view its layout."}
         </div>
       ) : (
@@ -161,7 +176,8 @@ export function FloorPlanCanvas({
                       e.target.x(),
                       e.target.y(),
                       size.widthCm!,
-                      size.depthCm!
+                      size.depthCm!,
+                      table.rotationDeg
                     )
                   }
                 >

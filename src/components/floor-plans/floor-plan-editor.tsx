@@ -85,19 +85,34 @@ export function FloorPlanEditor({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Tracks whether there's a save that hasn't been confirmed yet,
+  // regardless of whether it's sitting in the debounce or already in
+  // flight. Used by the beforeunload guard and the unmount flush.
+  const pendingRef = useRef(false);
   const latestPlan = useRef<FloorPlan>(plan);
   latestPlan.current = plan;
 
+  const runSave = useCallback(
+    async (snapshot: FloorPlan) => {
+      const form = new FormData();
+      form.set("eventId", eventId);
+      form.set("floorPlan", JSON.stringify(snapshot));
+      const result = await saveFloorPlan({}, form);
+      return result;
+    },
+    [eventId]
+  );
+
   const scheduleSave = useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
+    pendingRef.current = true;
     setStatus("saving");
     timerRef.current = setTimeout(() => {
+      timerRef.current = null;
       const snapshot = latestPlan.current;
       startTransition(async () => {
-        const form = new FormData();
-        form.set("eventId", eventId);
-        form.set("floorPlan", JSON.stringify(snapshot));
-        const result = await saveFloorPlan({}, form);
+        const result = await runSave(snapshot);
+        pendingRef.current = false;
         if (result.success) {
           setStatus("saved");
           setErrorMsg(null);
@@ -107,13 +122,33 @@ export function FloorPlanEditor({
         }
       });
     }, SAVE_DEBOUNCE_MS);
-  }, [eventId]);
+  }, [runSave]);
 
+  // If the user navigates (back, tab change, tab close) while a debounced
+  // save is still waiting, fire it synchronously so they don't lose the
+  // last edit. The beforeunload handler only fires for full tab close /
+  // reload; client-side Next.js route changes trigger the unmount cleanup.
   useEffect(() => {
+    function handleBeforeUnload(e: BeforeUnloadEvent) {
+      if (!pendingRef.current) return;
+      e.preventDefault();
+      e.returnValue = "";
+    }
+    window.addEventListener("beforeunload", handleBeforeUnload);
     return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+        // Fire-and-forget: the fetch survives component unmount, which
+        // is what we want — it's better to save an extra time than to
+        // drop the user's last drag.
+        if (pendingRef.current) {
+          void runSave(latestPlan.current);
+        }
+      }
     };
-  }, []);
+  }, [runSave]);
 
   const handlePlanChange = useCallback(
     (next: FloorPlan) => {

@@ -1,10 +1,9 @@
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
-import { ListChecks, Sliders } from "lucide-react";
+import { Sliders } from "lucide-react";
 import { auth } from "@/lib/auth";
 import type { Amenities } from "@/lib/db/schema/events";
 import {
-  getApplicationCounts,
   getOrganizerConvention,
   getOrganizerEvent,
 } from "@/lib/conventions/queries";
@@ -39,16 +38,6 @@ export default async function EventDetailPage({
     notFound();
   }
 
-  const showReviewLink =
-    event.status === "accepting_applications" ||
-    event.status === "reviewing" ||
-    event.status === "results_published";
-  let applicationCount = 0;
-  if (showReviewLink) {
-    const counts = await getApplicationCounts(event.id);
-    applicationCount = counts.total;
-  }
-
   const amenities = event.amenities as Amenities | null;
 
   return (
@@ -76,19 +65,6 @@ export default async function EventDetailPage({
               </Link>
             }
           />
-          {showReviewLink && (
-            <Button
-              variant="outline"
-              size="sm"
-              nativeButton={false}
-              render={
-                <Link href={`/conventions/manage/events/${event.id}/applications`}>
-                  <ListChecks className="size-4" />
-                  Review applications ({applicationCount})
-                </Link>
-              }
-            />
-          )}
         </div>
       </Card>
 
