@@ -17,6 +17,8 @@ export const notificationTypeEnum = pgEnum("notification_type", [
   "application_revoked",
   "new_application",
   "event_announcement",
+  "thread_message_from_artist",
+  "thread_message_from_organizer",
 ]);
 
 export const notifications = pgTable(

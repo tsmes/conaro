@@ -34,6 +34,12 @@ const ARTIST_PREFERENCE_TYPES = [
     label: "Application status changes",
     description: "When your application status is changed (e.g., revoked).",
   },
+  {
+    type: "thread_message_from_organizer",
+    label: "Reply from the organizer",
+    description:
+      "When the organizer replies to your question on an event you've been accepted to.",
+  },
 ];
 
 const ORGANIZER_PREFERENCE_TYPES = [
@@ -41,6 +47,12 @@ const ORGANIZER_PREFERENCE_TYPES = [
     type: "new_application",
     label: "New application received",
     description: "When an artist applies to one of your events.",
+  },
+  {
+    type: "thread_message_from_artist",
+    label: "New question from an applicant",
+    description:
+      "When an accepted artist sends you a question about one of your events.",
   },
 ];
 

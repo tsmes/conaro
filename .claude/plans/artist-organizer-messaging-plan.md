@@ -34,7 +34,7 @@ Add the two tables and generate the Drizzle migration. No behavior change yet â€
 
 **Depends on:** none.
 
-### 2. Extend `notification_type` enum + service plumbing + preferences
+### 2. Extend `notification_type` enum + service plumbing + preferences âœ…
 
 Add the two new enum values end-to-end so triggers can fire and preferences can gate email delivery.
 

@@ -45,8 +45,8 @@ describe("updateNotificationPreferences", () => {
       .from(notificationPreferences)
       .where(eq(notificationPreferences.profileId, artist.profile.id));
 
-    // Should have entries for all 5 artist types
-    expect(prefs).toHaveLength(5);
+    // One row per artist preference type (currently 6).
+    expect(prefs).toHaveLength(6);
 
     const eventOpenedPref = prefs.find(
       (p) => p.notificationType === "event_opened"
@@ -82,9 +82,14 @@ describe("updateNotificationPreferences", () => {
       .from(notificationPreferences)
       .where(eq(notificationPreferences.profileId, profile.id));
 
-    expect(prefs).toHaveLength(1);
-    expect(prefs[0].notificationType).toBe("new_application");
-    expect(prefs[0].emailEnabled).toBe(true);
+    // One row per organizer preference type (currently 2).
+    expect(prefs).toHaveLength(2);
+    const newApp = prefs.find((p) => p.notificationType === "new_application");
+    expect(newApp?.emailEnabled).toBe(true);
+    const threadFromArtist = prefs.find(
+      (p) => p.notificationType === "thread_message_from_artist"
+    );
+    expect(threadFromArtist?.emailEnabled).toBe(false);
   });
 
   it("updates existing preferences on re-save", async () => {

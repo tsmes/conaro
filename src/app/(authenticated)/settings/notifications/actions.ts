@@ -12,9 +12,13 @@ const ARTIST_TYPES = [
   "new_event",
   "results_published",
   "application_revoked",
+  "thread_message_from_organizer",
 ] as const;
 
-const ORGANIZER_TYPES = ["new_application"] as const;
+const ORGANIZER_TYPES = [
+  "new_application",
+  "thread_message_from_artist",
+] as const;
 
 export async function updateNotificationPreferences(
   _prevState: ActionState,

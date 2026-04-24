@@ -14,7 +14,9 @@ type NotificationType =
   | "new_event"
   | "results_published"
   | "application_revoked"
-  | "new_application";
+  | "new_application"
+  | "thread_message_from_artist"
+  | "thread_message_from_organizer";
 
 interface NotificationInput {
   recipientProfileId: string;
@@ -144,6 +146,8 @@ function formatSubject(type: NotificationType): string {
     results_published: "Application results are in",
     application_revoked: "Your application status has changed",
     new_application: "New application received",
+    thread_message_from_artist: "New message from an applicant",
+    thread_message_from_organizer: "New message from the organizer",
   };
   return `Conaro: ${subjects[type]}`;
 }
