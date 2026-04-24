@@ -53,7 +53,7 @@ Persistence infrastructure for the plan itself.
 **Verification:** `npm run db:generate` produces the migration; `npm run db:migrate:test` applies cleanly; integration test green.
 **Depends on:** none (parallelizable with task 1).
 
-### 3. Read helper — `getFloorPlanForEvent`
+### 3. Read helper — `getFloorPlanForEvent` ✅
 
 Loads the plan + resolves assignments to artist info in one query pass.
 
