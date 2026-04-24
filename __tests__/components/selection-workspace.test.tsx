@@ -51,6 +51,19 @@ vi.mock(
   })
 );
 
+const emptyAnswers = {
+  tableSizeLabel: null,
+  tableSizeDimensions: null,
+  tableSizePriceNok: null,
+  assistantsCount: null,
+  assistantsNames: [],
+  sharingStand: null,
+  placementPreference: null,
+  additionalComments: null,
+  promotionConsent: null,
+  guidelinesAcknowledgedAt: null,
+};
+
 function buildApplicants(): SelectionApplicantView[] {
   return [
     {
@@ -64,10 +77,10 @@ function buildApplicants(): SelectionApplicantView[] {
       bio: null,
       helpers: 0,
       accessibilityNeeds: null,
-      tableSizePreference: null,
       genres: ["Comics"],
       mediums: ["Ink"],
       images: [],
+      answers: emptyAnswers,
     },
     {
       id: "a2",
@@ -80,10 +93,10 @@ function buildApplicants(): SelectionApplicantView[] {
       bio: null,
       helpers: 0,
       accessibilityNeeds: null,
-      tableSizePreference: null,
       genres: [],
       mediums: [],
       images: [],
+      answers: emptyAnswers,
     },
   ];
 }
