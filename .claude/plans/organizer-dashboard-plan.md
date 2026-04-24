@@ -200,7 +200,7 @@ Rewrite the server page to fan out data fetching in parallel and mount the view 
 
 **Depends on:** 2, 3, 4, 5, 6.
 
-### 8. De-duplicate `ORGANIZER_NAV`
+### 8. De-duplicate `ORGANIZER_NAV` ✅
 
 **Requirements:** REQ-8.
 

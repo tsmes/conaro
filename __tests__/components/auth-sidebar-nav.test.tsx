@@ -38,7 +38,7 @@ describe("AuthSidebarNav", () => {
     renderNav("organizer", "/conventions/manage");
     expect(screen.getByText("Convention Studio")).toBeInTheDocument();
     expect(screen.getByText("Overview")).toBeInTheDocument();
-    expect(screen.getByText("Conventions")).toBeInTheDocument();
+    expect(screen.queryByText("Conventions")).not.toBeInTheDocument();
     expect(screen.getByText("Notifications")).toBeInTheDocument();
     expect(screen.queryByText("Profile")).not.toBeInTheDocument();
     expect(screen.queryByText("Events")).not.toBeInTheDocument();

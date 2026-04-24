@@ -9,7 +9,6 @@ import {
   Bell,
   Settings,
   LogOut,
-  Building2,
   Palette,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
@@ -42,7 +41,6 @@ const ARTIST_NAV: NavItem[] = [
 
 const ORGANIZER_NAV: NavItem[] = [
   { href: "/conventions/manage", label: "Overview", icon: LayoutDashboard },
-  { href: "/conventions/manage", label: "Conventions", icon: Building2 },
   { href: "/notifications", label: "Notifications", icon: Bell },
 ];
 
