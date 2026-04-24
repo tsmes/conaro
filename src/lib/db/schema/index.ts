@@ -9,3 +9,4 @@ export * from "./notifications";
 export * from "./artist-profiles";
 export * from "./portfolio-images";
 export * from "./event-announcements";
+export * from "./event-threads";
