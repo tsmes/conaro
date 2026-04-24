@@ -154,7 +154,7 @@ Single field: `bio`.
 **Verification:** Component test passes; `npm run build` green.
 **Depends on:** 3.
 
-### 8. Wire rich-text editor into LogisticsForm
+### 8. Wire rich-text editor into LogisticsForm ✅
 
 Two fields: `accessibilityNeeds`, `notes`.
 

@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 
 const LABEL_CLASS =
   "text-[11px] font-bold uppercase tracking-wider text-muted-foreground";
-import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 
 interface LogisticsFormProps {
   defaultValues: {
@@ -64,20 +64,18 @@ export function LogisticsForm({ defaultValues }: LogisticsFormProps) {
       </div>
       <div className="space-y-2">
         <Label htmlFor="accessibilityNeeds" className={LABEL_CLASS}>Accessibility needs</Label>
-        <Textarea
+        <RichTextEditor
           id="accessibilityNeeds"
           name="accessibilityNeeds"
-          rows={3}
           defaultValue={defaultValues.accessibilityNeeds}
           placeholder="Any accessibility requirements..."
         />
       </div>
       <div className="space-y-2">
         <Label htmlFor="notes" className={LABEL_CLASS}>Additional notes</Label>
-        <Textarea
+        <RichTextEditor
           id="notes"
           name="notes"
-          rows={3}
           defaultValue={defaultValues.notes}
           placeholder="Anything else conventions should know..."
         />
