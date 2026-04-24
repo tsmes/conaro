@@ -412,9 +412,10 @@ export default async function EventDetailPage({
               }
             >
               {ownResponseMessage && (
-                <p className="whitespace-pre-line text-sm leading-relaxed text-foreground">
-                  {ownResponseMessage}
-                </p>
+                <Markdown
+                  source={ownResponseMessage}
+                  className="text-foreground"
+                />
               )}
               {ownApplicationStatus === "rejected" &&
                 event.waitlistEnabled && (

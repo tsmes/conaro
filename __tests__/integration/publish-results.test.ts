@@ -157,6 +157,47 @@ describe("publishResults", () => {
     expect(updatedApp2.responseMessage).toBe("Sorry, not this time.");
   });
 
+  it("preserves Markdown syntax and substitutes placeholders in stored responseMessage", async () => {
+    const { profile, convention } = await createTestOrganizer();
+    const event = await createTestEvent(convention.id, {
+      status: "reviewing",
+    });
+
+    mockAuth.mockResolvedValue({
+      user: { id: "u", role: "organizer", profileId: profile.id },
+    });
+
+    await updateResponseTemplates(
+      {},
+      buildFormData({
+        eventId: event.id,
+        acceptanceMessage: "Hi **{{ artist_name }}**, welcome!",
+        rejectionMessage: "Thanks for applying.",
+      })
+    );
+
+    const artist = await createTestArtist("elena@test.com", "Elena");
+    const app = await createTestApplication(event.id, artist.profile.id);
+    await setApplicationDecision(
+      {},
+      buildFormData({
+        applicationId: app.id,
+        eventId: event.id,
+        decision: "accepted",
+      })
+    );
+    await publishResults({}, buildFormData({ eventId: event.id }));
+
+    const [updated] = await db
+      .select()
+      .from(applications)
+      .where(eq(applications.id, app.id));
+    // The Markdown markers survive template rendering; Elena's name is
+    // substituted. The read-side renderer (public event page) applies the
+    // Markdown formatting; the DB just holds the raw source.
+    expect(updated.responseMessage).toBe("Hi **Elena**, welcome!");
+  });
+
   it("rejects publish for non-reviewing events", async () => {
     const { profile, convention } = await createTestOrganizer();
     const event = await createTestEvent(convention.id, {

@@ -209,7 +209,7 @@ Covers "About this event", "About the convention", and — importantly — the e
 **Verification:** Manual: set convention guidelines with lists, open the apply dialog, guidelines render formatted.
 **Depends on:** 1.
 
-### 12. Render Markdown in the applicant-facing acceptance/rejection message
+### 12. Render Markdown in the applicant-facing acceptance/rejection message ✅
 
 After publish, applicants see their own response message on the event page. That string is already the substituted-and-rendered template; now it needs to render as Markdown.
 
