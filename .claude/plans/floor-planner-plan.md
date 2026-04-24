@@ -79,7 +79,7 @@ Single action that accepts the whole plan as a JSON body and persists it with Zo
 **Verification:** Integration test green.
 **Depends on:** 2, 3.
 
-### 5. Install react-konva + scaffold `<FloorPlanCanvas>` client component
+### 5. Install react-konva + scaffold `<FloorPlanCanvas>` client component ✅ (shipped with 6 + 7)
 
 Gets the canvas mounting at all. No interactivity yet.
 
@@ -98,7 +98,7 @@ Gets the canvas mounting at all. No interactivity yet.
 **Verification:** `npm run build` green (including verifying Konva doesn't SSR); smoke test passes; manual: mount the component on a scratch page and see an empty grid.
 **Depends on:** none (parallelizable with 1–4).
 
-### 6. `<FloorPlanCanvas>` renders rooms + tables (read-only)
+### 6. `<FloorPlanCanvas>` renders rooms + tables (read-only) ✅
 
 Extend the canvas to actually draw what's in the plan.
 
@@ -115,7 +115,7 @@ Extend the canvas to actually draw what's in the plan.
 **Verification:** Smoke test passes; manual: mount with a hand-crafted plan (two rooms, five tables) and visually verify each renders at the right size.
 **Depends on:** 5.
 
-### 7. `<FloorPlanCanvas>` drag-to-move tables
+### 7. `<FloorPlanCanvas>` drag-to-move tables ✅
 
 Tables become draggable, drop position snaps to integer cm, fires an `onChange(plan)` callback with the updated plan.
 
