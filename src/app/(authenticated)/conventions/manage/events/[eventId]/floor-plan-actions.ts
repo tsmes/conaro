@@ -31,11 +31,8 @@ const tableSchema = z.object({
     z.literal(180),
     z.literal(270),
   ]),
-  // Tables can be placed outside the room (hallway overflow) so we
-  // allow negative coordinates; a generous upper bound catches plain
-  // bogus input while still allowing reasonable overflow.
-  x: z.number().int().min(-10000).max(10000),
-  y: z.number().int().min(-10000).max(10000),
+  x: z.number().int().min(0).max(10000),
+  y: z.number().int().min(0).max(10000),
   assignedApplicationId: z.string().min(1).nullable(),
 });
 
