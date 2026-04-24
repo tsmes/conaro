@@ -286,6 +286,14 @@ export function FloorPlanCanvas({
               const hPx = size.depthCm * scale;
               const centerX = PADDING_PX + (table.x + size.widthCm / 2) * scale;
               const centerY = PADDING_PX + (table.y + size.depthCm / 2) * scale;
+              const rotated =
+                table.rotationDeg === 90 || table.rotationDeg === 270;
+              const effWidthPx = (rotated ? size.depthCm : size.widthCm) * scale;
+              const effDepthPx = (rotated ? size.widthCm : size.depthCm) * scale;
+              const minCx = PADDING_PX + effWidthPx / 2;
+              const maxCx = PADDING_PX + activeRoom.widthCm * scale - effWidthPx / 2;
+              const minCy = PADDING_PX + effDepthPx / 2;
+              const maxCy = PADDING_PX + activeRoom.heightCm * scale - effDepthPx / 2;
               const fill = assigned
                 ? COLORS.tableAssignedFill
                 : COLORS.tableUnassignedFill;
@@ -301,6 +309,10 @@ export function FloorPlanCanvas({
                   y={centerY}
                   rotation={table.rotationDeg}
                   draggable={editable}
+                  dragBoundFunc={(pos) => ({
+                    x: Math.max(minCx, Math.min(maxCx, pos.x)),
+                    y: Math.max(minCy, Math.min(maxCy, pos.y)),
+                  })}
                   onMouseDown={(e) => {
                     if (onSelectTable) {
                       e.cancelBubble = true;
