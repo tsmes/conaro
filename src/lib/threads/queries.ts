@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, inArray } from "drizzle-orm";
+import { and, asc, desc, eq, gt, inArray, isNull, or, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import {
   eventThreads,
@@ -128,6 +128,41 @@ export async function getThreadsForOrganizer(
       unreadForOrganizer,
     };
   });
+}
+
+// Scalar "how many unread Q&A threads on this event?" for the organizer
+// dashboard. A thread is unread when its latest message was authored by
+// the artist AND the organizer hasn't opened the thread since (or ever).
+// Single round-trip; correlated subquery picks the latest message.
+export async function getUnreadThreadCountForEvent(
+  eventId: string
+): Promise<number> {
+  const latestAuthorSubquery = sql<string>`(
+    SELECT ${eventThreadMessages.authorProfileId}
+    FROM ${eventThreadMessages}
+    WHERE ${eventThreadMessages.threadId} = ${eventThreads.id}
+    ORDER BY ${eventThreadMessages.createdAt} DESC
+    LIMIT 1
+  )`;
+
+  const [row] = await db
+    .select({ value: sql<number>`count(*)::int` })
+    .from(eventThreads)
+    .where(
+      and(
+        eq(eventThreads.eventId, eventId),
+        or(
+          isNull(eventThreads.organizerLastReadAt),
+          gt(
+            eventThreads.lastMessageAt,
+            eventThreads.organizerLastReadAt
+          )
+        ),
+        eq(latestAuthorSubquery, eventThreads.artistProfileId)
+      )
+    );
+
+  return row?.value ?? 0;
 }
 
 // Full organizer inbox — threads + all messages per thread — fetched in

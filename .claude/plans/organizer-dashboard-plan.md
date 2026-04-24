@@ -48,7 +48,7 @@ Replace two copy-pasted inline `count()` queries with one shared helper, used by
 **Verification:** All existing tests still green; new test green; build green.
 **Depends on:** none.
 
-### 3. Add `getUnreadThreadCountForEvent(eventId)` helper
+### 3. Add `getUnreadThreadCountForEvent(eventId)` helper ✅
 
 New single-query helper the dashboard calls once per current-event render.
 
