@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 const LABEL_CLASS =
   "text-[11px] font-bold uppercase tracking-wider text-muted-foreground";
 import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import {
   Card,
   CardContent,
@@ -204,11 +205,11 @@ export function EventForm({ action, defaultValues, submitLabel }: EventFormProps
 
           <div className="space-y-2">
             <Label htmlFor="description" className={LABEL_CLASS}>Description</Label>
-            <Textarea
+            <RichTextEditor
               id="description"
               name="description"
               defaultValue={dv.description ?? ""}
-              rows={4}
+              aria-invalid={!!state.fieldErrors?.description}
             />
             <FieldError state={state} field="description" />
           </div>
@@ -444,10 +445,9 @@ export function EventForm({ action, defaultValues, submitLabel }: EventFormProps
             <Label htmlFor="guidelinesOverride" className={LABEL_CLASS}>
               Guidelines (event override)
             </Label>
-            <Textarea
+            <RichTextEditor
               id="guidelinesOverride"
               name="guidelinesOverride"
-              rows={6}
               defaultValue={dv.guidelinesOverride ?? ""}
               placeholder="Leave blank to use the convention's guidelines."
             />
@@ -511,10 +511,9 @@ export function EventForm({ action, defaultValues, submitLabel }: EventFormProps
             <Label htmlFor="acceptanceMessage" className={LABEL_CLASS}>
               Acceptance message
             </Label>
-            <Textarea
+            <RichTextEditor
               id="acceptanceMessage"
               name="acceptanceMessage"
-              rows={5}
               defaultValue={dv.acceptanceMessage ?? ""}
               placeholder={
                 dv.conventionAcceptanceMessage
@@ -532,10 +531,9 @@ export function EventForm({ action, defaultValues, submitLabel }: EventFormProps
             <Label htmlFor="rejectionMessage" className={LABEL_CLASS}>
               Rejection message
             </Label>
-            <Textarea
+            <RichTextEditor
               id="rejectionMessage"
               name="rejectionMessage"
-              rows={5}
               defaultValue={dv.rejectionMessage ?? ""}
               placeholder={
                 dv.conventionRejectionMessage

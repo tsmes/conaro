@@ -107,7 +107,7 @@ Swap four `<Textarea>`s for `<RichTextEditor>` in the convention-info form.
 **Verification:** `npm run build` green; new component test passes; manual edit of a convention description shows the toolbar, saves, and re-renders on reload.
 **Depends on:** 3.
 
-### 5. Wire rich-text editor into EventForm
+### 5. Wire rich-text editor into EventForm ✅
 
 Swap `description`, `guidelinesOverride`, `acceptanceMessage`, `rejectionMessage`. **`priceInfo` stays a plain `<Textarea>`**.
 
