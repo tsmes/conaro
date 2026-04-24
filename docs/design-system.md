@@ -1,7 +1,7 @@
 # Design System Strategy: The Curated Canvas
 
 ## 1. Overview & Creative North Star
-**Creative North Star: "The Digital Curator"**
+**Creative North Star: "Conaro"**
 
 This design system is built on the tension between the "Strict Gallery" and the "Expressive Artist." We are moving away from the generic, template-driven look of standard application forms. Instead, we treat the artist's application process as an exhibition in itself.
 

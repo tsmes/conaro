@@ -397,7 +397,7 @@ shortcuts, and persistent open/closed state automatically.
   hidden as a Sheet below `md`):
   - Brand block (top): primary-container chip with palette icon + role-specific
     title ("Artist Studio" or "Convention Studio") in Manrope 900 violet +
-    "THE DIGITAL CURATOR" tagline in label-sm.
+    "CONARO" tagline in label-sm.
   - Nav list (artist role):
     - Overview → `/dashboard`
     - Profile → `/dashboard/profile`
@@ -448,7 +448,7 @@ Long-scroll editorial layout matching `stitch/homepage_1` (light) and
 ### Section A — Hero
 - Container: `max-w-7xl mx-auto px-8` with top spacing to clear glass nav
 - Inner: `max-w-3xl` (left-aligned per the no-centralization rule)
-- Overline: "THE DIGITAL CURATOR" in `text-label-sm text-primary`
+- Overline: "CONARO" in `text-label-sm text-primary`
 - Headline: "Apply to conventions. *Once.*" in `text-display-lg
   font-extrabold tracking-tighter` — "Once." wrapped in
   `<span className="text-primary italic">`

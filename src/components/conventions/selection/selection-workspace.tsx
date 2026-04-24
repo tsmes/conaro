@@ -303,12 +303,14 @@ export function SelectionWorkspace({
 
   return (
     <div className="space-y-5">
-      <SelectionProgress
-        applied={counts.all}
-        accepted={counts.accepted}
-        pinned={counts.pinned}
-        target={availableStands}
-      />
+      <div className="sticky top-16 z-20 -mx-6 bg-background px-6 pb-1 md:-mx-8 md:px-8">
+        <SelectionProgress
+          applied={counts.all}
+          accepted={counts.accepted}
+          pinned={counts.pinned}
+          target={availableStands}
+        />
+      </div>
       <div className="flex flex-wrap items-center gap-3">
         <Segmented
           value={layout}
@@ -318,7 +320,7 @@ export function SelectionWorkspace({
         />
         <Input
           type="search"
-          placeholder="Search name, bio, genres, mediums\u2026"
+          placeholder="Search name, bio, genres, mediums…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           aria-label="Search applicants"
@@ -336,7 +338,7 @@ export function SelectionWorkspace({
           </Button>
         )}
         {pending && (
-          <span className="text-xs text-muted-foreground">Saving\u2026</span>
+          <span className="text-xs text-muted-foreground">Saving…</span>
         )}
       </div>
       {error && (

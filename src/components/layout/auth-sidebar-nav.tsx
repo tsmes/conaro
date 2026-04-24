@@ -56,8 +56,7 @@ function findActiveHref(pathname: string, items: NavItem[]): string | null {
   for (const item of items) {
     const href = item.href;
     const matches =
-      pathname === href ||
-      (href !== "/" && pathname.startsWith(`${href}/`));
+      pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
     if (matches && href.length > bestLen) {
       bestHref = href;
       bestLen = href.length;
@@ -101,7 +100,7 @@ export function AuthSidebarNav({
                   {studioTitle}
                 </span>
                 <span className="truncate font-heading text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-                  The Digital Curator
+                  Conaro
                 </span>
               </div>
             </SidebarMenuButton>

@@ -15,8 +15,7 @@ export default function RegisterPage() {
           Join Conaro
         </h1>
         <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
-          Choose your role to get started with the digital curator&apos;s
-          platform.
+          Choose your role to get started with Conaros&apos;s platform.
         </p>
       </div>
       <div className="grid gap-6 md:grid-cols-2">
@@ -30,8 +29,7 @@ export default function RegisterPage() {
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
               Exhibit your portfolio, track applications for conventions, and
-              connect with organizers through a streamlined editorial
-              interface.
+              connect with organizers through a streamlined editorial interface.
             </p>
             <div className="mt-8 flex items-center gap-1 text-sm font-semibold text-primary">
               Create artist profile
@@ -48,8 +46,8 @@ export default function RegisterPage() {
               Organizer
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              Manage conventions, review submissions, and curate the artists
-              who fill your floor.
+              Manage conventions, review submissions, and curate the artists who
+              fill your floor.
             </p>
             <div className="mt-8 flex items-center gap-1 text-sm font-semibold text-primary">
               Launch organization
