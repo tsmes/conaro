@@ -341,7 +341,9 @@ export function DeepReviewLayout({
                 onClick={() => onConfirmPayment(applicant.id)}
               >
                 <Wallet className="size-3.5" />
-                {applicant.paymentConfirmed ? "Mark unpaid" : "Mark paid"}
+                {applicant.paymentConfirmed
+                  ? "Mark unconfirmed"
+                  : "Mark confirmed"}
               </Button>
             )}
             {canRevoke && (

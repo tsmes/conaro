@@ -103,7 +103,7 @@ describe("TableLayout", () => {
     expect(screen.getByRole("button", { name: /Artist One/ })).toBeDisabled();
   });
 
-  it("post-publish: shows Mark paid + Revoke icons for accepted rows only", async () => {
+  it("post-publish: shows Mark confirmed + Revoke icons for accepted rows only", async () => {
     const user = userEvent.setup();
     const onConfirmPayment = vi.fn();
     const onRevoke = vi.fn();
@@ -122,11 +122,13 @@ describe("TableLayout", () => {
         })}
       />
     );
-    const markPaid = screen.getAllByRole("button", { name: /Mark paid/i });
+    const markConfirmed = screen.getAllByRole("button", {
+      name: /Mark confirmed/i,
+    });
     const revoke = screen.getAllByRole("button", { name: /Revoke acceptance/i });
-    expect(markPaid).toHaveLength(1);
+    expect(markConfirmed).toHaveLength(1);
     expect(revoke).toHaveLength(1);
-    await user.click(markPaid[0]);
+    await user.click(markConfirmed[0]);
     expect(onConfirmPayment).toHaveBeenCalledWith("a1");
     await user.click(revoke[0]);
     expect(onRevoke).toHaveBeenCalledWith("a1");

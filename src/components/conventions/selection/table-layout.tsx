@@ -148,13 +148,13 @@ export function TableLayout({
                         onClick={() => onConfirmPayment(applicant.id)}
                         title={
                           applicant.paymentConfirmed
-                            ? "Mark unpaid"
-                            : "Mark paid"
+                            ? "Mark unconfirmed"
+                            : "Mark confirmed"
                         }
                         aria-label={
                           applicant.paymentConfirmed
-                            ? "Mark unpaid"
-                            : "Mark paid"
+                            ? "Mark unconfirmed"
+                            : "Mark confirmed"
                         }
                         className={cn(
                           "grid size-8 place-items-center rounded-lg",

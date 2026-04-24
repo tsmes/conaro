@@ -191,7 +191,7 @@ export function GalleryLayout({
                     )}
                   >
                     <Wallet className="size-3" />
-                    {applicant.paymentConfirmed ? "Paid" : "Mark paid"}
+                    {applicant.paymentConfirmed ? "Confirmed" : "Mark confirmed"}
                   </button>
                   <button
                     type="button"

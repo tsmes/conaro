@@ -159,7 +159,9 @@ describe("DeepReviewLayout", () => {
     expect(
       screen.queryByRole("button", { name: /^pin$/i })
     ).toBeNull();
-    expect(screen.getByRole("button", { name: /mark paid/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /mark confirmed/i })
+    ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /revoke/i })).toBeInTheDocument();
   });
 
