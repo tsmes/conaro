@@ -44,6 +44,34 @@ export interface TableSizeOption {
   depthCm?: number;
 }
 
+// Organizer-authored floor plan for the event. Rooms are axis-aligned
+// rectangles in centimetres; tables are axis-aligned rectangles that
+// reference a `tableSizeOptions[].id` for their real-world dimensions.
+// Assignments reference `applications.id` of accepted artists on this
+// event. The floor planner writes the whole shape on every save.
+export interface FloorPlanRoom {
+  id: string;
+  name: string;
+  x: number; // cm, top-left
+  y: number;
+  widthCm: number;
+  heightCm: number;
+}
+
+export interface FloorPlanTable {
+  id: string;
+  label: string;
+  tableSizeOptionId: string;
+  x: number;
+  y: number;
+  assignedApplicationId: string | null;
+}
+
+export interface FloorPlan {
+  rooms: FloorPlanRoom[];
+  tables: FloorPlanTable[];
+}
+
 export const events = pgTable(
   "events",
   {
@@ -82,6 +110,7 @@ export const events = pgTable(
       .default([]),
     maxAssistants: integer("max_assistants").notNull().default(0),
     assistantFeeNok: integer("assistant_fee_nok"),
+    floorPlan: jsonb("floor_plan").$type<FloorPlan>(),
     createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
   },

@@ -35,7 +35,7 @@ Adds the numeric fields to the type, Zod schema, event editor UI, and event-form
 **Verification:** `npm run build` green; `npm test -- event-form` green.
 **Depends on:** none.
 
-### 2. Add `events.floor_plan` JSONB column + `FloorPlan` type
+### 2. Add `events.floor_plan` JSONB column + `FloorPlan` type ✅
 
 Persistence infrastructure for the plan itself.
 
