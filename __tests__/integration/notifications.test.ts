@@ -13,6 +13,8 @@ import { conventionFollows } from "@/lib/db/schema/convention-follows";
 import { notificationPreferences } from "@/lib/db/schema/notifications";
 import {
   notifyEventPublished,
+  notifyThreadMessageFromArtist,
+  notifyThreadMessageFromOrganizer,
   notifyEventOpened,
   notifyResultsPublished,
   notifyApplicationRevoked,
@@ -200,6 +202,48 @@ describe("notification triggers", () => {
       expect(notifs).toHaveLength(1);
       expect(notifs[0].type).toBe("new_application");
       expect(notifs[0].message).toContain("Test Artist");
+    });
+  });
+
+  describe("notifyThreadMessageFromArtist", () => {
+    it("creates a notification for the organizer with a thread deep-link", async () => {
+      const { profile } = await createTestOrganizer();
+      const artist = await createTestArtist();
+
+      await notifyThreadMessageFromArtist(
+        profile.id,
+        artist.profile.id,
+        "Elena",
+        "ev-1",
+        "Kawaiicon 2026"
+      );
+
+      const notifs = await findNotificationsByProfileId(profile.id);
+      expect(notifs).toHaveLength(1);
+      expect(notifs[0].type).toBe("thread_message_from_artist");
+      expect(notifs[0].message).toContain("Elena");
+      expect(notifs[0].message).toContain("Kawaiicon 2026");
+      expect(notifs[0].link).toBe(
+        `/conventions/manage/events/ev-1#thread-${artist.profile.id}`
+      );
+    });
+  });
+
+  describe("notifyThreadMessageFromOrganizer", () => {
+    it("creates a notification for the artist with a thread deep-link", async () => {
+      const artist = await createTestArtist();
+
+      await notifyThreadMessageFromOrganizer(
+        artist.profile.id,
+        "ev-1",
+        "Kawaiicon 2026"
+      );
+
+      const notifs = await findNotificationsByProfileId(artist.profile.id);
+      expect(notifs).toHaveLength(1);
+      expect(notifs[0].type).toBe("thread_message_from_organizer");
+      expect(notifs[0].message).toContain("Kawaiicon 2026");
+      expect(notifs[0].link).toBe("/events/ev-1#thread");
     });
   });
 

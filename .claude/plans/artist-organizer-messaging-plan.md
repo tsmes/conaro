@@ -54,7 +54,7 @@ Add the two new enum values end-to-end so triggers can fire and preferences can 
 
 **Depends on:** none (parallelizable with task 1).
 
-### 3. Trigger helpers for thread notifications
+### 3. Trigger helpers for thread notifications ✅
 
 Thin wrappers around `createNotifications` so the two server-action files don't duplicate notification construction.
 

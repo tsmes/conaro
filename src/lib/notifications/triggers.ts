@@ -128,3 +128,35 @@ export async function notifyNewApplication(
     },
   ]);
 }
+
+export async function notifyThreadMessageFromArtist(
+  organizerProfileId: string,
+  artistProfileId: string,
+  artistDisplayName: string,
+  eventId: string,
+  eventName: string
+): Promise<void> {
+  await createNotifications([
+    {
+      recipientProfileId: organizerProfileId,
+      type: "thread_message_from_artist",
+      message: `${artistDisplayName} sent you a question about ${eventName}`,
+      link: `/conventions/manage/events/${eventId}#thread-${artistProfileId}`,
+    },
+  ]);
+}
+
+export async function notifyThreadMessageFromOrganizer(
+  artistProfileId: string,
+  eventId: string,
+  eventName: string
+): Promise<void> {
+  await createNotifications([
+    {
+      recipientProfileId: artistProfileId,
+      type: "thread_message_from_organizer",
+      message: `The organizer replied to your question about ${eventName}`,
+      link: `/events/${eventId}#thread`,
+    },
+  ]);
+}
