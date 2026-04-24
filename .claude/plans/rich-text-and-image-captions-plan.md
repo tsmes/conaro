@@ -90,7 +90,7 @@ Adds Tiptap and a single wrapper component that every form reuses.
 **Verification:** `npm test -- __tests__/components/rich-text-editor.test.tsx` passes. `npm run build` green.
 **Depends on:** 1 (renderer isn't imported by the editor, but we want a consistent commit order).
 
-### 4. Wire rich-text editor into ConventionProfileForm
+### 4. Wire rich-text editor into ConventionProfileForm ✅
 
 Swap four `<Textarea>`s for `<RichTextEditor>` in the convention-info form.
 

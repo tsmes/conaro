@@ -10,7 +10,7 @@ import { TemplateTokenReference } from "./template-token-reference";
 
 const LABEL_CLASS =
   "text-[11px] font-bold uppercase tracking-wider text-muted-foreground";
-import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 
 interface ConventionProfileFormProps {
   defaultValues: {
@@ -67,11 +67,10 @@ export function ConventionProfileForm({
 
       <div className="space-y-2">
         <Label htmlFor="description" className={LABEL_CLASS}>Description</Label>
-        <Textarea
+        <RichTextEditor
           id="description"
           name="description"
           defaultValue={defaultValues.description}
-          rows={4}
           aria-describedby={
             state.fieldErrors?.description ? "description-error" : undefined
           }
@@ -116,10 +115,9 @@ export function ConventionProfileForm({
         <Label htmlFor="guidelines" className={LABEL_CLASS}>
           Guidelines
         </Label>
-        <Textarea
+        <RichTextEditor
           id="guidelines"
           name="guidelines"
-          rows={8}
           defaultValue={defaultValues.guidelines}
           placeholder="Convention-wide guidelines artists must read and acknowledge before applying. Each event can override this text."
           aria-describedby={
@@ -145,10 +143,9 @@ export function ConventionProfileForm({
         <Label htmlFor="acceptanceMessage" className={LABEL_CLASS}>
           Default acceptance message
         </Label>
-        <Textarea
+        <RichTextEditor
           id="acceptanceMessage"
           name="acceptanceMessage"
-          rows={5}
           defaultValue={defaultValues.acceptanceMessage}
           placeholder="The default message each event sends to accepted artists when results are published. Events can override this."
         />
@@ -161,10 +158,9 @@ export function ConventionProfileForm({
         <Label htmlFor="rejectionMessage" className={LABEL_CLASS}>
           Default rejection message
         </Label>
-        <Textarea
+        <RichTextEditor
           id="rejectionMessage"
           name="rejectionMessage"
-          rows={5}
           defaultValue={defaultValues.rejectionMessage}
           placeholder="Default message sent to rejected artists. Events can override this."
         />
