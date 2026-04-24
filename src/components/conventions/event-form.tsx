@@ -378,23 +378,30 @@ export function EventForm({ action, defaultValues, submitLabel }: EventFormProps
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="setupTime" className={LABEL_CLASS}>Setup Time</Label>
+              <Label htmlFor="setupTime" className={LABEL_CLASS}>Setup</Label>
               <Input
                 id="setupTime"
                 name="setupTime"
-                placeholder="e.g., 8:00 AM - 10:00 AM"
+                placeholder="e.g., Fri 20. Jun 18:00 – 22:00"
                 defaultValue={dv.setupTime ?? ""}
               />
+              <p className="text-xs text-muted-foreground">
+                Include the date so artists know which day to arrive — not
+                every event opens on its start date.
+              </p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="teardownTime" className={LABEL_CLASS}>Teardown Time</Label>
+              <Label htmlFor="teardownTime" className={LABEL_CLASS}>Teardown</Label>
               <Input
                 id="teardownTime"
                 name="teardownTime"
-                placeholder="e.g., 6:00 PM - 8:00 PM"
+                placeholder="e.g., Sun 22. Jun 18:00 – 20:00"
                 defaultValue={dv.teardownTime ?? ""}
               />
+              <p className="text-xs text-muted-foreground">
+                Include the date so artists know which day to tear down.
+              </p>
             </div>
           </div>
 
