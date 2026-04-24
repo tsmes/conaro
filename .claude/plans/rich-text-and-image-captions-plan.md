@@ -169,7 +169,7 @@ Two fields: `accessibilityNeeds`, `notes`.
 **Verification:** Component test passes; `npm run build` green.
 **Depends on:** 3.
 
-### 9. Render Markdown on public convention surfaces
+### 9. Render Markdown on public convention surfaces ✅
 
 Make the public convention page + the convention list teaser show formatted output.
 

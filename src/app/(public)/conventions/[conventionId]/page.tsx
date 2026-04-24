@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Markdown } from "@/components/ui/markdown";
 import { ARTIST_STATUS_LABELS } from "@/lib/events/status-display";
 import { formatDateNo, formatDateRangeNo } from "@/lib/utils/format-date-no";
 
@@ -136,9 +137,10 @@ export default async function ConventionDetailPage({
 
       {convention.description && (
         <Card className="mt-8 p-6">
-          <p className="whitespace-pre-line leading-relaxed text-foreground">
-            {convention.description}
-          </p>
+          <Markdown
+            source={convention.description}
+            className="leading-relaxed text-foreground"
+          />
         </Card>
       )}
 

@@ -4,6 +4,7 @@ import { conventions } from "@/lib/db/schema/conventions";
 import { storage } from "@/lib/storage";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
+import { markdownToText } from "@/lib/utils/markdown-to-text";
 
 function conventionInitials(name: string): string {
   const parts = name.trim().split(/\s+/).slice(0, 2);
@@ -66,7 +67,7 @@ export default async function ConventionsDirectoryPage() {
                   </div>
                   {convention.description && (
                     <p className="mt-4 line-clamp-3 text-sm leading-relaxed text-muted-foreground">
-                      {convention.description}
+                      {markdownToText(convention.description)}
                     </p>
                   )}
                 </Card>
