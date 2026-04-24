@@ -42,6 +42,13 @@ interface RichTextEditorProps {
   "aria-describedby"?: string;
   "aria-invalid"?: boolean;
   disabled?: boolean;
+  /**
+   * Caps the editor content area at this CSS height; content scrolls
+   * within the box once it exceeds the cap. Defaults to `16rem` so a
+   * long body doesn't push the rest of the form off-screen. Pass
+   * `"none"` to opt out (rarely needed).
+   */
+  maxHeight?: string;
 }
 
 function buildExtensions(placeholder?: string): Extensions {
@@ -85,6 +92,7 @@ export function RichTextEditor({
   "aria-describedby": ariaDescribedBy,
   "aria-invalid": ariaInvalid,
   disabled,
+  maxHeight = "16rem",
 }: RichTextEditorProps) {
   const isControlled = value !== undefined;
   const initialContent = isControlled ? value : defaultValue ?? "";
@@ -137,7 +145,8 @@ export function RichTextEditor({
         id={id}
         aria-describedby={ariaDescribedBy}
         aria-invalid={ariaInvalid}
-        className="min-h-20 min-w-0 px-3 py-2 text-base md:text-sm [&_.ProseMirror]:min-h-16 [&_.ProseMirror]:min-w-0 [&_.ProseMirror]:break-words [&_.ProseMirror]:outline-none [&_.ProseMirror>*+*]:mt-2 [&_.ProseMirror_a]:break-all [&_.ProseMirror_a]:text-primary [&_.ProseMirror_a]:underline [&_.ProseMirror_a]:underline-offset-4 [&_.ProseMirror_h3]:font-heading [&_.ProseMirror_h3]:text-base [&_.ProseMirror_h3]:font-semibold [&_.ProseMirror_h3]:tracking-tight [&_.ProseMirror_ol]:ml-5 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0 [&_.ProseMirror_p.is-editor-empty:first-child::before]:max-w-full [&_.ProseMirror_p.is-editor-empty:first-child::before]:whitespace-pre-wrap [&_.ProseMirror_p.is-editor-empty:first-child::before]:break-words [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-muted-foreground [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.ProseMirror_ul]:ml-5 [&_.ProseMirror_ul]:list-disc"
+        style={maxHeight !== "none" ? { maxHeight } : undefined}
+        className="min-h-20 min-w-0 overflow-y-auto px-3 py-2 text-base md:text-sm [&_.ProseMirror]:min-h-16 [&_.ProseMirror]:min-w-0 [&_.ProseMirror]:break-words [&_.ProseMirror]:outline-none [&_.ProseMirror>*+*]:mt-2 [&_.ProseMirror_a]:break-all [&_.ProseMirror_a]:text-primary [&_.ProseMirror_a]:underline [&_.ProseMirror_a]:underline-offset-4 [&_.ProseMirror_h3]:font-heading [&_.ProseMirror_h3]:text-base [&_.ProseMirror_h3]:font-semibold [&_.ProseMirror_h3]:tracking-tight [&_.ProseMirror_ol]:ml-5 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0 [&_.ProseMirror_p.is-editor-empty:first-child::before]:max-w-full [&_.ProseMirror_p.is-editor-empty:first-child::before]:whitespace-pre-wrap [&_.ProseMirror_p.is-editor-empty:first-child::before]:break-words [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-muted-foreground [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.ProseMirror_ul]:ml-5 [&_.ProseMirror_ul]:list-disc"
       />
       <input
         ref={hiddenRef}

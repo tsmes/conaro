@@ -422,25 +422,6 @@ export default async function EventDetailPage({
             </SectionCard>
           )}
 
-        {showPublicFloorPlan && publicFloorPlan && hasAnyTables && (
-          <SectionCard label="Floor plan">
-            {ownApplicationStatus === "accepted" && ownApplicationId && (
-              <p className="mb-3 text-sm text-muted-foreground">
-                Your table is outlined in violet.
-              </p>
-            )}
-            <PublicFloorPlanView
-              plan={publicFloorPlan}
-              tableSizeOptions={event.tableSizeOptions ?? []}
-              highlightApplicationId={
-                ownApplicationStatus === "accepted" && ownApplicationId
-                  ? ownApplicationId
-                  : undefined
-              }
-            />
-          </SectionCard>
-        )}
-
         {event.description && (
           <SectionCard label="About this event">
             <Markdown
@@ -538,6 +519,25 @@ export default async function EventDetailPage({
             <Markdown
               source={event.conventionDescription}
               className="text-muted-foreground"
+            />
+          </SectionCard>
+        )}
+
+        {showPublicFloorPlan && publicFloorPlan && hasAnyTables && (
+          <SectionCard label="Floor plan">
+            {ownApplicationStatus === "accepted" && ownApplicationId && (
+              <p className="mb-3 text-sm text-muted-foreground">
+                Your table is outlined in violet.
+              </p>
+            )}
+            <PublicFloorPlanView
+              plan={publicFloorPlan}
+              tableSizeOptions={event.tableSizeOptions ?? []}
+              highlightApplicationId={
+                ownApplicationStatus === "accepted" && ownApplicationId
+                  ? ownApplicationId
+                  : undefined
+              }
             />
           </SectionCard>
         )}
