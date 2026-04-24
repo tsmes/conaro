@@ -53,10 +53,7 @@ export default async function FieldConfigPage({
           size="sm"
           nativeButton={false}
           render={
-            <Link
-              href={`/conventions/manage/events/${event.id}`}
-              className="inline-flex items-center gap-1"
-            >
+            <Link href={`/conventions/manage/events/${event.id}`}>
               <ArrowLeft className="size-4" />
               Back to event
             </Link>

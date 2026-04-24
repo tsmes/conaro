@@ -72,10 +72,7 @@ export default async function ConventionManagePage() {
             size="sm"
             nativeButton={false}
             render={
-              <Link
-                href="/conventions/manage/lists"
-                className="inline-flex items-center gap-1.5"
-              >
+              <Link href="/conventions/manage/lists">
                 <Users className="size-4" />
                 Manage lists
               </Link>
@@ -85,10 +82,7 @@ export default async function ConventionManagePage() {
             size="sm"
             nativeButton={false}
             render={
-              <Link
-                href="/conventions/manage/events/new"
-                className="inline-flex items-center gap-1.5"
-              >
+              <Link href="/conventions/manage/events/new">
                 <Plus className="size-4" />
                 Create event
               </Link>
@@ -115,10 +109,7 @@ export default async function ConventionManagePage() {
               <Button
                 nativeButton={false}
                 render={
-                  <Link
-                    href="/conventions/manage/events/new"
-                    className="inline-flex items-center gap-1.5"
-                  >
+                  <Link href="/conventions/manage/events/new">
                     <Plus className="size-4" />
                     Create event
                   </Link>

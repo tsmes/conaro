@@ -70,10 +70,7 @@ export default async function EventDetailPage({
           size="sm"
           nativeButton={false}
           render={
-            <Link
-              href="/conventions/manage"
-              className="inline-flex items-center gap-1"
-            >
+            <Link href="/conventions/manage">
               <ArrowLeft className="size-4" />
               Back to workspace
             </Link>
@@ -107,10 +104,7 @@ export default async function EventDetailPage({
             size="sm"
             nativeButton={false}
             render={
-              <Link
-                href={`/conventions/manage/events/${event.id}/fields`}
-                className="inline-flex items-center gap-1.5"
-              >
+              <Link href={`/conventions/manage/events/${event.id}/fields`}>
                 <Sliders className="size-4" />
                 Field configuration
               </Link>
@@ -122,10 +116,7 @@ export default async function EventDetailPage({
               size="sm"
               nativeButton={false}
               render={
-                <Link
-                  href={`/conventions/manage/events/${event.id}/applications`}
-                  className="inline-flex items-center gap-1.5"
-                >
+                <Link href={`/conventions/manage/events/${event.id}/applications`}>
                   <ListChecks className="size-4" />
                   Review applications ({applicationCount})
                 </Link>

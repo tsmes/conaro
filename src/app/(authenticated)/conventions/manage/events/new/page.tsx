@@ -27,10 +27,7 @@ export default async function NewEventPage() {
           size="sm"
           nativeButton={false}
           render={
-            <Link
-              href="/conventions/manage"
-              className="inline-flex items-center gap-1"
-            >
+            <Link href="/conventions/manage">
               <ArrowLeft className="size-4" />
               Back to workspace
             </Link>
