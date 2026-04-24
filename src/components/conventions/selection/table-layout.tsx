@@ -1,6 +1,6 @@
 "use client";
 
-import { Pin, PinOff, Undo2, Wallet } from "lucide-react";
+import { Pin, PinOff, Undo2, BadgeCheck } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -163,7 +163,7 @@ export function TableLayout({
                             : "text-muted-foreground hover:bg-muted"
                         )}
                       >
-                        <Wallet className="size-3.5" />
+                        <BadgeCheck className="size-3.5" />
                       </button>
                       <button
                         type="button"

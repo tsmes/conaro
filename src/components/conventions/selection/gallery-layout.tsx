@@ -1,6 +1,6 @@
 "use client";
 
-import { Pin, PinOff, Check, X, Undo2, Wallet } from "lucide-react";
+import { Pin, PinOff, Check, X, Undo2, BadgeCheck } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -190,7 +190,7 @@ export function GalleryLayout({
                         : "border-border text-muted-foreground hover:bg-muted hover:text-foreground"
                     )}
                   >
-                    <Wallet className="size-3" />
+                    <BadgeCheck className="size-3" />
                     {applicant.paymentConfirmed ? "Confirmed" : "Mark confirmed"}
                   </button>
                   <button

@@ -3,11 +3,11 @@
 import {
   ArrowLeft,
   ArrowRight,
+  BadgeCheck,
   Check,
   Pin,
   PinOff,
   X,
-  Wallet,
   Undo2,
 } from "lucide-react";
 
@@ -340,7 +340,7 @@ export function DeepReviewLayout({
                 size="sm"
                 onClick={() => onConfirmPayment(applicant.id)}
               >
-                <Wallet className="size-3.5" />
+                <BadgeCheck className="size-3.5" />
                 {applicant.paymentConfirmed
                   ? "Mark unconfirmed"
                   : "Mark confirmed"}
