@@ -21,10 +21,7 @@ import { EventStatusControls } from "@/components/conventions/event-status-contr
 import { AnnouncementsEditor } from "@/components/conventions/announcements-editor";
 import { getEventAnnouncements } from "@/app/(authenticated)/conventions/manage/events/[eventId]/announcements/actions";
 import { ThreadInbox } from "@/components/conventions/thread-inbox";
-import {
-  getThreadsForOrganizer,
-  getThreadByIdForOrganizer,
-} from "@/lib/threads/queries";
+import { getOrganizerInboxWithMessages } from "@/lib/threads/queries";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
@@ -66,28 +63,21 @@ export default async function EventDetailPage({
 
   const amenities = event.amenities as Amenities | null;
   const announcements = await getEventAnnouncements(event.id);
-  const threadRows = await getThreadsForOrganizer(event.id);
-  const inboxThreads = await Promise.all(
-    threadRows.map(async (row) => {
-      const full = await getThreadByIdForOrganizer(event.id, row.thread.id);
-      return {
-        threadId: row.thread.id,
-        artistProfileId: row.thread.artistProfileId,
-        artistDisplayName: row.artistDisplayName,
-        lastMessageAt: row.thread.lastMessageAt,
-        lastMessagePreview: row.lastMessagePreview,
-        unreadForOrganizer: row.unreadForOrganizer,
-        messages:
-          full?.messages.map((m) => ({
-            id: m.id,
-            body: m.body,
-            authorIsArtist:
-              m.authorProfileId === row.thread.artistProfileId,
-            createdAt: m.createdAt,
-          })) ?? [],
-      };
-    })
-  );
+  const inboxRows = await getOrganizerInboxWithMessages(event.id);
+  const inboxThreads = inboxRows.map((row) => ({
+    threadId: row.thread.id,
+    artistProfileId: row.thread.artistProfileId,
+    artistDisplayName: row.artistDisplayName,
+    lastMessageAt: row.thread.lastMessageAt,
+    lastMessagePreview: row.lastMessagePreview,
+    unreadForOrganizer: row.unreadForOrganizer,
+    messages: row.messages.map((m) => ({
+      id: m.id,
+      body: m.body,
+      authorIsArtist: m.authorProfileId === row.thread.artistProfileId,
+      createdAt: m.createdAt,
+    })),
+  }));
 
   return (
     <div className="mx-auto max-w-4xl space-y-10 px-6 py-10 md:px-8">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import {
   replyToThread,
   markThreadReadAsOrganizer,
@@ -16,6 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { formatRelativeTime } from "@/lib/utils/format-relative-time";
 
 export interface ThreadDialogMessage {
   id: string;
@@ -32,14 +33,6 @@ interface ThreadDialogContentsProps {
   onClose: () => void;
 }
 
-function formatTime(date: Date): string {
-  const iso = typeof date === "string" ? date : date.toISOString();
-  return new Date(iso).toLocaleString(undefined, {
-    dateStyle: "short",
-    timeStyle: "short",
-  });
-}
-
 export function ThreadDialogContents({
   eventId,
   threadId,
@@ -53,12 +46,14 @@ export function ThreadDialogContents({
   // Mark the thread read on mount so the inbox row's unread dot clears
   // on the next render. Fire-and-forget — if it fails, the indicator
   // just stays until the next successful read, which is harmless.
-  if (typeof window !== "undefined") {
+  useEffect(() => {
     const fd = new FormData();
     fd.set("threadId", threadId);
     fd.set("eventId", eventId);
-    markThreadReadAsOrganizer({}, fd).catch(() => {});
-  }
+    markThreadReadAsOrganizer({}, fd).catch((err) => {
+      console.error("Failed to mark thread as read:", err);
+    });
+  }, [threadId, eventId]);
 
   return (
     <>
@@ -88,7 +83,9 @@ export function ThreadDialogContents({
                 <span className="font-semibold">
                   {m.authorIsArtist ? artistDisplayName : "You"}
                 </span>
-                <span className="font-mono">{formatTime(m.createdAt)}</span>
+                <span className="font-mono">
+                  {formatRelativeTime(m.createdAt)}
+                </span>
               </div>
               <p className="whitespace-pre-line text-sm leading-relaxed text-foreground">
                 {m.body}

@@ -5,7 +5,6 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { events } from "@/lib/db/schema/events";
 import { applications } from "@/lib/db/schema/applications";
 import { eventAnnouncements } from "@/lib/db/schema/event-announcements";
 import { notifications } from "@/lib/db/schema/notifications";
@@ -185,13 +184,8 @@ export async function markThreadReadAsOrganizer(
 
   const { threadId, eventId } = parsed.data;
 
-  // Ownership check via the existing helper.
-  const owned = await db
-    .select({ id: events.id })
-    .from(events)
-    .where(eq(events.id, eventId));
-  if (!owned.length) return { error: "Event not found" };
-
+  // getOrganizerEvent is the real ownership check — it filters by the
+  // organizer's convention, so a foreign event id cannot slip through.
   const event = await getOrganizerEvent(organizerProfileId, eventId);
   if (!event) return { error: "Event not found" };
 

@@ -7,6 +7,7 @@ import {
 } from "@/app/(public)/events/[eventId]/thread-actions";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { formatRelativeTime } from "@/lib/utils/format-relative-time";
 
 export interface EventThreadMessageView {
   id: string;
@@ -20,14 +21,6 @@ interface EventThreadProps {
   threadId: string | null;
   messages: EventThreadMessageView[];
   hasUnreadFromOrganizer: boolean;
-}
-
-function formatTime(date: Date): string {
-  const iso = typeof date === "string" ? date : date.toISOString();
-  return new Date(iso).toLocaleString(undefined, {
-    dateStyle: "short",
-    timeStyle: "short",
-  });
 }
 
 export function EventThread({
@@ -85,7 +78,9 @@ export function EventThread({
                 <span className="font-semibold">
                   {m.authorIsArtist ? "You" : "Organizer"}
                 </span>
-                <span className="font-mono">{formatTime(m.createdAt)}</span>
+                <span className="font-mono">
+                  {formatRelativeTime(m.createdAt)}
+                </span>
               </div>
               <p className="whitespace-pre-line text-sm leading-relaxed text-foreground">
                 {m.body}

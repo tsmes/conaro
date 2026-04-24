@@ -83,29 +83,40 @@ export async function sendThreadMessage(
 
   const now = new Date();
 
-  // Upsert the thread row: ON CONFLICT keeps the existing id but bumps
-  // lastMessageAt + updatedAt. RETURNING id gives us either the freshly
-  // inserted or the pre-existing thread id in a single round trip.
-  const [thread] = await db
-    .insert(eventThreads)
-    .values({
-      eventId,
-      artistProfileId,
-      lastMessageAt: now,
-      // Artist is the author; they've implicitly "read" their own message.
-      artistLastReadAt: now,
-    })
-    .onConflictDoUpdate({
-      target: [eventThreads.eventId, eventThreads.artistProfileId],
-      set: { lastMessageAt: now, artistLastReadAt: now, updatedAt: now },
-    })
-    .returning({ id: eventThreads.id });
+  // Upsert the thread row and insert the message in a single transaction
+  // so a post-upsert failure can't leave a thread with a bumped
+  // lastMessageAt but no corresponding message.
+  let threadId: string;
+  try {
+    threadId = await db.transaction(async (tx) => {
+      const [thread] = await tx
+        .insert(eventThreads)
+        .values({
+          eventId,
+          artistProfileId,
+          lastMessageAt: now,
+          // Artist is the author; they've implicitly "read" their own message.
+          artistLastReadAt: now,
+        })
+        .onConflictDoUpdate({
+          target: [eventThreads.eventId, eventThreads.artistProfileId],
+          set: { lastMessageAt: now, artistLastReadAt: now, updatedAt: now },
+        })
+        .returning({ id: eventThreads.id });
 
-  await db.insert(eventThreadMessages).values({
-    threadId: thread.id,
-    authorProfileId: artistProfileId,
-    body,
-  });
+      await tx.insert(eventThreadMessages).values({
+        threadId: thread.id,
+        authorProfileId: artistProfileId,
+        body,
+      });
+
+      return thread.id;
+    });
+  } catch (error) {
+    console.error("Failed to send thread message:", error);
+    return { error: "Failed to send message. Please try again." };
+  }
+  void threadId;
 
   try {
     await notifyThreadMessageFromArtist(

@@ -1,4 +1,4 @@
-import { and, asc, desc, eq } from "drizzle-orm";
+import { and, asc, desc, eq, inArray } from "drizzle-orm";
 import { db } from "@/lib/db";
 import {
   eventThreads,
@@ -85,22 +85,31 @@ export async function getThreadsForOrganizer(
 
   if (rows.length === 0) return [];
 
-  // Fetch the latest message per thread so the inbox row can show a
-  // preview without a second round-trip per row.
+  // Batch-fetch the latest message per thread so the inbox is 2 queries
+  // total regardless of the number of threads.
+  const threadIds = rows.map((r) => r.thread.id);
+  const latestMessages = await db
+    .select({
+      id: eventThreadMessages.id,
+      threadId: eventThreadMessages.threadId,
+      body: eventThreadMessages.body,
+      authorProfileId: eventThreadMessages.authorProfileId,
+      createdAt: eventThreadMessages.createdAt,
+    })
+    .from(eventThreadMessages)
+    .where(inArray(eventThreadMessages.threadId, threadIds))
+    .orderBy(desc(eventThreadMessages.createdAt));
+
   const latestByThread = new Map<string, ThreadMessage>();
-  for (const row of rows) {
-    const [latest] = await db
-      .select({
-        id: eventThreadMessages.id,
-        body: eventThreadMessages.body,
-        authorProfileId: eventThreadMessages.authorProfileId,
-        createdAt: eventThreadMessages.createdAt,
-      })
-      .from(eventThreadMessages)
-      .where(eq(eventThreadMessages.threadId, row.thread.id))
-      .orderBy(desc(eventThreadMessages.createdAt))
-      .limit(1);
-    if (latest) latestByThread.set(row.thread.id, latest);
+  for (const m of latestMessages) {
+    if (!latestByThread.has(m.threadId)) {
+      latestByThread.set(m.threadId, {
+        id: m.id,
+        body: m.body,
+        authorProfileId: m.authorProfileId,
+        createdAt: m.createdAt,
+      });
+    }
   }
 
   return rows.map((row) => {
@@ -119,6 +128,53 @@ export async function getThreadsForOrganizer(
       unreadForOrganizer,
     };
   });
+}
+
+// Full organizer inbox — threads + all messages per thread — fetched in
+// exactly two queries regardless of N. Used by the organizer event page
+// to prepopulate every thread dialog up front, avoiding the per-row
+// `getThreadByIdForOrganizer` fan-out that previously created an
+// O(N) query storm on page load.
+export interface OrganizerInboxThread extends OrganizerInboxRow {
+  messages: ThreadMessage[];
+}
+
+export async function getOrganizerInboxWithMessages(
+  eventId: string
+): Promise<OrganizerInboxThread[]> {
+  const inbox = await getThreadsForOrganizer(eventId);
+  if (inbox.length === 0) return [];
+
+  const threadIds = inbox.map((r) => r.thread.id);
+  const allMessages = await db
+    .select({
+      id: eventThreadMessages.id,
+      threadId: eventThreadMessages.threadId,
+      body: eventThreadMessages.body,
+      authorProfileId: eventThreadMessages.authorProfileId,
+      createdAt: eventThreadMessages.createdAt,
+    })
+    .from(eventThreadMessages)
+    .where(inArray(eventThreadMessages.threadId, threadIds))
+    .orderBy(asc(eventThreadMessages.createdAt));
+
+  const messagesByThread = new Map<string, ThreadMessage[]>();
+  for (const m of allMessages) {
+    const bucket = messagesByThread.get(m.threadId);
+    const entry = {
+      id: m.id,
+      body: m.body,
+      authorProfileId: m.authorProfileId,
+      createdAt: m.createdAt,
+    };
+    if (bucket) bucket.push(entry);
+    else messagesByThread.set(m.threadId, [entry]);
+  }
+
+  return inbox.map((row) => ({
+    ...row,
+    messages: messagesByThread.get(row.thread.id) ?? [],
+  }));
 }
 
 // Full thread + messages + artist identity for the dialog contents.
