@@ -7,6 +7,10 @@ import {
   promoteFromWaitlist,
   removeFromWaitlist,
 } from "@/app/(authenticated)/conventions/manage/events/[eventId]/applications/waitlist-actions";
+// Note: the organizer has no UI path to demote an already-accepted
+// artist back to the waitlist — that's what the "Revoke acceptance"
+// action is for. demoteToWaitlist is still used by the
+// "Offer waitlist" flow (rejected → waitlisted).
 import type { ApplicationStatus } from "./types";
 
 // Post-publish waitlist controls. Only rendered when the convention has
@@ -46,13 +50,11 @@ export function WaitlistControls({
   }
 
   const canPromoteFromWaitlist = status === "waitlisted";
-  const canDemoteFromAccepted = status === "accepted";
   const canRemoveFromWaitlist = status === "waitlisted";
   const canMoveRejectedToWaitlist = status === "rejected";
 
   if (
     !canPromoteFromWaitlist &&
-    !canDemoteFromAccepted &&
     !canRemoveFromWaitlist &&
     !canMoveRejectedToWaitlist
   ) {
@@ -72,17 +74,6 @@ export function WaitlistControls({
           disabled={pending}
         >
           Promote to accepted
-        </Button>
-      )}
-      {canDemoteFromAccepted && (
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={() => submit(demoteAction)}
-          disabled={pending}
-        >
-          Move to waitlist
         </Button>
       )}
       {canMoveRejectedToWaitlist && (

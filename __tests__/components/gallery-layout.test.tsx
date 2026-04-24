@@ -154,21 +154,31 @@ describe("GalleryLayout", () => {
     expect(onRevoke).toHaveBeenCalledWith("a2");
   });
 
-  it("post-publish + waitlistEnabled: renders waitlist controls on accepted cards", () => {
+  it("post-publish + waitlistEnabled: renders waitlist controls for rejected and waitlisted cards, but not for accepted", () => {
     render(
       <GalleryLayout
         {...defaultProps({
+          applicants: [
+            makeApplicant({ id: "a1", status: "rejected", displayName: "A1" }),
+            makeApplicant({ id: "a2", status: "waitlisted", displayName: "A2" }),
+            makeApplicant({ id: "a3", status: "accepted", displayName: "A3" }),
+          ],
           readOnly: true,
           eventStatus: "results_published",
           waitlistEnabled: true,
         })}
       />
     );
-    // WaitlistControls renders a "Waitlist" label + a "Move to waitlist"
-    // button for accepted applicants.
-    expect(screen.getAllByText("Waitlist").length).toBeGreaterThan(0);
+    // Rejected → "Offer waitlist"; waitlisted → "Promote to accepted".
     expect(
-      screen.getByRole("button", { name: /Move to waitlist/i })
+      screen.getByRole("button", { name: /Offer waitlist/i })
     ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /Promote to accepted/i })
+    ).toBeInTheDocument();
+    // Accepted artists no longer have a waitlist-demote path.
+    expect(
+      screen.queryByRole("button", { name: /Move to waitlist/i })
+    ).not.toBeInTheDocument();
   });
 });

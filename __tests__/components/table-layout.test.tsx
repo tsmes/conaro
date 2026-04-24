@@ -132,12 +132,13 @@ describe("TableLayout", () => {
     expect(onRevoke).toHaveBeenCalledWith("a1");
   });
 
-  it("post-publish + waitlistEnabled: renders waitlist controls on accepted rows", () => {
+  it("post-publish + waitlistEnabled: renders waitlist controls on waitlisted/rejected rows, not accepted", () => {
     render(
       <TableLayout
         {...defaultProps({
           applicants: [
             makeApplicant({ id: "a1", status: "accepted", displayName: "A1" }),
+            makeApplicant({ id: "a2", status: "waitlisted", displayName: "A2" }),
           ],
           eventStatus: "results_published",
           readOnly: true,
@@ -145,8 +146,13 @@ describe("TableLayout", () => {
         })}
       />
     );
+    // Waitlisted → "Promote to accepted".
     expect(
-      screen.getByRole("button", { name: /Move to waitlist/i })
+      screen.getByRole("button", { name: /Promote to accepted/i })
     ).toBeInTheDocument();
+    // Accepted artists no longer have a waitlist-demote path.
+    expect(
+      screen.queryByRole("button", { name: /Move to waitlist/i })
+    ).not.toBeInTheDocument();
   });
 });
