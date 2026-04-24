@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { Markdown } from "@/components/ui/markdown";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { formatDateNo } from "@/lib/utils/format-date-no";
 import {
   createEventAnnouncement,
@@ -82,11 +83,10 @@ function CreateForm({ eventId }: { eventId: string }) {
         <Label htmlFor="new-body" className={LABEL_CLASS}>
           Message
         </Label>
-        <Textarea
+        <RichTextEditor
           id="new-body"
           name="body"
-          rows={6}
-          placeholder="Plain text. Includes contact info, logistics, schedule changes, etc."
+          placeholder="Contact info, logistics, schedule changes, etc."
         />
         {state.fieldErrors?.body && (
           <p role="alert" className="text-sm text-destructive">
@@ -127,12 +127,7 @@ function EditRow({
         defaultValue={announcement.subject}
         aria-label="Subject"
       />
-      <Textarea
-        name="body"
-        defaultValue={announcement.body}
-        rows={6}
-        aria-label="Message"
-      />
+      <RichTextEditor name="body" defaultValue={announcement.body} />
       {!pending && state.error && (
         <p role="alert" className="text-sm text-destructive">
           {state.error}
@@ -221,9 +216,10 @@ function AnnouncementRow({
                 {isoDate(announcement.createdAt)}
                 {edited && " \u00b7 edited"}
               </p>
-              <p className="mt-3 whitespace-pre-line text-sm text-foreground">
-                {announcement.body}
-              </p>
+              <Markdown
+                source={announcement.body}
+                className="mt-3 text-sm text-foreground"
+              />
             </>
           )}
         </div>

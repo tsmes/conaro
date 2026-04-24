@@ -315,9 +315,10 @@ export default async function EventDetailPage({
                     {formatDateNo(a.createdAt.toISOString().slice(0, 10))}
                     {edited && " \u00b7 edited"}
                   </p>
-                  <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-foreground">
-                    {a.body}
-                  </p>
+                  <Markdown
+                    source={a.body}
+                    className="mt-3 text-foreground"
+                  />
                 </Card>
               );
             })}
