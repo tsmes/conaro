@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -202,11 +203,12 @@ function TableSizeOptionsEditor({
                     <Button
                       type="button"
                       variant="ghost"
-                      size="sm"
+                      size="icon-sm"
                       aria-label={`Remove ${opt.label || "table size"}`}
                       onClick={() => remove(opt.id)}
+                      className="text-destructive hover:bg-destructive/10 hover:text-destructive"
                     >
-                      Remove
+                      <Trash2 className="size-4" />
                     </Button>
                   </td>
                 </tr>
