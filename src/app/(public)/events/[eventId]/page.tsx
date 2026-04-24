@@ -28,6 +28,8 @@ import { Markdown } from "@/components/ui/markdown";
 import { formatDateNo, formatDateRangeNo } from "@/lib/utils/format-date-no";
 import { cn } from "@/lib/utils";
 import { getEventAnnouncements } from "@/app/(authenticated)/conventions/manage/events/[eventId]/announcements/actions";
+import { getThreadForArtist } from "@/lib/threads/queries";
+import { EventThread } from "@/components/events/event-thread";
 
 interface EventDetailPageProps {
   params: Promise<{ eventId: string }>;
@@ -207,6 +209,25 @@ export default async function EventDetailPage({
     ? await getEventAnnouncements(event.id)
     : [];
 
+  // Accepted artists can start a Q&A thread with the organizer. Fetch it
+  // server-side so the initial render ships the full timeline with the
+  // page, matching how announcements load.
+  const artistProfileId = session?.user?.profileId ?? null;
+  const artistThread =
+    isAcceptedToEvent && artistProfileId
+      ? await getThreadForArtist(event.id, artistProfileId)
+      : null;
+  const artistHasUnread = Boolean(
+    artistThread &&
+      artistProfileId &&
+      artistThread.messages.length > 0 &&
+      artistThread.messages[artistThread.messages.length - 1]
+        .authorProfileId !== artistProfileId &&
+      (artistThread.thread.artistLastReadAt === null ||
+        artistThread.messages[artistThread.messages.length - 1].createdAt >
+          artistThread.thread.artistLastReadAt)
+  );
+
   return (
     <div className="mx-auto max-w-4xl px-6 py-12 md:px-8">
       <div className="mb-8">
@@ -363,6 +384,21 @@ export default async function EventDetailPage({
                     <JoinWaitlistButton eventId={event.id} />
                   </div>
                 )}
+              {ownApplicationStatus === "accepted" && artistProfileId && (
+                <EventThread
+                  eventId={event.id}
+                  threadId={artistThread?.thread.id ?? null}
+                  messages={
+                    artistThread?.messages.map((m) => ({
+                      id: m.id,
+                      body: m.body,
+                      authorIsArtist: m.authorProfileId === artistProfileId,
+                      createdAt: m.createdAt,
+                    })) ?? []
+                  }
+                  hasUnreadFromOrganizer={artistHasUnread}
+                />
+              )}
             </SectionCard>
           )}
 

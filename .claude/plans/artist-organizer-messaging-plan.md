@@ -128,7 +128,7 @@ Reply to a thread, optionally also post as announcement, mark the thread read.
 
 **Depends on:** 1, 3, 4.
 
-### 7. Artist-side thread UI + public event page wiring
+### 7. Artist-side thread UI + public event page wiring ✅
 
 Renders the chat feed + composer inside the existing Results `SectionCard`.
 
