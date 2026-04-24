@@ -86,6 +86,7 @@ export function FloorPlanEditor({
   });
   const [assignTableId, setAssignTableId] = useState<string | null>(null);
   const [editTableId, setEditTableId] = useState<string | null>(null);
+  const [selectedTableId, setSelectedTableId] = useState<string | null>(null);
   const [editingLabelId, setEditingLabelId] = useState<string | null>(null);
   const [addLabelOpen, setAddLabelOpen] = useState(false);
   const [status, setStatus] = useState<SaveStatus>("idle");
@@ -98,6 +99,10 @@ export function FloorPlanEditor({
   const pendingRef = useRef(false);
   const latestPlan = useRef<FloorPlan>(plan);
   latestPlan.current = plan;
+  // Undo stack — most-recent-first. Bounded so we don't grow without
+  // limit on heavy editing sessions.
+  const historyRef = useRef<FloorPlan[]>([]);
+  const UNDO_LIMIT = 50;
 
   const runSave = useCallback(
     async (snapshot: FloorPlan) => {
@@ -159,9 +164,14 @@ export function FloorPlanEditor({
 
   const handlePlanChange = useCallback(
     (next: FloorPlan) => {
+      // Push the state we're leaving onto the undo stack BEFORE
+      // applying the new one, so Ctrl+Z always returns to the last
+      // user-visible state.
+      historyRef.current.unshift(latestPlan.current);
+      if (historyRef.current.length > UNDO_LIMIT) {
+        historyRef.current.length = UNDO_LIMIT;
+      }
       setPlan(next);
-      // Keep activeRoomId pointing at a valid room if the user just
-      // deleted the active one.
       setActiveRoomId((prev) => {
         if (!prev) return next.rooms[0]?.id ?? null;
         return next.rooms.some((r) => r.id === prev)
@@ -172,6 +182,104 @@ export function FloorPlanEditor({
     },
     [scheduleSave]
   );
+
+  const undo = useCallback(() => {
+    const previous = historyRef.current.shift();
+    if (!previous) return;
+    setPlan(previous);
+    setActiveRoomId((prev) => {
+      if (prev && previous.rooms.some((r) => r.id === prev)) return prev;
+      return previous.rooms[0]?.id ?? null;
+    });
+    scheduleSave();
+  }, [scheduleSave]);
+
+  const nudgeSelected = useCallback(
+    (dx: number, dy: number) => {
+      if (!selectedTableId) return;
+      const table = latestPlan.current.tables.find(
+        (t) => t.id === selectedTableId
+      );
+      if (!table) return;
+      const room = latestPlan.current.rooms.find(
+        (r) => r.id === table.roomId
+      );
+      const size = tableSizeOptions.find(
+        (s) => s.id === table.tableSizeOptionId
+      );
+      if (!room || !size?.widthCm || !size?.depthCm) return;
+      const rotated = table.rotationDeg === 90 || table.rotationDeg === 270;
+      const effWidthCm = rotated ? size.depthCm : size.widthCm;
+      const effDepthCm = rotated ? size.widthCm : size.depthCm;
+      const centreX = table.x + size.widthCm / 2 + dx;
+      const centreY = table.y + size.depthCm / 2 + dy;
+      const clampedCx = Math.max(
+        effWidthCm / 2,
+        Math.min(room.widthCm - effWidthCm / 2, centreX)
+      );
+      const clampedCy = Math.max(
+        effDepthCm / 2,
+        Math.min(room.heightCm - effDepthCm / 2, centreY)
+      );
+      const newX = Math.round(clampedCx - size.widthCm / 2);
+      const newY = Math.round(clampedCy - size.depthCm / 2);
+      if (newX === table.x && newY === table.y) return;
+      handlePlanChange({
+        ...latestPlan.current,
+        tables: latestPlan.current.tables.map((t) =>
+          t.id === selectedTableId ? { ...t, x: newX, y: newY } : t
+        ),
+      });
+    },
+    [selectedTableId, tableSizeOptions, handlePlanChange]
+  );
+
+  // Keyboard shortcuts:
+  //   Ctrl/Cmd+Z   → undo
+  //   Arrow keys   → nudge the selected table by 1 cm
+  //   Shift+Arrow  → nudge by 10 cm
+  //   Esc          → deselect
+  // Disabled while typing in a form field so dialog inputs still get
+  // their native behaviour.
+  useEffect(() => {
+    function isTypingTarget(el: EventTarget | null): boolean {
+      if (!(el instanceof HTMLElement)) return false;
+      if (el.isContentEditable) return true;
+      const tag = el.tagName;
+      return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
+    }
+    function handleKey(e: KeyboardEvent) {
+      if (isTypingTarget(e.target)) return;
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey) {
+        if (e.key === "z" || e.key === "Z") {
+          e.preventDefault();
+          undo();
+          return;
+        }
+      }
+      if (e.key === "Escape") {
+        setSelectedTableId(null);
+        return;
+      }
+      if (!selectedTableId) return;
+      const step = e.shiftKey ? 10 : 1;
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        nudgeSelected(-step, 0);
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        nudgeSelected(step, 0);
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        nudgeSelected(0, -step);
+      } else if (e.key === "ArrowDown") {
+        e.preventDefault();
+        nudgeSelected(0, step);
+      }
+    }
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [undo, selectedTableId, nudgeSelected]);
 
   function handleAssign(applicationId: string | null) {
     if (!assignTableId) return;
@@ -259,10 +367,14 @@ export function FloorPlanEditor({
             tableSizeOptions={tableSizeOptions}
             editable
             onChange={handlePlanChange}
+            selectedTableId={selectedTableId}
+            onSelectTable={setSelectedTableId}
           />
           <p className="mt-2 text-xs text-muted-foreground">
-            Drag tables to place them. Click a table row in the sidebar to
-            assign an accepted artist. Changes save automatically.
+            Drag tables to place them, or click a table and use the
+            arrow keys to nudge (hold Shift for 10&nbsp;cm steps).
+            <kbd className="mx-1 rounded border bg-muted px-1 py-0.5 font-mono text-[10px]">⌘Z</kbd>
+            undoes. Changes save automatically.
           </p>
         </div>
         <div className="lg:sticky lg:top-4 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto lg:pr-1">

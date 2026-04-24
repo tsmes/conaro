@@ -36,6 +36,10 @@ interface FloorPlanCanvasProps {
   editable: boolean;
   onChange?: (next: FloorPlan) => void;
   highlightApplicationId?: string;
+  /** Outlines the selected table; arrow-key nudging in the parent
+   *  moves it. */
+  selectedTableId?: string | null;
+  onSelectTable?: (id: string | null) => void;
 }
 
 export function FloorPlanCanvas({
@@ -45,6 +49,8 @@ export function FloorPlanCanvas({
   editable,
   onChange,
   highlightApplicationId,
+  selectedTableId,
+  onSelectTable,
 }: FloorPlanCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(800);
@@ -183,7 +189,16 @@ export function FloorPlanCanvas({
             : "Select a room to view its layout."}
         </div>
       ) : (
-        <Stage width={stageWidth} height={stageHeight}>
+        <Stage
+          width={stageWidth}
+          height={stageHeight}
+          onMouseDown={(e) => {
+            // Click on the stage background → clear selection.
+            if (e.target === e.target.getStage() && onSelectTable) {
+              onSelectTable(null);
+            }
+          }}
+        >
           {/* Layer 1: room frame (shadow + fill + grid) */}
           <Layer listening={false}>
             {/* Drop shadow sits slightly below and to the right */}
@@ -265,6 +280,7 @@ export function FloorPlanCanvas({
               const highlight =
                 highlightApplicationId &&
                 table.assignment?.applicationId === highlightApplicationId;
+              const selected = table.id === selectedTableId;
               const assigned = table.assignment !== null;
               const wPx = size.widthCm * scale;
               const hPx = size.depthCm * scale;
@@ -285,6 +301,13 @@ export function FloorPlanCanvas({
                   y={centerY}
                   rotation={table.rotationDeg}
                   draggable={editable}
+                  onMouseDown={(e) => {
+                    if (onSelectTable) {
+                      e.cancelBubble = true;
+                      onSelectTable(table.id);
+                    }
+                  }}
+                  onTap={() => onSelectTable?.(table.id)}
                   onDragEnd={(e) =>
                     handleTableDragEnd(
                       table.id,
@@ -306,6 +329,21 @@ export function FloorPlanCanvas({
                       height={hPx + 12}
                       fill="rgba(139, 92, 246, 0.15)"
                       cornerRadius={8}
+                    />
+                  )}
+                  {/* Selection ring (editor only) — dashed outline that
+                      tells the user which table the arrow keys move */}
+                  {selected && !highlight && (
+                    <Rect
+                      x={-wPx / 2 - 4}
+                      y={-hPx / 2 - 4}
+                      width={wPx + 8}
+                      height={hPx + 8}
+                      stroke="#1d4ed8"
+                      strokeWidth={1.5}
+                      dash={[6, 4]}
+                      cornerRadius={8}
+                      listening={false}
                     />
                   )}
                   {/* Shadow */}
