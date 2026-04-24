@@ -1,4 +1,4 @@
-import { and, asc, count, eq } from "drizzle-orm";
+import { and, asc, count, eq, gte, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { conventions } from "@/lib/db/schema/conventions";
 import { events } from "@/lib/db/schema/events";
@@ -99,6 +99,25 @@ function normalizeSnapshot(snapshot: ProfileSnapshot): ProfileSnapshot {
       caption: image.caption ?? null,
     })),
   };
+}
+
+// Returns the event with the nearest upcoming or ongoing
+// `eventStartDate` for a convention, or null when there is none.
+// "Ongoing or upcoming" = start date is today or in the future — past
+// events are never featured on the organizer dashboard.
+export async function getCurrentEventForConvention(conventionId: string) {
+  const [event] = await db
+    .select()
+    .from(events)
+    .where(
+      and(
+        eq(events.conventionId, conventionId),
+        gte(events.eventStartDate, sql`current_date`)
+      )
+    )
+    .orderBy(asc(events.eventStartDate))
+    .limit(1);
+  return event ?? null;
 }
 
 // Counts applications for an event grouped by status, returning the

@@ -99,7 +99,7 @@ New single-query helper the dashboard calls once per current-event render.
 **Verification:** Integration test green; build green.
 **Depends on:** none.
 
-### 5. Add `getCurrentEventForConvention(conventionId)` helper
+### 5. Add `getCurrentEventForConvention(conventionId)` helper ✅
 
 The "nearest upcoming / ongoing" selection rule, isolated in one helper.
 
