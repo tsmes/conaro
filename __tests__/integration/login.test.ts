@@ -131,7 +131,7 @@ describe("login", () => {
     expect(mockSignIn).toHaveBeenCalledWith("credentials", {
       email: "organizer@test.com",
       password: "password123",
-      redirectTo: "/conventions",
+      redirectTo: "/conventions/manage",
     });
   });
 

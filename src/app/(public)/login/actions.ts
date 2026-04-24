@@ -39,7 +39,7 @@ export async function login(
   });
 
   const redirectTo =
-    profile?.role === "organizer" ? "/conventions" : "/dashboard";
+    profile?.role === "organizer" ? "/conventions/manage" : "/dashboard";
 
   try {
     await signIn("credentials", {
