@@ -22,6 +22,9 @@ interface RoomSwitcherProps {
   activeRoomId: string | null;
   onActiveRoomChange: (roomId: string) => void;
   onChange: (next: FloorPlan) => void;
+  /** Slotted on the far right of the toolbar alongside Edit/Delete —
+   *  used by the editor to drop the save indicator inline. */
+  rightSlot?: React.ReactNode;
 }
 
 type RoomDialogMode =
@@ -34,6 +37,7 @@ export function RoomSwitcher({
   activeRoomId,
   onActiveRoomChange,
   onChange,
+  rightSlot,
 }: RoomSwitcherProps) {
   const [dialog, setDialog] = useState<RoomDialogMode>({ kind: "closed" });
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
@@ -141,9 +145,9 @@ export function RoomSwitcher({
         <Plus className="size-4" />
         New room
       </Button>
-      {activeRoomId && activeRoom && (
-        <>
-          <div className="ml-auto flex items-center gap-1">
+      <div className="ml-auto flex items-center gap-2">
+        {activeRoomId && activeRoom && (
+          <>
             <Button
               type="button"
               variant="ghost"
@@ -162,9 +166,10 @@ export function RoomSwitcher({
               <Trash2 className="size-4" />
               Delete room
             </Button>
-          </div>
-        </>
-      )}
+          </>
+        )}
+        {rightSlot}
+      </div>
 
       <ConfirmDialog
         open={confirmDeleteOpen}

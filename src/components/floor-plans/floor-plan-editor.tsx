@@ -350,15 +350,19 @@ export function FloorPlanEditor({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <RoomSwitcher
-          plan={plan}
-          activeRoomId={activeRoomId}
-          onActiveRoomChange={setActiveRoomId}
-          onChange={handlePlanChange}
-        />
-        <SaveIndicator status={status} isPending={isPending} error={errorMsg} />
-      </div>
+      <RoomSwitcher
+        plan={plan}
+        activeRoomId={activeRoomId}
+        onActiveRoomChange={setActiveRoomId}
+        onChange={handlePlanChange}
+        rightSlot={
+          <SaveIndicator
+            status={status}
+            isPending={isPending}
+            error={errorMsg}
+          />
+        }
+      />
       <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div>
           <FloorPlanCanvasDynamic
