@@ -1,4 +1,4 @@
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, count, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { conventions } from "@/lib/db/schema/conventions";
 import { events } from "@/lib/db/schema/events";
@@ -99,6 +99,30 @@ function normalizeSnapshot(snapshot: ProfileSnapshot): ProfileSnapshot {
       caption: image.caption ?? null,
     })),
   };
+}
+
+// Counts applications for an event grouped by status, returning the
+// specific buckets the organizer dashboard needs. One DB round-trip.
+export interface ApplicationCounts {
+  total: number;
+  accepted: number;
+}
+
+export async function getApplicationCounts(
+  eventId: string
+): Promise<ApplicationCounts> {
+  const rows = await db
+    .select({ status: applications.status, value: count() })
+    .from(applications)
+    .where(eq(applications.eventId, eventId))
+    .groupBy(applications.status);
+  let total = 0;
+  let accepted = 0;
+  for (const row of rows) {
+    total += row.value;
+    if (row.status === "accepted") accepted = row.value;
+  }
+  return { total, accepted };
 }
 
 export function buildDefaultFieldRequirements(): FieldRequirements {

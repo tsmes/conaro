@@ -31,7 +31,7 @@ One-line change + test update. Independent of everything else; ship first.
 **Verification:** `npm test -- __tests__/integration/login.test.ts` green; `npm run build` green.
 **Depends on:** none.
 
-### 2. Extract `getApplicationCounts(eventId)` helper
+### 2. Extract `getApplicationCounts(eventId)` helper ✅
 
 Replace two copy-pasted inline `count()` queries with one shared helper, used by the new dashboard and by the two existing call sites.
 

@@ -1,12 +1,10 @@
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, ListChecks, Sliders } from "lucide-react";
-import { eq, count } from "drizzle-orm";
 import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
-import { applications } from "@/lib/db/schema/applications";
 import type { Amenities } from "@/lib/db/schema/events";
 import {
+  getApplicationCounts,
   getOrganizerConvention,
   getOrganizerEvent,
 } from "@/lib/conventions/queries";
@@ -54,11 +52,8 @@ export default async function EventDetailPage({
     event.status === "results_published";
   let applicationCount = 0;
   if (showReviewLink) {
-    const [{ value }] = await db
-      .select({ value: count() })
-      .from(applications)
-      .where(eq(applications.eventId, event.id));
-    applicationCount = value;
+    const counts = await getApplicationCounts(event.id);
+    applicationCount = counts.total;
   }
 
   const amenities = event.amenities as Amenities | null;
