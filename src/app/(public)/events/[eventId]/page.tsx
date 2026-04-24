@@ -30,6 +30,8 @@ import { cn } from "@/lib/utils";
 import { getEventAnnouncements } from "@/app/(authenticated)/conventions/manage/events/[eventId]/announcements/actions";
 import { getThreadForArtist } from "@/lib/threads/queries";
 import { EventThread } from "@/components/events/event-thread";
+import { getFloorPlanForEvent } from "@/lib/floor-plans/queries";
+import { FloorPlanCanvasDynamic } from "@/components/floor-plans/floor-plan-canvas-dynamic";
 
 interface EventDetailPageProps {
   params: Promise<{ eventId: string }>;
@@ -147,6 +149,7 @@ export default async function EventDetailPage({
     | "waitlisted"
     | null = null;
   let ownResponseMessage: string | null = null;
+  let ownApplicationId: string | null = null;
 
   if (isArtist) {
     const profileId = session.user.profileId!;
@@ -189,6 +192,7 @@ export default async function EventDetailPage({
     hasExistingApplication = !!existingApp;
     isAcceptedToEvent = existingApp?.status === "accepted";
     ownApplicationStatus = existingApp?.status ?? null;
+    ownApplicationId = existingApp?.id ?? null;
     ownResponseMessage = existingApp?.responseMessage ?? null;
     isFollowingConvention = !!follow;
 
@@ -208,6 +212,12 @@ export default async function EventDetailPage({
   const announcements = isAcceptedToEvent
     ? await getEventAnnouncements(event.id)
     : [];
+
+  const showPublicFloorPlan = event.status === "results_published";
+  const publicFloorPlan = showPublicFloorPlan
+    ? await getFloorPlanForEvent(event.id)
+    : null;
+  const hasAnyTables = (publicFloorPlan?.tables.length ?? 0) > 0;
 
   // Accepted artists can start a Q&A thread with the organizer. Fetch it
   // server-side so the initial render ships the full timeline with the
@@ -411,6 +421,26 @@ export default async function EventDetailPage({
               )}
             </SectionCard>
           )}
+
+        {showPublicFloorPlan && publicFloorPlan && hasAnyTables && (
+          <SectionCard label="Floor plan">
+            {ownApplicationStatus === "accepted" && ownApplicationId && (
+              <p className="mb-3 text-sm text-muted-foreground">
+                Your table is outlined in violet.
+              </p>
+            )}
+            <FloorPlanCanvasDynamic
+              plan={publicFloorPlan}
+              tableSizeOptions={event.tableSizeOptions ?? []}
+              editable={false}
+              highlightApplicationId={
+                ownApplicationStatus === "accepted" && ownApplicationId
+                  ? ownApplicationId
+                  : undefined
+              }
+            />
+          </SectionCard>
+        )}
 
         {event.description && (
           <SectionCard label="About this event">

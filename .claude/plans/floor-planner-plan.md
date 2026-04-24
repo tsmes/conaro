@@ -188,7 +188,7 @@ The top-level client component that hosts canvas + sidebar + dialog, threads sta
 **Verification:** Manual: create rooms, place tables, drag them, assign artists, reload the page, verify the plan persists.
 **Depends on:** 3, 4, 7, 8, 9.
 
-### 11. Public read-only render + "you are here"
+### 11. Public read-only render + "you are here" ✅
 
 Mount a read-only `<FloorPlanCanvas>` on the public event page after results publish; highlight the viewing artist's own table.
 
