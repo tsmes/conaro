@@ -5,45 +5,29 @@ import { Stage, Layer, Rect, Line, Text, Group } from "react-konva";
 import type { FloorPlan, TableSizeOption } from "@/lib/db/schema/events";
 import type { ResolvedFloorPlan } from "@/lib/floor-plans/queries";
 
-const GRID_MINOR_CM = 10;
-const GRID_MAJOR_CM = 100;
-const DEFAULT_VIEWPORT_CM = { widthCm: 1200, heightCm: 800 };
+const GRID_CM = 100;
+const DEFAULT_ROOM_SIZE_CM = { widthCm: 1000, heightCm: 700 };
 
 interface FloorPlanCanvasProps {
   // Resolved plan for read-side rendering (assignment → artist name).
   plan: ResolvedFloorPlan | null;
-  // Event's size catalog, keyed by id, used to render each table at its
-  // real-world dimensions.
+  // Only tables belonging to the active room render. When null and the
+  // plan has rooms, nothing renders; when the plan has no rooms, the
+  // empty-state placeholder takes over.
+  activeRoomId: string | null;
+  // Event's size catalog, used to render each table at its real-world
+  // dimensions.
   tableSizeOptions: TableSizeOption[];
-  // Editable mode enables drag + fires onChange on drop. Read-only mode
-  // keeps every shape static.
   editable: boolean;
-  // Fires with the updated FloorPlan after a table has been moved.
   onChange?: (next: FloorPlan) => void;
-  // Highlight this application's table with a coloured outline (used for
-  // the "you are here" marker on the public event page).
+  // Highlight the matching table with a violet outline ("you are
+  // here" marker on the public event page).
   highlightApplicationId?: string;
-}
-
-function computeViewport(plan: ResolvedFloorPlan | null): {
-  widthCm: number;
-  heightCm: number;
-} {
-  if (!plan || plan.rooms.length === 0) return DEFAULT_VIEWPORT_CM;
-  let maxX = 0;
-  let maxY = 0;
-  for (const room of plan.rooms) {
-    maxX = Math.max(maxX, room.x + room.widthCm);
-    maxY = Math.max(maxY, room.y + room.heightCm);
-  }
-  return {
-    widthCm: Math.max(maxX + 50, DEFAULT_VIEWPORT_CM.widthCm),
-    heightCm: Math.max(maxY + 50, DEFAULT_VIEWPORT_CM.heightCm),
-  };
 }
 
 export function FloorPlanCanvas({
   plan,
+  activeRoomId,
   tableSizeOptions,
   editable,
   onChange,
@@ -64,10 +48,16 @@ export function FloorPlanCanvas({
     return () => ro.disconnect();
   }, []);
 
-  const viewport = useMemo(() => computeViewport(plan), [plan]);
-  const scale = containerWidth / viewport.widthCm;
+  const activeRoom =
+    plan?.rooms.find((r) => r.id === activeRoomId) ?? null;
+
+  const viewportCm = activeRoom
+    ? { widthCm: activeRoom.widthCm, heightCm: activeRoom.heightCm }
+    : DEFAULT_ROOM_SIZE_CM;
+
+  const scale = containerWidth / viewportCm.widthCm;
   const stageWidth = containerWidth;
-  const stageHeight = viewport.heightCm * scale;
+  const stageHeight = viewportCm.heightCm * scale;
 
   const sizeById = useMemo(
     () => new Map(tableSizeOptions.map((s) => [s.id, s])),
@@ -80,14 +70,14 @@ export function FloorPlanCanvas({
     stageYPx: number
   ) {
     if (!plan || !onChange) return;
-    const newXCm = Math.round(stageXPx / scale);
-    const newYCm = Math.round(stageYPx / scale);
-    // Storage shape is the raw FloorPlanTable (no resolved `assignment`).
+    const newXCm = Math.max(0, Math.round(stageXPx / scale));
+    const newYCm = Math.max(0, Math.round(stageYPx / scale));
     const nextTables = plan.tables.map((t) => {
       const raw = {
         id: t.id,
         label: t.label,
         tableSizeOptionId: t.tableSizeOptionId,
+        roomId: t.roomId,
         x: t.x,
         y: t.y,
         assignedApplicationId: t.assignedApplicationId,
@@ -98,98 +88,96 @@ export function FloorPlanCanvas({
     onChange({ rooms: plan.rooms, tables: nextTables });
   }
 
+  const tablesInRoom =
+    activeRoomId && plan
+      ? plan.tables.filter((t) => t.roomId === activeRoomId)
+      : [];
+
   return (
     <div
       ref={containerRef}
       className="w-full overflow-hidden rounded-lg border border-border bg-background"
     >
-      <Stage width={stageWidth} height={stageHeight}>
-        <Layer>
-          <GridBackground
-            widthCm={viewport.widthCm}
-            heightCm={viewport.heightCm}
-            scale={scale}
-          />
-        </Layer>
-        <Layer>
-          {plan?.rooms.map((room) => (
-            <Group key={room.id}>
-              <Rect
-                x={room.x * scale}
-                y={room.y * scale}
-                width={room.widthCm * scale}
-                height={room.heightCm * scale}
-                fill="rgba(255,255,255,0.6)"
-                stroke="#4b5563"
-                strokeWidth={2}
-              />
-              <Text
-                x={room.x * scale + 8}
-                y={room.y * scale + 6}
-                text={`${room.name}  ·  ${(room.widthCm / 100).toFixed(1)} × ${(
-                  room.heightCm / 100
-                ).toFixed(1)} m`}
-                fontSize={12}
-                fontStyle="bold"
-                fill="#374151"
-              />
-            </Group>
-          ))}
-        </Layer>
-        <Layer>
-          {plan?.tables.map((table) => {
-            const size = sizeById.get(table.tableSizeOptionId);
-            if (!size || !size.widthCm || !size.depthCm) return null;
-            const highlight =
-              highlightApplicationId &&
-              table.assignment?.applicationId === highlightApplicationId;
-            const assigned = table.assignment !== null;
-            return (
-              <Group
-                key={table.id}
-                x={table.x * scale}
-                y={table.y * scale}
-                draggable={editable}
-                onDragEnd={(e) =>
-                  handleTableDragEnd(table.id, e.target.x(), e.target.y())
-                }
-              >
-                <Rect
-                  width={size.widthCm * scale}
-                  height={size.depthCm * scale}
-                  fill={assigned ? "#fde68a" : "#e5e7eb"}
-                  stroke={highlight ? "#7c3aed" : "#374151"}
-                  strokeWidth={highlight ? 3 : 1.5}
-                  cornerRadius={4}
-                />
-                <Text
-                  x={6}
-                  y={6}
-                  text={table.label}
-                  fontSize={11}
-                  fontStyle="bold"
-                  fill="#111827"
-                />
-                <Text
-                  x={6}
-                  y={20}
-                  text={
-                    table.assignment
-                      ? table.assignment.artistDisplayName
-                      : "available"
+      {!activeRoom ? (
+        <div
+          className="flex items-center justify-center p-12 text-center text-sm text-muted-foreground"
+          style={{ minHeight: 360 }}
+        >
+          {(plan?.rooms.length ?? 0) === 0
+            ? "Add your first room in the sidebar."
+            : "Select a room to view its layout."}
+        </div>
+      ) : (
+        <Stage width={stageWidth} height={stageHeight}>
+          <Layer>
+            <Rect
+              x={0}
+              y={0}
+              width={viewportCm.widthCm * scale}
+              height={viewportCm.heightCm * scale}
+              fill="rgba(255,255,255,0.6)"
+              stroke="#4b5563"
+              strokeWidth={2}
+            />
+            <GridBackground
+              widthCm={viewportCm.widthCm}
+              heightCm={viewportCm.heightCm}
+              scale={scale}
+            />
+          </Layer>
+          <Layer>
+            {tablesInRoom.map((table) => {
+              const size = sizeById.get(table.tableSizeOptionId);
+              if (!size || !size.widthCm || !size.depthCm) return null;
+              const highlight =
+                highlightApplicationId &&
+                table.assignment?.applicationId === highlightApplicationId;
+              const assigned = table.assignment !== null;
+              return (
+                <Group
+                  key={table.id}
+                  x={table.x * scale}
+                  y={table.y * scale}
+                  draggable={editable}
+                  onDragEnd={(e) =>
+                    handleTableDragEnd(table.id, e.target.x(), e.target.y())
                   }
-                  fontSize={10}
-                  fill={
-                    table.assignment ? "#111827" : "#6b7280"
-                  }
-                  width={size.widthCm * scale - 12}
-                  ellipsis
-                />
-              </Group>
-            );
-          })}
-        </Layer>
-      </Stage>
+                >
+                  <Rect
+                    width={size.widthCm * scale}
+                    height={size.depthCm * scale}
+                    fill={assigned ? "#fde68a" : "#e5e7eb"}
+                    stroke={highlight ? "#7c3aed" : "#374151"}
+                    strokeWidth={highlight ? 3 : 1.5}
+                    cornerRadius={4}
+                  />
+                  <Text
+                    x={6}
+                    y={6}
+                    text={table.label}
+                    fontSize={11}
+                    fontStyle="bold"
+                    fill="#111827"
+                  />
+                  <Text
+                    x={6}
+                    y={20}
+                    text={
+                      table.assignment
+                        ? table.assignment.artistDisplayName
+                        : "available"
+                    }
+                    fontSize={10}
+                    fill={table.assignment ? "#111827" : "#6b7280"}
+                    width={size.widthCm * scale - 12}
+                    ellipsis
+                  />
+                </Group>
+              );
+            })}
+          </Layer>
+        </Stage>
+      )}
     </div>
   );
 }
@@ -204,30 +192,27 @@ function GridBackground({
   scale: number;
 }) {
   const lines: React.ReactNode[] = [];
-  for (let x = 0; x <= widthCm; x += GRID_MINOR_CM) {
-    const isMajor = x % GRID_MAJOR_CM === 0;
+  for (let x = GRID_CM; x < widthCm; x += GRID_CM) {
     lines.push(
       <Line
         key={`v-${x}`}
         points={[x * scale, 0, x * scale, heightCm * scale]}
-        stroke={isMajor ? "#d1d5db" : "#f3f4f6"}
-        strokeWidth={isMajor ? 1 : 0.5}
+        stroke="#e5e7eb"
+        strokeWidth={1}
       />
     );
   }
-  for (let y = 0; y <= heightCm; y += GRID_MINOR_CM) {
-    const isMajor = y % GRID_MAJOR_CM === 0;
+  for (let y = GRID_CM; y < heightCm; y += GRID_CM) {
     lines.push(
       <Line
         key={`h-${y}`}
         points={[0, y * scale, widthCm * scale, y * scale]}
-        stroke={isMajor ? "#d1d5db" : "#f3f4f6"}
-        strokeWidth={isMajor ? 1 : 0.5}
+        stroke="#e5e7eb"
+        strokeWidth={1}
       />
     );
   }
   return <>{lines}</>;
 }
 
-// Default export so it works with next/dynamic.
 export default FloorPlanCanvas;

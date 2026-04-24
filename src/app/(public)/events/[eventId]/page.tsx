@@ -31,7 +31,7 @@ import { getEventAnnouncements } from "@/app/(authenticated)/conventions/manage/
 import { getThreadForArtist } from "@/lib/threads/queries";
 import { EventThread } from "@/components/events/event-thread";
 import { getFloorPlanForEvent } from "@/lib/floor-plans/queries";
-import { FloorPlanCanvasDynamic } from "@/components/floor-plans/floor-plan-canvas-dynamic";
+import { PublicFloorPlanView } from "@/components/floor-plans/public-floor-plan-view";
 
 interface EventDetailPageProps {
   params: Promise<{ eventId: string }>;
@@ -429,10 +429,9 @@ export default async function EventDetailPage({
                 Your table is outlined in violet.
               </p>
             )}
-            <FloorPlanCanvasDynamic
+            <PublicFloorPlanView
               plan={publicFloorPlan}
               tableSizeOptions={event.tableSizeOptions ?? []}
-              editable={false}
               highlightApplicationId={
                 ownApplicationStatus === "accepted" && ownApplicationId
                   ? ownApplicationId

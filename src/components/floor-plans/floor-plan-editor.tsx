@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { saveFloorPlan } from "@/app/(authenticated)/conventions/manage/events/[eventId]/floor-plan-actions";
 import { FloorPlanCanvasDynamic } from "./floor-plan-canvas-dynamic";
 import { FloorPlanSidebar } from "./floor-plan-sidebar";
+import { RoomSwitcher } from "./room-switcher";
 import {
   AssignArtistDialog,
   type AcceptedArtistEntry,
@@ -34,6 +35,7 @@ function toRawPlan(resolved: ResolvedFloorPlan | null): FloorPlan {
       id: t.id,
       label: t.label,
       tableSizeOptionId: t.tableSizeOptionId,
+      roomId: t.roomId,
       x: t.x,
       y: t.y,
       assignedApplicationId: t.assignedApplicationId,
@@ -41,10 +43,6 @@ function toRawPlan(resolved: ResolvedFloorPlan | null): FloorPlan {
   };
 }
 
-// Builds a resolved view of the raw plan by looking up each table's
-// assignedApplicationId against the accepted-artists catalog. Used only
-// for the canvas (so it can display artist names without a server round
-// trip between saves).
 function resolvePlan(
   plan: FloorPlan,
   artists: AcceptedArtistEntry[]
@@ -77,6 +75,10 @@ export function FloorPlanEditor({
   acceptedArtists,
 }: FloorPlanEditorProps) {
   const [plan, setPlan] = useState<FloorPlan>(() => toRawPlan(initialPlan));
+  const [activeRoomId, setActiveRoomId] = useState<string | null>(() => {
+    const rooms = toRawPlan(initialPlan).rooms;
+    return rooms[0]?.id ?? null;
+  });
   const [assignTableId, setAssignTableId] = useState<string | null>(null);
   const [status, setStatus] = useState<SaveStatus>("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -112,22 +114,32 @@ export function FloorPlanEditor({
     };
   }, []);
 
-  function handlePlanChange(next: FloorPlan) {
-    setPlan(next);
-    scheduleSave();
-  }
+  const handlePlanChange = useCallback(
+    (next: FloorPlan) => {
+      setPlan(next);
+      // Keep activeRoomId pointing at a valid room if the user just
+      // deleted the active one.
+      setActiveRoomId((prev) => {
+        if (!prev) return next.rooms[0]?.id ?? null;
+        return next.rooms.some((r) => r.id === prev)
+          ? prev
+          : next.rooms[0]?.id ?? null;
+      });
+      scheduleSave();
+    },
+    [scheduleSave]
+  );
 
   function handleAssign(applicationId: string | null) {
     if (!assignTableId) return;
-    const next: FloorPlan = {
+    handlePlanChange({
       ...plan,
       tables: plan.tables.map((t) =>
         t.id === assignTableId
           ? { ...t, assignedApplicationId: applicationId }
           : t
       ),
-    };
-    handlePlanChange(next);
+    });
   }
 
   const resolvedForCanvas = resolvePlan(plan, acceptedArtists);
@@ -137,26 +149,35 @@ export function FloorPlanEditor({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between gap-3 text-xs">
-        <p className="text-muted-foreground">
-          Drag tables to place them. Click the pencil icon next to a table
-          to assign an accepted artist. Changes save automatically.
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <RoomSwitcher
+          plan={plan}
+          activeRoomId={activeRoomId}
+          onActiveRoomChange={setActiveRoomId}
+          onChange={handlePlanChange}
+        />
         <SaveIndicator status={status} isPending={isPending} error={errorMsg} />
       </div>
-      <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_280px]">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div>
           <FloorPlanCanvasDynamic
             plan={resolvedForCanvas}
+            activeRoomId={activeRoomId}
             tableSizeOptions={tableSizeOptions}
             editable
             onChange={handlePlanChange}
           />
+          <p className="mt-2 text-xs text-muted-foreground">
+            Drag tables to place them. Click a table row in the sidebar to
+            assign an accepted artist. Changes save automatically.
+          </p>
         </div>
         <FloorPlanSidebar
           eventId={eventId}
           plan={plan}
+          activeRoomId={activeRoomId}
           tableSizeOptions={tableSizeOptions}
+          acceptedArtists={acceptedArtists}
           onChange={handlePlanChange}
           onSelectTable={(id) => setAssignTableId(id)}
         />
@@ -186,14 +207,16 @@ function SaveIndicator({
   error: string | null;
 }) {
   if (status === "saving" || isPending) {
-    return <span className="text-muted-foreground">Saving…</span>;
+    return (
+      <span className="text-xs text-muted-foreground">Saving…</span>
+    );
   }
   if (status === "saved") {
-    return <span className="text-muted-foreground">Saved</span>;
+    return <span className="text-xs text-muted-foreground">Saved</span>;
   }
   if (status === "error") {
     return (
-      <span className="text-destructive" title={error ?? undefined}>
+      <span className="text-xs text-destructive" title={error ?? undefined}>
         Save failed
       </span>
     );

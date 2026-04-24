@@ -43,6 +43,7 @@ describe("getFloorPlanForEvent", () => {
           id: "t-1",
           label: "T1",
           tableSizeOptionId: "ts-std",
+          roomId: "r-1",
           x: 100,
           y: 100,
           assignedApplicationId: null,
@@ -73,12 +74,22 @@ describe("getFloorPlanForEvent", () => {
       .where(eq(applications.id, app.id));
 
     const plan: FloorPlan = {
-      rooms: [],
+      rooms: [
+        {
+          id: "r-1",
+          name: "Hall",
+          x: 0,
+          y: 0,
+          widthCm: 500,
+          heightCm: 400,
+        },
+      ],
       tables: [
         {
           id: "t-1",
           label: "T1",
           tableSizeOptionId: "ts-std",
+          roomId: "r-1",
           x: 0,
           y: 0,
           assignedApplicationId: app.id,
@@ -115,12 +126,22 @@ describe("getFloorPlanForEvent", () => {
       .update(events)
       .set({
         floorPlan: {
-          rooms: [],
+          rooms: [
+            {
+              id: "r-1",
+              name: "Hall",
+              x: 0,
+              y: 0,
+              widthCm: 500,
+              heightCm: 400,
+            },
+          ],
           tables: [
             {
               id: "t-1",
               label: "T1",
               tableSizeOptionId: "ts-std",
+              roomId: "r-1",
               x: 0,
               y: 0,
               assignedApplicationId: app.id,
@@ -148,12 +169,22 @@ describe("getFloorPlanForEvent", () => {
       .update(events)
       .set({
         floorPlan: {
-          rooms: [],
+          rooms: [
+            {
+              id: "r-1",
+              name: "Hall",
+              x: 0,
+              y: 0,
+              widthCm: 500,
+              heightCm: 400,
+            },
+          ],
           tables: [
             {
               id: "t-1",
               label: "T1",
               tableSizeOptionId: "ts-std",
+              roomId: "r-1",
               x: 0,
               y: 0,
               assignedApplicationId: app.id,

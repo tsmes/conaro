@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { FloorPlanSidebar } from "@/components/floor-plans/floor-plan-sidebar";
 import type { FloorPlan, TableSizeOption } from "@/lib/db/schema/events";
+import type { AcceptedArtistEntry } from "@/components/floor-plans/assign-artist-dialog";
 
 function sizedOption(
   overrides: Partial<TableSizeOption> = {}
@@ -17,87 +18,48 @@ function sizedOption(
   };
 }
 
-function sizelessOption(
-  overrides: Partial<TableSizeOption> = {}
-): TableSizeOption {
+function sizelessOption(): TableSizeOption {
   return {
     id: "ts-nodims",
     label: "Corner",
     dimensions: "",
     priceNok: null,
-    ...overrides,
   };
 }
 
-const emptyPlan: FloorPlan = { rooms: [], tables: [] };
+const roomA = {
+  id: "r-1",
+  name: "Main hall",
+  x: 0,
+  y: 0,
+  widthCm: 800,
+  heightCm: 500,
+};
+
+function planWith(tables: FloorPlan["tables"] = []): FloorPlan {
+  return { rooms: [roomA], tables };
+}
 
 describe("FloorPlanSidebar", () => {
-  it("adds a room via the inline form", () => {
+  it("appends a new table to the active room with an auto label", () => {
     const onChange = vi.fn();
     render(
       <FloorPlanSidebar
         eventId="e1"
-        plan={emptyPlan}
+        plan={planWith([
+          {
+            id: "existing",
+            label: "T1",
+            tableSizeOptionId: "ts-std",
+            roomId: "r-1",
+            x: 0,
+            y: 0,
+            assignedApplicationId: null,
+          },
+        ])}
+        activeRoomId="r-1"
         tableSizeOptions={[sizedOption()]}
-        onChange={onChange}
-        onSelectTable={() => {}}
-      />
-    );
-    fireEvent.change(screen.getByLabelText(/^Name$/i), {
-      target: { value: "Main hall" },
-    });
-    fireEvent.change(screen.getByLabelText(/^Width \(m\)$/i), {
-      target: { value: "8.5" },
-    });
-    fireEvent.change(screen.getByLabelText(/^Depth \(m\)$/i), {
-      target: { value: "5" },
-    });
-    fireEvent.click(screen.getByRole("button", { name: /Add room/i }));
-
-    expect(onChange).toHaveBeenCalledTimes(1);
-    const next = onChange.mock.calls[0][0] as FloorPlan;
-    expect(next.rooms).toHaveLength(1);
-    expect(next.rooms[0]).toMatchObject({
-      name: "Main hall",
-      widthCm: 850,
-      heightCm: 500,
-    });
-  });
-
-  it("refuses to add a room when inputs are incomplete", () => {
-    const onChange = vi.fn();
-    render(
-      <FloorPlanSidebar
-        eventId="e1"
-        plan={emptyPlan}
-        tableSizeOptions={[sizedOption()]}
-        onChange={onChange}
-        onSelectTable={() => {}}
-      />
-    );
-    fireEvent.click(screen.getByRole("button", { name: /Add room/i }));
-    expect(onChange).not.toHaveBeenCalled();
-  });
-
-  it("appends a new table with an auto-generated label", () => {
-    const onChange = vi.fn();
-    render(
-      <FloorPlanSidebar
-        eventId="e1"
-        plan={{
-          rooms: [],
-          tables: [
-            {
-              id: "existing",
-              label: "T1",
-              tableSizeOptionId: "ts-std",
-              x: 0,
-              y: 0,
-              assignedApplicationId: null,
-            },
-          ],
-        }}
-        tableSizeOptions={[sizedOption()]}
+        acceptedArtists={[]}
         onChange={onChange}
         onSelectTable={() => {}}
       />
@@ -111,20 +73,37 @@ describe("FloorPlanSidebar", () => {
     const next = onChange.mock.calls[0][0] as FloorPlan;
     expect(next.tables).toHaveLength(2);
     expect(next.tables[1].label).toBe("T2");
-    expect(next.tables[1].tableSizeOptionId).toBe("ts-std");
+    expect(next.tables[1].roomId).toBe("r-1");
   });
 
-  it("shows a Set dimensions link when the catalog has sizeless options", () => {
+  it("hides Add-table when no room is active", () => {
     render(
       <FloorPlanSidebar
         eventId="e1"
-        plan={emptyPlan}
-        tableSizeOptions={[sizelessOption()]}
+        plan={{ rooms: [], tables: [] }}
+        activeRoomId={null}
+        tableSizeOptions={[sizedOption()]}
+        acceptedArtists={[]}
         onChange={() => {}}
         onSelectTable={() => {}}
       />
     );
-    // The option is rendered but disabled with the "set dimensions" hint.
+    expect(screen.queryByLabelText(/Table size/i)).toBeNull();
+    expect(screen.getByText(/Add or pick a room first/i)).toBeInTheDocument();
+  });
+
+  it("shows a sizeless option as disabled with a 'set dimensions' hint", () => {
+    render(
+      <FloorPlanSidebar
+        eventId="e1"
+        plan={planWith()}
+        activeRoomId="r-1"
+        tableSizeOptions={[sizelessOption()]}
+        acceptedArtists={[]}
+        onChange={() => {}}
+        onSelectTable={() => {}}
+      />
+    );
     const option = screen
       .getByLabelText(/Table size/i)
       .querySelector(`option[value="ts-nodims"]`) as HTMLOptionElement;
@@ -133,25 +112,67 @@ describe("FloorPlanSidebar", () => {
     expect(option.disabled).toBe(true);
   });
 
-  it("fires onSelectTable when the Assign button on a table row is clicked", () => {
+  it("splits accepted artists into Unassigned and Assigned lists", () => {
+    const acceptedArtists: AcceptedArtistEntry[] = [
+      {
+        applicationId: "app-1",
+        displayName: "Elena",
+        requestedTableSizeOptionId: "ts-std",
+      },
+      {
+        applicationId: "app-2",
+        displayName: "Mika",
+        requestedTableSizeOptionId: "ts-std",
+      },
+    ];
+    render(
+      <FloorPlanSidebar
+        eventId="e1"
+        plan={planWith([
+          {
+            id: "t-1",
+            label: "T1",
+            tableSizeOptionId: "ts-std",
+            roomId: "r-1",
+            x: 0,
+            y: 0,
+            assignedApplicationId: "app-1",
+          },
+        ])}
+        activeRoomId="r-1"
+        tableSizeOptions={[sizedOption()]}
+        acceptedArtists={acceptedArtists}
+        onChange={() => {}}
+        onSelectTable={() => {}}
+      />
+    );
+    expect(screen.getByText(/Unassigned/i)).toBeInTheDocument();
+    expect(screen.getByText(/^Assigned$/i)).toBeInTheDocument();
+    // Mika is unassigned (only shown once, in the unassigned list).
+    expect(screen.getByText("Mika")).toBeInTheDocument();
+    // Elena appears in both the Assigned list and on her table row.
+    expect(screen.getAllByText("Elena").length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("fires onSelectTable when a table row is clicked", () => {
     const onSelectTable = vi.fn();
     render(
       <FloorPlanSidebar
         eventId="e1"
-        plan={{
-          rooms: [],
-          tables: [
-            {
-              id: "tbl-1",
-              label: "T1",
-              tableSizeOptionId: "ts-std",
-              x: 0,
-              y: 0,
-              assignedApplicationId: null,
-            },
-          ],
-        }}
+        plan={planWith([
+          {
+            id: "tbl-1",
+            label: "T1",
+            tableSizeOptionId: "ts-std",
+            roomId: "r-1",
+            x: 0,
+            y: 0,
+            assignedApplicationId: null,
+          },
+        ])}
+        activeRoomId="r-1"
         tableSizeOptions={[sizedOption()]}
+        acceptedArtists={[]}
         onChange={() => {}}
         onSelectTable={onSelectTable}
       />
@@ -162,45 +183,31 @@ describe("FloorPlanSidebar", () => {
     expect(onSelectTable).toHaveBeenCalledWith("tbl-1");
   });
 
-  it("deletes rooms and tables via their row delete buttons", () => {
+  it("deletes a table via its row delete button", () => {
     const onChange = vi.fn();
     render(
       <FloorPlanSidebar
         eventId="e1"
-        plan={{
-          rooms: [
-            {
-              id: "r-1",
-              name: "Hall",
-              x: 0,
-              y: 0,
-              widthCm: 500,
-              heightCm: 400,
-            },
-          ],
-          tables: [
-            {
-              id: "t-1",
-              label: "T1",
-              tableSizeOptionId: "ts-std",
-              x: 0,
-              y: 0,
-              assignedApplicationId: null,
-            },
-          ],
-        }}
+        plan={planWith([
+          {
+            id: "t-1",
+            label: "T1",
+            tableSizeOptionId: "ts-std",
+            roomId: "r-1",
+            x: 0,
+            y: 0,
+            assignedApplicationId: null,
+          },
+        ])}
+        activeRoomId="r-1"
         tableSizeOptions={[sizedOption()]}
+        acceptedArtists={[]}
         onChange={onChange}
         onSelectTable={() => {}}
       />
     );
-    fireEvent.click(screen.getByRole("button", { name: /Delete Hall/i }));
-    expect(onChange).toHaveBeenLastCalledWith({
-      rooms: [],
-      tables: expect.any(Array),
-    });
     fireEvent.click(screen.getByRole("button", { name: /Delete T1/i }));
-    const lastCall = onChange.mock.calls[onChange.mock.calls.length - 1][0];
-    expect(lastCall.tables).toHaveLength(0);
+    const last = onChange.mock.calls[onChange.mock.calls.length - 1][0];
+    expect(last.tables).toHaveLength(0);
   });
 });
