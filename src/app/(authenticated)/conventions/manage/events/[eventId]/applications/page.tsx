@@ -1,6 +1,4 @@
 import { redirect, notFound } from "next/navigation";
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 import { auth } from "@/lib/auth";
 import {
   getEventApplicants,
@@ -12,7 +10,6 @@ import { storage } from "@/lib/storage";
 import { PublishResultsButton } from "@/components/conventions/publish-results-button";
 import { SelectionWorkspace } from "@/components/conventions/selection/selection-workspace";
 import type { SelectionApplicantView } from "@/components/conventions/selection/types";
-import { Button } from "@/components/ui/button";
 
 interface ApplicationsPageProps {
   params: Promise<{ eventId: string }>;
@@ -97,33 +94,16 @@ export default async function ApplicationsPage({
   );
 
   return (
-    <div className="mx-auto max-w-[1400px] space-y-10 px-6 py-10 md:px-8">
-      <div>
-        <Button
-          variant="ghost"
-          size="sm"
-          nativeButton={false}
-          render={
-            <Link href={`/conventions/manage/events/${event.id}`}>
-              <ArrowLeft className="size-4" />
-              Back to event
-            </Link>
-          }
-        />
-      </div>
-
+    <div className="space-y-8">
       <header className="space-y-2">
-        <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
-          Selection · {event.name}
-        </p>
-        <h1 className="font-heading text-display-md font-extrabold leading-[1.05] tracking-tight">
-          Pick your artists
-        </h1>
-        <p className="max-w-2xl text-muted-foreground">
+        <h2 className="font-heading text-2xl font-bold tracking-tight">
+          {applicants.length === 0 ? "No applicants yet" : "Pick your artists"}
+        </h2>
+        <p className="max-w-2xl text-sm text-muted-foreground">
           {applicants.length === 0
-            ? "No applicants yet. Once artists submit, you'll see them here."
+            ? "Once artists submit, you'll see them here."
             : event.status === "accepting_applications"
-              ? `${applicants.length} application${applicants.length === 1 ? "" : "s"} so far. Accept, reject, or pin as they come in \u2014 applications are still open.`
+              ? `${applicants.length} application${applicants.length === 1 ? "" : "s"} so far. Accept, reject, or pin as they come in — applications are still open.`
               : `${undecidedCount} still undecided. Pin favourites as you browse; accept when you're ready.`}
         </p>
       </header>

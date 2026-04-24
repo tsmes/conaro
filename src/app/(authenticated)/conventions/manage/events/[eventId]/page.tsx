@@ -1,6 +1,6 @@
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, ListChecks, Sliders } from "lucide-react";
+import { ListChecks, Sliders } from "lucide-react";
 import { auth } from "@/lib/auth";
 import type { Amenities } from "@/lib/db/schema/events";
 import {
@@ -16,15 +16,6 @@ import {
 } from "@/app/(authenticated)/conventions/manage/events/actions";
 import { EventForm } from "@/components/conventions/event-form";
 import { EventStatusControls } from "@/components/conventions/event-status-controls";
-import { AnnouncementsEditor } from "@/components/conventions/announcements-editor";
-import { getEventAnnouncements } from "@/app/(authenticated)/conventions/manage/events/[eventId]/announcements/actions";
-import { ThreadInbox } from "@/components/conventions/thread-inbox";
-import { getOrganizerInboxWithMessages } from "@/lib/threads/queries";
-import {
-  getAcceptedArtistsForEvent,
-  getFloorPlanForEvent,
-} from "@/lib/floor-plans/queries";
-import { FloorPlanEditor } from "@/components/floor-plans/floor-plan-editor";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
@@ -48,9 +39,6 @@ export default async function EventDetailPage({
     notFound();
   }
 
-  // Organizers can view the applications list in any status from
-  // accepting_applications onwards — before reviewing it's read-only, which
-  // is enforced inside SelectionWorkspace via eventStatus.
   const showReviewLink =
     event.status === "accepting_applications" ||
     event.status === "reviewing" ||
@@ -62,55 +50,9 @@ export default async function EventDetailPage({
   }
 
   const amenities = event.amenities as Amenities | null;
-  const announcements = await getEventAnnouncements(event.id);
-  const inboxRows = await getOrganizerInboxWithMessages(event.id);
-  const showFloorPlan = event.status === "results_published";
-  const [floorPlan, acceptedArtistsForPlanner] = showFloorPlan
-    ? await Promise.all([
-        getFloorPlanForEvent(event.id),
-        getAcceptedArtistsForEvent(event.id),
-      ])
-    : [null, []];
-  const inboxThreads = inboxRows.map((row) => ({
-    threadId: row.thread.id,
-    artistProfileId: row.thread.artistProfileId,
-    artistDisplayName: row.artistDisplayName,
-    lastMessageAt: row.thread.lastMessageAt,
-    lastMessagePreview: row.lastMessagePreview,
-    unreadForOrganizer: row.unreadForOrganizer,
-    messages: row.messages.map((m) => ({
-      id: m.id,
-      body: m.body,
-      authorIsArtist: m.authorProfileId === row.thread.artistProfileId,
-      createdAt: m.createdAt,
-    })),
-  }));
 
   return (
-    <div className="mx-auto max-w-4xl space-y-10 px-6 py-10 md:px-8">
-      <div>
-        <Button
-          variant="ghost"
-          size="sm"
-          nativeButton={false}
-          render={
-            <Link href="/conventions/manage">
-              <ArrowLeft className="size-4" />
-              Back to workspace
-            </Link>
-          }
-        />
-      </div>
-
-      <header>
-        <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
-          Event
-        </p>
-        <h1 className="mt-3 font-heading text-4xl font-extrabold tracking-tight">
-          {event.name}
-        </h1>
-      </header>
-
+    <div className="mx-auto max-w-4xl space-y-10">
       <Card className="p-6 md:p-8">
         <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
           Lifecycle
@@ -149,71 +91,6 @@ export default async function EventDetailPage({
           )}
         </div>
       </Card>
-
-      {event.status === "results_published" && (
-        <Card className="p-6 md:p-8">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-            Announcements
-          </p>
-          <h2 className="mt-2 font-heading text-2xl font-bold tracking-tight">
-            Messages to accepted artists
-          </h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Use this for pre-event logistics, day-of updates, and anything
-            else accepted artists need before or during the event.
-          </p>
-          <div className="mt-6">
-            <AnnouncementsEditor
-              eventId={event.id}
-              announcements={announcements}
-            />
-          </div>
-        </Card>
-      )}
-
-      {showFloorPlan && (
-        <Card className="p-6 md:p-8">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-            Floor plan
-          </p>
-          <h2 className="mt-2 font-heading text-2xl font-bold tracking-tight">
-            Layout &amp; table assignments
-          </h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Arrange rooms and tables to match your venue, then assign
-            accepted artists to their spots. Sizes use the table-size
-            catalog from the event details; fill in width/depth on any
-            size you want to place here.
-          </p>
-          <div className="mt-6">
-            <FloorPlanEditor
-              eventId={event.id}
-              initialPlan={floorPlan}
-              tableSizeOptions={event.tableSizeOptions ?? []}
-              acceptedArtists={acceptedArtistsForPlanner}
-            />
-          </div>
-        </Card>
-      )}
-
-      {event.status === "results_published" && (
-        <Card className="p-6 md:p-8">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-            Inbox
-          </p>
-          <h2 className="mt-2 font-heading text-2xl font-bold tracking-tight">
-            Questions from artists
-          </h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Private Q&A threads. Replies go to the asker; tick
-            &ldquo;Also post as announcement&rdquo; to share an answer
-            with every accepted artist in one go.
-          </p>
-          <div className="mt-6">
-            <ThreadInbox eventId={event.id} threads={inboxThreads} />
-          </div>
-        </Card>
-      )}
 
       <Card className="p-8 md:p-10">
         <p className="text-[11px] font-bold uppercase tracking-wider text-primary">

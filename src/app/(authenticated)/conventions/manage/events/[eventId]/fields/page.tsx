@@ -1,6 +1,4 @@
 import { redirect, notFound } from "next/navigation";
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 import { eq, ne, and } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -8,7 +6,6 @@ import { events } from "@/lib/db/schema/events";
 import type { FieldRequirements } from "@/lib/db/schema/events";
 import { getOrganizerEvent } from "@/lib/conventions/queries";
 import { FieldConfigForm } from "@/components/conventions/field-config-form";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
 interface FieldConfigPageProps {
@@ -46,29 +43,12 @@ export default async function FieldConfigPage({
     );
 
   return (
-    <div className="mx-auto max-w-3xl space-y-10 px-6 py-10 md:px-8">
-      <div>
-        <Button
-          variant="ghost"
-          size="sm"
-          nativeButton={false}
-          render={
-            <Link href={`/conventions/manage/events/${event.id}`}>
-              <ArrowLeft className="size-4" />
-              Back to event
-            </Link>
-          }
-        />
-      </div>
-
+    <div className="mx-auto max-w-3xl space-y-6">
       <header>
-        <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
-          {event.name}
-        </p>
-        <h1 className="mt-3 font-heading text-4xl font-extrabold tracking-tight">
-          Field Configuration
-        </h1>
-        <p className="mt-3 max-w-2xl text-muted-foreground">
+        <h2 className="font-heading text-2xl font-bold tracking-tight">
+          Field configuration
+        </h2>
+        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
           Pick which profile fields artists must complete before they can
           apply to this event.
         </p>
