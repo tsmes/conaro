@@ -86,6 +86,9 @@ function TableSizeOptionsEditor({
       prev.map((o) => (o.id === id ? { ...o, ...patch } : o))
     );
 
+  const HEADER_CLASS =
+    "text-left text-[11px] font-bold uppercase tracking-wider text-muted-foreground";
+
   return (
     <div className="space-y-3">
       <input
@@ -93,80 +96,125 @@ function TableSizeOptionsEditor({
         name="tableSizeOptions"
         value={JSON.stringify(options)}
       />
-      {options.length === 0 && (
+      {options.length === 0 ? (
         <p className="text-sm text-muted-foreground">
           No structured options yet. Add one to let artists pick a table size
           and price at apply time.
         </p>
-      )}
-      {options.map((opt) => (
-        <div
-          key={opt.id}
-          className="space-y-2 rounded-md border border-border p-3"
-        >
-          <div className="grid gap-2 sm:grid-cols-[1fr_110px_110px_110px_auto]">
-            <Input
-              aria-label="Name"
-              placeholder="Standard"
-              value={opt.label}
-              onChange={(e) => update(opt.id, { label: e.target.value })}
-            />
-            <Input
-              aria-label="Width (cm)"
-              type="number"
-              min={1}
-              max={1000}
-              placeholder="Width cm"
-              value={opt.widthCm ?? ""}
-              onChange={(e) =>
-                update(opt.id, {
-                  widthCm:
-                    e.target.value === ""
-                      ? undefined
-                      : Number(e.target.value),
-                })
-              }
-            />
-            <Input
-              aria-label="Depth (cm)"
-              type="number"
-              min={1}
-              max={1000}
-              placeholder="Depth cm"
-              value={opt.depthCm ?? ""}
-              onChange={(e) =>
-                update(opt.id, {
-                  depthCm:
-                    e.target.value === ""
-                      ? undefined
-                      : Number(e.target.value),
-                })
-              }
-            />
-            <Input
-              aria-label="Price (NOK)"
-              type="number"
-              min={0}
-              placeholder="280 NOK"
-              value={opt.priceNok ?? ""}
-              onChange={(e) =>
-                update(opt.id, {
-                  priceNok:
-                    e.target.value === "" ? null : Number(e.target.value),
-                })
-              }
-            />
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => remove(opt.id)}
-            >
-              Remove
-            </Button>
-          </div>
+      ) : (
+        <div className="overflow-x-auto rounded-md border border-border">
+          <table className="w-full border-collapse">
+            <thead className="bg-muted/40">
+              <tr>
+                <th scope="col" className={`${HEADER_CLASS} px-3 py-2`}>
+                  Name
+                </th>
+                <th
+                  scope="col"
+                  className={`${HEADER_CLASS} w-[120px] px-3 py-2`}
+                >
+                  Width (cm)
+                </th>
+                <th
+                  scope="col"
+                  className={`${HEADER_CLASS} w-[120px] px-3 py-2`}
+                >
+                  Depth (cm)
+                </th>
+                <th
+                  scope="col"
+                  className={`${HEADER_CLASS} w-[120px] px-3 py-2`}
+                >
+                  Price (NOK)
+                </th>
+                <th scope="col" className="w-[80px] px-3 py-2">
+                  <span className="sr-only">Actions</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {options.map((opt, i) => (
+                <tr
+                  key={opt.id}
+                  className={i > 0 ? "border-t border-border" : undefined}
+                >
+                  <td className="px-3 py-2">
+                    <Input
+                      aria-label="Name"
+                      placeholder="Standard"
+                      value={opt.label}
+                      onChange={(e) =>
+                        update(opt.id, { label: e.target.value })
+                      }
+                    />
+                  </td>
+                  <td className="px-3 py-2">
+                    <Input
+                      aria-label="Width (cm)"
+                      type="number"
+                      min={1}
+                      max={1000}
+                      value={opt.widthCm ?? ""}
+                      onChange={(e) =>
+                        update(opt.id, {
+                          widthCm:
+                            e.target.value === ""
+                              ? undefined
+                              : Number(e.target.value),
+                        })
+                      }
+                    />
+                  </td>
+                  <td className="px-3 py-2">
+                    <Input
+                      aria-label="Depth (cm)"
+                      type="number"
+                      min={1}
+                      max={1000}
+                      value={opt.depthCm ?? ""}
+                      onChange={(e) =>
+                        update(opt.id, {
+                          depthCm:
+                            e.target.value === ""
+                              ? undefined
+                              : Number(e.target.value),
+                        })
+                      }
+                    />
+                  </td>
+                  <td className="px-3 py-2">
+                    <Input
+                      aria-label="Price (NOK)"
+                      type="number"
+                      min={0}
+                      value={opt.priceNok ?? ""}
+                      onChange={(e) =>
+                        update(opt.id, {
+                          priceNok:
+                            e.target.value === ""
+                              ? null
+                              : Number(e.target.value),
+                        })
+                      }
+                    />
+                  </td>
+                  <td className="px-3 py-2 text-right">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      aria-label={`Remove ${opt.label || "table size"}`}
+                      onClick={() => remove(opt.id)}
+                    >
+                      Remove
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-      ))}
+      )}
       <Button type="button" variant="outline" size="sm" onClick={add}>
         Add table size
       </Button>
