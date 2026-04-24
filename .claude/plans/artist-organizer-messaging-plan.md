@@ -72,7 +72,7 @@ Thin wrappers around `createNotifications` so the two server-action files don't 
 
 **Depends on:** 2 (needs the enum values).
 
-### 4. Thread query helpers
+### 4. Thread query helpers ✅
 
 Pure read helpers used by both artist-facing and organizer-facing pages. No mutations, no auth — consumers handle that.
 
