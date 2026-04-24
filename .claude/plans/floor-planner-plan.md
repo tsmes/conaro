@@ -66,7 +66,7 @@ Loads the plan + resolves assignments to artist info in one query pass.
 **Verification:** Integration test green.
 **Depends on:** 2.
 
-### 4. Server action — `saveFloorPlan`
+### 4. Server action — `saveFloorPlan` ✅
 
 Single action that accepts the whole plan as a JSON body and persists it with Zod validation + event ownership + assignment integrity.
 
