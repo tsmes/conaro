@@ -148,8 +148,8 @@ describe("FloorPlanSidebar", () => {
         onSelectTable={() => {}}
       />
     );
-    expect(screen.getByText(/Unassigned/i)).toBeInTheDocument();
-    expect(screen.getByText(/^Assigned$/i)).toBeInTheDocument();
+    expect(screen.getByText(/^Unassigned \(\d+\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/^Assigned \(\d+\)/i)).toBeInTheDocument();
     // Mika is unassigned (only shown once, in the unassigned list).
     expect(screen.getByText("Mika")).toBeInTheDocument();
     // Elena appears in both the Assigned list and on her table row.

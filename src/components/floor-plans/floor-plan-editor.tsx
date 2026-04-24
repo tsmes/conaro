@@ -159,7 +159,7 @@ export function FloorPlanEditor({
         />
         <SaveIndicator status={status} isPending={isPending} error={errorMsg} />
       </div>
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div>
           <FloorPlanCanvasDynamic
             plan={resolvedForCanvas}
@@ -173,15 +173,17 @@ export function FloorPlanEditor({
             assign an accepted artist. Changes save automatically.
           </p>
         </div>
-        <FloorPlanSidebar
-          eventId={eventId}
-          plan={plan}
-          activeRoomId={activeRoomId}
-          tableSizeOptions={tableSizeOptions}
-          acceptedArtists={acceptedArtists}
-          onChange={handlePlanChange}
-          onSelectTable={(id) => setAssignTableId(id)}
-        />
+        <div className="lg:sticky lg:top-4 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto lg:pr-1">
+          <FloorPlanSidebar
+            eventId={eventId}
+            plan={plan}
+            activeRoomId={activeRoomId}
+            tableSizeOptions={tableSizeOptions}
+            acceptedArtists={acceptedArtists}
+            onChange={handlePlanChange}
+            onSelectTable={(id) => setAssignTableId(id)}
+          />
+        </div>
       </div>
       <AssignArtistDialog
         open={dialogTable !== null}

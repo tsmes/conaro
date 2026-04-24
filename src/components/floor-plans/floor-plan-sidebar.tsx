@@ -183,7 +183,7 @@ export function FloorPlanSidebar({
           <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
             Tables in {activeRoom?.name} ({tablesInActiveRoom.length})
           </p>
-          <ul className="space-y-1">
+          <ul className="max-h-72 space-y-1 overflow-y-auto pr-1">
             {tablesInActiveRoom.map((table) => {
               const size = tableSizeOptions.find(
                 (s) => s.id === table.tableSizeOptionId
@@ -259,9 +259,9 @@ export function FloorPlanSidebar({
           {unassignedArtists.length > 0 && (
             <div className="space-y-1">
               <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                Unassigned
+                Unassigned ({unassignedArtists.length})
               </p>
-              <ul className="space-y-1">
+              <ul className="max-h-56 space-y-1 overflow-y-auto pr-1">
                 {unassignedArtists.map((artist) => (
                   <li
                     key={artist.applicationId}
@@ -279,9 +279,9 @@ export function FloorPlanSidebar({
           {assignedArtists.length > 0 && (
             <div className="space-y-1">
               <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                Assigned
+                Assigned ({assignedArtists.length})
               </p>
-              <ul className="space-y-1">
+              <ul className="max-h-56 space-y-1 overflow-y-auto pr-1">
                 {assignedArtists.map((artist) => (
                   <li
                     key={artist.applicationId}
