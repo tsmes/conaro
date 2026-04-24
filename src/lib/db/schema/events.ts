@@ -59,14 +59,16 @@ export interface FloorPlanRoom {
 }
 
 // Tables are scoped to a room — `x`/`y` are room-local coordinates in cm
-// (0,0 = top-left of the containing room). `roomId` must reference a
-// `FloorPlan.rooms[].id`. Legacy plans without `roomId` get auto-assigned
-// to the first available room in `getFloorPlanForEvent`.
+// (0,0 = top-left of the *unrotated* rect). `roomId` must reference a
+// `FloorPlan.rooms[].id`. `rotationDeg` is one of 0/90/180/270 and
+// applies around the rect's centre at render time. Legacy plans
+// without `roomId`/`rotationDeg` get backfilled on read.
 export interface FloorPlanTable {
   id: string;
   label: string;
   tableSizeOptionId: string;
   roomId: string;
+  rotationDeg: 0 | 90 | 180 | 270;
   x: number;
   y: number;
   assignedApplicationId: string | null;

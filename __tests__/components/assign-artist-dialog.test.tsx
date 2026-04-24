@@ -33,6 +33,7 @@ function makeTable(
     label: "T1",
     tableSizeOptionId: "ts-std",
     roomId: "r-1",
+    rotationDeg: 0,
     x: 0,
     y: 0,
     assignedApplicationId: null,

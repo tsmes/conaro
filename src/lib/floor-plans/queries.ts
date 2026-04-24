@@ -28,12 +28,16 @@ function migrateLegacyPlan(stored: FloorPlan): FloorPlan {
   const tables: FloorPlanTable[] = [];
   for (const t of stored.tables) {
     const hasValidRoom = t.roomId && roomIds.has(t.roomId);
+    const rotationDeg =
+      t.rotationDeg === 90 || t.rotationDeg === 180 || t.rotationDeg === 270
+        ? t.rotationDeg
+        : 0;
     if (hasValidRoom) {
-      tables.push(t);
+      tables.push({ ...t, rotationDeg });
       continue;
     }
     if (!fallbackRoomId) continue;
-    tables.push({ ...t, roomId: fallbackRoomId });
+    tables.push({ ...t, roomId: fallbackRoomId, rotationDeg });
   }
   return { rooms: stored.rooms, tables };
 }

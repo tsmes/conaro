@@ -66,18 +66,26 @@ export function FloorPlanCanvas({
 
   function handleTableDragEnd(
     tableId: string,
-    stageXPx: number,
-    stageYPx: number
+    centerStageXPx: number,
+    centerStageYPx: number,
+    sizeWidthCm: number,
+    sizeDepthCm: number
   ) {
     if (!plan || !onChange) return;
-    const newXCm = Math.max(0, Math.round(stageXPx / scale));
-    const newYCm = Math.max(0, Math.round(stageYPx / scale));
+    // Drag position is the Group's centre-of-rotation, which we've
+    // placed at the rect's geometric centre. Convert back to the
+    // un-rotated top-left coordinate we store.
+    const centerXCm = centerStageXPx / scale;
+    const centerYCm = centerStageYPx / scale;
+    const newXCm = Math.max(0, Math.round(centerXCm - sizeWidthCm / 2));
+    const newYCm = Math.max(0, Math.round(centerYCm - sizeDepthCm / 2));
     const nextTables = plan.tables.map((t) => {
       const raw = {
         id: t.id,
         label: t.label,
         tableSizeOptionId: t.tableSizeOptionId,
         roomId: t.roomId,
+        rotationDeg: t.rotationDeg,
         x: t.x,
         y: t.y,
         assignedApplicationId: t.assignedApplicationId,
@@ -133,35 +141,51 @@ export function FloorPlanCanvas({
                 highlightApplicationId &&
                 table.assignment?.applicationId === highlightApplicationId;
               const assigned = table.assignment !== null;
+              const wPx = size.widthCm * scale;
+              const hPx = size.depthCm * scale;
+              // Group is positioned at the rect's centre so rotation
+              // pivots around the centre. Rect + Text use negative
+              // offsets to sit around that origin.
+              const centerX = (table.x + size.widthCm / 2) * scale;
+              const centerY = (table.y + size.depthCm / 2) * scale;
               return (
                 <Group
                   key={table.id}
-                  x={table.x * scale}
-                  y={table.y * scale}
+                  x={centerX}
+                  y={centerY}
+                  rotation={table.rotationDeg}
                   draggable={editable}
                   onDragEnd={(e) =>
-                    handleTableDragEnd(table.id, e.target.x(), e.target.y())
+                    handleTableDragEnd(
+                      table.id,
+                      e.target.x(),
+                      e.target.y(),
+                      size.widthCm!,
+                      size.depthCm!
+                    )
                   }
                 >
                   <Rect
-                    width={size.widthCm * scale}
-                    height={size.depthCm * scale}
+                    x={-wPx / 2}
+                    y={-hPx / 2}
+                    width={wPx}
+                    height={hPx}
                     fill={assigned ? "#fde68a" : "#e5e7eb"}
                     stroke={highlight ? "#7c3aed" : "#374151"}
                     strokeWidth={highlight ? 3 : 1.5}
                     cornerRadius={4}
                   />
                   <Text
-                    x={6}
-                    y={6}
+                    x={-wPx / 2 + 6}
+                    y={-hPx / 2 + 6}
                     text={table.label}
                     fontSize={11}
                     fontStyle="bold"
                     fill="#111827"
                   />
                   <Text
-                    x={6}
-                    y={20}
+                    x={-wPx / 2 + 6}
+                    y={-hPx / 2 + 20}
                     text={
                       table.assignment
                         ? table.assignment.artistDisplayName
@@ -169,7 +193,7 @@ export function FloorPlanCanvas({
                     }
                     fontSize={10}
                     fill={table.assignment ? "#111827" : "#6b7280"}
-                    width={size.widthCm * scale - 12}
+                    width={wPx - 12}
                     ellipsis
                   />
                 </Group>

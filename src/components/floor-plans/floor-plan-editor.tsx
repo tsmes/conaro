@@ -36,6 +36,7 @@ function toRawPlan(resolved: ResolvedFloorPlan | null): FloorPlan {
       label: t.label,
       tableSizeOptionId: t.tableSizeOptionId,
       roomId: t.roomId,
+      rotationDeg: t.rotationDeg,
       x: t.x,
       y: t.y,
       assignedApplicationId: t.assignedApplicationId,
@@ -206,20 +207,41 @@ function SaveIndicator({
   isPending: boolean;
   error: string | null;
 }) {
-  if (status === "saving" || isPending) {
-    return (
-      <span className="text-xs text-muted-foreground">Saving…</span>
-    );
-  }
-  if (status === "saved") {
-    return <span className="text-xs text-muted-foreground">Saved</span>;
-  }
-  if (status === "error") {
-    return (
-      <span className="text-xs text-destructive" title={error ?? undefined}>
-        Save failed
-      </span>
-    );
-  }
-  return null;
+  const shown = status === "saving" || isPending
+    ? "saving"
+    : status === "error"
+      ? "error"
+      : status === "saved"
+        ? "saved"
+        : "idle";
+  if (shown === "idle") return null;
+  const text =
+    shown === "saving" ? "Saving changes…"
+      : shown === "saved" ? "All changes saved"
+        : "Save failed";
+  const classes =
+    shown === "saving"
+      ? "border-border bg-muted text-muted-foreground"
+      : shown === "saved"
+        ? "border-success/40 bg-success-container text-on-success-container"
+        : "border-destructive/40 bg-destructive/10 text-destructive";
+  const dotClasses =
+    shown === "saving"
+      ? "animate-pulse bg-muted-foreground"
+      : shown === "saved"
+        ? "bg-success"
+        : "bg-destructive";
+  return (
+    <span
+      className={
+        "inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium " +
+        classes
+      }
+      title={shown === "error" ? error ?? undefined : undefined}
+      aria-live="polite"
+    >
+      <span className={"size-2 rounded-full " + dotClasses} />
+      {text}
+    </span>
+  );
 }

@@ -52,6 +52,7 @@ describe("FloorPlanSidebar", () => {
             label: "T1",
             tableSizeOptionId: "ts-std",
             roomId: "r-1",
+            rotationDeg: 0,
             x: 0,
             y: 0,
             assignedApplicationId: null,
@@ -134,6 +135,7 @@ describe("FloorPlanSidebar", () => {
             label: "T1",
             tableSizeOptionId: "ts-std",
             roomId: "r-1",
+            rotationDeg: 0,
             x: 0,
             y: 0,
             assignedApplicationId: "app-1",
@@ -165,6 +167,7 @@ describe("FloorPlanSidebar", () => {
             label: "T1",
             tableSizeOptionId: "ts-std",
             roomId: "r-1",
+            rotationDeg: 0,
             x: 0,
             y: 0,
             assignedApplicationId: null,
@@ -183,6 +186,35 @@ describe("FloorPlanSidebar", () => {
     expect(onSelectTable).toHaveBeenCalledWith("tbl-1");
   });
 
+  it("rotates a table through 0 → 90 → 180 → 270 → 0 via the rotate button", () => {
+    const onChange = vi.fn();
+    render(
+      <FloorPlanSidebar
+        eventId="e1"
+        plan={planWith([
+          {
+            id: "t-1",
+            label: "T1",
+            tableSizeOptionId: "ts-std",
+            roomId: "r-1",
+            rotationDeg: 90,
+            x: 0,
+            y: 0,
+            assignedApplicationId: null,
+          },
+        ])}
+        activeRoomId="r-1"
+        tableSizeOptions={[sizedOption()]}
+        acceptedArtists={[]}
+        onChange={onChange}
+        onSelectTable={() => {}}
+      />
+    );
+    fireEvent.click(screen.getByRole("button", { name: /Rotate T1/i }));
+    const next = onChange.mock.calls[0][0] as FloorPlan;
+    expect(next.tables[0].rotationDeg).toBe(180);
+  });
+
   it("deletes a table via its row delete button", () => {
     const onChange = vi.fn();
     render(
@@ -194,6 +226,7 @@ describe("FloorPlanSidebar", () => {
             label: "T1",
             tableSizeOptionId: "ts-std",
             roomId: "r-1",
+            rotationDeg: 0,
             x: 0,
             y: 0,
             assignedApplicationId: null,

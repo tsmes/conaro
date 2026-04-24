@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Plus, Trash2, UserRound } from "lucide-react";
+import { Plus, RotateCw, Trash2, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { FloorPlan, TableSizeOption } from "@/lib/db/schema/events";
 import type { AcceptedArtistEntry } from "./assign-artist-dialog";
@@ -75,6 +75,7 @@ export function FloorPlanSidebar({
           label: nextTableLabel(plan),
           tableSizeOptionId: size.id,
           roomId: activeRoomId,
+          rotationDeg: 0,
           x: 0,
           y: 0,
           assignedApplicationId: null,
@@ -85,6 +86,20 @@ export function FloorPlanSidebar({
 
   function deleteTable(id: string) {
     onChange({ ...plan, tables: plan.tables.filter((t) => t.id !== id) });
+  }
+
+  function rotateTable(id: string) {
+    onChange({
+      ...plan,
+      tables: plan.tables.map((t) =>
+        t.id === id
+          ? {
+              ...t,
+              rotationDeg: (((t.rotationDeg + 90) % 360) as 0 | 90 | 180 | 270),
+            }
+          : t
+      ),
+    });
   }
 
   return (
@@ -163,6 +178,79 @@ export function FloorPlanSidebar({
         )}
       </section>
 
+      {tablesInActiveRoom.length > 0 && (
+        <section className="space-y-2">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+            Tables in {activeRoom?.name} ({tablesInActiveRoom.length})
+          </p>
+          <ul className="space-y-1">
+            {tablesInActiveRoom.map((table) => {
+              const size = tableSizeOptions.find(
+                (s) => s.id === table.tableSizeOptionId
+              );
+              const assigned = Boolean(table.assignedApplicationId);
+              const artistName = table.assignedApplicationId
+                ? acceptedArtists.find(
+                    (a) => a.applicationId === table.assignedApplicationId
+                  )?.displayName ?? "Assigned"
+                : null;
+              return (
+                <li
+                  key={table.id}
+                  className={
+                    "flex items-center justify-between gap-2 rounded-md px-3 py-2 " +
+                    (assigned
+                      ? "bg-success-container text-on-success-container"
+                      : "border border-dashed border-border text-muted-foreground")
+                  }
+                >
+                  <button
+                    type="button"
+                    onClick={() => onSelectTable(table.id)}
+                    className="min-w-0 flex-1 text-left"
+                    aria-label={`Assign artist to ${table.label}`}
+                  >
+                    <p className="truncate text-sm font-semibold text-foreground">
+                      {table.label}
+                      {artistName ? (
+                        <span className="ml-2 font-normal">{artistName}</span>
+                      ) : (
+                        <span className="ml-2 font-normal italic">
+                          available
+                        </span>
+                      )}
+                    </p>
+                    <p className="truncate text-[11px]">
+                      {size?.label ?? "(missing size)"}
+                    </p>
+                  </button>
+                  <div className="flex shrink-0 items-center">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      aria-label={`Rotate ${table.label}`}
+                      onClick={() => rotateTable(table.id)}
+                    >
+                      <RotateCw className="size-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      aria-label={`Delete ${table.label}`}
+                      onClick={() => deleteTable(table.id)}
+                    >
+                      <Trash2 className="size-4" />
+                    </Button>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
+
       {acceptedArtists.length > 0 && (
         <section className="space-y-2">
           <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
@@ -210,68 +298,6 @@ export function FloorPlanSidebar({
               </ul>
             </div>
           )}
-        </section>
-      )}
-
-      {tablesInActiveRoom.length > 0 && (
-        <section className="space-y-2">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-            Tables in {activeRoom?.name} ({tablesInActiveRoom.length})
-          </p>
-          <ul className="space-y-1">
-            {tablesInActiveRoom.map((table) => {
-              const size = tableSizeOptions.find(
-                (s) => s.id === table.tableSizeOptionId
-              );
-              const assigned = Boolean(table.assignedApplicationId);
-              const artistName = table.assignedApplicationId
-                ? acceptedArtists.find(
-                    (a) => a.applicationId === table.assignedApplicationId
-                  )?.displayName ?? "Assigned"
-                : null;
-              return (
-                <li
-                  key={table.id}
-                  className={
-                    "flex items-center justify-between gap-2 rounded-md px-3 py-2 " +
-                    (assigned
-                      ? "bg-success-container text-on-success-container"
-                      : "border border-dashed border-border text-muted-foreground")
-                  }
-                >
-                  <button
-                    type="button"
-                    onClick={() => onSelectTable(table.id)}
-                    className="min-w-0 flex-1 text-left"
-                    aria-label={`Assign artist to ${table.label}`}
-                  >
-                    <p className="truncate text-sm font-semibold text-foreground">
-                      {table.label}
-                      {artistName ? (
-                        <span className="ml-2 font-normal">{artistName}</span>
-                      ) : (
-                        <span className="ml-2 font-normal italic">
-                          available
-                        </span>
-                      )}
-                    </p>
-                    <p className="truncate text-[11px]">
-                      {size?.label ?? "(missing size)"}
-                    </p>
-                  </button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    aria-label={`Delete ${table.label}`}
-                    onClick={() => deleteTable(table.id)}
-                  >
-                    <Trash2 className="size-4" />
-                  </Button>
-                </li>
-              );
-            })}
-          </ul>
         </section>
       )}
     </aside>
