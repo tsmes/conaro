@@ -139,7 +139,7 @@ This form uses a "Copy from convention default" dropdown that overwrites the tex
 **Verification:** Component test passes; manual: open applications page, switch between event override and "Copy from convention default", typing works without cursor jumps.
 **Depends on:** 3.
 
-### 7. Wire rich-text editor into BasicInfoForm
+### 7. Wire rich-text editor into BasicInfoForm ✅
 
 Single field: `bio`.
 

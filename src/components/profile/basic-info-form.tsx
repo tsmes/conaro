@@ -12,7 +12,7 @@ import { SocialLinksEditor } from "./social-links-editor";
 
 const LABEL_CLASS =
   "text-[11px] font-bold uppercase tracking-wider text-muted-foreground";
-import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 
 interface BasicInfoFormProps {
   defaultValues: {
@@ -143,10 +143,9 @@ export function BasicInfoForm({ defaultValues }: BasicInfoFormProps) {
       </div>
       <div className="space-y-2">
         <Label htmlFor="bio" className={LABEL_CLASS}>Bio / description</Label>
-        <Textarea
+        <RichTextEditor
           id="bio"
           name="bio"
-          rows={4}
           defaultValue={defaultValues.bio}
           placeholder="Tell conventions about yourself and your work..."
         />
