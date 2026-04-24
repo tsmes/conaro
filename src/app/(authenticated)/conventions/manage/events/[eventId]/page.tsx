@@ -126,6 +126,27 @@ export default async function EventDetailPage({
         </div>
       </Card>
 
+      {event.status === "results_published" && (
+        <Card className="p-6 md:p-8">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+            Announcements
+          </p>
+          <h2 className="mt-2 font-heading text-2xl font-bold tracking-tight">
+            Messages to accepted artists
+          </h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Use this for pre-event logistics, day-of updates, and anything
+            else accepted artists need before or during the event.
+          </p>
+          <div className="mt-6">
+            <AnnouncementsEditor
+              eventId={event.id}
+              announcements={announcements}
+            />
+          </div>
+        </Card>
+      )}
+
       <Card className="p-8 md:p-10">
         <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
           Details
@@ -178,27 +199,6 @@ export default async function EventDetailPage({
           />
         </div>
       </Card>
-
-      {event.status === "results_published" && (
-        <Card className="p-6 md:p-8">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-            Announcements
-          </p>
-          <h2 className="mt-2 font-heading text-2xl font-bold tracking-tight">
-            Messages to accepted artists
-          </h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Use this for pre-event logistics, day-of updates, and anything
-            else accepted artists need before or during the event.
-          </p>
-          <div className="mt-6">
-            <AnnouncementsEditor
-              eventId={event.id}
-              announcements={announcements}
-            />
-          </div>
-        </Card>
-      )}
     </div>
   );
 }
