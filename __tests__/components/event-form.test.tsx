@@ -79,7 +79,6 @@ describe("EventForm", () => {
             {
               id: "ts-1",
               label: "Standard",
-              dimensions: "120x80 cm",
               priceNok: 1200,
               widthCm: 120,
               depthCm: 80,

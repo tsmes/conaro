@@ -10,7 +10,6 @@ import type {
 const sizeStd: TableSizeOption = {
   id: "ts-std",
   label: "Standard",
-  dimensions: "120x80 cm",
   priceNok: 1200,
   widthCm: 120,
   depthCm: 80,
@@ -19,7 +18,6 @@ const sizeStd: TableSizeOption = {
 const sizeCorner: TableSizeOption = {
   id: "ts-corner",
   label: "Corner",
-  dimensions: "100x100 cm",
   priceNok: 1500,
   widthCm: 100,
   depthCm: 100,

@@ -100,13 +100,11 @@ async function run() {
         {
           id: crypto.randomUUID(),
           label: "Standard",
-          dimensions: "90 x 120 cm",
           priceNok: 280,
         },
         {
           id: crypto.randomUUID(),
           label: "Double",
-          dimensions: "90 x 240 cm",
           priceNok: 580,
         },
       ],

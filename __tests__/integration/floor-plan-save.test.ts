@@ -27,7 +27,6 @@ vi.mock("next/cache", () => ({
 const sizeWithDims: TableSizeOption = {
   id: "ts-std",
   label: "Standard",
-  dimensions: "120x80 cm",
   priceNok: 1200,
   widthCm: 120,
   depthCm: 80,
@@ -36,7 +35,6 @@ const sizeWithDims: TableSizeOption = {
 const sizeMissingDims: TableSizeOption = {
   id: "ts-nodims",
   label: "No dims",
-  dimensions: "",
   priceNok: null,
 };
 

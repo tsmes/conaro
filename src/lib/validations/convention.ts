@@ -194,7 +194,6 @@ export const eventSchema = z
             z.object({
               id: z.string().min(1),
               label: z.string().min(1, "Label is required").max(100),
-              dimensions: z.string().max(100).optional().default(""),
               priceNok: z
                 .union([z.number().int().min(0), z.null()])
                 .nullable()

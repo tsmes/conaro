@@ -10,7 +10,6 @@ function sizedOption(
   return {
     id: "ts-std",
     label: "Standard",
-    dimensions: "120x80 cm",
     priceNok: 1200,
     widthCm: 120,
     depthCm: 80,
@@ -22,7 +21,6 @@ function sizelessOption(): TableSizeOption {
   return {
     id: "ts-nodims",
     label: "Corner",
-    dimensions: "",
     priceNok: null,
   };
 }

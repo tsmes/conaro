@@ -252,7 +252,7 @@ describe("applyToEvent", () => {
     const { convention } = await createTestOrganizer();
     const event = await createTestEvent(convention.id, {
       tableSizeOptions: [
-        { id: "size-a", label: "Standard", dimensions: "90x120", priceNok: 280 },
+        { id: "size-a", label: "Standard", priceNok: 280 },
       ],
       maxAssistants: 1,
       assistantFeeNok: 300,
@@ -317,7 +317,7 @@ describe("applyToEvent", () => {
     const { convention } = await createTestOrganizer();
     const event = await createTestEvent(convention.id, {
       tableSizeOptions: [
-        { id: "size-a", label: "Standard", dimensions: "90x120", priceNok: 280 },
+        { id: "size-a", label: "Standard", priceNok: 280 },
       ],
       maxAssistants: 0,
       fieldRequirements: {

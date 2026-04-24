@@ -3,8 +3,8 @@ import { buildApplicationAnswersSchema } from "@/lib/validations/application";
 import type { TableSizeOption } from "@/lib/db/schema/events";
 
 const tableOptions: TableSizeOption[] = [
-  { id: "size-a", label: "Standard", dimensions: "90x120", priceNok: 280 },
-  { id: "size-b", label: "Double", dimensions: "90x240", priceNok: 580 },
+  { id: "size-a", label: "Standard", priceNok: 280 },
+  { id: "size-b", label: "Double", priceNok: 580 },
 ];
 
 describe("buildApplicationAnswersSchema", () => {

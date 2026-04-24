@@ -223,9 +223,9 @@ export function ApplicationForm({
                 />
                 <div className="flex-1">
                   <div className="font-semibold">{opt.label}</div>
-                  {opt.dimensions && (
+                  {opt.widthCm && opt.depthCm && (
                     <div className="text-xs text-muted-foreground">
-                      {opt.dimensions}
+                      {opt.widthCm} × {opt.depthCm} cm
                     </div>
                   )}
                 </div>

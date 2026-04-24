@@ -74,7 +74,10 @@ export default async function ApplicationsPage({
           })),
         answers: {
           tableSizeLabel: tableSize?.label ?? null,
-          tableSizeDimensions: tableSize?.dimensions ?? null,
+          tableSizeDimensions:
+            tableSize?.widthCm && tableSize?.depthCm
+              ? `${tableSize.widthCm} × ${tableSize.depthCm} cm`
+              : null,
           tableSizePriceNok: tableSize?.priceNok ?? null,
           assistantsCount: ans.assistants?.count ?? null,
           assistantsNames: ans.assistants?.names ?? [],
