@@ -167,7 +167,7 @@ Click a table → pick an accepted artist → mismatch warning if sizes don't ma
 **Verification:** Component test green; manual: assignment flow end-to-end.
 **Depends on:** 8 (sidebar is what opens the dialog via `onSelectTable`).
 
-### 10. Wire the whole `<FloorPlanEditor>` into the organizer event-management page
+### 10. Wire the whole `<FloorPlanEditor>` into the organizer event-management page ✅
 
 The top-level client component that hosts canvas + sidebar + dialog, threads state, debounces the save.
 

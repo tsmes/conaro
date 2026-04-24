@@ -20,6 +20,11 @@ import { AnnouncementsEditor } from "@/components/conventions/announcements-edit
 import { getEventAnnouncements } from "@/app/(authenticated)/conventions/manage/events/[eventId]/announcements/actions";
 import { ThreadInbox } from "@/components/conventions/thread-inbox";
 import { getOrganizerInboxWithMessages } from "@/lib/threads/queries";
+import {
+  getAcceptedArtistsForEvent,
+  getFloorPlanForEvent,
+} from "@/lib/floor-plans/queries";
+import { FloorPlanEditor } from "@/components/floor-plans/floor-plan-editor";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
@@ -59,6 +64,13 @@ export default async function EventDetailPage({
   const amenities = event.amenities as Amenities | null;
   const announcements = await getEventAnnouncements(event.id);
   const inboxRows = await getOrganizerInboxWithMessages(event.id);
+  const showFloorPlan = event.status === "results_published";
+  const [floorPlan, acceptedArtistsForPlanner] = showFloorPlan
+    ? await Promise.all([
+        getFloorPlanForEvent(event.id),
+        getAcceptedArtistsForEvent(event.id),
+      ])
+    : [null, []];
   const inboxThreads = inboxRows.map((row) => ({
     threadId: row.thread.id,
     artistProfileId: row.thread.artistProfileId,
@@ -154,6 +166,31 @@ export default async function EventDetailPage({
             <AnnouncementsEditor
               eventId={event.id}
               announcements={announcements}
+            />
+          </div>
+        </Card>
+      )}
+
+      {showFloorPlan && (
+        <Card className="p-6 md:p-8">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+            Floor plan
+          </p>
+          <h2 className="mt-2 font-heading text-2xl font-bold tracking-tight">
+            Layout &amp; table assignments
+          </h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Arrange rooms and tables to match your venue, then assign
+            accepted artists to their spots. Sizes use the table-size
+            catalog from the event details; fill in width/depth on any
+            size you want to place here.
+          </p>
+          <div className="mt-6">
+            <FloorPlanEditor
+              eventId={event.id}
+              initialPlan={floorPlan}
+              tableSizeOptions={event.tableSizeOptions ?? []}
+              acceptedArtists={acceptedArtistsForPlanner}
             />
           </div>
         </Card>

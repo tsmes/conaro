@@ -43,7 +43,7 @@ const sizeMissingDims: TableSizeOption = {
 function submit(input: {
   eventId: string;
   plan: unknown;
-}): Promise<ReturnType<typeof saveFloorPlan>> {
+}): ReturnType<typeof saveFloorPlan> {
   return saveFloorPlan(
     {},
     buildFormData({

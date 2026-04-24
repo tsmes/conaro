@@ -83,3 +83,40 @@ export async function getFloorPlanForEvent(
     })),
   };
 }
+
+export interface AcceptedArtistForPlanner {
+  applicationId: string;
+  displayName: string;
+  requestedTableSizeOptionId: string | null;
+}
+
+// Every accepted artist on the event, shaped for the assign-artist
+// dialog. Ordered by displayName so the list is stable between renders.
+export async function getAcceptedArtistsForEvent(
+  eventId: string
+): Promise<AcceptedArtistForPlanner[]> {
+  const rows = await db
+    .select({
+      applicationId: applications.id,
+      displayName: profiles.displayName,
+      answers: applications.answers,
+    })
+    .from(applications)
+    .innerJoin(profiles, eq(profiles.id, applications.profileId))
+    .where(
+      and(
+        eq(applications.eventId, eventId),
+        eq(applications.status, "accepted")
+      )
+    );
+
+  return rows
+    .map((r) => ({
+      applicationId: r.applicationId,
+      displayName: r.displayName,
+      requestedTableSizeOptionId:
+        (r.answers as { tableSizeOptionId?: string } | null)
+          ?.tableSizeOptionId ?? null,
+    }))
+    .sort((a, b) => a.displayName.localeCompare(b.displayName));
+}
