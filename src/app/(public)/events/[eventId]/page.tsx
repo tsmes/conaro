@@ -296,6 +296,62 @@ export default async function EventDetailPage({
       )}
 
       <div className="mt-12 space-y-6">
+        {isArtist &&
+          event.status === "results_published" &&
+          ownApplicationStatus &&
+          ownApplicationStatus !== "revoked" && (
+            <SectionCard
+              label={
+                ownApplicationStatus === "accepted"
+                  ? "You're in"
+                  : ownApplicationStatus === "rejected"
+                    ? "Results"
+                    : ownApplicationStatus === "waitlisted"
+                      ? "You're on the waitlist"
+                      : "Your application"
+              }
+            >
+              {/* Waitlisted entries come FROM rejected status, so the stored
+                  responseMessage is the stale rejection text. Show the
+                  waitlist-specific confirmation instead. */}
+              {ownApplicationStatus === "waitlisted" ? (
+                <p className="text-sm leading-relaxed text-foreground">
+                  You&apos;re on the waitlist. If a spot opens up, the
+                  organizer may offer it to you — we&apos;ll let you know.
+                </p>
+              ) : ownResponseMessage ? (
+                <Markdown
+                  source={ownResponseMessage}
+                  className="text-foreground"
+                />
+              ) : (
+                <p className="text-sm leading-relaxed text-foreground">
+                  {ownApplicationStatus === "accepted"
+                    ? "Congratulations! Your application has been accepted."
+                    : ownApplicationStatus === "rejected"
+                      ? "Thank you for applying. Unfortunately, we can't offer you a spot at this event."
+                      : "Your application has been reviewed."}
+                </p>
+              )}
+              {ownApplicationStatus === "rejected" &&
+                event.waitlistEnabled && (
+                  <div
+                    className={cn(
+                      "mt-5",
+                      ownResponseMessage &&
+                        "border-t border-border pt-5"
+                    )}
+                  >
+                    <p className="mb-3 text-sm text-muted-foreground">
+                      If a spot opens up, the organizer may offer it to
+                      you — join the waitlist to opt in.
+                    </p>
+                    <JoinWaitlistButton eventId={event.id} />
+                  </div>
+                )}
+            </SectionCard>
+          )}
+
         {event.description && (
           <SectionCard label="About this event">
             <Markdown
@@ -396,56 +452,6 @@ export default async function EventDetailPage({
             />
           </SectionCard>
         )}
-
-        {isArtist &&
-          event.status === "results_published" &&
-          ownApplicationStatus &&
-          ownApplicationStatus !== "revoked" && (
-            <SectionCard
-              label={
-                ownApplicationStatus === "accepted"
-                  ? "You're in"
-                  : ownApplicationStatus === "rejected"
-                    ? "Results"
-                    : ownApplicationStatus === "waitlisted"
-                      ? "You're on the waitlist"
-                      : "Your application"
-              }
-            >
-              {ownResponseMessage ? (
-                <Markdown
-                  source={ownResponseMessage}
-                  className="text-foreground"
-                />
-              ) : (
-                <p className="text-sm leading-relaxed text-foreground">
-                  {ownApplicationStatus === "accepted"
-                    ? "Congratulations! Your application has been accepted."
-                    : ownApplicationStatus === "rejected"
-                      ? "Thank you for applying. Unfortunately, we can't offer you a spot at this event."
-                      : ownApplicationStatus === "waitlisted"
-                        ? "You're on the waitlist. If a spot opens up, the organizer may offer it to you."
-                        : "Your application has been reviewed."}
-                </p>
-              )}
-              {ownApplicationStatus === "rejected" &&
-                event.waitlistEnabled && (
-                  <div
-                    className={cn(
-                      "mt-5",
-                      ownResponseMessage &&
-                        "border-t border-border pt-5"
-                    )}
-                  >
-                    <p className="mb-3 text-sm text-muted-foreground">
-                      If a spot opens up, the organizer may offer it to
-                      you — join the waitlist to opt in.
-                    </p>
-                    <JoinWaitlistButton eventId={event.id} />
-                  </div>
-                )}
-            </SectionCard>
-          )}
 
         {isAccepting && (
           <SectionCard label="Apply">

@@ -27,7 +27,7 @@ export function JoinWaitlistButton({ eventId }: { eventId: string }) {
         </p>
       )}
       <Button type="submit" size="sm" disabled={pending}>
-        {pending ? "Joining\u2026" : "Join the waitlist"}
+        {pending ? "Joining…" : "Join the waitlist"}
       </Button>
     </form>
   );
