@@ -117,7 +117,7 @@ The "nearest upcoming / ongoing" selection rule, isolated in one helper.
 **Verification:** Integration test green; build green.
 **Depends on:** none.
 
-### 6. Build `<OrganizerDashboardView>` component
+### 6. Build `<OrganizerDashboardView>` component ✅
 
 Pure presentational component + tests. No data fetching inside — all props come from the page.
 
