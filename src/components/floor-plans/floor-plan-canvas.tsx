@@ -1,27 +1,40 @@
 "use client";
 
 import { useMemo, useRef, useState, useEffect } from "react";
-import { Stage, Layer, Rect, Line, Text, Group } from "react-konva";
+import { Stage, Layer, Rect, Line, Text, Group, Circle } from "react-konva";
 import type { FloorPlan, TableSizeOption } from "@/lib/db/schema/events";
 import type { ResolvedFloorPlan } from "@/lib/floor-plans/queries";
 
 const GRID_CM = 100;
 const DEFAULT_ROOM_SIZE_CM = { widthCm: 1000, heightCm: 700 };
 
+// Colour palette tuned against the Conaro theme. Stays muted so the
+// plan reads as a drafting surface, not a painted diagram.
+const COLORS = {
+  backdrop: "#f6f7f9",
+  roomFill: "#ffffff",
+  roomStroke: "#cbd5e1",
+  roomLabelBg: "#1f2937",
+  roomLabelText: "#ffffff",
+  gridLine: "#e6e8ec",
+  gridOrigin: "#d1d5db",
+  tableUnassignedFill: "#f1f5f9",
+  tableUnassignedStroke: "#94a3b8",
+  tableAssignedFill: "#dbeafe",
+  tableAssignedStroke: "#3b82f6",
+  tableShadow: "rgba(15, 23, 42, 0.12)",
+  highlightGlow: "#8b5cf6",
+  labelText: "#0f172a",
+  labelPin: "#6366f1",
+  hintText: "#64748b",
+};
+
 interface FloorPlanCanvasProps {
-  // Resolved plan for read-side rendering (assignment → artist name).
   plan: ResolvedFloorPlan | null;
-  // Only tables belonging to the active room render. When null and the
-  // plan has rooms, nothing renders; when the plan has no rooms, the
-  // empty-state placeholder takes over.
   activeRoomId: string | null;
-  // Event's size catalog, used to render each table at its real-world
-  // dimensions.
   tableSizeOptions: TableSizeOption[];
   editable: boolean;
   onChange?: (next: FloorPlan) => void;
-  // Highlight the matching table with a violet outline ("you are
-  // here" marker on the public event page).
   highlightApplicationId?: string;
 }
 
@@ -55,9 +68,14 @@ export function FloorPlanCanvas({
     ? { widthCm: activeRoom.widthCm, heightCm: activeRoom.heightCm }
     : DEFAULT_ROOM_SIZE_CM;
 
-  const scale = containerWidth / viewportCm.widthCm;
+  // Leave a small padding inside the stage so the room doesn't hug the
+  // container edge — purely aesthetic but makes shadows + labels
+  // breathe.
+  const PADDING_PX = 16;
+  const effectiveWidthPx = Math.max(0, containerWidth - PADDING_PX * 2);
+  const scale = effectiveWidthPx / viewportCm.widthCm;
   const stageWidth = containerWidth;
-  const stageHeight = viewportCm.heightCm * scale;
+  const stageHeight = viewportCm.heightCm * scale + PADDING_PX * 2;
 
   const sizeById = useMemo(
     () => new Map(tableSizeOptions.map((s) => [s.id, s])),
@@ -73,16 +91,11 @@ export function FloorPlanCanvas({
     rotationDeg: number
   ) {
     if (!plan || !onChange || !activeRoom) return;
-    // Drag position is the Group's centre-of-rotation, which we've
-    // placed at the rect's geometric centre. For 90/270° rotations the
-    // visual footprint swaps width and depth, so clamping has to use
-    // the rotated half-extents — otherwise tables can half-vanish into
-    // a wall when nudged to the edge.
     const rotated = rotationDeg === 90 || rotationDeg === 270;
     const effWidthCm = rotated ? sizeDepthCm : sizeWidthCm;
     const effDepthCm = rotated ? sizeWidthCm : sizeDepthCm;
-    const centerXCm = centerStageXPx / scale;
-    const centerYCm = centerStageYPx / scale;
+    const centerXCm = (centerStageXPx - PADDING_PX) / scale;
+    const centerYCm = (centerStageYPx - PADDING_PX) / scale;
     const clampedCenterX = Math.max(
       effWidthCm / 2,
       Math.min(activeRoom.widthCm - effWidthCm / 2, centerXCm)
@@ -91,7 +104,6 @@ export function FloorPlanCanvas({
       effDepthCm / 2,
       Math.min(activeRoom.heightCm - effDepthCm / 2, centerYCm)
     );
-    // Convert back to the un-rotated top-left coordinate we store.
     const newXCm = Math.round(clampedCenterX - sizeWidthCm / 2);
     const newYCm = Math.round(clampedCenterY - sizeDepthCm / 2);
     const nextTables = plan.tables.map((t) => {
@@ -108,7 +120,7 @@ export function FloorPlanCanvas({
       if (t.id !== tableId) return raw;
       return { ...raw, x: newXCm, y: newYCm };
     });
-    onChange({ rooms: plan.rooms, tables: nextTables });
+    onChange({ rooms: plan.rooms, tables: nextTables, labels: plan.labels });
   }
 
   const tablesInRoom =
@@ -128,11 +140,11 @@ export function FloorPlanCanvas({
     if (!plan || !onChange || !activeRoom) return;
     const newX = Math.max(
       0,
-      Math.min(activeRoom.widthCm, Math.round(stageXPx / scale))
+      Math.min(activeRoom.widthCm, Math.round((stageXPx - PADDING_PX) / scale))
     );
     const newY = Math.max(
       0,
-      Math.min(activeRoom.heightCm, Math.round(stageYPx / scale))
+      Math.min(activeRoom.heightCm, Math.round((stageYPx - PADDING_PX) / scale))
     );
     onChange({
       rooms: plan.rooms,
@@ -152,15 +164,19 @@ export function FloorPlanCanvas({
     });
   }
 
+  const roomWidthPx = viewportCm.widthCm * scale;
+  const roomHeightPx = viewportCm.heightCm * scale;
+
   return (
     <div
       ref={containerRef}
-      className="w-full overflow-hidden rounded-lg border border-border bg-background"
+      className="w-full overflow-hidden rounded-xl border border-border"
+      style={{ backgroundColor: COLORS.backdrop }}
     >
       {!activeRoom ? (
         <div
-          className="flex items-center justify-center p-12 text-center text-sm text-muted-foreground"
-          style={{ minHeight: 360 }}
+          className="flex items-center justify-center p-12 text-center text-sm"
+          style={{ minHeight: 360, color: COLORS.hintText }}
         >
           {(plan?.rooms.length ?? 0) === 0
             ? "Add your first room from the toolbar above."
@@ -168,43 +184,82 @@ export function FloorPlanCanvas({
         </div>
       ) : (
         <Stage width={stageWidth} height={stageHeight}>
-          <Layer>
+          {/* Layer 1: room frame (shadow + fill + grid) */}
+          <Layer listening={false}>
+            {/* Drop shadow sits slightly below and to the right */}
             <Rect
-              x={0}
-              y={0}
-              width={viewportCm.widthCm * scale}
-              height={viewportCm.heightCm * scale}
-              fill="rgba(255,255,255,0.6)"
-              stroke="#4b5563"
-              strokeWidth={2}
+              x={PADDING_PX + 2}
+              y={PADDING_PX + 4}
+              width={roomWidthPx}
+              height={roomHeightPx}
+              fill={COLORS.tableShadow}
+              cornerRadius={10}
+              opacity={0.35}
+            />
+            <Rect
+              x={PADDING_PX}
+              y={PADDING_PX}
+              width={roomWidthPx}
+              height={roomHeightPx}
+              fill={COLORS.roomFill}
+              stroke={COLORS.roomStroke}
+              strokeWidth={1.5}
+              cornerRadius={10}
             />
             <GridBackground
               widthCm={viewportCm.widthCm}
               heightCm={viewportCm.heightCm}
               scale={scale}
+              offsetX={PADDING_PX}
+              offsetY={PADDING_PX}
             />
-          </Layer>
-          <Layer>
-            {labelsInRoom.map((label) => (
-            <Group
-              key={label.id}
-              x={label.x * scale}
-              y={label.y * scale}
-              rotation={label.rotationDeg}
-              draggable={editable}
-              onDragEnd={(e) =>
-                handleLabelDragEnd(label.id, e.target.x(), e.target.y())
-              }
-            >
+            {/* Room label pill */}
+            <Group x={PADDING_PX + 10} y={PADDING_PX + 10}>
+              <Rect
+                width={Math.max(120, activeRoom.name.length * 7 + 32)}
+                height={22}
+                fill={COLORS.roomLabelBg}
+                cornerRadius={11}
+              />
               <Text
-                text={label.text}
-                fontSize={13}
+                x={12}
+                y={5}
+                text={`${activeRoom.name}  ·  ${(activeRoom.widthCm / 100).toFixed(1)} × ${(activeRoom.heightCm / 100).toFixed(1)} m`}
+                fontSize={11}
                 fontStyle="600"
-                fill="#1f2937"
+                fill={COLORS.roomLabelText}
               />
             </Group>
-          ))}
-          {tablesInRoom.map((table) => {
+          </Layer>
+
+          {/* Layer 2: labels (drawn beneath tables so a table on top of a
+              label doesn't get obscured by annotation text) */}
+          <Layer>
+            {labelsInRoom.map((label) => (
+              <Group
+                key={label.id}
+                x={PADDING_PX + label.x * scale}
+                y={PADDING_PX + label.y * scale}
+                rotation={label.rotationDeg}
+                draggable={editable}
+                onDragEnd={(e) =>
+                  handleLabelDragEnd(label.id, e.target.x(), e.target.y())
+                }
+              >
+                <Circle x={-6} y={7} radius={3} fill={COLORS.labelPin} />
+                <Text
+                  text={label.text}
+                  fontSize={13}
+                  fontStyle="600"
+                  fill={COLORS.labelText}
+                />
+              </Group>
+            ))}
+          </Layer>
+
+          {/* Layer 3: tables */}
+          <Layer>
+            {tablesInRoom.map((table) => {
               const size = sizeById.get(table.tableSizeOptionId);
               if (!size || !size.widthCm || !size.depthCm) return null;
               const highlight =
@@ -213,11 +268,16 @@ export function FloorPlanCanvas({
               const assigned = table.assignment !== null;
               const wPx = size.widthCm * scale;
               const hPx = size.depthCm * scale;
-              // Group is positioned at the rect's centre so rotation
-              // pivots around the centre. Rect + Text use negative
-              // offsets to sit around that origin.
-              const centerX = (table.x + size.widthCm / 2) * scale;
-              const centerY = (table.y + size.depthCm / 2) * scale;
+              const centerX = PADDING_PX + (table.x + size.widthCm / 2) * scale;
+              const centerY = PADDING_PX + (table.y + size.depthCm / 2) * scale;
+              const fill = assigned
+                ? COLORS.tableAssignedFill
+                : COLORS.tableUnassignedFill;
+              const stroke = highlight
+                ? COLORS.highlightGlow
+                : assigned
+                  ? COLORS.tableAssignedStroke
+                  : COLORS.tableUnassignedStroke;
               return (
                 <Group
                   key={table.id}
@@ -236,35 +296,74 @@ export function FloorPlanCanvas({
                     )
                   }
                 >
+                  {/* Highlight halo (rendered under the rect when viewer
+                      is the assigned artist) */}
+                  {highlight && (
+                    <Rect
+                      x={-wPx / 2 - 6}
+                      y={-hPx / 2 - 6}
+                      width={wPx + 12}
+                      height={hPx + 12}
+                      fill="rgba(139, 92, 246, 0.15)"
+                      cornerRadius={8}
+                    />
+                  )}
+                  {/* Shadow */}
+                  <Rect
+                    x={-wPx / 2 + 1}
+                    y={-hPx / 2 + 3}
+                    width={wPx}
+                    height={hPx}
+                    fill={COLORS.tableShadow}
+                    cornerRadius={6}
+                    opacity={0.4}
+                  />
+                  {/* Main body */}
                   <Rect
                     x={-wPx / 2}
                     y={-hPx / 2}
                     width={wPx}
                     height={hPx}
-                    fill={assigned ? "#fde68a" : "#e5e7eb"}
-                    stroke={highlight ? "#7c3aed" : "#374151"}
-                    strokeWidth={highlight ? 3 : 1.5}
-                    cornerRadius={4}
+                    fill={fill}
+                    stroke={stroke}
+                    strokeWidth={highlight ? 2.5 : assigned ? 1.5 : 1}
+                    cornerRadius={6}
+                  />
+                  {/* Accent strip along the top — signals "this end faces
+                      the aisle" and adds a splash of colour */}
+                  <Rect
+                    x={-wPx / 2}
+                    y={-hPx / 2}
+                    width={wPx}
+                    height={4}
+                    fill={
+                      assigned
+                        ? COLORS.tableAssignedStroke
+                        : COLORS.tableUnassignedStroke
+                    }
+                    cornerRadius={[6, 6, 0, 0]}
+                    opacity={0.6}
                   />
                   <Text
-                    x={-wPx / 2 + 6}
-                    y={-hPx / 2 + 6}
+                    x={-wPx / 2 + 8}
+                    y={-hPx / 2 + 10}
                     text={table.label}
-                    fontSize={11}
-                    fontStyle="bold"
-                    fill="#111827"
+                    fontSize={12}
+                    fontStyle="700"
+                    fill="#0f172a"
                   />
                   <Text
-                    x={-wPx / 2 + 6}
-                    y={-hPx / 2 + 20}
+                    x={-wPx / 2 + 8}
+                    y={-hPx / 2 + 26}
                     text={
                       table.assignment
                         ? table.assignment.artistDisplayName
                         : "available"
                     }
                     fontSize={10}
-                    fill={table.assignment ? "#111827" : "#6b7280"}
-                    width={wPx - 12}
+                    fontStyle={table.assignment ? "500" : "400"}
+                    fill={table.assignment ? "#1e40af" : "#64748b"}
+                    width={wPx - 16}
                     ellipsis
                   />
                 </Group>
@@ -281,19 +380,24 @@ function GridBackground({
   widthCm,
   heightCm,
   scale,
+  offsetX,
+  offsetY,
 }: {
   widthCm: number;
   heightCm: number;
   scale: number;
+  offsetX: number;
+  offsetY: number;
 }) {
   const lines: React.ReactNode[] = [];
   for (let x = GRID_CM; x < widthCm; x += GRID_CM) {
     lines.push(
       <Line
         key={`v-${x}`}
-        points={[x * scale, 0, x * scale, heightCm * scale]}
-        stroke="#e5e7eb"
+        points={[offsetX + x * scale, offsetY, offsetX + x * scale, offsetY + heightCm * scale]}
+        stroke={COLORS.gridLine}
         strokeWidth={1}
+        dash={[2, 4]}
       />
     );
   }
@@ -301,9 +405,10 @@ function GridBackground({
     lines.push(
       <Line
         key={`h-${y}`}
-        points={[0, y * scale, widthCm * scale, y * scale]}
-        stroke="#e5e7eb"
+        points={[offsetX, offsetY + y * scale, offsetX + widthCm * scale, offsetY + y * scale]}
+        stroke={COLORS.gridLine}
         strokeWidth={1}
+        dash={[2, 4]}
       />
     );
   }
