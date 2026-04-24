@@ -36,9 +36,24 @@ const tableSchema = z.object({
   assignedApplicationId: z.string().min(1).nullable(),
 });
 
+const labelSchema = z.object({
+  id: z.string().min(1),
+  roomId: z.string().min(1),
+  text: z.string().trim().min(1, "Label text is required").max(40),
+  x: z.number().int().min(0),
+  y: z.number().int().min(0),
+  rotationDeg: z.union([
+    z.literal(0),
+    z.literal(90),
+    z.literal(180),
+    z.literal(270),
+  ]),
+});
+
 const planSchema = z.object({
   rooms: z.array(roomSchema).max(50),
   tables: z.array(tableSchema).max(500),
+  labels: z.array(labelSchema).max(200).optional(),
 });
 
 // Organizer saves the whole floor plan atomically. The action accepts a
@@ -78,12 +93,20 @@ export async function saveFloorPlan(
   const event = await getOrganizerEvent(session.user.profileId, eventId);
   if (!event) return { error: "Event not found" };
 
-  // Every table must live in a room that's part of the same plan.
+  // Every table and label must live in a room that's part of the same
+  // plan.
   const roomIds = new Set(plan.rooms.map((r) => r.id));
   for (const table of plan.tables) {
     if (!roomIds.has(table.roomId)) {
       return {
         error: `Table ${table.label} is not assigned to a room`,
+      };
+    }
+  }
+  for (const label of plan.labels ?? []) {
+    if (!roomIds.has(label.roomId)) {
+      return {
+        error: `Label "${label.text}" references an unknown room`,
       };
     }
   }

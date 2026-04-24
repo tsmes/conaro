@@ -10,6 +10,7 @@ import {
   type AcceptedArtistEntry,
 } from "./assign-artist-dialog";
 import { EditTableDialog } from "./edit-table-dialog";
+import { EditLabelDialog } from "./edit-label-dialog";
 import type {
   FloorPlan,
   FloorPlanTable,
@@ -29,7 +30,7 @@ interface FloorPlanEditorProps {
 type SaveStatus = "idle" | "saving" | "saved" | "error";
 
 function toRawPlan(resolved: ResolvedFloorPlan | null): FloorPlan {
-  if (!resolved) return { rooms: [], tables: [] };
+  if (!resolved) return { rooms: [], tables: [], labels: [] };
   return {
     rooms: resolved.rooms,
     tables: resolved.tables.map((t) => ({
@@ -42,6 +43,7 @@ function toRawPlan(resolved: ResolvedFloorPlan | null): FloorPlan {
       y: t.y,
       assignedApplicationId: t.assignedApplicationId,
     })),
+    labels: resolved.labels,
   };
 }
 
@@ -67,6 +69,7 @@ function resolvePlan(
           : null,
       };
     }),
+    labels: plan.labels ?? [],
   };
 }
 
@@ -83,6 +86,8 @@ export function FloorPlanEditor({
   });
   const [assignTableId, setAssignTableId] = useState<string | null>(null);
   const [editTableId, setEditTableId] = useState<string | null>(null);
+  const [editingLabelId, setEditingLabelId] = useState<string | null>(null);
+  const [addLabelOpen, setAddLabelOpen] = useState(false);
   const [status, setStatus] = useState<SaveStatus>("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -196,12 +201,43 @@ export function FloorPlanEditor({
     });
   }
 
+  function handleAddLabel(text: string) {
+    if (!activeRoomId) return;
+    handlePlanChange({
+      ...plan,
+      labels: [
+        ...(plan.labels ?? []),
+        {
+          id: crypto.randomUUID(),
+          roomId: activeRoomId,
+          text,
+          x: 50,
+          y: 50,
+          rotationDeg: 0,
+        },
+      ],
+    });
+  }
+
+  function handleEditLabelText(text: string) {
+    if (!editingLabelId) return;
+    handlePlanChange({
+      ...plan,
+      labels: (plan.labels ?? []).map((l) =>
+        l.id === editingLabelId ? { ...l, text } : l
+      ),
+    });
+  }
+
   const resolvedForCanvas = resolvePlan(plan, acceptedArtists);
   const dialogTable: FloorPlanTable | null = assignTableId
     ? plan.tables.find((t) => t.id === assignTableId) ?? null
     : null;
   const editingTable: FloorPlanTable | null = editTableId
     ? plan.tables.find((t) => t.id === editTableId) ?? null
+    : null;
+  const editingLabel = editingLabelId
+    ? (plan.labels ?? []).find((l) => l.id === editingLabelId) ?? null
     : null;
 
   return (
@@ -239,6 +275,8 @@ export function FloorPlanEditor({
             onChange={handlePlanChange}
             onSelectTable={(id) => setAssignTableId(id)}
             onEditTable={(id) => setEditTableId(id)}
+            onAddLabel={() => setAddLabelOpen(true)}
+            onEditLabel={(id) => setEditingLabelId(id)}
           />
         </div>
       </div>
@@ -261,6 +299,20 @@ export function FloorPlanEditor({
         table={editingTable}
         tableSizeOptions={tableSizeOptions}
         onSave={handleEditTable}
+      />
+      <EditLabelDialog
+        open={addLabelOpen}
+        onOpenChange={setAddLabelOpen}
+        initialText={null}
+        onSave={handleAddLabel}
+      />
+      <EditLabelDialog
+        open={editingLabel !== null}
+        onOpenChange={(open) => {
+          if (!open) setEditingLabelId(null);
+        }}
+        initialText={editingLabel?.text ?? null}
+        onSave={handleEditLabelText}
       />
     </div>
   );

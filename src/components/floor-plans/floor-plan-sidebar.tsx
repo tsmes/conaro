@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Pencil, Plus, RotateCw, Trash2, UserRound } from "lucide-react";
+import { Pencil, Plus, RotateCw, Tag, Trash2, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { FloorPlan, TableSizeOption } from "@/lib/db/schema/events";
 import type { AcceptedArtistEntry } from "./assign-artist-dialog";
@@ -16,6 +16,8 @@ interface FloorPlanSidebarProps {
   onChange: (next: FloorPlan) => void;
   onSelectTable: (tableId: string) => void;
   onEditTable: (tableId: string) => void;
+  onAddLabel: () => void;
+  onEditLabel: (labelId: string) => void;
 }
 
 function hasDims(size: TableSizeOption): boolean {
@@ -43,12 +45,17 @@ export function FloorPlanSidebar({
   onChange,
   onSelectTable,
   onEditTable,
+  onAddLabel,
+  onEditLabel,
 }: FloorPlanSidebarProps) {
   const [selectedSizeId, setSelectedSizeId] = useState<string>("");
 
   const activeRoom = plan.rooms.find((r) => r.id === activeRoomId) ?? null;
   const tablesInActiveRoom = activeRoomId
     ? plan.tables.filter((t) => t.roomId === activeRoomId)
+    : [];
+  const labelsInActiveRoom = activeRoomId
+    ? (plan.labels ?? []).filter((l) => l.roomId === activeRoomId)
     : [];
 
   const assignedByArtist = new Map<string, string>();
@@ -101,6 +108,27 @@ export function FloorPlanSidebar({
             }
           : t
       ),
+    });
+  }
+
+  function rotateLabel(id: string) {
+    onChange({
+      ...plan,
+      labels: (plan.labels ?? []).map((l) =>
+        l.id === id
+          ? {
+              ...l,
+              rotationDeg: (((l.rotationDeg + 90) % 360) as 0 | 90 | 180 | 270),
+            }
+          : l
+      ),
+    });
+  }
+
+  function deleteLabel(id: string) {
+    onChange({
+      ...plan,
+      labels: (plan.labels ?? []).filter((l) => l.id !== id),
     });
   }
 
@@ -259,6 +287,76 @@ export function FloorPlanSidebar({
               );
             })}
           </ul>
+        </section>
+      )}
+
+      {activeRoom && (
+        <section className="space-y-2">
+          <div className="flex items-center justify-between">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+              Labels{labelsInActiveRoom.length > 0 ? ` (${labelsInActiveRoom.length})` : ""}
+            </p>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={onAddLabel}
+            >
+              <Plus className="size-4" />
+              Add label
+            </Button>
+          </div>
+          {labelsInActiveRoom.length === 0 ? (
+            <p className="text-xs text-muted-foreground">
+              Mark doorways, entrances, bars, or other landmarks on the
+              canvas.
+            </p>
+          ) : (
+            <ul className="max-h-56 space-y-1 overflow-y-auto pr-1">
+              {labelsInActiveRoom.map((label) => (
+                <li
+                  key={label.id}
+                  className="flex items-center justify-between gap-2 rounded-md border border-border px-3 py-2"
+                >
+                  <div className="flex min-w-0 items-center gap-2">
+                    <Tag className="size-3.5 shrink-0 text-muted-foreground" />
+                    <span className="min-w-0 truncate text-sm font-medium">
+                      {label.text}
+                    </span>
+                  </div>
+                  <div className="flex shrink-0 items-center">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      aria-label={`Edit ${label.text}`}
+                      onClick={() => onEditLabel(label.id)}
+                    >
+                      <Pencil className="size-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      aria-label={`Rotate ${label.text}`}
+                      onClick={() => rotateLabel(label.id)}
+                    >
+                      <RotateCw className="size-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      aria-label={`Delete ${label.text}`}
+                      onClick={() => deleteLabel(label.id)}
+                    >
+                      <Trash2 className="size-4" />
+                    </Button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
       )}
 

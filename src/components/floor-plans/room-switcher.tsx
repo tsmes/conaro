@@ -110,7 +110,7 @@ export function RoomSwitcher({
   const isEdit = dialog.kind === "edit";
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <div className="flex w-full flex-wrap items-center gap-2">
       {plan.rooms.map((room) => {
         const active = room.id === activeRoomId;
         return (
@@ -143,24 +143,26 @@ export function RoomSwitcher({
       </Button>
       {activeRoomId && activeRoom && (
         <>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => setDialog({ kind: "edit", roomId: activeRoomId })}
-          >
-            <Pencil className="size-4" />
-            Edit room
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => setConfirmDeleteOpen(true)}
-          >
-            <Trash2 className="size-4" />
-            Delete room
-          </Button>
+          <div className="ml-auto flex items-center gap-1">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => setDialog({ kind: "edit", roomId: activeRoomId })}
+            >
+              <Pencil className="size-4" />
+              Edit room
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => setConfirmDeleteOpen(true)}
+            >
+              <Trash2 className="size-4" />
+              Delete room
+            </Button>
+          </div>
         </>
       )}
 

@@ -64,6 +64,8 @@ describe("FloorPlanSidebar", () => {
         onChange={onChange}
         onSelectTable={() => {}}
         onEditTable={() => {}}
+        onAddLabel={() => {}}
+        onEditLabel={() => {}}
       />
     );
     fireEvent.change(screen.getByLabelText(/Table size/i), {
@@ -89,6 +91,8 @@ describe("FloorPlanSidebar", () => {
         onChange={() => {}}
         onSelectTable={() => {}}
         onEditTable={() => {}}
+        onAddLabel={() => {}}
+        onEditLabel={() => {}}
       />
     );
     expect(screen.queryByLabelText(/Table size/i)).toBeNull();
@@ -106,6 +110,8 @@ describe("FloorPlanSidebar", () => {
         onChange={() => {}}
         onSelectTable={() => {}}
         onEditTable={() => {}}
+        onAddLabel={() => {}}
+        onEditLabel={() => {}}
       />
     );
     const option = screen
@@ -150,6 +156,8 @@ describe("FloorPlanSidebar", () => {
         onChange={() => {}}
         onSelectTable={() => {}}
         onEditTable={() => {}}
+        onAddLabel={() => {}}
+        onEditLabel={() => {}}
       />
     );
     expect(screen.getByText(/^Unassigned \(\d+\)/i)).toBeInTheDocument();
@@ -183,6 +191,8 @@ describe("FloorPlanSidebar", () => {
         onChange={() => {}}
         onSelectTable={onSelectTable}
         onEditTable={() => {}}
+        onAddLabel={() => {}}
+        onEditLabel={() => {}}
       />
     );
     fireEvent.click(
@@ -214,6 +224,8 @@ describe("FloorPlanSidebar", () => {
         onChange={onChange}
         onSelectTable={() => {}}
         onEditTable={() => {}}
+        onAddLabel={() => {}}
+        onEditLabel={() => {}}
       />
     );
     fireEvent.click(screen.getByRole("button", { name: /Rotate T1/i }));
@@ -244,6 +256,8 @@ describe("FloorPlanSidebar", () => {
         onChange={onChange}
         onSelectTable={() => {}}
         onEditTable={() => {}}
+        onAddLabel={() => {}}
+        onEditLabel={() => {}}
       />
     );
     fireEvent.click(screen.getByRole("button", { name: /Delete T1/i }));

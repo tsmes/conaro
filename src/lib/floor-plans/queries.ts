@@ -1,7 +1,11 @@
 import { and, eq, inArray } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { events } from "@/lib/db/schema/events";
-import type { FloorPlan, FloorPlanTable } from "@/lib/db/schema/events";
+import type {
+  FloorPlan,
+  FloorPlanLabel,
+  FloorPlanTable,
+} from "@/lib/db/schema/events";
 import { applications } from "@/lib/db/schema/applications";
 import { profiles } from "@/lib/db/schema/profiles";
 
@@ -39,12 +43,24 @@ function migrateLegacyPlan(stored: FloorPlan): FloorPlan {
     if (!fallbackRoomId) continue;
     tables.push({ ...t, roomId: fallbackRoomId, rotationDeg });
   }
-  return { rooms: stored.rooms, tables };
+  // Labels are optional in storage — normalise to an array and drop
+  // any that reference a missing room, mirroring the table rule.
+  const labels: FloorPlanLabel[] = [];
+  for (const l of stored.labels ?? []) {
+    if (!roomIds.has(l.roomId)) continue;
+    const rotationDeg =
+      l.rotationDeg === 90 || l.rotationDeg === 180 || l.rotationDeg === 270
+        ? l.rotationDeg
+        : 0;
+    labels.push({ ...l, rotationDeg });
+  }
+  return { rooms: stored.rooms, tables, labels };
 }
 
 export interface ResolvedFloorPlan {
   rooms: FloorPlan["rooms"];
   tables: ResolvedFloorPlanTable[];
+  labels: FloorPlanLabel[];
 }
 
 // Loads the stored plan and resolves every assignedApplicationId to
@@ -105,6 +121,7 @@ export async function getFloorPlanForEvent(
         ? resolved.get(t.assignedApplicationId) ?? null
         : null,
     })),
+    labels: plan.labels ?? [],
   };
 }
 

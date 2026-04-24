@@ -74,9 +74,23 @@ export interface FloorPlanTable {
   assignedApplicationId: string | null;
 }
 
+// Free-text annotations the organizer can drop onto a room (doorways,
+// entries, "coffee cart", direction markers, etc.). Coordinates are
+// room-local, same convention as tables. Rotation pivots around the
+// label's centre at render time.
+export interface FloorPlanLabel {
+  id: string;
+  roomId: string;
+  text: string;
+  x: number;
+  y: number;
+  rotationDeg: 0 | 90 | 180 | 270;
+}
+
 export interface FloorPlan {
   rooms: FloorPlanRoom[];
   tables: FloorPlanTable[];
+  labels?: FloorPlanLabel[];
 }
 
 export const events = pgTable(

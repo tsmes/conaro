@@ -115,6 +115,42 @@ export function FloorPlanCanvas({
     activeRoomId && plan
       ? plan.tables.filter((t) => t.roomId === activeRoomId)
       : [];
+  const labelsInRoom =
+    activeRoomId && plan
+      ? plan.labels.filter((l) => l.roomId === activeRoomId)
+      : [];
+
+  function handleLabelDragEnd(
+    labelId: string,
+    stageXPx: number,
+    stageYPx: number
+  ) {
+    if (!plan || !onChange || !activeRoom) return;
+    const newX = Math.max(
+      0,
+      Math.min(activeRoom.widthCm, Math.round(stageXPx / scale))
+    );
+    const newY = Math.max(
+      0,
+      Math.min(activeRoom.heightCm, Math.round(stageYPx / scale))
+    );
+    onChange({
+      rooms: plan.rooms,
+      tables: plan.tables.map((t) => ({
+        id: t.id,
+        label: t.label,
+        tableSizeOptionId: t.tableSizeOptionId,
+        roomId: t.roomId,
+        rotationDeg: t.rotationDeg,
+        x: t.x,
+        y: t.y,
+        assignedApplicationId: t.assignedApplicationId,
+      })),
+      labels: plan.labels.map((l) =>
+        l.id === labelId ? { ...l, x: newX, y: newY } : l
+      ),
+    });
+  }
 
   return (
     <div
@@ -149,7 +185,26 @@ export function FloorPlanCanvas({
             />
           </Layer>
           <Layer>
-            {tablesInRoom.map((table) => {
+            {labelsInRoom.map((label) => (
+            <Group
+              key={label.id}
+              x={label.x * scale}
+              y={label.y * scale}
+              rotation={label.rotationDeg}
+              draggable={editable}
+              onDragEnd={(e) =>
+                handleLabelDragEnd(label.id, e.target.x(), e.target.y())
+              }
+            >
+              <Text
+                text={label.text}
+                fontSize={13}
+                fontStyle="600"
+                fill="#1f2937"
+              />
+            </Group>
+          ))}
+          {tablesInRoom.map((table) => {
               const size = sizeById.get(table.tableSizeOptionId);
               if (!size || !size.widthCm || !size.depthCm) return null;
               const highlight =
