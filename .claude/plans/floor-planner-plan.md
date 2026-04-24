@@ -154,7 +154,7 @@ The organizer's control panel next to the canvas. Not draggable to insert; add-o
 **Verification:** Component test green; manual: add/delete flows work.
 **Depends on:** 1 (needs the widthCm/depthCm fields to gate the "Set dimensions" prompt), 2 (needs the FloorPlan shape).
 
-### 9. Assign-artist dialog
+### 9. Assign-artist dialog ✅
 
 Click a table → pick an accepted artist → mismatch warning if sizes don't match.
 
