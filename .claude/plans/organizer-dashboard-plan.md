@@ -176,7 +176,7 @@ Pure presentational component + tests. No data fetching inside — all props com
 **Verification:** Component test green; build green.
 **Depends on:** none (pure view, test with fixtures).
 
-### 7. Wire the dashboard page
+### 7. Wire the dashboard page ✅
 
 Rewrite the server page to fan out data fetching in parallel and mount the view component.
 
