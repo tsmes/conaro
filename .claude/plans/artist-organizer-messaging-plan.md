@@ -110,7 +110,7 @@ Post a message, mark the thread read. These are the actions the public event pag
 
 **Depends on:** 1, 3, 4 (uses `getThreadForArtist`).
 
-### 6. Organizer-facing server actions
+### 6. Organizer-facing server actions ✅
 
 Reply to a thread, optionally also post as announcement, mark the thread read.
 
