@@ -1,22 +1,10 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import {
   cleanDatabase,
   createTestOrganizer,
   createTestEvent,
 } from "../helpers/db";
-
-// The actions file we import from is `"use server"`, which pulls in the
-// auth chain at module load. Stub it out — this test only exercises the
-// reader helpers.
-vi.mock("@/lib/auth", () => ({
-  auth: () => Promise.resolve(null),
-}));
-
-vi.mock("next/cache", () => ({
-  revalidatePath: vi.fn(),
-}));
-
-import { getRecentAnnouncementsForConvention } from "@/app/(authenticated)/conventions/manage/events/[eventId]/announcements/actions";
+import { getRecentAnnouncementsForConvention } from "@/lib/conventions/queries";
 import { db } from "@/lib/db";
 import { eventAnnouncements } from "@/lib/db/schema/event-announcements";
 

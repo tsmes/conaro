@@ -75,6 +75,32 @@ describe("getCurrentEventForConvention", () => {
     expect(hit?.id).toBe(future.id);
   });
 
+  it("includes an ongoing multi-day event whose start is in the past but whose end is today or later", async () => {
+    const { convention } = await createTestOrganizer();
+    const ongoing = await createTestEvent(convention.id, {
+      eventStartDate: iso(-1),
+      eventEndDate: iso(2),
+      name: "ongoing",
+    });
+    // And a future event that starts later — shouldn't beat the ongoing one.
+    await createTestEvent(convention.id, {
+      eventStartDate: iso(30),
+      eventEndDate: iso(31),
+      name: "later",
+    });
+    const hit = await getCurrentEventForConvention(convention.id);
+    expect(hit?.id).toBe(ongoing.id);
+  });
+
+  it("excludes a multi-day event that already ended", async () => {
+    const { convention } = await createTestOrganizer();
+    await createTestEvent(convention.id, {
+      eventStartDate: iso(-10),
+      eventEndDate: iso(-5),
+    });
+    expect(await getCurrentEventForConvention(convention.id)).toBeNull();
+  });
+
   it("scopes to the given convention", async () => {
     const { convention: conA } = await createTestOrganizer();
     const { convention: conB } = await createTestOrganizer(

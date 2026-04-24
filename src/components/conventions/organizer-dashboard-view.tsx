@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ORGANIZER_STATUS_LABELS } from "@/lib/events/status-display";
-import { formatDateNo, formatDateRangeNo } from "@/lib/utils/format-date-no";
+import { formatDateRangeNo } from "@/lib/utils/format-date-no";
 import { formatRelativeTime } from "@/lib/utils/format-relative-time";
 import { cn } from "@/lib/utils";
 
@@ -299,7 +299,7 @@ function EventListItem({ event }: { event: DashboardEvent }) {
                     .filter(Boolean)
                     .join(", ")}`
                 : ""}
-              {event.availableStands
+              {event.availableStands !== null
                 ? ` · ${event.availableStands} stand${
                     event.availableStands === 1 ? "" : "s"
                   }`
@@ -320,7 +320,6 @@ export function OrganizerDashboardView({
   recentAnnouncements,
   events,
 }: OrganizerDashboardViewProps) {
-  void formatDateNo;
   return (
     <div className="mx-auto max-w-6xl space-y-12 px-6 py-10 md:px-8">
       {/* Hero */}

@@ -8,9 +8,9 @@ import {
   getApplicationCounts,
   getCurrentEventForConvention,
   getOrganizerConvention,
+  getRecentAnnouncementsForConvention,
 } from "@/lib/conventions/queries";
 import { getUnreadThreadCountForEvent } from "@/lib/threads/queries";
-import { getRecentAnnouncementsForConvention } from "@/app/(authenticated)/conventions/manage/events/[eventId]/announcements/actions";
 import { OrganizerDashboardView } from "@/components/conventions/organizer-dashboard-view";
 
 export default async function ConventionManagePage() {

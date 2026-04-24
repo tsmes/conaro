@@ -1,8 +1,9 @@
-import { and, asc, count, eq, gte, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, gte, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { conventions } from "@/lib/db/schema/conventions";
 import { events } from "@/lib/db/schema/events";
 import { applications } from "@/lib/db/schema/applications";
+import { eventAnnouncements } from "@/lib/db/schema/event-announcements";
 import type {
   ApplicationAnswers,
   ProfileSnapshot,
@@ -101,10 +102,12 @@ function normalizeSnapshot(snapshot: ProfileSnapshot): ProfileSnapshot {
   };
 }
 
-// Returns the event with the nearest upcoming or ongoing
-// `eventStartDate` for a convention, or null when there is none.
-// "Ongoing or upcoming" = start date is today or in the future — past
-// events are never featured on the organizer dashboard.
+// Returns the event with the nearest upcoming or ongoing event dates
+// for a convention, or null when there is none. "Ongoing" covers
+// multi-day events whose start date is in the past but whose end date
+// is today or later — an organizer shouldn't lose their dashboard
+// focus on day 2 of a weekend event. Single-day events fall back to
+// the start date.
 export async function getCurrentEventForConvention(conventionId: string) {
   const [event] = await db
     .select()
@@ -112,7 +115,10 @@ export async function getCurrentEventForConvention(conventionId: string) {
     .where(
       and(
         eq(events.conventionId, conventionId),
-        gte(events.eventStartDate, sql`current_date`)
+        gte(
+          sql`coalesce(${events.eventEndDate}, ${events.eventStartDate})`,
+          sql`current_date`
+        )
       )
     )
     .orderBy(asc(events.eventStartDate))
@@ -142,6 +148,39 @@ export async function getApplicationCounts(
     if (row.status === "accepted") accepted = row.value;
   }
   return { total, accepted };
+}
+
+// Dashboard helper: the organizer's most recent announcements across
+// every event in their convention. One inner-join query with event
+// name folded in so the UI doesn't need a follow-up lookup per row.
+// Lives here (not in the announcements `"use server"` file) so that
+// Next.js doesn't expose it as a publicly callable server action —
+// reader callers must already hold the resolved conventionId.
+export async function getRecentAnnouncementsForConvention(
+  conventionId: string,
+  limit: number = 3
+): Promise<
+  {
+    id: string;
+    subject: string;
+    createdAt: Date;
+    eventId: string;
+    eventName: string;
+  }[]
+> {
+  return db
+    .select({
+      id: eventAnnouncements.id,
+      subject: eventAnnouncements.subject,
+      createdAt: eventAnnouncements.createdAt,
+      eventId: eventAnnouncements.eventId,
+      eventName: events.name,
+    })
+    .from(eventAnnouncements)
+    .innerJoin(events, eq(events.id, eventAnnouncements.eventId))
+    .where(eq(events.conventionId, conventionId))
+    .orderBy(desc(eventAnnouncements.createdAt))
+    .limit(limit);
 }
 
 export function buildDefaultFieldRequirements(): FieldRequirements {
