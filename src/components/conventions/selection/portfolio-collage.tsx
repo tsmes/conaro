@@ -1,8 +1,14 @@
 /* eslint-disable @next/next/no-img-element */
 import { cn } from "@/lib/utils";
 
+interface PortfolioCollageImage {
+  id: string;
+  url: string;
+  caption?: string | null;
+}
+
 interface PortfolioCollageProps {
-  images: { id: string; url: string }[];
+  images: PortfolioCollageImage[];
   displayName: string;
   className?: string;
 }
@@ -25,18 +31,40 @@ export function PortfolioCollage({
           No portfolio
         </div>
       )}
-      {cells.map((image, index) => (
-        <img
-          key={image.id}
-          src={image.url}
-          alt={`Portfolio image ${index + 1} from ${displayName}`}
-          loading="lazy"
-          className={cn(
-            "h-full w-full object-cover",
-            index === 0 && cells.length > 1 && "col-span-2 row-span-2"
-          )}
-        />
-      ))}
+      {cells.map((image, index) => {
+        const caption = image.caption?.trim();
+        const altText =
+          caption && caption.length > 0
+            ? caption
+            : `Portfolio image ${index + 1} from ${displayName}`;
+        const heroCell = index === 0 && cells.length > 1;
+        return (
+          <figure
+            key={image.id}
+            className={cn(
+              "relative overflow-hidden",
+              heroCell && "col-span-2 row-span-2"
+            )}
+          >
+            <img
+              src={image.url}
+              alt={altText}
+              loading="lazy"
+              className="h-full w-full object-cover"
+            />
+            {caption && caption.length > 0 && (
+              <figcaption
+                className={cn(
+                  "pointer-events-none absolute inset-x-0 bottom-0 line-clamp-2 bg-gradient-to-t from-black/70 via-black/40 to-transparent px-2 py-1 text-[10px] font-medium leading-tight text-white",
+                  heroCell && "text-[11px]"
+                )}
+              >
+                {caption}
+              </figcaption>
+            )}
+          </figure>
+        );
+      })}
     </div>
   );
 }

@@ -273,7 +273,7 @@ Flip the existing `allowCaption` wiring.
 **Verification:** Component test passes; manual: add a caption to a Promo image, reload, caption persists.
 **Depends on:** none (independent of rich-text stream).
 
-### 16. Surface captions to organizers in PortfolioCollage
+### 16. Surface captions to organizers in PortfolioCollage ✅
 
 Render the caption beneath each image tile and use it as accessible `alt` when present.
 

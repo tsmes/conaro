@@ -163,6 +163,51 @@ describe("DeepReviewLayout", () => {
     expect(screen.getByRole("button", { name: /revoke/i })).toBeInTheDocument();
   });
 
+  it("renders portfolio image captions as accessible alt text and visible figcaption", () => {
+    const applicant = makeApplicant({
+      images: [
+        {
+          id: "img-1",
+          url: "https://cdn.test/1.webp",
+          sortOrder: 0,
+          caption: "Booth 2024 at Kawaiicon",
+        },
+        {
+          id: "img-2",
+          url: "https://cdn.test/2.webp",
+          sortOrder: 1,
+          caption: null,
+        },
+      ],
+    });
+    render(
+      <DeepReviewLayout
+        applicants={[applicant]}
+        index={0}
+        onIndexChange={() => {}}
+        onTogglePin={() => {}}
+        onSetStatus={() => {}}
+        onConfirmPayment={() => {}}
+        onRevoke={() => {}}
+        readOnly={false}
+        eventStatus="reviewing"
+        eventId="e1"
+        waitlistEnabled={false}
+      />
+    );
+    // Captioned image: alt uses caption, figcaption renders the text.
+    expect(
+      screen.getByAltText("Booth 2024 at Kawaiicon")
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Booth 2024 at Kawaiicon")
+    ).toBeInTheDocument();
+    // Uncaptioned image: falls back to positional alt.
+    expect(
+      screen.getByAltText(/Portfolio image 2 from Artist One/i)
+    ).toBeInTheDocument();
+  });
+
   it("shows empty state when there are no applicants", () => {
     render(
       <DeepReviewLayout
