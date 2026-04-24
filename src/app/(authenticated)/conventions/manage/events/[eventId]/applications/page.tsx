@@ -73,6 +73,7 @@ export default async function ApplicationsPage({
             id: image.id,
             url: storage.getUrl(image.storagePath),
             sortOrder: image.sortOrder,
+            caption: image.caption ?? null,
           })),
         answers: {
           tableSizeLabel: tableSize?.label ?? null,

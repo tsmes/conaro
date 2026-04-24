@@ -213,6 +213,7 @@ export async function applyToEvent(
         width: image.width,
         height: image.height,
         sortOrder: image.sortOrder,
+        caption: image.caption ?? null,
       });
     } catch (copyError) {
       console.error("Snapshot image copy failed:", copyError);

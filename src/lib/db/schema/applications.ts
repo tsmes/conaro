@@ -27,6 +27,7 @@ export interface SnapshotImage {
   width: number | null;
   height: number | null;
   sortOrder: number;
+  caption: string | null;
 }
 
 export interface ProfileSnapshot {

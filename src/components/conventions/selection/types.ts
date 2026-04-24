@@ -57,6 +57,11 @@ export interface SelectionApplicantView {
   accessibilityNeeds: string | null;
   genres: string[];
   mediums: string[];
-  images: { id: string; url: string; sortOrder: number }[];
+  images: {
+    id: string;
+    url: string;
+    sortOrder: number;
+    caption: string | null;
+  }[];
   answers: ApplicationAnswersView;
 }

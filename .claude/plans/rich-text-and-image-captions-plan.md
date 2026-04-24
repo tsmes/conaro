@@ -240,7 +240,7 @@ Bio + accessibility-needs are shown to organizers from `profileSnapshot`.
 **Verification:** Existing `__tests__/components/deep-review-layout.test.tsx` must still pass; extend it to assert that formatted content renders with `<strong>` / `<ul>` as expected.
 **Depends on:** 1.
 
-### 14. Extend the application image snapshot with `caption`
+### 14. Extend the application image snapshot with `caption` ✅
 
 Data-contract change that makes captions available to every consumer of `profileSnapshot.images`.
 

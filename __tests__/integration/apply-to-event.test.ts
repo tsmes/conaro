@@ -12,6 +12,7 @@ import { applyToEvent } from "@/app/(public)/events/[eventId]/actions";
 import { db } from "@/lib/db";
 import { artistProfiles } from "@/lib/db/schema/artist-profiles";
 import { conventionArtistLists } from "@/lib/db/schema/convention-artist-lists";
+import { portfolioImages } from "@/lib/db/schema/portfolio-images";
 import type { ProfileSnapshot } from "@/lib/db/schema/applications";
 
 const mockAuth = vi.fn();
@@ -93,6 +94,57 @@ describe("applyToEvent", () => {
     const snapshot = apps[0].profileSnapshot as ProfileSnapshot;
     expect(snapshot.genres).toEqual(["Comics", "Zines"]);
     expect(snapshot.mediums).toEqual(["Ink", "Risograph"]);
+  });
+
+  it("snapshots portfolio image captions into profileSnapshot.images", async () => {
+    const { convention } = await createTestOrganizer();
+    const event = await createTestEvent(convention.id);
+    const artist = await setupArtistWithProfile();
+
+    await db.insert(portfolioImages).values([
+      {
+        id: "img-promo-1",
+        profileId: artist.profile.id,
+        filename: "promo.webp",
+        storagePath: `portfolios/${artist.profile.id}/img-promo-1.webp`,
+        mimeType: "image/webp",
+        width: 800,
+        height: 600,
+        sortOrder: 0,
+        section: "promo",
+        caption: "Booth 2024 at Kawaiicon",
+      },
+      {
+        id: "img-product-1",
+        profileId: artist.profile.id,
+        filename: "product.webp",
+        storagePath: `portfolios/${artist.profile.id}/img-product-1.webp`,
+        mimeType: "image/webp",
+        width: 800,
+        height: 600,
+        sortOrder: 1,
+        section: "product",
+        caption: null,
+      },
+    ]);
+
+    mockAuth.mockResolvedValue({
+      user: { id: "u", role: "artist", profileId: artist.profile.id },
+    });
+
+    const result = await applyToEvent(
+      {},
+      buildFormData({ eventId: event.id, guidelinesAcknowledged: "true" })
+    );
+    expect(result.success).toBe(true);
+
+    const apps = await findApplicationsByEventId(event.id);
+    const snapshot = apps[0].profileSnapshot as ProfileSnapshot;
+    expect(snapshot.images).toHaveLength(2);
+    const promo = snapshot.images.find((i) => i.id === "img-promo-1");
+    const product = snapshot.images.find((i) => i.id === "img-product-1");
+    expect(promo?.caption).toBe("Booth 2024 at Kawaiicon");
+    expect(product?.caption).toBeNull();
   });
 
   it("rejects when event is not accepting applications", async () => {
