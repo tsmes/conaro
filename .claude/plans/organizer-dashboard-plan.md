@@ -88,7 +88,7 @@ New single-query helper the dashboard calls once per current-event render.
 **Verification:** Integration test green; build green.
 **Depends on:** none.
 
-### 4. Add `getRecentAnnouncementsForConvention(conventionId, limit)` helper
+### 4. Add `getRecentAnnouncementsForConvention(conventionId, limit)` helper ✅
 
 **Requirements:** Infrastructure (enables REQ-5).
 

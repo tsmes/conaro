@@ -7,6 +7,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { applications } from "@/lib/db/schema/applications";
 import { eventAnnouncements } from "@/lib/db/schema/event-announcements";
+import { events } from "@/lib/db/schema/events";
 import { notifications } from "@/lib/db/schema/notifications";
 import { type ActionState } from "@/lib/validations/auth";
 import { getOrganizerEvent } from "@/lib/conventions/queries";
@@ -221,4 +222,35 @@ export async function getEventAnnouncements(
     .from(eventAnnouncements)
     .where(eq(eventAnnouncements.eventId, eventId))
     .orderBy(desc(eventAnnouncements.createdAt));
+}
+
+// Dashboard helper: returns the organizer's most recent announcements
+// across every event in their convention. One JOIN, one ORDER, one
+// LIMIT. Event name is folded in so the UI doesn't need a follow-up
+// lookup per row.
+export async function getRecentAnnouncementsForConvention(
+  conventionId: string,
+  limit: number = 3
+): Promise<
+  {
+    id: string;
+    subject: string;
+    createdAt: Date;
+    eventId: string;
+    eventName: string;
+  }[]
+> {
+  return db
+    .select({
+      id: eventAnnouncements.id,
+      subject: eventAnnouncements.subject,
+      createdAt: eventAnnouncements.createdAt,
+      eventId: eventAnnouncements.eventId,
+      eventName: events.name,
+    })
+    .from(eventAnnouncements)
+    .innerJoin(events, eq(events.id, eventAnnouncements.eventId))
+    .where(eq(events.conventionId, conventionId))
+    .orderBy(desc(eventAnnouncements.createdAt))
+    .limit(limit);
 }
