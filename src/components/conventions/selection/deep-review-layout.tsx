@@ -14,6 +14,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Markdown } from "@/components/ui/markdown";
 import { cn } from "@/lib/utils";
 import { formatDateNo } from "@/lib/utils/format-date-no";
 import { getStatusDisplay } from "./applicant-visuals";
@@ -246,9 +247,10 @@ export function DeepReviewLayout({
               <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
                 Statement
               </p>
-              <p className="mt-1.5 text-[13.5px] leading-[1.55] text-foreground">
-                {applicant.bio}
-              </p>
+              <Markdown
+                source={applicant.bio}
+                className="mt-1.5 text-[13.5px] leading-[1.55] text-foreground"
+              />
             </div>
           )}
 
@@ -276,9 +278,10 @@ export function DeepReviewLayout({
               <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
                 Accessibility needs
               </p>
-              <p className="mt-1.5 text-[13px] text-foreground">
-                {applicant.accessibilityNeeds}
-              </p>
+              <Markdown
+                source={applicant.accessibilityNeeds}
+                className="mt-1.5 text-[13px] text-foreground"
+              />
             </div>
           )}
 

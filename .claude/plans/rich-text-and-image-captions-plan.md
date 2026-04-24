@@ -225,7 +225,7 @@ After publish, applicants see their own response message on the event page. That
 **Verification:** Integration test to extend: `__tests__/integration/publish-results.test.ts` — add a case that writes a template with `**{{ artist_name }}**`, publishes, and asserts the stored `responseMessage` contains `**Elena**`. Manual smoke confirms on-page render.
 **Depends on:** 1.
 
-### 13. Render Markdown in organizer deep-review
+### 13. Render Markdown in organizer deep-review ✅
 
 Bio + accessibility-needs are shown to organizers from `profileSnapshot`.
 
