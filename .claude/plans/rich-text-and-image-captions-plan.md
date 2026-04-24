@@ -258,7 +258,7 @@ Data-contract change that makes captions available to every consumer of `profile
 **Verification:** Integration test passes. No new columns required; `npm run db:generate` should show no schema drift.
 **Depends on:** none (parallelizable with tasks 1–13).
 
-### 15. Enable caption input on Promo + Products portfolio sections
+### 15. Enable caption input on Promo + Products portfolio sections ✅
 
 Flip the existing `allowCaption` wiring.
 

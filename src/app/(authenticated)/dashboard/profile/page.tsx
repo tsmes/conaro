@@ -139,6 +139,7 @@ export default async function ProfilePage() {
           images={promoImages}
           totalCap={20}
           totalUsed={totalUsed}
+          allowCaption
         />
       </SectionShell>
 
@@ -153,6 +154,7 @@ export default async function ProfilePage() {
           images={productImages}
           totalCap={20}
           totalUsed={totalUsed}
+          allowCaption
         />
       </SectionShell>
 
