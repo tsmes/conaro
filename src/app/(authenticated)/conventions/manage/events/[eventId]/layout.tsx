@@ -57,8 +57,7 @@ export default async function EventLayout({
       <div className="mb-8">
         <EventTabsNav
           eventId={event.id}
-          showMessaging={isPublished}
-          showFloorPlan={isPublished}
+          publishedFeaturesEnabled={isPublished}
         />
       </div>
 

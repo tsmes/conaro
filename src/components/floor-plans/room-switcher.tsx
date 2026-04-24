@@ -14,6 +14,7 @@ import {
   DialogTitle,
   DialogClose,
 } from "@/components/ui/dialog";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import type { FloorPlan } from "@/lib/db/schema/events";
 
 interface RoomSwitcherProps {
@@ -30,9 +31,15 @@ export function RoomSwitcher({
   onChange,
 }: RoomSwitcherProps) {
   const [addOpen, setAddOpen] = useState(false);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [name, setName] = useState("");
   const [widthM, setWidthM] = useState("");
   const [depthM, setDepthM] = useState("");
+
+  const activeRoom = plan.rooms.find((r) => r.id === activeRoomId) ?? null;
+  const tablesInActiveRoom = activeRoomId
+    ? plan.tables.filter((t) => t.roomId === activeRoomId).length
+    : 0;
 
   function resetForm() {
     setName("");
@@ -111,20 +118,26 @@ export function RoomSwitcher({
           type="button"
           variant="ghost"
           size="sm"
-          onClick={() => {
-            if (
-              confirm(
-                "Delete this room and any tables placed in it? This cannot be undone."
-              )
-            ) {
-              deleteActiveRoom();
-            }
-          }}
+          onClick={() => setConfirmDeleteOpen(true)}
         >
           <Trash2 className="size-4" />
           Delete room
         </Button>
       )}
+
+      <ConfirmDialog
+        open={confirmDeleteOpen}
+        onOpenChange={setConfirmDeleteOpen}
+        title={`Delete ${activeRoom?.name ?? "room"}?`}
+        description={
+          tablesInActiveRoom > 0
+            ? `This will also remove the ${tablesInActiveRoom} table${tablesInActiveRoom === 1 ? "" : "s"} placed in this room. This cannot be undone.`
+            : "This cannot be undone."
+        }
+        confirmLabel="Delete room"
+        destructive
+        onConfirm={deleteActiveRoom}
+      />
 
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
         <DialogContent className="sm:max-w-md">

@@ -16,6 +16,7 @@ const twoRoomPlan: FloorPlan = {
       label: "T1",
       tableSizeOptionId: "ts-std",
       roomId: "r-2",
+      rotationDeg: 0,
       x: 0,
       y: 0,
       assignedApplicationId: null,
@@ -73,8 +74,7 @@ describe("RoomSwitcher", () => {
     expect(onActiveRoomChange).toHaveBeenCalledWith("r-2");
   });
 
-  it("deletes the active room and its tables when confirmed", () => {
-    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
+  it("deletes the active room and its tables after confirming the dialog", () => {
     const onChange = vi.fn();
     const onActiveRoomChange = vi.fn();
     render(
@@ -85,14 +85,20 @@ describe("RoomSwitcher", () => {
         onChange={onChange}
       />
     );
+    // Opens the confirm dialog — not actually deleting yet.
     fireEvent.click(screen.getByRole("button", { name: /Delete room/i }));
+    expect(onChange).not.toHaveBeenCalled();
+
+    // The dialog has its own "Delete room" button — click it to confirm.
+    const confirmButtons = screen.getAllByRole("button", {
+      name: /Delete room/i,
+    });
+    // The last button is the confirm button inside the dialog footer.
+    fireEvent.click(confirmButtons[confirmButtons.length - 1]);
 
     const next = onChange.mock.calls[0][0] as FloorPlan;
     expect(next.rooms.map((r) => r.id)).toEqual(["r-1"]);
-    // Tables in the deleted room go away too.
     expect(next.tables.some((t) => t.roomId === "r-2")).toBe(false);
     expect(onActiveRoomChange).toHaveBeenCalledWith("r-1");
-
-    confirmSpy.mockRestore();
   });
 });
