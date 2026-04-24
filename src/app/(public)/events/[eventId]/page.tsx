@@ -271,9 +271,18 @@ export default async function EventDetailPage({
           {event.status === "reviewing" && (
             <Badge variant="secondary">Applications under review</Badge>
           )}
-          {event.status === "results_published" && (
-            <Badge variant="success">Results published</Badge>
-          )}
+          {event.status === "results_published" &&
+            (ownApplicationStatus === "accepted" ? (
+              <Badge variant="success">Accepted</Badge>
+            ) : ownApplicationStatus === "waitlisted" ? (
+              <Badge variant="warning">Waitlisted</Badge>
+            ) : ownApplicationStatus === "rejected" ? (
+              <Badge variant="destructive">Not selected</Badge>
+            ) : ownApplicationStatus === "revoked" ? (
+              <Badge variant="outline">Revoked</Badge>
+            ) : (
+              <Badge variant="success">Results published</Badge>
+            ))}
         </div>
         {isArtist && (
           <FollowButton
