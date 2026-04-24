@@ -34,7 +34,7 @@ Adds the renderer stack and the shared RSC-safe `<Markdown>` component. This unb
 **Verification:** `npm test -- __tests__/components/markdown.test.tsx` passes. `npm run build` green.
 **Depends on:** none.
 
-### 2. Plain-text flatten helper
+### 2. Plain-text flatten helper ✅
 
 Small, well-tested helper used by teasers and form placeholders.
 
