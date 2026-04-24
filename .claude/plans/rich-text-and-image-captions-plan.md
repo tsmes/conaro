@@ -122,7 +122,7 @@ Swap `description`, `guidelinesOverride`, `acceptanceMessage`, `rejectionMessage
 **Verification:** Component test passes; `npm run build` green; manual: create an event, use formatting on guidelines, save, reopen — round-trips.
 **Depends on:** 3.
 
-### 6. Wire rich-text editor into ResponseTemplatesForm (controlled mode)
+### 6. Wire rich-text editor into ResponseTemplatesForm (controlled mode) ✅
 
 This form uses a "Copy from convention default" dropdown that overwrites the textarea content, so the editor must be driven controlled.
 

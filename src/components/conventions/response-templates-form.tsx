@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 
 const LABEL_CLASS =
   "text-[11px] font-bold uppercase tracking-wider text-muted-foreground";
-import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import {
   Card,
   CardContent,
@@ -100,12 +100,11 @@ export function ResponseTemplatesForm({
 
           <div className="space-y-2">
             <Label htmlFor="acceptanceMessage" className={LABEL_CLASS}>Acceptance Message</Label>
-            <Textarea
+            <RichTextEditor
               id="acceptanceMessage"
               name="acceptanceMessage"
               value={acceptance}
-              onChange={(e) => setAcceptance(e.target.value)}
-              rows={4}
+              onChange={setAcceptance}
               placeholder="Message sent to accepted artists..."
               disabled={readOnly}
             />
@@ -113,12 +112,11 @@ export function ResponseTemplatesForm({
 
           <div className="space-y-2">
             <Label htmlFor="rejectionMessage" className={LABEL_CLASS}>Rejection Message</Label>
-            <Textarea
+            <RichTextEditor
               id="rejectionMessage"
               name="rejectionMessage"
               value={rejection}
-              onChange={(e) => setRejection(e.target.value)}
-              rows={4}
+              onChange={setRejection}
               placeholder="Message sent to rejected artists..."
               disabled={readOnly}
             />
