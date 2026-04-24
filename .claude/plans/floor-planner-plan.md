@@ -133,7 +133,7 @@ Tables become draggable, drop position snaps to integer cm, fires an `onChange(p
 **Verification:** Manual: drag a table in the editor, see it update position. (Persistence comes in task 10.)
 **Depends on:** 6.
 
-### 8. Sidebar — add/delete rooms + tables + `Set dimensions` prompt
+### 8. Sidebar — add/delete rooms + tables + `Set dimensions` prompt ✅
 
 The organizer's control panel next to the canvas. Not draggable to insert; add-on-click.
 
