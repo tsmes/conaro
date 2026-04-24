@@ -199,6 +199,8 @@ export const eventSchema = z
                 .union([z.number().int().min(0), z.null()])
                 .nullable()
                 .optional(),
+              widthCm: z.number().int().min(1).max(1000).optional(),
+              depthCm: z.number().int().min(1).max(1000).optional(),
             })
           )
           .max(10)

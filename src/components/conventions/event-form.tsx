@@ -102,40 +102,81 @@ function TableSizeOptionsEditor({
       {options.map((opt) => (
         <div
           key={opt.id}
-          className="grid gap-2 rounded-md border border-border p-3 sm:grid-cols-[1fr_1fr_120px_auto]"
+          className="space-y-2 rounded-md border border-border p-3"
         >
-          <Input
-            aria-label="Label"
-            placeholder="Standard"
-            value={opt.label}
-            onChange={(e) => update(opt.id, { label: e.target.value })}
-          />
-          <Input
-            aria-label="Dimensions"
-            placeholder="90 x 120 cm"
-            value={opt.dimensions}
-            onChange={(e) => update(opt.id, { dimensions: e.target.value })}
-          />
-          <Input
-            aria-label="Price (NOK)"
-            type="number"
-            min={0}
-            placeholder="280"
-            value={opt.priceNok ?? ""}
-            onChange={(e) =>
-              update(opt.id, {
-                priceNok: e.target.value === "" ? null : Number(e.target.value),
-              })
-            }
-          />
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => remove(opt.id)}
-          >
-            Remove
-          </Button>
+          <div className="grid gap-2 sm:grid-cols-[1fr_1fr_120px_auto]">
+            <Input
+              aria-label="Label"
+              placeholder="Standard"
+              value={opt.label}
+              onChange={(e) => update(opt.id, { label: e.target.value })}
+            />
+            <Input
+              aria-label="Dimensions"
+              placeholder="90 x 120 cm"
+              value={opt.dimensions}
+              onChange={(e) => update(opt.id, { dimensions: e.target.value })}
+            />
+            <Input
+              aria-label="Price (NOK)"
+              type="number"
+              min={0}
+              placeholder="280"
+              value={opt.priceNok ?? ""}
+              onChange={(e) =>
+                update(opt.id, {
+                  priceNok:
+                    e.target.value === "" ? null : Number(e.target.value),
+                })
+              }
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => remove(opt.id)}
+            >
+              Remove
+            </Button>
+          </div>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <Input
+              aria-label="Width (cm)"
+              type="number"
+              min={1}
+              max={1000}
+              placeholder="Width (cm)"
+              value={opt.widthCm ?? ""}
+              onChange={(e) =>
+                update(opt.id, {
+                  widthCm:
+                    e.target.value === ""
+                      ? undefined
+                      : Number(e.target.value),
+                })
+              }
+            />
+            <Input
+              aria-label="Depth (cm)"
+              type="number"
+              min={1}
+              max={1000}
+              placeholder="Depth (cm)"
+              value={opt.depthCm ?? ""}
+              onChange={(e) =>
+                update(opt.id, {
+                  depthCm:
+                    e.target.value === ""
+                      ? undefined
+                      : Number(e.target.value),
+                })
+              }
+            />
+          </div>
+          <p className="text-[11px] text-muted-foreground">
+            Width + depth in cm are only used by the floor planner. Leave
+            blank if you don&apos;t intend to map out a physical layout.
+          </p>
         </div>
       ))}
       <Button type="button" variant="outline" size="sm" onClick={add}>

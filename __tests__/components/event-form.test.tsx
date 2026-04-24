@@ -68,4 +68,37 @@ describe("EventForm", () => {
     // elements — accept either form.
     expect(guidelinesHidden?.value).toMatch(/^### Rules\n+- be kind$/);
   });
+
+  it("carries widthCm + depthCm on tableSizeOptions through to the hidden input", async () => {
+    render(
+      <EventForm
+        action={noopAction}
+        submitLabel="Save"
+        defaultValues={{
+          tableSizeOptions: [
+            {
+              id: "ts-1",
+              label: "Standard",
+              dimensions: "120x80 cm",
+              priceNok: 1200,
+              widthCm: 120,
+              depthCm: 80,
+            },
+          ],
+        }}
+      />
+    );
+    const hidden = document.querySelector(
+      'input[type="hidden"][name="tableSizeOptions"]'
+    ) as HTMLInputElement | null;
+    expect(hidden).not.toBeNull();
+    const parsed = JSON.parse(hidden!.value) as Array<Record<string, unknown>>;
+    expect(parsed).toHaveLength(1);
+    expect(parsed[0]).toMatchObject({
+      id: "ts-1",
+      label: "Standard",
+      widthCm: 120,
+      depthCm: 80,
+    });
+  });
 });

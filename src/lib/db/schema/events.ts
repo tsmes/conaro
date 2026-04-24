@@ -32,11 +32,16 @@ export type FieldRequirements = Record<string, FieldRequirementState>;
 
 // Structured table-size offering chosen at apply time. Each option carries a
 // stable `id` so applications referencing it remain valid across edits.
+// `widthCm` / `depthCm` are optional: they're only needed when the event
+// wants to use this size on the floor planner. Sizes without them render
+// a "Set dimensions" prompt in the planner's size picker.
 export interface TableSizeOption {
   id: string;
   label: string;
   dimensions: string;
   priceNok: number | null;
+  widthCm?: number;
+  depthCm?: number;
 }
 
 export const events = pgTable(
