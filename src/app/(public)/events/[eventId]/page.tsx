@@ -311,14 +311,28 @@ export default async function EventDetailPage({
                       : "Your application"
               }
             >
-              {/* Waitlisted entries come FROM rejected status, so the stored
-                  responseMessage is the stale rejection text. Show the
-                  waitlist-specific confirmation instead. */}
               {ownApplicationStatus === "waitlisted" ? (
-                <p className="text-sm leading-relaxed text-foreground">
-                  You&apos;re on the waitlist. If a spot opens up, the
-                  organizer may offer it to you — we&apos;ll let you know.
-                </p>
+                <>
+                  <p className="text-sm leading-relaxed text-foreground">
+                    You&apos;re on the waitlist. If a spot opens up, the
+                    organizer may offer it to you — we&apos;ll let you know.
+                  </p>
+                  {/* Waitlisted artists arrived via rejected, so the
+                      stored responseMessage is the original rejection
+                      text. Keep it visible below the waitlist
+                      confirmation for context. */}
+                  {ownResponseMessage && (
+                    <div className="mt-5 border-t border-border pt-5">
+                      <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                        Original message from organizer
+                      </p>
+                      <Markdown
+                        source={ownResponseMessage}
+                        className="text-foreground"
+                      />
+                    </div>
+                  )}
+                </>
               ) : ownResponseMessage ? (
                 <Markdown
                   source={ownResponseMessage}
