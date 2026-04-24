@@ -49,7 +49,7 @@ Small, well-tested helper used by teasers and form placeholders.
 **Verification:** `npm test -- __tests__/unit/lib/utils/markdown-to-text.test.ts` passes.
 **Depends on:** none.
 
-### 3. Install Tiptap + shared rich-text editor
+### 3. Install Tiptap + shared rich-text editor ✅
 
 Adds Tiptap and a single wrapper component that every form reuses.
 
