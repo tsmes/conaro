@@ -39,18 +39,27 @@ interface PortfolioGalleryProps {
   totalCap: number;
   totalUsed: number;
   allowCaption?: boolean;
+  captionPlaceholder?: string;
 }
+
+const DEFAULT_CAPTION_PLACEHOLDER: Record<PortfolioSection, string> = {
+  promo: "Short description (e.g. brand logo, banner)",
+  product: "Describe this piece (e.g. A4 giclée print)",
+  previous_stand: "Convention name + year (optional)",
+};
 
 function SortableImage({
   image,
   onDelete,
   onCaptionChange,
   allowCaption,
+  captionPlaceholder,
 }: {
   image: PortfolioImage;
   onDelete: (id: string) => void;
   onCaptionChange: (id: string, caption: string) => void;
   allowCaption: boolean;
+  captionPlaceholder: string;
 }) {
   const {
     attributes,
@@ -99,7 +108,7 @@ function SortableImage({
         <Input
           aria-label={`Caption for ${image.filename}`}
           defaultValue={image.caption ?? ""}
-          placeholder="Convention name + year (optional)"
+          placeholder={captionPlaceholder}
           className="h-8 text-[12.5px]"
           onBlur={(e) => onCaptionChange(image.id, e.target.value)}
         />
@@ -114,9 +123,12 @@ export function PortfolioGallery({
   totalCap,
   totalUsed,
   allowCaption = false,
+  captionPlaceholder,
 }: PortfolioGalleryProps) {
   const [images, setImages] = useState(initialImages);
   const [error, setError] = useState<string | null>(null);
+  const resolvedCaptionPlaceholder =
+    captionPlaceholder ?? DEFAULT_CAPTION_PLACEHOLDER[section];
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -267,6 +279,7 @@ export function PortfolioGallery({
                   onDelete={handleDelete}
                   onCaptionChange={handleCaptionChange}
                   allowCaption={allowCaption}
+                  captionPlaceholder={resolvedCaptionPlaceholder}
                 />
               ))}
             </div>

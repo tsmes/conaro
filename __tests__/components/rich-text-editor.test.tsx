@@ -42,22 +42,6 @@ describe("RichTextEditor", () => {
     expect(hidden.value).toBe("Hello **world**");
   });
 
-  it("invokes onChange with Markdown in controlled mode", async () => {
-    const onChange = vi.fn();
-    render(
-      <RichTextEditor name="bio" value="Start" onChange={onChange} />
-    );
-    await waitFor(() => {
-      expect(screen.getByRole("toolbar")).toBeInTheDocument();
-    });
-    // Click the Bold toggle - the editor starts empty-ish so clicking bold
-    // just toggles the mark active. To trigger onUpdate reliably we type
-    // into the contentEditable via dispatchEvent is complex in jsdom; so
-    // instead we verify controlled-sync: changing `value` prop updates the
-    // hidden input value.
-    // The onChange wiring is covered by the controlled-sync test below.
-  });
-
   it("syncs the hidden input when a new controlled value arrives", async () => {
     const { rerender } = render(
       <RichTextEditor name="msg" value="Initial" />

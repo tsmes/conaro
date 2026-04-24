@@ -105,11 +105,17 @@ export function RichTextEditor({
   useEffect(() => {
     if (!editor || !isControlled || value === undefined) return;
     const current = getMarkdown(editor);
-    if (current !== value) {
-      editor.commands.setContent(value, { emitUpdate: false });
-      if (hiddenRef.current) hiddenRef.current.value = value;
-    }
-  }, [editor, isControlled, value]);
+    if (current === value) return;
+    editor.commands.setContent(value, { emitUpdate: false });
+    // Tiptap's markdown serializer may canonicalise the input (e.g. insert
+    // blank lines between block elements). Read the post-setContent value
+    // back and notify the parent if it diverges, so parent state stays in
+    // sync with what the editor actually holds — otherwise this effect
+    // re-fires forever and the cursor resets on every render.
+    const normalized = getMarkdown(editor);
+    if (hiddenRef.current) hiddenRef.current.value = normalized;
+    if (normalized !== value) onChange?.(normalized);
+  }, [editor, isControlled, value, onChange]);
 
   useEffect(() => {
     if (!editor) return;
@@ -130,6 +136,7 @@ export function RichTextEditor({
         editor={editor}
         id={id}
         aria-describedby={ariaDescribedBy}
+        aria-invalid={ariaInvalid}
         className="min-h-20 px-3 py-2 text-base md:text-sm [&_.ProseMirror]:min-h-16 [&_.ProseMirror]:outline-none [&_.ProseMirror>*+*]:mt-2 [&_.ProseMirror_a]:text-primary [&_.ProseMirror_a]:underline [&_.ProseMirror_a]:underline-offset-4 [&_.ProseMirror_h3]:font-heading [&_.ProseMirror_h3]:text-base [&_.ProseMirror_h3]:font-semibold [&_.ProseMirror_h3]:tracking-tight [&_.ProseMirror_ol]:ml-5 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0 [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-muted-foreground [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.ProseMirror_ul]:ml-5 [&_.ProseMirror_ul]:list-disc"
       />
       <input

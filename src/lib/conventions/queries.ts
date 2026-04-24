@@ -90,7 +90,14 @@ function normalizeSnapshot(snapshot: ProfileSnapshot): ProfileSnapshot {
     ...snapshot,
     genres: snapshot.genres ?? [],
     mediums: snapshot.mediums ?? [],
-    images: snapshot.images ?? [],
+    // Historic snapshots predate the `caption` field — on read they arrive
+    // as `undefined`, but the SnapshotImage contract declares it required
+    // (`string | null`). Normalise here so every downstream consumer sees
+    // the invariant.
+    images: (snapshot.images ?? []).map((image) => ({
+      ...image,
+      caption: image.caption ?? null,
+    })),
   };
 }
 

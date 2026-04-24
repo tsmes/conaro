@@ -56,6 +56,35 @@ describe("PortfolioGallery (allowCaption)", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("uses section-appropriate caption placeholder copy by default", () => {
+    const { unmount } = render(
+      <PortfolioGallery
+        section="promo"
+        images={[baseImage]}
+        totalCap={20}
+        totalUsed={0}
+        allowCaption
+      />
+    );
+    expect(
+      screen.getByPlaceholderText(/brand logo|banner/i)
+    ).toBeInTheDocument();
+    unmount();
+
+    render(
+      <PortfolioGallery
+        section="product"
+        images={[baseImage]}
+        totalCap={20}
+        totalUsed={0}
+        allowCaption
+      />
+    );
+    expect(
+      screen.getByPlaceholderText(/describe this piece/i)
+    ).toBeInTheDocument();
+  });
+
   it("PATCHes the caption on blur when allowCaption is on", async () => {
     render(
       <PortfolioGallery
