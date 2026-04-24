@@ -148,7 +148,7 @@ Renders the chat feed + composer inside the existing Results `SectionCard`.
 
 **Depends on:** 4, 5.
 
-### 8. Organizer inbox UI + dialog + event management page wiring
+### 8. Organizer inbox UI + dialog + event management page wiring ✅
 
 Adds the "Questions from artists" card with clickable rows that open a dialog per thread.
 
