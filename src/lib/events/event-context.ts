@@ -200,7 +200,7 @@ export const getCachedThreadForArtist = cache(getThreadForArtist);
 export async function shouldShowFloorPlanTab(
   ctx: EventViewerContext
 ): Promise<boolean> {
-  if (ctx.event.status !== "results_published") return false;
+  if (!ctx.event.floorPlanPublishedAt) return false;
   const plan = await getCachedFloorPlan(ctx.event.id);
   return Boolean(plan && plan.tables.length > 0);
 }
@@ -228,7 +228,7 @@ export async function hasAssignedTableForViewer(
   if (
     !ctx.isAcceptedToEvent ||
     !ctx.ownApplicationId ||
-    ctx.event.status !== "results_published"
+    !ctx.event.floorPlanPublishedAt
   ) {
     return false;
   }

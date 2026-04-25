@@ -19,7 +19,7 @@ export default async function FloorPlanPage({
   const [{ eventId }, { focus }] = await Promise.all([params, searchParams]);
   const ctx = await getEventViewerContext(eventId);
 
-  if (ctx.event.status !== "results_published") notFound();
+  if (!ctx.event.floorPlanPublishedAt) notFound();
   const plan = await getCachedFloorPlan(ctx.event.id);
   if (!plan || plan.tables.length === 0) notFound();
 
