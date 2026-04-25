@@ -23,9 +23,6 @@ export default async function FloorPlanPage({
 
   const event = await getOrganizerEvent(session.user.profileId, eventId);
   if (!event) notFound();
-  if (event.status !== "results_published") {
-    redirect(`/conventions/manage/events/${eventId}`);
-  }
 
   const [floorPlan, acceptedArtists] = await Promise.all([
     getFloorPlanForEvent(event.id),
