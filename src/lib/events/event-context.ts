@@ -218,6 +218,38 @@ export async function shouldShowMessagesTab(
   return Boolean(thread);
 }
 
+/** Helper for the layout's tabs nav: should the Artists tab be
+ *  shown? Once results are published and at least one artist has
+ *  been accepted, the public gets a confirmed-artists gallery. */
+export async function shouldShowArtistsTab(
+  ctx: EventViewerContext
+): Promise<boolean> {
+  if (ctx.event.status !== "results_published") return false;
+  // Reuses the same cached floor-plan query that the floor-plan tab
+  // gating already loads, so this check is free when we're publishing
+  // assignments — and when no plan exists yet, falls back to checking
+  // accepted applications cheaply.
+  const plan = await getCachedFloorPlan(ctx.event.id);
+  if (plan && plan.tables.some((t) => t.assignment !== null)) return true;
+  // If the plan is empty (or hasn't been built yet), we don't show
+  // the tab — there's nothing to display until assignments exist.
+  return false;
+}
+
+/** Helper for the layout's tabs nav: does the event have enough
+ *  practical content (venue address, amenities, map link) to warrant
+ *  its own tab? */
+export function shouldShowPracticalTab(ctx: EventViewerContext): boolean {
+  const e = ctx.event;
+  return Boolean(
+    e.venueAddress ||
+      e.mapEmbedUrl ||
+      e.setupTime ||
+      e.teardownTime ||
+      e.amenities
+  );
+}
+
 /** Helper used by the status card: does the accepted artist's
  *  application have a table assignment on the event's floor plan?
  *  Reuses the cached plan so it's a free check after

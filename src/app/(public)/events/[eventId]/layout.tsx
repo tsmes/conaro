@@ -10,8 +10,10 @@ import {
 import {
   getEventViewerContext,
   hasAssignedTableForViewer,
+  shouldShowArtistsTab,
   shouldShowFloorPlanTab,
   shouldShowMessagesTab,
+  shouldShowPracticalTab,
 } from "@/lib/events/event-context";
 import { getEventAnnouncements } from "@/lib/events/announcements";
 import { getAcceptedArtistsForEvent } from "@/lib/floor-plans/queries";
@@ -82,17 +84,20 @@ export default async function EventLayout({
     announcements,
     showFloorPlan,
     showMessages,
+    showArtists,
     hasAssignedTable,
     acceptedArtists,
   ] = await Promise.all([
     isAcceptedToEvent ? getEventAnnouncements(event.id) : Promise.resolve([]),
     shouldShowFloorPlanTab(ctx),
     shouldShowMessagesTab(ctx),
+    shouldShowArtistsTab(ctx),
     hasAssignedTableForViewer(ctx),
     event.status === "results_published"
       ? getAcceptedArtistsForEvent(event.id)
       : Promise.resolve([]),
   ]);
+  const showPractical = shouldShowPracticalTab(ctx);
 
   const showStatusCard =
     isArtist &&
@@ -277,6 +282,9 @@ export default async function EventLayout({
             eventId={event.id}
             showFloorPlan={showFloorPlan}
             showMessages={showMessages}
+            showArtists={showArtists}
+            showPractical={showPractical}
+            artistsCount={acceptedArtists.length}
           />
         </div>
       </div>

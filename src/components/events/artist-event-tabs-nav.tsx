@@ -8,11 +8,15 @@ interface ArtistEventTabsNavProps {
   eventId: string;
   showFloorPlan: boolean;
   showMessages: boolean;
+  showArtists?: boolean;
+  showPractical?: boolean;
+  artistsCount?: number;
 }
 
 interface Tab {
   href: string;
   label: string;
+  count?: number;
   matchPath: (pathname: string) => boolean;
 }
 
@@ -20,12 +24,15 @@ export function ArtistEventTabsNav({
   eventId,
   showFloorPlan,
   showMessages,
+  showArtists = false,
+  showPractical = false,
+  artistsCount,
 }: ArtistEventTabsNavProps) {
   const pathname = usePathname();
   const base = `/events/${eventId}`;
 
   // Strip a single trailing slash so a "/events/x/" pathname still
-  // matches the bare-base "Details" tab.
+  // matches the bare-base "Overview" tab.
   const normalized = pathname.endsWith("/") && pathname !== "/"
     ? pathname.slice(0, -1)
     : pathname;
@@ -33,15 +40,30 @@ export function ArtistEventTabsNav({
   const tabs: Tab[] = [
     {
       href: base,
-      label: "Details",
+      label: "Overview",
       matchPath: (p) => p === base,
     },
   ];
+  if (showArtists) {
+    tabs.push({
+      href: `${base}/artists`,
+      label: "Artists",
+      count: artistsCount,
+      matchPath: (p) => p === `${base}/artists`,
+    });
+  }
   if (showFloorPlan) {
     tabs.push({
       href: `${base}/floor-plan`,
       label: "Floor plan",
       matchPath: (p) => p === `${base}/floor-plan`,
+    });
+  }
+  if (showPractical) {
+    tabs.push({
+      href: `${base}/practical`,
+      label: "Practical info",
+      matchPath: (p) => p === `${base}/practical`,
     });
   }
   if (showMessages) {
@@ -78,6 +100,11 @@ export function ArtistEventTabsNav({
               )}
             >
               {tab.label}
+              {tab.count !== undefined && tab.count > 0 && (
+                <span className="ml-1.5 font-mono text-[11px] text-muted-foreground">
+                  {tab.count}
+                </span>
+              )}
             </Link>
           );
         })}
