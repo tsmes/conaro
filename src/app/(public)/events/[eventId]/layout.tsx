@@ -39,12 +39,33 @@ export default async function EventLayout({
   const ctx = await getEventViewerContext(eventId);
   const {
     event,
+    session,
     isArtist,
     isFollowingConvention,
     ownApplicationStatus,
     ownResponseMessage,
     isAcceptedToEvent,
   } = ctx;
+  const isLoggedIn = Boolean(session?.user);
+
+  // Anonymous viewers don't care about lifecycle badges (open/under
+  // review/results published) or application deadlines — they want a
+  // countdown to the event itself. Compute days from local midnight
+  // so the count flips at user-local day boundaries.
+  let daysUntilEvent: number | null = null;
+  if (!isLoggedIn) {
+    const start = new Date(`${event.eventStartDate}T00:00:00`);
+    const now = new Date();
+    const todayMidnight = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate()
+    );
+    const diff = Math.round(
+      (start.getTime() - todayMidnight.getTime()) / 86_400_000
+    );
+    if (diff >= 0) daysUntilEvent = diff;
+  }
 
   const conventionLogoUrl = event.conventionLogoPath
     ? storage.getUrl(event.conventionLogoPath)
@@ -105,32 +126,48 @@ export default async function EventLayout({
           <h1 className="font-heading text-3xl font-extrabold tracking-tight md:text-5xl">
             {event.name}
           </h1>
-          {event.status === "published" && event.applicationOpenDate && (
-            <Badge variant="outline">
-              Applications open {formatDateNo(event.applicationOpenDate)}
-            </Badge>
+          {isLoggedIn && (
+            <>
+              {event.status === "published" && event.applicationOpenDate && (
+                <Badge variant="outline">
+                  Applications open {formatDateNo(event.applicationOpenDate)}
+                </Badge>
+              )}
+              {event.status === "reviewing" && (
+                <Badge variant="secondary">Applications under review</Badge>
+              )}
+              {event.status === "results_published" &&
+                (ownApplicationStatus === "accepted" ? (
+                  <Badge variant="success">Accepted</Badge>
+                ) : ownApplicationStatus === "waitlisted" ? (
+                  <Badge variant="warning">Waitlisted</Badge>
+                ) : ownApplicationStatus === "rejected" ? (
+                  <Badge variant="destructive">Not selected</Badge>
+                ) : ownApplicationStatus === "revoked" ? (
+                  <Badge variant="outline">Revoked</Badge>
+                ) : (
+                  <Badge variant="success">Results published</Badge>
+                ))}
+            </>
           )}
-          {event.status === "reviewing" && (
-            <Badge variant="secondary">Applications under review</Badge>
-          )}
-          {event.status === "results_published" &&
-            (ownApplicationStatus === "accepted" ? (
-              <Badge variant="success">Accepted</Badge>
-            ) : ownApplicationStatus === "waitlisted" ? (
-              <Badge variant="warning">Waitlisted</Badge>
-            ) : ownApplicationStatus === "rejected" ? (
-              <Badge variant="destructive">Not selected</Badge>
-            ) : ownApplicationStatus === "revoked" ? (
-              <Badge variant="outline">Revoked</Badge>
-            ) : (
-              <Badge variant="success">Results published</Badge>
-            ))}
         </div>
         {isArtist && (
           <FollowButton
             conventionId={event.conventionId}
             isFollowing={isFollowingConvention}
           />
+        )}
+        {!isLoggedIn && daysUntilEvent !== null && (
+          <div className="text-center md:text-right">
+            <div className="font-heading text-5xl font-extrabold leading-none tracking-tight md:text-6xl">
+              {daysUntilEvent === 0 ? "Today" : daysUntilEvent}
+            </div>
+            {daysUntilEvent > 0 && (
+              <div className="mt-2 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                {daysUntilEvent === 1 ? "Day" : "Days"} to go
+              </div>
+            )}
+          </div>
         )}
       </header>
 

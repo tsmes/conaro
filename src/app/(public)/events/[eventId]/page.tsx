@@ -73,7 +73,7 @@ export default async function EventDetailPage({
           <DetailField label="Event">
             {formatDateRangeNo(event.eventStartDate, event.eventEndDate)}
           </DetailField>
-          {event.applicationCloseDate && (
+          {event.applicationCloseDate && session?.user && (
             <DetailField label="Application deadline">
               <span className="font-semibold text-destructive">
                 {formatDateNo(event.applicationCloseDate)}
