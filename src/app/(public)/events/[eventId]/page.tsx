@@ -18,6 +18,7 @@ import {
   type ValidationResult,
 } from "@/lib/applications/validation";
 import { ApplyButton } from "@/components/events/apply-button";
+import { ApplicationStatusCard } from "@/components/events/application-status-card";
 import { JoinWaitlistButton } from "@/components/events/join-waitlist-button";
 import { FollowButton } from "@/components/conventions/follow-button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -341,85 +342,44 @@ export default async function EventDetailPage({
           event.status === "results_published" &&
           ownApplicationStatus &&
           ownApplicationStatus !== "revoked" && (
-            <SectionCard
-              label={
-                ownApplicationStatus === "accepted"
-                  ? "You're in"
-                  : ownApplicationStatus === "rejected"
-                    ? "Results"
-                    : ownApplicationStatus === "waitlisted"
-                      ? "You're on the waitlist"
-                      : "Your application"
-              }
+            <ApplicationStatusCard
+              status={ownApplicationStatus}
+              responseMessage={ownResponseMessage}
             >
-              {ownApplicationStatus === "waitlisted" ? (
-                <>
-                  <p className="text-sm leading-relaxed text-foreground">
-                    You&apos;re on the waitlist. If a spot opens up, the
-                    organizer may offer it to you — we&apos;ll let you know.
-                  </p>
-                  {/* Waitlisted artists arrived via rejected, so the
-                      stored responseMessage is the original rejection
-                      text. Keep it visible below the waitlist
-                      confirmation for context. */}
-                  {ownResponseMessage && (
-                    <div className="mt-5 border-t border-border pt-5">
-                      <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                        Original message from organizer
-                      </p>
-                      <Markdown
-                        source={ownResponseMessage}
-                        className="text-foreground"
-                      />
-                    </div>
-                  )}
-                </>
-              ) : ownResponseMessage ? (
-                <Markdown
-                  source={ownResponseMessage}
-                  className="text-foreground"
-                />
-              ) : (
-                <p className="text-sm leading-relaxed text-foreground">
-                  {ownApplicationStatus === "accepted"
-                    ? "Congratulations! Your application has been accepted."
-                    : ownApplicationStatus === "rejected"
-                      ? "Thank you for applying. Unfortunately, we can't offer you a spot at this event."
-                      : "Your application has been reviewed."}
-                </p>
-              )}
               {ownApplicationStatus === "rejected" &&
                 event.waitlistEnabled && (
                   <div
                     className={cn(
                       "mt-5",
-                      ownResponseMessage &&
-                        "border-t border-border pt-5"
+                      ownResponseMessage && "border-t border-border pt-5"
                     )}
                   >
                     <p className="mb-3 text-sm text-muted-foreground">
-                      If a spot opens up, the organizer may offer it to
-                      you — join the waitlist to opt in.
+                      If a spot opens up, the organizer may offer it to you —
+                      join the waitlist to opt in.
                     </p>
                     <JoinWaitlistButton eventId={event.id} />
                   </div>
                 )}
               {ownApplicationStatus === "accepted" && artistProfileId && (
-                <EventThread
-                  eventId={event.id}
-                  threadId={artistThread?.thread.id ?? null}
-                  messages={
-                    artistThread?.messages.map((m) => ({
-                      id: m.id,
-                      body: m.body,
-                      authorIsArtist: m.authorProfileId === artistProfileId,
-                      createdAt: m.createdAt,
-                    })) ?? []
-                  }
-                  hasUnreadFromOrganizer={artistHasUnread}
-                />
+                <div className="mt-5">
+                  <EventThread
+                    eventId={event.id}
+                    threadId={artistThread?.thread.id ?? null}
+                    messages={
+                      artistThread?.messages.map((m) => ({
+                        id: m.id,
+                        body: m.body,
+                        authorIsArtist:
+                          m.authorProfileId === artistProfileId,
+                        createdAt: m.createdAt,
+                      })) ?? []
+                    }
+                    hasUnreadFromOrganizer={artistHasUnread}
+                  />
+                </div>
               )}
-            </SectionCard>
+            </ApplicationStatusCard>
           )}
 
         {event.description && (
