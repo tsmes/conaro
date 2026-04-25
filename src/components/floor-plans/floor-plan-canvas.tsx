@@ -316,12 +316,12 @@ export function FloorPlanCanvas({
                       is the assigned artist) */}
                   {highlight && (
                     <Rect
-                      x={-wPx / 2 - 6}
-                      y={-hPx / 2 - 6}
-                      width={wPx + 12}
-                      height={hPx + 12}
-                      fill="rgba(139, 92, 246, 0.15)"
-                      cornerRadius={8}
+                      x={-wPx / 2 - 8}
+                      y={-hPx / 2 - 8}
+                      width={wPx + 16}
+                      height={hPx + 16}
+                      fill="rgba(139, 92, 246, 0.35)"
+                      cornerRadius={10}
                     />
                   )}
                   {/* Selection ring (editor only) — dashed outline that
@@ -357,7 +357,7 @@ export function FloorPlanCanvas({
                     height={hPx}
                     fill={fill}
                     stroke={stroke}
-                    strokeWidth={highlight ? 2.5 : assigned ? 1.5 : 1}
+                    strokeWidth={highlight ? 4 : assigned ? 1.5 : 1}
                     cornerRadius={6}
                   />
                   {/* Accent strip along the top — signals "this end faces
