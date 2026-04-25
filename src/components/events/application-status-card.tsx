@@ -54,10 +54,26 @@ const VARIANTS: Record<StatusVariantKey, VariantConfig> = {
 };
 
 function variantKeyFor(status: ApplicationStatus): StatusVariantKey {
-  if (status === "accepted") return "accepted";
-  if (status === "rejected") return "rejected";
-  if (status === "waitlisted") return "waitlisted";
-  return "default";
+  switch (status) {
+    case "accepted":
+      return "accepted";
+    case "rejected":
+      return "rejected";
+    case "waitlisted":
+      return "waitlisted";
+    case "submitted":
+    case "under_review":
+    case "pending":
+    case "revoked":
+      return "default";
+    default: {
+      // Compile-time exhaustiveness check: a new ApplicationStatus
+      // value will fail typecheck here until a variant is chosen.
+      const _exhaustive: never = status;
+      void _exhaustive;
+      return "default";
+    }
+  }
 }
 
 interface ApplicationStatusCardProps {

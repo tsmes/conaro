@@ -24,6 +24,12 @@ export function ArtistEventTabsNav({
   const pathname = usePathname();
   const base = `/events/${eventId}`;
 
+  // Strip a single trailing slash so a "/events/x/" pathname still
+  // matches the bare-base "Details" tab.
+  const normalized = pathname.endsWith("/") && pathname !== "/"
+    ? pathname.slice(0, -1)
+    : pathname;
+
   const tabs: Tab[] = [
     {
       href: base,
@@ -35,14 +41,14 @@ export function ArtistEventTabsNav({
     tabs.push({
       href: `${base}/floor-plan`,
       label: "Floor plan",
-      matchPath: (p) => p.startsWith(`${base}/floor-plan`),
+      matchPath: (p) => p === `${base}/floor-plan`,
     });
   }
   if (showMessages) {
     tabs.push({
       href: `${base}/messages`,
       label: "Messages",
-      matchPath: (p) => p.startsWith(`${base}/messages`),
+      matchPath: (p) => p === `${base}/messages`,
     });
   }
 
@@ -54,7 +60,7 @@ export function ArtistEventTabsNav({
   return (
     <nav className="flex gap-1 border-b border-border">
       {tabs.map((tab) => {
-        const active = tab.matchPath(pathname);
+        const active = tab.matchPath(normalized);
         return (
           <Link
             key={tab.href}

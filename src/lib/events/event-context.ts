@@ -21,6 +21,9 @@ import { getFloorPlanForEvent } from "@/lib/floor-plans/queries";
 import { getThreadForArtist } from "@/lib/threads/queries";
 import type { ApplicationStatus } from "@/lib/applications/status-styles";
 
+// "pending" is a UI-display-only status (used by the dashboard to
+// mask un-published decisions); the DB never stores it, so the
+// viewer-context's status field excludes it.
 type ArtistApplicationStatus = Exclude<ApplicationStatus, "pending"> | null;
 
 export interface EventViewerContext {
@@ -97,8 +100,8 @@ export const getEventViewerContext = cache(
     }
 
     const session = await auth();
-    const isArtist =
-      Boolean(session?.user?.profileId) && session?.user?.role === "artist";
+    const profileId = session?.user?.profileId ?? null;
+    const isArtist = profileId !== null && session?.user?.role === "artist";
 
     let hasExistingApplication = false;
     let ownApplicationStatus: ArtistApplicationStatus = null;
@@ -107,8 +110,7 @@ export const getEventViewerContext = cache(
     let isFollowingConvention = false;
     let validationResult: ValidationResult = { valid: true };
 
-    if (isArtist) {
-      const profileId = session!.user!.profileId!;
+    if (isArtist && profileId) {
       const [
         [profile],
         [artistProfile],
@@ -171,7 +173,7 @@ export const getEventViewerContext = cache(
       event,
       session,
       isArtist,
-      artistProfileId: session?.user?.profileId ?? null,
+      artistProfileId: profileId,
       hasExistingApplication,
       ownApplicationStatus,
       ownApplicationId,
@@ -212,6 +214,28 @@ export async function shouldShowMessagesTab(
     ctx.artistProfileId
   );
   return Boolean(thread);
+}
+
+/** Helper used by the status card: does the accepted artist's
+ *  application have a table assignment on the event's floor plan?
+ *  Reuses the cached plan so it's a free check after
+ *  shouldShowFloorPlanTab. */
+export async function hasAssignedTableForViewer(
+  ctx: EventViewerContext
+): Promise<boolean> {
+  if (
+    !ctx.isAcceptedToEvent ||
+    !ctx.ownApplicationId ||
+    ctx.event.status !== "results_published"
+  ) {
+    return false;
+  }
+  const plan = await getCachedFloorPlan(ctx.event.id);
+  return Boolean(
+    plan?.tables.some(
+      (t) => t.assignment?.applicationId === ctx.ownApplicationId
+    )
+  );
 }
 
 export type { Amenities, FieldRequirements };

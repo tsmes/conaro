@@ -2,8 +2,8 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
 import {
-  getCachedFloorPlan,
   getEventViewerContext,
+  hasAssignedTableForViewer,
   shouldShowFloorPlanTab,
   shouldShowMessagesTab,
 } from "@/lib/events/event-context";
@@ -42,7 +42,6 @@ export default async function EventLayout({
     isArtist,
     isFollowingConvention,
     ownApplicationStatus,
-    ownApplicationId,
     ownResponseMessage,
     isAcceptedToEvent,
   } = ctx;
@@ -51,27 +50,17 @@ export default async function EventLayout({
     ? storage.getUrl(event.conventionLogoPath)
     : null;
 
-  const announcements = isAcceptedToEvent
-    ? await getEventAnnouncements(event.id)
-    : [];
-
-  const [showFloorPlan, showMessages] = await Promise.all([
-    shouldShowFloorPlanTab(ctx),
-    shouldShowMessagesTab(ctx),
-  ]);
-
-  // Reuses the cached floor plan (already loaded by shouldShowFloorPlanTab
-  // when applicable) to decide whether to surface the "Show me my table"
-  // button on the status card.
-  const hasAssignedTable = await (async () => {
-    if (!isAcceptedToEvent || !ownApplicationId || !showFloorPlan) return false;
-    const plan = await getCachedFloorPlan(event.id);
-    return Boolean(
-      plan?.tables.some(
-        (t) => t.assignment?.applicationId === ownApplicationId
-      )
-    );
-  })();
+  // Run every layout-side fetch in parallel. shouldShowFloorPlanTab
+  // and hasAssignedTableForViewer share the cached floor-plan query;
+  // shouldShowMessagesTab caches the thread query too. Announcements
+  // is independent.
+  const [announcements, showFloorPlan, showMessages, hasAssignedTable] =
+    await Promise.all([
+      isAcceptedToEvent ? getEventAnnouncements(event.id) : Promise.resolve([]),
+      shouldShowFloorPlanTab(ctx),
+      shouldShowMessagesTab(ctx),
+      hasAssignedTableForViewer(ctx),
+    ]);
 
   const showStatusCard =
     isArtist &&
