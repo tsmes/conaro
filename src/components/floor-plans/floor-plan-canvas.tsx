@@ -1,8 +1,10 @@
 "use client";
 
-import { useMemo, useRef, useState, useEffect } from "react";
+import { useCallback, useMemo, useRef, useState, useEffect } from "react";
 import { Stage, Layer, Rect, Line, Text, Group, Circle } from "react-konva";
 import Konva from "konva";
+import type { KonvaEventObject } from "konva/lib/Node";
+import { Maximize2, Minus, Plus } from "lucide-react";
 import type { FloorPlan, TableSizeOption } from "@/lib/db/schema/events";
 import type { ResolvedFloorPlan } from "@/lib/floor-plans/queries";
 
@@ -57,6 +59,21 @@ export function FloorPlanCanvas({
 }: FloorPlanCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(800);
+  // View transform applied to the Stage. The base Stage already
+  // fits the room to the container width; this transform sits on
+  // top so viewers can pinch/wheel-zoom and drag-pan. Editor mode
+  // keeps the transform at identity so stage drag doesn't fight
+  // table drag.
+  const [view, setView] = useState({ scale: 1, x: 0, y: 0 });
+  const lastPinchDistRef = useRef(0);
+  // Stage container needs its own touch-action: none so the browser
+  // doesn't grab pinch / pan gestures.
+  const stageContainerRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = stageContainerRef.current;
+    if (!el) return;
+    el.style.touchAction = "none";
+  }, []);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -176,6 +193,130 @@ export function FloorPlanCanvas({
   const roomWidthPx = viewportCm.widthCm * scale;
   const roomHeightPx = viewportCm.heightCm * scale;
 
+  // Pan/zoom is viewer-only. In editor mode the user drags tables
+  // directly; layering Stage drag on top would steal those events.
+  const panZoomEnabled = !editable;
+  const SCALE_MIN = 0.4;
+  const SCALE_MAX = 4;
+
+  const clampScale = useCallback(
+    (s: number) => Math.max(SCALE_MIN, Math.min(SCALE_MAX, s)),
+    []
+  );
+
+  const handleWheel = useCallback(
+    (e: KonvaEventObject<WheelEvent>) => {
+      if (!panZoomEnabled) return;
+      e.evt.preventDefault();
+      const stage = e.target.getStage();
+      const pointer = stage?.getPointerPosition();
+      if (!stage || !pointer) return;
+      setView((v) => {
+        const oldScale = v.scale;
+        const direction = e.evt.deltaY > 0 ? -1 : 1;
+        const factor = 1.12;
+        const newScale = clampScale(
+          direction > 0 ? oldScale * factor : oldScale / factor
+        );
+        const ratio = newScale / oldScale;
+        return {
+          scale: newScale,
+          x: pointer.x - (pointer.x - v.x) * ratio,
+          y: pointer.y - (pointer.y - v.y) * ratio,
+        };
+      });
+    },
+    [panZoomEnabled, clampScale]
+  );
+
+  const handleTouchMove = useCallback(
+    (e: KonvaEventObject<TouchEvent>) => {
+      if (!panZoomEnabled) return;
+      const touches = e.evt.touches;
+      if (touches.length !== 2) return;
+      e.evt.preventDefault();
+      const t1 = touches[0];
+      const t2 = touches[1];
+      const dist = Math.hypot(
+        t2.clientX - t1.clientX,
+        t2.clientY - t1.clientY
+      );
+      if (lastPinchDistRef.current === 0) {
+        lastPinchDistRef.current = dist;
+        return;
+      }
+      const stage = e.target.getStage();
+      const rect = stage?.container().getBoundingClientRect();
+      if (!rect) return;
+      const midX = (t1.clientX + t2.clientX) / 2 - rect.left;
+      const midY = (t1.clientY + t2.clientY) / 2 - rect.top;
+      const factor = dist / lastPinchDistRef.current;
+      lastPinchDistRef.current = dist;
+      setView((v) => {
+        const newScale = clampScale(v.scale * factor);
+        const ratio = newScale / v.scale;
+        return {
+          scale: newScale,
+          x: midX - (midX - v.x) * ratio,
+          y: midY - (midY - v.y) * ratio,
+        };
+      });
+    },
+    [panZoomEnabled, clampScale]
+  );
+
+  const handleTouchEnd = useCallback(() => {
+    lastPinchDistRef.current = 0;
+  }, []);
+
+  const zoomBy = useCallback(
+    (factor: number) => {
+      setView((v) => {
+        const newScale = clampScale(v.scale * factor);
+        if (newScale === v.scale) return v;
+        const cx = stageWidth / 2;
+        const cy = stageHeight / 2;
+        const ratio = newScale / v.scale;
+        return {
+          scale: newScale,
+          x: cx - (cx - v.x) * ratio,
+          y: cy - (cy - v.y) * ratio,
+        };
+      });
+    },
+    [clampScale, stageWidth, stageHeight]
+  );
+
+  const resetView = useCallback(() => {
+    setView({ scale: 1, x: 0, y: 0 });
+    lastPinchDistRef.current = 0;
+  }, []);
+
+  // Auto-focus on the highlighted table when "Show me my table" is
+  // active. Centres the table at scale 1.6 so the artist sees their
+  // stand without hunting through the room.
+  useEffect(() => {
+    if (!panZoomEnabled || !pulseHighlight || !highlightApplicationId) return;
+    const target = tablesInRoom.find(
+      (t) => t.assignment?.applicationId === highlightApplicationId
+    );
+    if (!target) return;
+    const size = sizeById.get(target.tableSizeOptionId);
+    if (!size?.widthCm || !size?.depthCm) return;
+    const cx = PADDING_PX + (target.x + size.widthCm / 2) * scale;
+    const cy = PADDING_PX + (target.y + size.depthCm / 2) * scale;
+    const targetScale = 1.6;
+    setView({
+      scale: targetScale,
+      x: stageWidth / 2 - cx * targetScale,
+      y: stageHeight / 2 - cy * targetScale,
+    });
+    // Scale + sizeById intentionally not in deps — we re-run when
+    // the trigger flips or the highlight target changes, not on
+    // every container resize.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [panZoomEnabled, pulseHighlight, highlightApplicationId]);
+
   return (
     <div
       ref={containerRef}
@@ -192,16 +333,45 @@ export function FloorPlanCanvas({
             : "Select a room to view its layout."}
         </div>
       ) : (
-        <Stage
-          width={stageWidth}
-          height={stageHeight}
-          onMouseDown={(e) => {
-            // Click on the stage background → clear selection.
-            if (e.target === e.target.getStage() && onSelectTable) {
-              onSelectTable(null);
+        <div ref={stageContainerRef} className="relative">
+          {panZoomEnabled && (
+            <ZoomToolbar
+              scale={view.scale}
+              onZoomIn={() => zoomBy(1.25)}
+              onZoomOut={() => zoomBy(1 / 1.25)}
+              onReset={resetView}
+            />
+          )}
+          <Stage
+            width={stageWidth}
+            height={stageHeight}
+            scaleX={panZoomEnabled ? view.scale : 1}
+            scaleY={panZoomEnabled ? view.scale : 1}
+            x={panZoomEnabled ? view.x : 0}
+            y={panZoomEnabled ? view.y : 0}
+            draggable={panZoomEnabled}
+            onWheel={handleWheel}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            onDragEnd={
+              panZoomEnabled
+                ? (e) => {
+                    if (e.target.getStage() !== e.target) return;
+                    setView((v) => ({
+                      ...v,
+                      x: e.target.x(),
+                      y: e.target.y(),
+                    }));
+                  }
+                : undefined
             }
-          }}
-        >
+            onMouseDown={(e) => {
+              // Click on the stage background → clear selection.
+              if (e.target === e.target.getStage() && onSelectTable) {
+                onSelectTable(null);
+              }
+            }}
+          >
           {/* Layer 1: room frame (shadow + fill + grid) */}
           <Layer listening={false}>
             {/* Drop shadow sits slightly below and to the right */}
@@ -404,7 +574,54 @@ export function FloorPlanCanvas({
             })}
           </Layer>
         </Stage>
+        </div>
       )}
+    </div>
+  );
+}
+
+interface ZoomToolbarProps {
+  scale: number;
+  onZoomIn: () => void;
+  onZoomOut: () => void;
+  onReset: () => void;
+}
+
+function ZoomToolbar({
+  scale,
+  onZoomIn,
+  onZoomOut,
+  onReset,
+}: ZoomToolbarProps) {
+  return (
+    <div className="absolute right-3 top-3 z-10 flex items-center gap-1 rounded-[10px] border border-border bg-background/90 p-1 shadow-sm backdrop-blur">
+      <button
+        type="button"
+        onClick={onZoomOut}
+        aria-label="Zoom out"
+        className="grid size-9 place-items-center rounded-[7px] text-foreground transition hover:bg-muted active:scale-95"
+      >
+        <Minus className="size-4" />
+      </button>
+      <span className="w-12 text-center font-mono text-[11px] text-muted-foreground">
+        {Math.round(scale * 100)}%
+      </span>
+      <button
+        type="button"
+        onClick={onZoomIn}
+        aria-label="Zoom in"
+        className="grid size-9 place-items-center rounded-[7px] text-foreground transition hover:bg-muted active:scale-95"
+      >
+        <Plus className="size-4" />
+      </button>
+      <button
+        type="button"
+        onClick={onReset}
+        aria-label="Reset view"
+        className="grid size-9 place-items-center rounded-[7px] text-foreground transition hover:bg-muted active:scale-95"
+      >
+        <Maximize2 className="size-4" />
+      </button>
     </div>
   );
 }
