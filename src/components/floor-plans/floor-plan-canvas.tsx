@@ -131,7 +131,15 @@ export function FloorPlanCanvas({
   const effectiveWidthPx = Math.max(0, containerWidth - PADDING_PX * 2);
   const scale = effectiveWidthPx / viewportCm.widthCm;
   const stageWidth = containerWidth;
-  const stageHeight = viewportCm.heightCm * scale + PADDING_PX * 2;
+  const aspectFitHeight = viewportCm.heightCm * scale + PADDING_PX * 2;
+  // On phone-sized containers we floor the canvas at a generous
+  // height so the room has real estate to breathe, the zoom toolbar
+  // doesn't overlap content, and pinch-zoom has somewhere to go.
+  // Desktop stays aspect-fit.
+  const isMobileWidth = containerWidth > 0 && containerWidth < 640;
+  const stageHeight = isMobileWidth
+    ? Math.max(aspectFitHeight, 520)
+    : aspectFitHeight;
 
   const sizeById = useMemo(
     () => new Map(tableSizeOptions.map((s) => [s.id, s])),
