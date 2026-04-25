@@ -14,6 +14,7 @@ import {
   shouldShowMessagesTab,
 } from "@/lib/events/event-context";
 import { getEventAnnouncements } from "@/lib/events/announcements";
+import { getAcceptedArtistsForEvent } from "@/lib/floor-plans/queries";
 import { pickCoverGradient } from "@/lib/landing/cover-gradient";
 import { storage } from "@/lib/storage";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -74,14 +75,24 @@ export default async function EventLayout({
     : null;
   const heroGradientClass = pickCoverGradient(event.conventionId);
 
-  // Run every layout-side fetch in parallel.
-  const [announcements, showFloorPlan, showMessages, hasAssignedTable] =
-    await Promise.all([
-      isAcceptedToEvent ? getEventAnnouncements(event.id) : Promise.resolve([]),
-      shouldShowFloorPlanTab(ctx),
-      shouldShowMessagesTab(ctx),
-      hasAssignedTableForViewer(ctx),
-    ]);
+  // Run every layout-side fetch in parallel. The accepted-artists
+  // marquee is only meaningful once results are out — skip the query
+  // before then.
+  const [
+    announcements,
+    showFloorPlan,
+    showMessages,
+    hasAssignedTable,
+    acceptedArtists,
+  ] = await Promise.all([
+    isAcceptedToEvent ? getEventAnnouncements(event.id) : Promise.resolve([]),
+    shouldShowFloorPlanTab(ctx),
+    shouldShowMessagesTab(ctx),
+    hasAssignedTableForViewer(ctx),
+    event.status === "results_published"
+      ? getAcceptedArtistsForEvent(event.id)
+      : Promise.resolve([]),
+  ]);
 
   const showStatusCard =
     isArtist &&
@@ -254,6 +265,9 @@ export default async function EventLayout({
             )}
           </div>
         </div>
+        {acceptedArtists.length > 0 && (
+          <ArtistMarquee artists={acceptedArtists} />
+        )}
       </section>
 
       {/* Sticky pill tab bar */}
@@ -334,6 +348,38 @@ export default async function EventLayout({
 
         {children}
       </main>
+    </div>
+  );
+}
+
+interface MarqueeArtist {
+  applicationId: string;
+  displayName: string;
+}
+
+function ArtistMarquee({ artists }: { artists: MarqueeArtist[] }) {
+  // Duplicate the list so the keyframe-driven translate to -50%
+  // lands the second copy where the first started — seamless loop.
+  const doubled = [...artists, ...artists];
+  return (
+    <div
+      aria-hidden
+      className="relative overflow-hidden border-t border-white/15 bg-black/25 py-2"
+    >
+      <ul className="marquee-track text-[12.5px] font-semibold text-white/85">
+        {doubled.map((a, i) => (
+          <li
+            key={`${a.applicationId}-${i}`}
+            className="flex items-center gap-2 px-2"
+          >
+            <span className="size-1.5 shrink-0 rounded-full bg-white/60" />
+            {a.displayName}
+          </li>
+        ))}
+      </ul>
+      <span className="sr-only">
+        Confirmed artists: {artists.map((a) => a.displayName).join(", ")}
+      </span>
     </div>
   );
 }

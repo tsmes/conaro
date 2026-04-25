@@ -260,6 +260,34 @@
     -webkit-backdrop-filter: blur(20px);
   }
 
+  /* Marquee — continuous horizontal scroll. The track holds two
+     copies of the same content; translating to -50% puts the second
+     copy where the first started, so the loop has no visible seam.
+     Pauses on hover for users who want to read a name. */
+  .marquee-track {
+    display: flex;
+    gap: 14px;
+    white-space: nowrap;
+    animation: marquee-scroll 40s linear infinite;
+    width: max-content;
+  }
+  .marquee-track:hover {
+    animation-play-state: paused;
+  }
+  @keyframes marquee-scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track {
+      animation: none;
+    }
+  }
+
   /* Event-card cover rails. Six deterministic gradients used as fallback
      when a convention has no logo. Chosen via pickCoverGradient. */
   .cover-a {
