@@ -21,14 +21,39 @@ const COLORS = {
   gridOrigin: "#d1d5db",
   tableUnassignedFill: "#f1f5f9",
   tableUnassignedStroke: "#94a3b8",
-  tableAssignedFill: "#dbeafe",
-  tableAssignedStroke: "#3b82f6",
   tableShadow: "rgba(15, 23, 42, 0.12)",
   highlightGlow: "#8b5cf6",
   labelText: "#0f172a",
+  labelMuted: "#6b7280",
   labelPin: "#6366f1",
   hintText: "#64748b",
 };
+
+// Pastel container palette mirroring the design's per-artist tints.
+// Each assigned table picks a deterministic colour from this list
+// based on the application id, so the room reads as a varied set of
+// occupied stands without needing any per-artist cover data.
+const ASSIGNED_PALETTE: ReadonlyArray<{ fill: string; stroke: string }> = [
+  { fill: "#ece1ff", stroke: "#6a37d4" }, // primary-container / primary
+  { fill: "#ffd6e1", stroke: "#b41340" }, // tertiary-container / destructive
+  { fill: "#d8f4e4", stroke: "#0a8f5a" }, // success-container / success
+  { fill: "#ffe7b3", stroke: "#b06b00" }, // warning-container / warning
+  { fill: "#d7e4fb", stroke: "#1960c7" }, // info-container / info
+  { fill: "#e4c6ff", stroke: "#5f2d92" }, // secondary-container
+];
+
+function pickAssignedTone(applicationId: string) {
+  let sum = 0;
+  for (let i = 0; i < applicationId.length; i += 1) {
+    sum += applicationId.charCodeAt(i);
+  }
+  return ASSIGNED_PALETTE[sum % ASSIGNED_PALETTE.length];
+}
+
+function initialsFor(name: string): string {
+  const parts = name.trim().split(/\s+/).slice(0, 2);
+  return parts.map((p) => p[0]?.toUpperCase() ?? "").join("") || "?";
+}
 
 interface FloorPlanCanvasProps {
   plan: ResolvedFloorPlan | null;
@@ -450,14 +475,24 @@ export function FloorPlanCanvas({
               const maxCx = PADDING_PX + activeRoom.widthCm * scale - effWidthPx / 2;
               const minCy = PADDING_PX + effDepthPx / 2;
               const maxCy = PADDING_PX + activeRoom.heightCm * scale - effDepthPx / 2;
-              const fill = assigned
-                ? COLORS.tableAssignedFill
-                : COLORS.tableUnassignedFill;
+              const tone = table.assignment
+                ? pickAssignedTone(table.assignment.applicationId)
+                : null;
+              const fill = tone ? tone.fill : COLORS.tableUnassignedFill;
               const stroke = highlight
                 ? COLORS.highlightGlow
-                : assigned
-                  ? COLORS.tableAssignedStroke
+                : tone
+                  ? tone.stroke
                   : COLORS.tableUnassignedStroke;
+              const initials = table.assignment
+                ? initialsFor(table.assignment.artistDisplayName)
+                : "";
+              // Initials font scales loosely with the smaller side
+              // so they read at any room/zoom — clamped between
+              // 11 and 18 px.
+              const initialsFontPx = Math.round(
+                Math.max(11, Math.min(18, Math.min(wPx, hPx) / 2.6))
+              );
               return (
                 <Group
                   key={table.id}
@@ -511,17 +546,10 @@ export function FloorPlanCanvas({
                       listening={false}
                     />
                   )}
-                  {/* Shadow */}
-                  <Rect
-                    x={-wPx / 2 + 1}
-                    y={-hPx / 2 + 3}
-                    width={wPx}
-                    height={hPx}
-                    fill={COLORS.tableShadow}
-                    cornerRadius={6}
-                    opacity={0.4}
-                  />
-                  {/* Main body */}
+                  {/* Main body — soft-pastel container per assigned
+                      artist, muted grey when unassigned. No accent
+                      strip; the design keeps each stand a single
+                      clean rect. */}
                   <Rect
                     x={-wPx / 2}
                     y={-hPx / 2}
@@ -532,43 +560,34 @@ export function FloorPlanCanvas({
                     strokeWidth={highlight ? 4 : assigned ? 1.5 : 1}
                     cornerRadius={6}
                   />
-                  {/* Accent strip along the top — signals "this end faces
-                      the aisle" and adds a splash of colour */}
-                  <Rect
-                    x={-wPx / 2}
-                    y={-hPx / 2}
-                    width={wPx}
-                    height={4}
-                    fill={
-                      assigned
-                        ? COLORS.tableAssignedStroke
-                        : COLORS.tableUnassignedStroke
-                    }
-                    cornerRadius={[6, 6, 0, 0]}
-                    opacity={0.6}
-                  />
+                  {/* Stand ID — small mono label top-left. */}
                   <Text
-                    x={-wPx / 2 + 8}
-                    y={-hPx / 2 + 10}
+                    x={-wPx / 2 + 6}
+                    y={-hPx / 2 + 5}
                     text={table.label}
-                    fontSize={12}
+                    fontSize={9}
                     fontStyle="700"
-                    fill="#0f172a"
+                    fontFamily="JetBrains Mono, ui-monospace, monospace"
+                    fill={COLORS.labelMuted}
+                    listening={false}
                   />
-                  <Text
-                    x={-wPx / 2 + 8}
-                    y={-hPx / 2 + 26}
-                    text={
-                      table.assignment
-                        ? table.assignment.artistDisplayName
-                        : "available"
-                    }
-                    fontSize={10}
-                    fontStyle={table.assignment ? "500" : "400"}
-                    fill={table.assignment ? "#1e40af" : "#64748b"}
-                    width={wPx - 16}
-                    ellipsis
-                  />
+                  {/* Big artist initials, centred — replaces the
+                      previous wordy artist-name footer. Computed once
+                      via initialsFor(). */}
+                  {initials && (
+                    <Text
+                      x={-wPx / 2}
+                      y={-initialsFontPx / 2}
+                      width={wPx}
+                      align="center"
+                      text={initials}
+                      fontSize={initialsFontPx}
+                      fontStyle="800"
+                      fontFamily="Manrope, ui-sans-serif, system-ui, sans-serif"
+                      fill={COLORS.labelText}
+                      listening={false}
+                    />
+                  )}
                 </Group>
               );
             })}
