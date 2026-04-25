@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gte, ne } from "drizzle-orm";
+import { and, asc, desc, eq, ne, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { applications } from "@/lib/db/schema/applications";
 import { conventions } from "@/lib/db/schema/conventions";
@@ -78,7 +78,15 @@ export async function getUpcomingEvents(): Promise<LandingEvent[]> {
     })
     .from(events)
     .innerJoin(conventions, eq(conventions.id, events.conventionId))
-    .where(and(ne(events.status, "draft"), gte(events.eventEndDate, today)))
+    // Events without an explicit end date default to their start date
+    // for the "still upcoming" check — otherwise NULL >= today is
+    // unknown and the row would be silently excluded.
+    .where(
+      and(
+        ne(events.status, "draft"),
+        sql`COALESCE(${events.eventEndDate}, ${events.eventStartDate}) >= ${today}`
+      )
+    )
     .orderBy(asc(events.eventStartDate));
 
   return rows as LandingEvent[];
