@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { timingSafeEqual } from "crypto";
-import { and, eq, lte, lt, isNotNull } from "drizzle-orm";
+import { and, eq, isNull, lte, lt, isNotNull } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { events } from "@/lib/db/schema/events";
 import { notifyEventOpened } from "@/lib/notifications/triggers";
@@ -113,5 +113,64 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  return NextResponse.json({ opened, closed });
+  // Auto-publish floor plans whose lead-time threshold has been
+  // reached. Only events with results already published are eligible
+  // (the public floor plan viewer assumes assignments are visible).
+  const autoPublishCandidates = await db
+    .select({
+      id: events.id,
+      eventStartDate: events.eventStartDate,
+      daysBefore: events.floorPlanAutoPublishDaysBefore,
+    })
+    .from(events)
+    .where(
+      and(
+        eq(events.status, "results_published"),
+        isNull(events.floorPlanPublishedAt),
+        isNotNull(events.floorPlanAutoPublishDaysBefore)
+      )
+    );
+
+  let floorPlansPublished = 0;
+  for (const event of autoPublishCandidates) {
+    if (event.daysBefore === null) continue;
+    // Compute trigger date in UTC: eventStartDate − N days. Compared
+    // against today (also UTC), so the publish fires the day the
+    // threshold is reached or any cron tick after.
+    const startMs = Date.parse(`${event.eventStartDate}T00:00:00Z`);
+    if (Number.isNaN(startMs)) continue;
+    const triggerMs = startMs - event.daysBefore * 86_400_000;
+    const triggerYmd = new Date(triggerMs).toISOString().slice(0, 10);
+    if (triggerYmd > todayUtc) continue;
+
+    try {
+      const updated = await db
+        .update(events)
+        .set({
+          floorPlanPublishedAt: new Date(),
+          floorPlanAutoPublishDaysBefore: null,
+          updatedAt: new Date(),
+        })
+        .where(
+          and(
+            eq(events.id, event.id),
+            eq(events.status, "results_published"),
+            isNull(events.floorPlanPublishedAt),
+            eq(events.floorPlanAutoPublishDaysBefore, event.daysBefore)
+          )
+        )
+        .returning({ id: events.id });
+
+      if (updated.length > 0) {
+        floorPlansPublished += 1;
+      }
+    } catch (error) {
+      console.error(
+        `Failed to auto-publish floor plan for event ${event.id}:`,
+        error
+      );
+    }
+  }
+
+  return NextResponse.json({ opened, closed, floorPlansPublished });
 }

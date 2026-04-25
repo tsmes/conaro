@@ -148,4 +148,102 @@ describe("cron /api/cron/events/tick", () => {
       .where(eq(events.id, event.id));
     expect(updated.status).toBe("accepting_applications");
   });
+
+  describe("auto-publish floor plan", () => {
+    function ymdOffset(days: number): string {
+      return new Date(Date.now() + days * 86_400_000)
+        .toISOString()
+        .slice(0, 10);
+    }
+
+    it("publishes the plan when the lead-time threshold has been reached", async () => {
+      const { convention } = await createTestOrganizer();
+      const event = await createTestEvent(convention.id, {
+        status: "results_published",
+        eventStartDate: ymdOffset(1),
+        floorPlanAutoPublishDaysBefore: 1,
+      });
+
+      const secret = process.env.CRON_SECRET!;
+      const response = await GET(makeRequest(`Bearer ${secret}`));
+      expect(response.status).toBe(200);
+      const data = await response.json();
+      expect(data.floorPlansPublished).toBe(1);
+
+      const [row] = await db
+        .select({
+          publishedAt: events.floorPlanPublishedAt,
+          daysBefore: events.floorPlanAutoPublishDaysBefore,
+        })
+        .from(events)
+        .where(eq(events.id, event.id));
+      expect(row.publishedAt).toBeInstanceOf(Date);
+      expect(row.daysBefore).toBeNull();
+    });
+
+    it("does not publish before the lead-time threshold", async () => {
+      const { convention } = await createTestOrganizer();
+      const event = await createTestEvent(convention.id, {
+        status: "results_published",
+        eventStartDate: ymdOffset(5),
+        floorPlanAutoPublishDaysBefore: 1,
+      });
+
+      const secret = process.env.CRON_SECRET!;
+      const response = await GET(makeRequest(`Bearer ${secret}`));
+      const data = await response.json();
+      expect(data.floorPlansPublished).toBe(0);
+
+      const [row] = await db
+        .select({ publishedAt: events.floorPlanPublishedAt })
+        .from(events)
+        .where(eq(events.id, event.id));
+      expect(row.publishedAt).toBeNull();
+    });
+
+    it("does not publish for events that aren't yet results_published", async () => {
+      const { convention } = await createTestOrganizer();
+      const event = await createTestEvent(convention.id, {
+        status: "reviewing",
+        eventStartDate: ymdOffset(1),
+        floorPlanAutoPublishDaysBefore: 3,
+      });
+
+      const secret = process.env.CRON_SECRET!;
+      const response = await GET(makeRequest(`Bearer ${secret}`));
+      const data = await response.json();
+      expect(data.floorPlansPublished).toBe(0);
+
+      const [row] = await db
+        .select({ publishedAt: events.floorPlanPublishedAt })
+        .from(events)
+        .where(eq(events.id, event.id));
+      expect(row.publishedAt).toBeNull();
+    });
+
+    it("does not re-publish a plan that's already public", async () => {
+      const { convention } = await createTestOrganizer();
+      const alreadyPublishedAt = new Date("2026-01-01");
+      const event = await createTestEvent(convention.id, {
+        status: "results_published",
+        eventStartDate: ymdOffset(1),
+        floorPlanPublishedAt: alreadyPublishedAt,
+        floorPlanAutoPublishDaysBefore: 1,
+      });
+
+      const secret = process.env.CRON_SECRET!;
+      const response = await GET(makeRequest(`Bearer ${secret}`));
+      const data = await response.json();
+      expect(data.floorPlansPublished).toBe(0);
+
+      const [row] = await db
+        .select({ publishedAt: events.floorPlanPublishedAt })
+        .from(events)
+        .where(eq(events.id, event.id));
+      // Original timestamp is preserved.
+      expect(row.publishedAt?.toISOString()).toBe(
+        alreadyPublishedAt.toISOString()
+      );
+    });
+  });
 });
