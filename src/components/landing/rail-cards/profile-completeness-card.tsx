@@ -14,9 +14,14 @@ export function ProfileCompletenessCard({
   return (
     <Card>
       <CardHeader>
-        <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-primary">
-          Profile
-        </p>
+        <div className="flex items-start justify-between gap-3">
+          <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-primary">
+            Profile
+          </p>
+          <span className="font-mono text-[11px] text-muted-foreground">
+            {Math.round(completeness.overall)}%
+          </span>
+        </div>
         <h3 className="font-heading text-base font-extrabold tracking-tight">
           {isComplete ? "Ready to apply" : "Almost ready to apply"}
         </h3>

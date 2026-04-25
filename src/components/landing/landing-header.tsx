@@ -48,18 +48,25 @@ export function LandingHeader({
     !isArtist && (activeFilter === "country" || activeCountry !== null);
 
   return (
-    <section className="space-y-5 pt-8 pb-2">
-      <div className="flex flex-wrap items-end justify-between gap-6">
-        <div className="max-w-2xl space-y-2">
+    <section className="space-y-4 pb-3 pt-5 sm:space-y-5 sm:pb-4 sm:pt-8">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
+        <div className="max-w-2xl space-y-1.5 sm:space-y-2">
           <p className="text-[10.5px] font-bold uppercase tracking-[0.12em] text-primary">
             {overline}
           </p>
-          <h1 className="font-heading text-4xl font-extrabold leading-[1.05] tracking-tighter md:text-display-md">
+          <h1 className="font-heading text-[clamp(1.7rem,6vw,2.6rem)] font-extrabold leading-[1.05] tracking-[-0.025em]">
             What&apos;s coming up
           </h1>
-          <p className="text-[14px] text-muted-foreground">{subhead}</p>
+          <p
+            className="text-[13.5px] text-muted-foreground sm:text-[14px]"
+            style={{ textWrap: "pretty" }}
+          >
+            {subhead}
+          </p>
         </div>
-        <FilterChips options={options} activeValue={activeFilter} />
+        <div className="-mx-4 flex items-center gap-2 overflow-x-auto px-4 sm:mx-0 sm:overflow-visible sm:px-0 [&::-webkit-scrollbar]:hidden">
+          <FilterChips options={options} activeValue={activeFilter} />
+        </div>
       </div>
       {showCountryChips && (
         <CountryChips
