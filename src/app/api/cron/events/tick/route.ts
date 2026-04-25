@@ -133,6 +133,8 @@ export async function GET(request: NextRequest) {
 
   let floorPlansPublished = 0;
   for (const event of autoPublishCandidates) {
+    // Drizzle's isNotNull filter keeps null rows out at runtime but
+    // doesn't propagate to the inferred TS type — narrow explicitly.
     if (event.daysBefore === null) continue;
     // Compute trigger date in UTC: eventStartDate − N days. Compared
     // against today (also UTC), so the publish fires the day the

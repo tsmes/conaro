@@ -35,21 +35,6 @@ export function FloorPlanPublishControls({
     {} as { error?: string; success?: boolean }
   );
 
-  const [autoOn, setAutoOn] = useState(
-    floorPlanAutoPublishDaysBefore !== null
-  );
-  const [daysInput, setDaysInput] = useState(
-    floorPlanAutoPublishDaysBefore?.toString() ?? "1"
-  );
-  const [autoState, autoAction, autoPending] = useActionState(
-    setFloorPlanAutoPublish,
-    {} as {
-      error?: string;
-      success?: boolean;
-      fieldErrors?: Record<string, string[]>;
-    }
-  );
-
   return (
     <Card className="space-y-6 p-6">
       <section className="space-y-3">
@@ -59,8 +44,10 @@ export function FloorPlanPublishControls({
               Floor plan visibility
             </h3>
             <p className="mt-1 text-sm text-muted-foreground">
-              {isPublic
-                ? `Public since ${formatDateNo(floorPlanPublishedAt!.toISOString().slice(0, 10))}`
+              {floorPlanPublishedAt
+                ? `Public since ${formatDateNo(
+                    floorPlanPublishedAt.toISOString().slice(0, 10)
+                  )}`
                 : "Not public yet — only you can see it."}
             </p>
           </div>
@@ -85,7 +72,10 @@ export function FloorPlanPublishControls({
             Publish results first to enable floor-plan publishing.
           </p>
         )}
-        {manualState.error && (
+        {/* Errors only render until the next render swaps the action,
+            so a stale "publish failed" message can't hang around once
+            the prop has flipped to public (or vice versa). */}
+        {manualState.error && !manualState.success && (
           <p className="text-xs text-destructive">{manualState.error}</p>
         )}
       </section>
@@ -101,60 +91,88 @@ export function FloorPlanPublishControls({
           is close enough — provided results are already out. After firing
           the schedule clears itself; turn it back on if you need it again.
         </p>
-        <form action={autoAction} className="space-y-3">
-          <input type="hidden" name="eventId" value={eventId} />
-          <Label className="flex items-center gap-2">
-            <Checkbox
-              checked={autoOn}
-              onCheckedChange={(next) => setAutoOn(next === true)}
-            />
-            <span className="text-sm">Auto-publish floor plan</span>
-          </Label>
-          {autoOn && (
-            <div className="flex items-end gap-2">
-              <div className="space-y-1.5">
-                <Label
-                  htmlFor="floor-plan-days-before"
-                  className="text-xs uppercase tracking-wider text-muted-foreground"
-                >
-                  Days before event start
-                </Label>
-                <Input
-                  id="floor-plan-days-before"
-                  name="daysBefore"
-                  type="number"
-                  min={1}
-                  step={1}
-                  value={daysInput}
-                  onChange={(e) => setDaysInput(e.target.value)}
-                  className="w-24"
-                />
-              </div>
-            </div>
-          )}
-          {/* When the toggle is off we send an empty daysBefore so the
-              action clears the column. */}
-          {!autoOn && (
-            <input type="hidden" name="daysBefore" value="" />
-          )}
-          <div className="flex items-center gap-2">
-            <Button type="submit" size="sm" disabled={autoPending}>
-              {autoPending ? "Saving..." : "Save schedule"}
-            </Button>
-            {autoState.success && (
-              <span className="text-xs text-muted-foreground">Saved.</span>
-            )}
-          </div>
-          {autoState.error && (
-            <p className="text-xs text-destructive">{autoState.error}</p>
-          )}
-          {autoState.fieldErrors?.daysBefore && (
-            <p className="text-xs text-destructive">
-              {autoState.fieldErrors.daysBefore[0]}
-            </p>
-          )}
-        </form>
+        {/* The form lives in its own component so a `key` from the
+            persisted prop remounts it on server-side updates; that
+            wipes any stale local input state instead of leaving the
+            old text behind. */}
+        <AutoPublishForm
+          key={`auto-${floorPlanAutoPublishDaysBefore ?? "off"}`}
+          eventId={eventId}
+          initialDaysBefore={floorPlanAutoPublishDaysBefore}
+        />
       </section>
     </Card>
+  );
+}
+
+interface AutoPublishFormProps {
+  eventId: string;
+  initialDaysBefore: number | null;
+}
+
+function AutoPublishForm({ eventId, initialDaysBefore }: AutoPublishFormProps) {
+  const [autoOn, setAutoOn] = useState(initialDaysBefore !== null);
+  const [daysInput, setDaysInput] = useState(
+    initialDaysBefore?.toString() ?? "1"
+  );
+  const [state, action, pending] = useActionState(setFloorPlanAutoPublish, {} as {
+    error?: string;
+    success?: boolean;
+    fieldErrors?: Record<string, string[]>;
+  });
+
+  return (
+    <form action={action} className="space-y-3">
+      <input type="hidden" name="eventId" value={eventId} />
+      <Label className="flex items-center gap-2">
+        <Checkbox
+          checked={autoOn}
+          onCheckedChange={(next) => setAutoOn(next === true)}
+        />
+        <span className="text-sm">Auto-publish floor plan</span>
+      </Label>
+      {autoOn ? (
+        <div className="flex items-end gap-2">
+          <div className="space-y-1.5">
+            <Label
+              htmlFor="floor-plan-days-before"
+              className="text-xs uppercase tracking-wider text-muted-foreground"
+            >
+              Days before event start
+            </Label>
+            <Input
+              id="floor-plan-days-before"
+              name="daysBefore"
+              type="number"
+              min={1}
+              step={1}
+              value={daysInput}
+              onChange={(e) => setDaysInput(e.target.value)}
+              className="w-24"
+            />
+          </div>
+        </div>
+      ) : (
+        // When the toggle is off we send an empty daysBefore so the
+        // action clears the column.
+        <input type="hidden" name="daysBefore" value="" />
+      )}
+      <div className="flex items-center gap-2">
+        <Button type="submit" size="sm" disabled={pending}>
+          {pending ? "Saving..." : "Save schedule"}
+        </Button>
+        {state.success && (
+          <span className="text-xs text-muted-foreground">Saved.</span>
+        )}
+      </div>
+      {state.error && (
+        <p className="text-xs text-destructive">{state.error}</p>
+      )}
+      {state.fieldErrors?.daysBefore && (
+        <p className="text-xs text-destructive">
+          {state.fieldErrors.daysBefore[0]}
+        </p>
+      )}
+    </form>
   );
 }
