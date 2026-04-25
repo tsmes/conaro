@@ -15,23 +15,16 @@ export function FollowButton({
 }: FollowButtonProps) {
   const [state, formAction, pending] = useActionState(toggleFollow, {});
 
-  // Each successful toggle flips the state
-  const currentlyFollowing = state.success ? !isFollowing : isFollowing;
-
   return (
     <form action={formAction}>
       <input type="hidden" name="conventionId" value={conventionId} />
       <Button
         type="submit"
-        variant={currentlyFollowing ? "outline" : "default"}
+        variant={isFollowing ? "outline" : "default"}
         size="sm"
         disabled={pending}
       >
-        {pending
-          ? "..."
-          : currentlyFollowing
-            ? "Following"
-            : "Follow"}
+        {pending ? "..." : isFollowing ? "Following" : "Follow"}
       </Button>
       {state.error && (
         <p role="alert" className="mt-1 text-sm text-destructive">
