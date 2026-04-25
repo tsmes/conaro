@@ -227,6 +227,27 @@ interface ArtistInfoCardProps {
 }
 
 function ArtistInfoCard({ artist, onClose, onFocus }: ArtistInfoCardProps) {
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  // Click outside the card → close. Stops the listener from firing
+  // on the same click that opened the card by listening on
+  // mousedown (the canvas tap fires onClick, which runs after).
+  useEffect(() => {
+    function handler(e: MouseEvent) {
+      if (!cardRef.current) return;
+      if (!cardRef.current.contains(e.target as Node)) onClose();
+    }
+    function escHandler(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+    }
+    window.addEventListener("mousedown", handler);
+    window.addEventListener("keydown", escHandler);
+    return () => {
+      window.removeEventListener("mousedown", handler);
+      window.removeEventListener("keydown", escHandler);
+    };
+  }, [onClose]);
+
   if (!artist) return null;
   const {
     displayName,
@@ -238,7 +259,10 @@ function ArtistInfoCard({ artist, onClose, onFocus }: ArtistInfoCardProps) {
     standLabel,
   } = artist;
   return (
-    <Card className="absolute right-3 top-3 z-20 w-[min(320px,calc(100%-1.5rem))] overflow-hidden p-0 shadow-lg">
+    <Card
+      ref={cardRef}
+      className="absolute right-3 top-3 z-20 w-[min(320px,calc(100%-1.5rem))] overflow-hidden p-0 shadow-lg"
+    >
       <div className="flex items-start gap-3 p-4">
         <span className="grid size-9 shrink-0 place-items-center rounded-md bg-primary/10 text-[12px] font-bold text-primary">
           {standLabel}
