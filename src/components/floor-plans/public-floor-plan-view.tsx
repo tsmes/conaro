@@ -9,12 +9,16 @@ interface PublicFloorPlanViewProps {
   plan: ResolvedFloorPlan;
   tableSizeOptions: TableSizeOption[];
   highlightApplicationId?: string;
+  /** When true, the highlighted table briefly pulses on mount.
+   *  Used by the "Show me my table" entry point. */
+  pulseHighlight?: boolean;
 }
 
 export function PublicFloorPlanView({
   plan,
   tableSizeOptions,
   highlightApplicationId,
+  pulseHighlight = false,
 }: PublicFloorPlanViewProps) {
   // If the viewer's own table lives in a specific room, open that one
   // first — spares them a click to find "you are here".
@@ -58,6 +62,7 @@ export function PublicFloorPlanView({
         tableSizeOptions={tableSizeOptions}
         editable={false}
         highlightApplicationId={highlightApplicationId}
+        pulseHighlight={pulseHighlight}
       />
     </div>
   );

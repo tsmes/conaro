@@ -9,10 +9,14 @@ import { Card } from "@/components/ui/card";
 
 interface FloorPlanPageProps {
   params: Promise<{ eventId: string }>;
+  searchParams: Promise<{ focus?: string }>;
 }
 
-export default async function FloorPlanPage({ params }: FloorPlanPageProps) {
-  const { eventId } = await params;
+export default async function FloorPlanPage({
+  params,
+  searchParams,
+}: FloorPlanPageProps) {
+  const [{ eventId }, { focus }] = await Promise.all([params, searchParams]);
   const ctx = await getEventViewerContext(eventId);
 
   if (ctx.event.status !== "results_published") notFound();
@@ -38,6 +42,7 @@ export default async function FloorPlanPage({ params }: FloorPlanPageProps) {
         plan={plan}
         tableSizeOptions={ctx.event.tableSizeOptions ?? []}
         highlightApplicationId={highlightApplicationId}
+        pulseHighlight={focus === "table"}
       />
     </Card>
   );

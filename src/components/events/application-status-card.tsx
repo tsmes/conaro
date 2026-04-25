@@ -1,5 +1,7 @@
-import { CheckCircle2, Hourglass, Info } from "lucide-react";
+import Link from "next/link";
+import { CheckCircle2, Hourglass, Info, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import { Markdown } from "@/components/ui/markdown";
 import type { ApplicationStatus } from "@/lib/applications/status-styles";
 
@@ -61,6 +63,13 @@ function variantKeyFor(status: ApplicationStatus): StatusVariantKey {
 interface ApplicationStatusCardProps {
   status: ApplicationStatus;
   responseMessage: string | null;
+  /** Required when status === "accepted" + hasAssignedTable is true,
+   *  used to build the "Show me my table" link target. */
+  eventId?: string;
+  /** When true (and status === "accepted"), surface a button that
+   *  links to the Floor plan tab with `?focus=table` so the canvas
+   *  pulses the artist's table on arrival. */
+  hasAssignedTable?: boolean;
   /** Trailing content rendered below the message body — typically the
    *  EventThread (accepted) or JoinWaitlistButton (rejected). */
   children?: React.ReactNode;
@@ -69,6 +78,8 @@ interface ApplicationStatusCardProps {
 export function ApplicationStatusCard({
   status,
   responseMessage,
+  eventId,
+  hasAssignedTable = false,
   children,
 }: ApplicationStatusCardProps) {
   const key = variantKeyFor(status);
@@ -117,6 +128,21 @@ export function ApplicationStatusCard({
         <p className="text-sm leading-relaxed text-foreground">
           {v.fallbackBody}
         </p>
+      )}
+      {status === "accepted" && hasAssignedTable && eventId && (
+        <div className="mt-5">
+          <Button
+            variant="default"
+            size="sm"
+            nativeButton={false}
+            render={
+              <Link href={`/events/${eventId}/floor-plan?focus=table`}>
+                <MapPin className="size-4" />
+                Show me my table
+              </Link>
+            }
+          />
+        </div>
       )}
       {children}
     </section>

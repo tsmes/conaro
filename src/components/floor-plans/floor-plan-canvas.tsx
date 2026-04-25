@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useState, useEffect } from "react";
 import { Stage, Layer, Rect, Line, Text, Group, Circle } from "react-konva";
+import Konva from "konva";
 import type { FloorPlan, TableSizeOption } from "@/lib/db/schema/events";
 import type { ResolvedFloorPlan } from "@/lib/floor-plans/queries";
 
@@ -34,6 +35,9 @@ interface FloorPlanCanvasProps {
   editable: boolean;
   onChange?: (next: FloorPlan) => void;
   highlightApplicationId?: string;
+  /** When true, the highlighted table's halo briefly pulses on
+   *  mount before settling back to the static highlight. */
+  pulseHighlight?: boolean;
   /** Outlines the selected table; arrow-key nudging in the parent
    *  moves it. */
   selectedTableId?: string | null;
@@ -47,6 +51,7 @@ export function FloorPlanCanvas({
   editable,
   onChange,
   highlightApplicationId,
+  pulseHighlight = false,
   selectedTableId,
   onSelectTable,
 }: FloorPlanCanvasProps) {
@@ -315,13 +320,10 @@ export function FloorPlanCanvas({
                   {/* Highlight halo (rendered under the rect when viewer
                       is the assigned artist) */}
                   {highlight && (
-                    <Rect
-                      x={-wPx / 2 - 8}
-                      y={-hPx / 2 - 8}
-                      width={wPx + 16}
-                      height={hPx + 16}
-                      fill="rgba(139, 92, 246, 0.35)"
-                      cornerRadius={10}
+                    <HighlightHalo
+                      wPx={wPx}
+                      hPx={hPx}
+                      pulse={pulseHighlight}
                     />
                   )}
                   {/* Selection ring (editor only) — dashed outline that
@@ -444,6 +446,77 @@ function GridBackground({
     );
   }
   return <>{lines}</>;
+}
+
+// Soft purple halo behind the artist's own table. When `pulse` is
+// true (driven by `?focus=table` on the floor-plan tab), runs a
+// short attention-grabbing tween before settling at the static
+// post-pulse opacity. Otherwise renders the static highlight.
+function HighlightHalo({
+  wPx,
+  hPx,
+  pulse,
+}: {
+  wPx: number;
+  hPx: number;
+  pulse: boolean;
+}) {
+  const ref = useRef<Konva.Rect | null>(null);
+
+  useEffect(() => {
+    if (!pulse || !ref.current) return;
+    const node = ref.current;
+    let t1: Konva.Tween | null = null;
+    let t2: Konva.Tween | null = null;
+    // Two-cycle yo-yo from the static 0.35 → 0.85 → 0.35, ~1s each
+    // pass, then leave the node at the static opacity.
+    t1 = new Konva.Tween({
+      node,
+      duration: 0.5,
+      opacity: 0.85,
+      onFinish: () => {
+        t2 = new Konva.Tween({
+          node,
+          duration: 0.5,
+          opacity: 0.35,
+          onFinish: () => {
+            t1 = new Konva.Tween({
+              node,
+              duration: 0.5,
+              opacity: 0.85,
+              onFinish: () => {
+                t2 = new Konva.Tween({
+                  node,
+                  duration: 0.5,
+                  opacity: 0.35,
+                });
+                t2.play();
+              },
+            });
+            t1.play();
+          },
+        });
+        t2.play();
+      },
+    });
+    t1.play();
+    return () => {
+      t1?.destroy();
+      t2?.destroy();
+    };
+  }, [pulse]);
+
+  return (
+    <Rect
+      ref={ref}
+      x={-wPx / 2 - 8}
+      y={-hPx / 2 - 8}
+      width={wPx + 16}
+      height={hPx + 16}
+      fill="rgba(139, 92, 246, 0.35)"
+      cornerRadius={10}
+    />
+  );
 }
 
 export default FloorPlanCanvas;

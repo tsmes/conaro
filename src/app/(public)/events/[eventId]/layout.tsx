@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
 import {
+  getCachedFloorPlan,
   getEventViewerContext,
   shouldShowFloorPlanTab,
   shouldShowMessagesTab,
@@ -41,6 +42,7 @@ export default async function EventLayout({
     isArtist,
     isFollowingConvention,
     ownApplicationStatus,
+    ownApplicationId,
     ownResponseMessage,
     isAcceptedToEvent,
   } = ctx;
@@ -57,6 +59,19 @@ export default async function EventLayout({
     shouldShowFloorPlanTab(ctx),
     shouldShowMessagesTab(ctx),
   ]);
+
+  // Reuses the cached floor plan (already loaded by shouldShowFloorPlanTab
+  // when applicable) to decide whether to surface the "Show me my table"
+  // button on the status card.
+  const hasAssignedTable = await (async () => {
+    if (!isAcceptedToEvent || !ownApplicationId || !showFloorPlan) return false;
+    const plan = await getCachedFloorPlan(event.id);
+    return Boolean(
+      plan?.tables.some(
+        (t) => t.assignment?.applicationId === ownApplicationId
+      )
+    );
+  })();
 
   const showStatusCard =
     isArtist &&
@@ -166,6 +181,8 @@ export default async function EventLayout({
           <ApplicationStatusCard
             status={ownApplicationStatus}
             responseMessage={ownResponseMessage}
+            eventId={event.id}
+            hasAssignedTable={hasAssignedTable}
           >
             {ownApplicationStatus === "rejected" &&
               event.waitlistEnabled && (
