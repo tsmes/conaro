@@ -452,6 +452,10 @@ function GridBackground({
 // true (driven by `?focus=table` on the floor-plan tab), runs a
 // short attention-grabbing tween before settling at the static
 // post-pulse opacity. Otherwise renders the static highlight.
+const STATIC_HALO_OPACITY = 0.35;
+const PULSE_PEAK_OPACITY = 0.85;
+const PULSE_DURATION_MS = 2000;
+
 function HighlightHalo({
   wPx,
   hPx,
@@ -464,45 +468,37 @@ function HighlightHalo({
   const ref = useRef<Konva.Rect | null>(null);
 
   useEffect(() => {
-    if (!pulse || !ref.current) return;
+    if (!pulse) return;
     const node = ref.current;
-    let t1: Konva.Tween | null = null;
-    let t2: Konva.Tween | null = null;
-    // Two-cycle yo-yo from the static 0.35 → 0.85 → 0.35, ~1s each
-    // pass, then leave the node at the static opacity.
-    t1 = new Konva.Tween({
-      node,
-      duration: 0.5,
-      opacity: 0.85,
-      onFinish: () => {
-        t2 = new Konva.Tween({
-          node,
-          duration: 0.5,
-          opacity: 0.35,
-          onFinish: () => {
-            t1 = new Konva.Tween({
-              node,
-              duration: 0.5,
-              opacity: 0.85,
-              onFinish: () => {
-                t2 = new Konva.Tween({
-                  node,
-                  duration: 0.5,
-                  opacity: 0.35,
-                });
-                t2.play();
-              },
-            });
-            t1.play();
-          },
-        });
-        t2.play();
-      },
-    });
-    t1.play();
+    const layer = node?.getLayer() ?? null;
+    if (!node || !layer) return;
+    const startedAt = Date.now();
+    // Closed-form opacity over time — two full sin cycles over 2 s,
+    // then snap back to the static highlight. A single Konva.Animation
+    // owns the whole pulse, so cancellation (unmount, prop flip,
+    // route change) is one stop() call. No chained callbacks → no
+    // race where a queued onFinish fires on a destroyed node.
+    const anim = new Konva.Animation(() => {
+      if (!node.getStage()) {
+        anim.stop();
+        return;
+      }
+      const elapsed = Date.now() - startedAt;
+      if (elapsed >= PULSE_DURATION_MS) {
+        node.opacity(STATIC_HALO_OPACITY);
+        anim.stop();
+        return;
+      }
+      const phase = (elapsed / PULSE_DURATION_MS) * Math.PI * 4;
+      const t = (Math.sin(phase) + 1) / 2;
+      node.opacity(
+        STATIC_HALO_OPACITY + t * (PULSE_PEAK_OPACITY - STATIC_HALO_OPACITY)
+      );
+    }, layer);
+    anim.start();
     return () => {
-      t1?.destroy();
-      t2?.destroy();
+      anim.stop();
+      if (node.getStage()) node.opacity(STATIC_HALO_OPACITY);
     };
   }, [pulse]);
 
