@@ -14,7 +14,9 @@ Spec: `.claude/plans/auto-publish-floor-plan-spec.md`
 
 ## Tasks
 
-### 1. Add schema columns + thread them into the event-context loader
+> **Status:** All 6 tasks committed (`057830b0`, `bd99a580`, `19eb4a78`, `158db78f`, `e038a0b4`, `4e451bca`). One incidental landing-list bug fix landed alongside (`193adc64`). Code review and manual testing pending.
+
+### 1. ✅ Add schema columns + thread them into the event-context loader
 Adds the two new columns to `events`, generates the drizzle migration, and pulls the columns into `getEventViewerContext` so downstream code can read them. No behavior change yet.
 
 **Requirements:** REQ-1 (foundation), Infrastructure
@@ -35,7 +37,7 @@ Adds the two new columns to `events`, generates the drizzle migration, and pulls
 
 ---
 
-### 2. Unblock organizer floor-plan editor before results are published
+### 2. ✅ Unblock organizer floor-plan editor before results are published
 Removes the `event.status !== "results_published"` redirect at the top of the organizer's floor-plan editor page so they can lay out tables during `reviewing` (and earlier statuses too). Pure deletion of three lines.
 
 **Requirements:** REQ-9
@@ -53,7 +55,7 @@ Removes the `event.status !== "results_published"` redirect at the top of the or
 
 ---
 
-### 3. Server actions: publish, unpublish, set auto-publish
+### 3. ✅ Server actions: publish, unpublish, set auto-publish
 Three server actions following the existing organizer mutation pattern. Drives the new UI in task 4 and is also the call site for the cron's "publish" path (cron uses a direct DB write, not the action).
 
 **Requirements:** REQ-3, REQ-4, REQ-5
@@ -81,7 +83,7 @@ Three server actions following the existing organizer mutation pattern. Drives t
 
 ---
 
-### 4. `<FloorPlanPublishControls>` component on the editor page
+### 4. ✅ `<FloorPlanPublishControls>` component on the editor page
 Renders two independent toggles + the auto-publish days input. Uses the new actions.
 
 **Requirements:** REQ-3, REQ-4, REQ-5
@@ -105,7 +107,7 @@ Renders two independent toggles + the auto-publish days input. Uses the new acti
 
 ---
 
-### 5. Cron auto-publish transition
+### 5. ✅ Cron auto-publish transition
 Adds a third independent pass to the existing tick handler.
 
 **Requirements:** REQ-5, REQ-6
@@ -130,7 +132,7 @@ Adds a third independent pass to the existing tick handler.
 
 ---
 
-### 6. Migrate the three viewer-side visibility gates to the new flag
+### 6. ✅ Migrate the three viewer-side visibility gates to the new flag
 Last task — flips the system-wide visibility model.
 
 **Requirements:** REQ-1, REQ-2, REQ-7
