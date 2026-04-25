@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, ne } from "drizzle-orm";
+import { and, asc, desc, eq, gte, ne } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { applications } from "@/lib/db/schema/applications";
 import { conventions } from "@/lib/db/schema/conventions";
@@ -54,9 +54,12 @@ export interface LandingNotification {
   createdAtISO: string;
 }
 
-// Fetch all non-draft events joined with their conventions, ordered by
-// start date. Powers the events list on the landing page.
+// Fetch all non-draft, non-finished events joined with their
+// conventions, ordered by start date (soonest first). An event drops
+// off the list the day after its end date — past events aren't
+// actionable for browsing artists.
 export async function getUpcomingEvents(): Promise<LandingEvent[]> {
+  const today = new Date().toISOString().slice(0, 10);
   const rows = await db
     .select({
       id: events.id,
@@ -75,7 +78,7 @@ export async function getUpcomingEvents(): Promise<LandingEvent[]> {
     })
     .from(events)
     .innerJoin(conventions, eq(conventions.id, events.conventionId))
-    .where(ne(events.status, "draft"))
+    .where(and(ne(events.status, "draft"), gte(events.eventEndDate, today)))
     .orderBy(asc(events.eventStartDate));
 
   return rows as LandingEvent[];
