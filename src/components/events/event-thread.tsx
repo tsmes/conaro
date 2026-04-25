@@ -51,7 +51,7 @@ export function EventThread({
   }, [threadId, hasUnreadFromOrganizer]);
 
   return (
-    <div id="thread" className="mt-5 border-t border-border pt-5 scroll-mt-20">
+    <div>
       <div className="mb-3 flex items-center justify-between gap-2">
         <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
           Chat with the organizer

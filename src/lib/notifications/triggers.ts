@@ -156,7 +156,7 @@ export async function notifyThreadMessageFromOrganizer(
       recipientProfileId: artistProfileId,
       type: "thread_message_from_organizer",
       message: `The organizer replied to your question about ${eventName}`,
-      link: `/events/${eventId}#thread`,
+      link: `/events/${eventId}/messages`,
     },
   ]);
 }

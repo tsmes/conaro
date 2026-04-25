@@ -243,7 +243,7 @@ describe("notification triggers", () => {
       expect(notifs).toHaveLength(1);
       expect(notifs[0].type).toBe("thread_message_from_organizer");
       expect(notifs[0].message).toContain("Kawaiicon 2026");
-      expect(notifs[0].link).toBe("/events/ev-1#thread");
+      expect(notifs[0].link).toBe("/events/ev-1/messages");
     });
   });
 

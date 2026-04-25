@@ -70,8 +70,9 @@ interface ApplicationStatusCardProps {
    *  links to the Floor plan tab with `?focus=table` so the canvas
    *  pulses the artist's table on arrival. */
   hasAssignedTable?: boolean;
-  /** Trailing content rendered below the message body — typically the
-   *  EventThread (accepted) or JoinWaitlistButton (rejected). */
+  /** Trailing content rendered below the message body — typically
+   *  the JoinWaitlistButton when status === "rejected" + waitlist
+   *  is enabled. */
   children?: React.ReactNode;
 }
 
