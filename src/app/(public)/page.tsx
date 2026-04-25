@@ -191,14 +191,14 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                 No events match this view
               </h2>
               <p className="mt-2 text-[13px] text-muted-foreground">
-                Try a different filter or browse the full directory.
+                Try a different filter to see more.
               </p>
               <div className="mt-5">
                 <Button
                   variant="outline"
                   size="sm"
                   nativeButton={false}
-                  render={<Link href="/events">Browse directory</Link>}
+                  render={<Link href="/?filter=all">Show all events</Link>}
                 />
               </div>
             </Card>

@@ -215,7 +215,7 @@ export function DashboardView({
           Icon={LayoutGrid}
         />
         <QuickAction
-          href="/events"
+          href="/"
           title="Browse Events"
           description="Discover upcoming conventions and application deadlines."
           tileClassName="bg-tertiary-container text-on-tertiary-container"
@@ -249,7 +249,7 @@ export function DashboardView({
               <div className="flex justify-center pt-2">
                 <Button
                   nativeButton={false}
-                  render={<Link href="/events">Browse Events</Link>}
+                  render={<Link href="/">Browse Events</Link>}
                 />
               </div>
             </CardContent>

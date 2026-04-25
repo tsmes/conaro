@@ -97,7 +97,7 @@ export default async function EventLayout({
           size="sm"
           nativeButton={false}
           render={
-            <Link href="/events">
+            <Link href="/">
               <ArrowLeft className="size-4" />
               All events
             </Link>
