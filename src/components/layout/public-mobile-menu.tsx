@@ -37,8 +37,8 @@ const ARTIST_LINKS: NavItem[] = [
 ];
 
 const PUBLIC_LINKS: NavItem[] = [
-  { href: "/", label: "Events", Icon: Sparkles },
-  { href: "/conventions", label: "Conventions", Icon: Users },
+  { href: "/for-artists", label: "For artists", Icon: Palette },
+  { href: "/for-conventions", label: "For conventions", Icon: Users },
 ];
 
 export function PublicMobileMenu({
@@ -116,17 +116,6 @@ export function PublicMobileMenu({
               <div className="mt-auto flex flex-col gap-2 border-t border-border pt-6">
                 <Button
                   size="default"
-                  className="w-full justify-center"
-                  nativeButton={false}
-                  render={
-                    <Link href="/register" onClick={() => setOpen(false)}>
-                      Create free account
-                    </Link>
-                  }
-                />
-                <Button
-                  size="default"
-                  variant="outline"
                   className="w-full justify-center"
                   nativeButton={false}
                   render={

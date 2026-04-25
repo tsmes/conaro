@@ -5,8 +5,8 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
-  { href: "/events", label: "Events" },
-  { href: "/conventions", label: "Conventions" },
+  { href: "/for-artists", label: "For artists" },
+  { href: "/for-conventions", label: "For conventions" },
 ] as const;
 
 // Center-aligned public nav links with active-state styling. Hidden below

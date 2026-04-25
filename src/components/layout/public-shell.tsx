@@ -70,15 +70,9 @@ export async function PublicShell({
             ) : (
               <div className="hidden items-center gap-2 border-l border-border pl-2 md:flex">
                 <Button
-                  variant="ghost"
                   size="sm"
                   nativeButton={false}
                   render={<Link href="/login">Sign in</Link>}
-                />
-                <Button
-                  size="sm"
-                  nativeButton={false}
-                  render={<Link href="/register">Register</Link>}
                 />
               </div>
             )}
