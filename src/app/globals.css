@@ -58,6 +58,7 @@
   --font-sans: var(--font-inter);
   --font-heading: var(--font-manrope);
   --font-display: var(--font-manrope);
+  --font-serif: var(--font-fraunces);
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Consolas, monospace;
 
   /* Type scale — Curator's Canvas editorial */
