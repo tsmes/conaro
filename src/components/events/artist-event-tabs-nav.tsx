@@ -58,24 +58,30 @@ export function ArtistEventTabsNav({
   if (tabs.length <= 1) return null;
 
   return (
-    <nav className="flex gap-1 border-b border-border">
-      {tabs.map((tab) => {
-        const active = tab.matchPath(normalized);
-        return (
-          <Link
-            key={tab.href}
-            href={tab.href}
-            className={cn(
-              "-mb-px border-b-2 px-3 py-2 text-sm font-medium transition-colors",
-              active
-                ? "border-primary text-foreground"
-                : "border-transparent text-muted-foreground hover:text-foreground"
-            )}
-          >
-            {tab.label}
-          </Link>
-        );
-      })}
+    <nav
+      aria-label="Event sections"
+      className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden"
+    >
+      <div className="inline-flex gap-0.5 rounded-[11px] bg-muted p-[3px]">
+        {tabs.map((tab) => {
+          const active = tab.matchPath(normalized);
+          return (
+            <Link
+              key={tab.href}
+              href={tab.href}
+              aria-current={active ? "page" : undefined}
+              className={cn(
+                "whitespace-nowrap rounded-[8px] px-3.5 py-2 text-[13px] font-semibold transition-colors",
+                active
+                  ? "bg-card text-foreground shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              {tab.label}
+            </Link>
+          );
+        })}
+      </div>
     </nav>
   );
 }

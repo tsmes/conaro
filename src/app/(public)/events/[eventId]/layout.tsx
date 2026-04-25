@@ -1,5 +1,11 @@
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import {
+  ArrowLeft,
+  CalendarDays,
+  ChevronRight,
+  Heart,
+  MapPin,
+} from "lucide-react";
 
 import {
   getEventViewerContext,
@@ -7,10 +13,10 @@ import {
   shouldShowFloorPlanTab,
   shouldShowMessagesTab,
 } from "@/lib/events/event-context";
-import { storage } from "@/lib/storage";
 import { getEventAnnouncements } from "@/lib/events/announcements";
+import { pickCoverGradient } from "@/lib/landing/cover-gradient";
+import { storage } from "@/lib/storage";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Markdown } from "@/components/ui/markdown";
@@ -18,7 +24,10 @@ import { FollowButton } from "@/components/conventions/follow-button";
 import { ApplicationStatusCard } from "@/components/events/application-status-card";
 import { ArtistEventTabsNav } from "@/components/events/artist-event-tabs-nav";
 import { JoinWaitlistButton } from "@/components/events/join-waitlist-button";
-import { formatDateNo } from "@/lib/utils/format-date-no";
+import {
+  formatDateNo,
+  formatDateRangeNo,
+} from "@/lib/utils/format-date-no";
 import { cn } from "@/lib/utils";
 
 function conventionInitials(name: string): string {
@@ -48,33 +57,24 @@ export default async function EventLayout({
   } = ctx;
   const isLoggedIn = Boolean(session?.user);
 
-  // Anonymous viewers don't care about lifecycle badges (open/under
-  // review/results published) or application deadlines — they want a
-  // countdown to the event itself. Compute days from local midnight
-  // so the count flips at user-local day boundaries.
-  let daysUntilEvent: number | null = null;
-  if (!isLoggedIn) {
-    const start = new Date(`${event.eventStartDate}T00:00:00`);
-    const now = new Date();
-    const todayMidnight = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate()
-    );
-    const diff = Math.round(
-      (start.getTime() - todayMidnight.getTime()) / 86_400_000
-    );
-    if (diff >= 0) daysUntilEvent = diff;
-  }
+  const start = new Date(`${event.eventStartDate}T00:00:00`);
+  const now = new Date();
+  const todayMidnight = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate()
+  );
+  const daysUntilEvent = Math.round(
+    (start.getTime() - todayMidnight.getTime()) / 86_400_000
+  );
+  const showCountdown = daysUntilEvent >= 0;
 
   const conventionLogoUrl = event.conventionLogoPath
     ? storage.getUrl(event.conventionLogoPath)
     : null;
+  const heroGradientClass = pickCoverGradient(event.conventionId);
 
-  // Run every layout-side fetch in parallel. shouldShowFloorPlanTab
-  // and hasAssignedTableForViewer share the cached floor-plan query;
-  // shouldShowMessagesTab caches the thread query too. Announcements
-  // is independent.
+  // Run every layout-side fetch in parallel.
   const [announcements, showFloorPlan, showMessages, hasAssignedTable] =
     await Promise.all([
       isAcceptedToEvent ? getEventAnnouncements(event.id) : Promise.resolve([]),
@@ -89,155 +89,251 @@ export default async function EventLayout({
     ownApplicationStatus &&
     ownApplicationStatus !== "revoked";
 
-  return (
-    <div className="mx-auto max-w-4xl px-6 py-12 md:px-8">
-      <div className="mb-8">
-        <Button
-          variant="ghost"
-          size="sm"
-          nativeButton={false}
-          render={
-            <Link href="/">
-              <ArrowLeft className="size-4" />
-              All events
-            </Link>
-          }
-        />
-      </div>
+  const venueLine = [event.venueCity, event.venueCountry]
+    .filter(Boolean)
+    .join(", ");
 
-      <header className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
-        <div className="min-w-0 space-y-3">
-          <Link
-            href={`/conventions/${event.conventionId}`}
-            className="group/conv inline-flex items-center gap-3"
+  return (
+    <div>
+      {/* Full-bleed hero. The conv. gradient sets the mood; a soft
+          dark overlay keeps white text legible on warm covers. */}
+      <section className="relative overflow-hidden text-white">
+        <div
+          className={cn("absolute inset-0", heroGradientClass)}
+          aria-hidden
+        />
+        <div
+          className="absolute inset-0"
+          aria-hidden
+          style={{
+            background:
+              "radial-gradient(120% 80% at 80% 20%, rgba(255,255,255,.18), transparent 60%), linear-gradient(to bottom, rgba(0,0,0,0) 30%, rgba(0,0,0,.45) 100%)",
+          }}
+        />
+        <div className="relative mx-auto max-w-[1240px] px-4 py-10 sm:px-6 sm:py-14 md:py-16">
+          {/* Breadcrumb / back */}
+          <nav
+            aria-label="Breadcrumb"
+            className="flex items-center gap-2 text-[12px] font-semibold text-white/85"
           >
-            <Avatar className="size-10 rounded-lg">
-              {conventionLogoUrl && (
-                <AvatarImage src={conventionLogoUrl} alt="" />
-              )}
-              <AvatarFallback className="rounded-lg bg-secondary text-xs font-semibold">
-                {conventionInitials(event.conventionName)}
-              </AvatarFallback>
-            </Avatar>
-            <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground transition-colors group-hover/conv:text-primary">
+            <Link href="/" className="inline-flex items-center gap-1.5 hover:underline">
+              <ArrowLeft className="size-3.5" /> All events
+            </Link>
+            <ChevronRight className="size-3 opacity-60" />
+            <Link
+              href={`/conventions/${event.conventionId}`}
+              className="hover:underline"
+            >
               {event.conventionName}
-            </span>
-          </Link>
-          <h1 className="font-heading text-3xl font-extrabold tracking-tight md:text-5xl">
-            {event.name}
-          </h1>
-          {isLoggedIn && (
-            <>
-              {event.status === "published" && event.applicationOpenDate && (
-                <Badge variant="outline">
-                  Applications open {formatDateNo(event.applicationOpenDate)}
-                </Badge>
+            </Link>
+            <ChevronRight className="size-3 opacity-60" />
+            <span className="truncate text-white">{event.name}</span>
+          </nav>
+
+          <div className="mt-5 grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
+            <div className="min-w-0">
+              <div className="flex items-center gap-3">
+                <Avatar className="size-10 rounded-lg">
+                  {conventionLogoUrl && (
+                    <AvatarImage src={conventionLogoUrl} alt="" />
+                  )}
+                  <AvatarFallback className="rounded-lg bg-white/15 text-xs font-semibold text-white">
+                    {conventionInitials(event.conventionName)}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="text-[10.5px] font-bold uppercase tracking-[0.16em] text-white/85">
+                  {event.conventionName}
+                </span>
+              </div>
+              <h1 className="mt-3 font-heading text-[clamp(2rem,6vw,3.4rem)] font-extrabold leading-[1] tracking-[-0.03em]">
+                {event.name}
+              </h1>
+              {event.description && (
+                <p className="mt-3 max-w-[640px] text-[14.5px] leading-relaxed text-white/85 sm:text-[15.5px]">
+                  {event.description}
+                </p>
               )}
-              {event.status === "reviewing" && (
-                <Badge variant="secondary">Applications under review</Badge>
-              )}
-              {event.status === "results_published" &&
-                (ownApplicationStatus === "accepted" ? (
-                  <Badge variant="success">Accepted</Badge>
-                ) : ownApplicationStatus === "waitlisted" ? (
-                  <Badge variant="warning">Waitlisted</Badge>
-                ) : ownApplicationStatus === "rejected" ? (
-                  <Badge variant="destructive">Not selected</Badge>
-                ) : ownApplicationStatus === "revoked" ? (
-                  <Badge variant="outline">Revoked</Badge>
-                ) : (
-                  <Badge variant="success">Results published</Badge>
-                ))}
-            </>
-          )}
-        </div>
-        {isArtist && (
-          <FollowButton
-            conventionId={event.conventionId}
-            isFollowing={isFollowingConvention}
-          />
-        )}
-        {!isLoggedIn && daysUntilEvent !== null && (
-          <div className="text-center md:text-right">
-            <div className="font-heading text-5xl font-extrabold leading-none tracking-tight md:text-6xl">
-              {daysUntilEvent === 0 ? "Today" : daysUntilEvent}
+              <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2 text-[13.5px] text-white/95">
+                <span className="inline-flex items-center gap-2">
+                  <CalendarDays className="size-4" />
+                  <span className="font-semibold">
+                    {formatDateRangeNo(event.eventStartDate, event.eventEndDate)}
+                  </span>
+                </span>
+                {(event.venueName || venueLine) && (
+                  <span className="inline-flex items-center gap-2 min-w-0">
+                    <MapPin className="size-4" />
+                    <span className="font-semibold truncate">
+                      {event.venueName ?? venueLine}
+                    </span>
+                    {event.venueName && venueLine && (
+                      <span className="text-white/70">· {venueLine}</span>
+                    )}
+                  </span>
+                )}
+              </div>
+              {/* Hero actions: status badge for the artist, follow CTA */}
+              <div className="mt-6 flex flex-wrap items-center gap-2">
+                {isArtist && (
+                  <FollowButton
+                    conventionId={event.conventionId}
+                    isFollowing={isFollowingConvention}
+                  />
+                )}
+                {!isLoggedIn && (
+                  <Link
+                    href="/login"
+                    className="inline-flex h-10 items-center justify-center gap-2 rounded-[10px] border border-white/35 bg-white/10 px-4 text-[13px] font-semibold text-white transition hover:bg-white/15"
+                  >
+                    <Heart className="size-4" /> Sign in to follow
+                  </Link>
+                )}
+                {isLoggedIn && (
+                  <>
+                    {event.status === "published" &&
+                      event.applicationOpenDate && (
+                        <Badge
+                          variant="outline"
+                          className="border-white/35 bg-white/10 text-white"
+                        >
+                          Applications open{" "}
+                          {formatDateNo(event.applicationOpenDate)}
+                        </Badge>
+                      )}
+                    {event.status === "reviewing" && (
+                      <Badge
+                        variant="outline"
+                        className="border-white/35 bg-white/10 text-white"
+                      >
+                        Applications under review
+                      </Badge>
+                    )}
+                    {event.status === "results_published" &&
+                      (ownApplicationStatus === "accepted" ? (
+                        <Badge variant="success">Accepted</Badge>
+                      ) : ownApplicationStatus === "waitlisted" ? (
+                        <Badge variant="warning">Waitlisted</Badge>
+                      ) : ownApplicationStatus === "rejected" ? (
+                        <Badge variant="destructive">Not selected</Badge>
+                      ) : (
+                        <Badge
+                          variant="outline"
+                          className="border-white/35 bg-white/10 text-white"
+                        >
+                          Results published
+                        </Badge>
+                      ))}
+                  </>
+                )}
+              </div>
             </div>
-            {daysUntilEvent > 0 && (
-              <div className="mt-2 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                {daysUntilEvent === 1 ? "Day" : "Days"} to go
+            {/* Days-to-go card on the right */}
+            {showCountdown && (
+              <div className="lg:text-right">
+                <div className="inline-flex flex-col gap-1 rounded-[14px] border border-white/25 bg-white/12 px-5 py-4 backdrop-blur-md">
+                  <div className="text-[10.5px] font-bold uppercase tracking-[0.16em] text-white/80">
+                    Doors open in
+                  </div>
+                  <div className="font-heading font-extrabold leading-none text-[clamp(2.6rem,5vw,3.4rem)] tabular-nums">
+                    {daysUntilEvent === 0 ? "Today" : daysUntilEvent}
+                    {daysUntilEvent > 0 && (
+                      <span className="ml-1.5 text-[14px] font-bold uppercase tracking-[0.16em] text-white/80">
+                        days
+                      </span>
+                    )}
+                  </div>
+                  <div className="font-mono text-[12px] text-white/80">
+                    {start.toLocaleDateString(undefined, {
+                      weekday: "short",
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </div>
+                </div>
               </div>
             )}
           </div>
-        )}
-      </header>
-
-      {isAcceptedToEvent && announcements.length > 0 && (
-        <section className="mt-10 space-y-4">
-          <div className="flex items-center gap-2">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
-              Organizer updates
-            </p>
-            <span className="font-mono text-[11px] text-muted-foreground">
-              {announcements.length}
-            </span>
-          </div>
-          <div className="space-y-3">
-            {announcements.map((a) => {
-              const edited =
-                a.updatedAt.getTime() - a.createdAt.getTime() > 1000;
-              return (
-                <Card key={a.id} className="p-5">
-                  <h3 className="font-heading text-lg font-bold leading-tight">
-                    {a.subject}
-                  </h3>
-                  <p className="mt-1 font-mono text-[11px] text-muted-foreground">
-                    {formatDateNo(a.createdAt.toISOString().slice(0, 10))}
-                    {edited && " · edited"}
-                  </p>
-                  <Markdown source={a.body} className="mt-3 text-foreground" />
-                </Card>
-              );
-            })}
-          </div>
-        </section>
-      )}
-
-      {showStatusCard && ownApplicationStatus && (
-        <div className="mt-10">
-          <ApplicationStatusCard
-            status={ownApplicationStatus}
-            responseMessage={ownResponseMessage}
-            eventId={event.id}
-            hasAssignedTable={hasAssignedTable}
-          >
-            {ownApplicationStatus === "rejected" &&
-              event.waitlistEnabled && (
-                <div
-                  className={cn(
-                    "mt-5",
-                    ownResponseMessage && "border-t border-border pt-5"
-                  )}
-                >
-                  <p className="mb-3 text-sm text-muted-foreground">
-                    If a spot opens up, the organizer may offer it to you —
-                    join the waitlist to opt in.
-                  </p>
-                  <JoinWaitlistButton eventId={event.id} />
-                </div>
-              )}
-          </ApplicationStatusCard>
         </div>
-      )}
+      </section>
 
-      <div className="mt-10">
-        <ArtistEventTabsNav
-          eventId={event.id}
-          showFloorPlan={showFloorPlan}
-          showMessages={showMessages}
-        />
+      {/* Sticky pill tab bar */}
+      <div className="sticky top-14 z-30 border-b border-border bg-background/80 backdrop-blur sm:top-16">
+        <div className="mx-auto max-w-[1240px] px-4 py-3 sm:px-6">
+          <ArtistEventTabsNav
+            eventId={event.id}
+            showFloorPlan={showFloorPlan}
+            showMessages={showMessages}
+          />
+        </div>
       </div>
 
-      <div className="mt-8">{children}</div>
+      <main className="mx-auto max-w-[1240px] px-4 py-6 sm:px-6 sm:py-8">
+        {/* Announcements */}
+        {isAcceptedToEvent && announcements.length > 0 && (
+          <section className="mb-6 space-y-4">
+            <div className="flex items-center gap-2">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
+                Organizer updates
+              </p>
+              <span className="font-mono text-[11px] text-muted-foreground">
+                {announcements.length}
+              </span>
+            </div>
+            <div className="space-y-3">
+              {announcements.map((a) => {
+                const edited =
+                  a.updatedAt.getTime() - a.createdAt.getTime() > 1000;
+                return (
+                  <Card key={a.id} className="p-5">
+                    <h3 className="font-heading text-lg font-bold leading-tight">
+                      {a.subject}
+                    </h3>
+                    <p className="mt-1 font-mono text-[11px] text-muted-foreground">
+                      {formatDateNo(a.createdAt.toISOString().slice(0, 10))}
+                      {edited && " · edited"}
+                    </p>
+                    <Markdown
+                      source={a.body}
+                      className="mt-3 text-foreground"
+                    />
+                  </Card>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
+        {/* Application status card stays pinned at the top of the
+            content area for accepted/rejected/waitlisted artists. */}
+        {showStatusCard && ownApplicationStatus && (
+          <div className="mb-6">
+            <ApplicationStatusCard
+              status={ownApplicationStatus}
+              responseMessage={ownResponseMessage}
+              eventId={event.id}
+              hasAssignedTable={hasAssignedTable}
+            >
+              {ownApplicationStatus === "rejected" &&
+                event.waitlistEnabled && (
+                  <div
+                    className={cn(
+                      "mt-5",
+                      ownResponseMessage && "border-t border-border pt-5"
+                    )}
+                  >
+                    <p className="mb-3 text-sm text-muted-foreground">
+                      If a spot opens up, the organizer may offer it to
+                      you — join the waitlist to opt in.
+                    </p>
+                    <JoinWaitlistButton eventId={event.id} />
+                  </div>
+                )}
+            </ApplicationStatusCard>
+          </div>
+        )}
+
+        {children}
+      </main>
     </div>
   );
 }
