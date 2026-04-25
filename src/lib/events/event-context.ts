@@ -68,6 +68,8 @@ async function loadEventRow(eventId: string) {
       tableSizeOptions: events.tableSizeOptions,
       maxAssistants: events.maxAssistants,
       assistantFeeNok: events.assistantFeeNok,
+      floorPlanPublishedAt: events.floorPlanPublishedAt,
+      floorPlanAutoPublishDaysBefore: events.floorPlanAutoPublishDaysBefore,
       conventionId: events.conventionId,
       conventionName: conventions.name,
       conventionLogoPath: conventions.logoPath,

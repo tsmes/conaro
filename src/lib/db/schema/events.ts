@@ -131,6 +131,12 @@ export const events = pgTable(
     maxAssistants: integer("max_assistants").notNull().default(0),
     assistantFeeNok: integer("assistant_fee_nok"),
     floorPlan: jsonb("floor_plan").$type<FloorPlan>(),
+    floorPlanPublishedAt: timestamp("floor_plan_published_at", {
+      mode: "date",
+    }),
+    floorPlanAutoPublishDaysBefore: integer(
+      "floor_plan_auto_publish_days_before"
+    ),
     createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
   },

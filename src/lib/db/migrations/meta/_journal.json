@@ -134,6 +134,13 @@
       "when": 1777042982279,
       "tag": "0018_uneven_warbird",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1777136644083,
+      "tag": "0019_legal_maginty",
+      "breakpoints": true
     }
   ]
 }
