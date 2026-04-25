@@ -5,29 +5,22 @@ import {
   ChevronRight,
   Heart,
   MapPin,
-  MapPinned,
 } from "lucide-react";
 
 import {
   getEventViewerContext,
-  hasAssignedTableForViewer,
   shouldShowArtistsTab,
   shouldShowFloorPlanTab,
   shouldShowMessagesTab,
   shouldShowPracticalTab,
 } from "@/lib/events/event-context";
-import type { ApplicationStatus } from "@/lib/applications/status-styles";
 import { getAcceptedArtistsForEvent } from "@/lib/floor-plans/queries";
 import { pickCoverGradient } from "@/lib/landing/cover-gradient";
 import { storage } from "@/lib/storage";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Markdown } from "@/components/ui/markdown";
 import { FollowButton } from "@/components/conventions/follow-button";
 import { ArtistEventTabsNav } from "@/components/events/artist-event-tabs-nav";
-import { JoinWaitlistButton } from "@/components/events/join-waitlist-button";
 import { formatDateNo, formatDateRangeNo } from "@/lib/utils/format-date-no";
 import { cn } from "@/lib/utils";
 
@@ -53,7 +46,6 @@ export default async function EventLayout({
     isArtist,
     isFollowingConvention,
     ownApplicationStatus,
-    ownResponseMessage,
   } = ctx;
   const isLoggedIn = Boolean(session?.user);
 
@@ -77,28 +69,16 @@ export default async function EventLayout({
   // Run every layout-side fetch in parallel. The accepted-artists
   // marquee is only meaningful once results are out — skip the query
   // before then.
-  const [
-    showFloorPlan,
-    showMessages,
-    showArtists,
-    hasAssignedTable,
-    acceptedArtists,
-  ] = await Promise.all([
-    shouldShowFloorPlanTab(ctx),
-    shouldShowMessagesTab(ctx),
-    shouldShowArtistsTab(ctx),
-    hasAssignedTableForViewer(ctx),
-    event.status === "results_published"
-      ? getAcceptedArtistsForEvent(event.id)
-      : Promise.resolve([]),
-  ]);
+  const [showFloorPlan, showMessages, showArtists, acceptedArtists] =
+    await Promise.all([
+      shouldShowFloorPlanTab(ctx),
+      shouldShowMessagesTab(ctx),
+      shouldShowArtistsTab(ctx),
+      event.status === "results_published"
+        ? getAcceptedArtistsForEvent(event.id)
+        : Promise.resolve([]),
+    ]);
   const showPractical = shouldShowPracticalTab(ctx);
-
-  const showStatusCard =
-    isArtist &&
-    event.status === "results_published" &&
-    ownApplicationStatus &&
-    ownApplicationStatus !== "revoked";
 
   const venueLine = [event.venueCity, event.venueCountry]
     .filter(Boolean)
@@ -285,80 +265,12 @@ export default async function EventLayout({
       </div>
 
       <main className="mx-auto max-w-[1240px] px-4 py-6 sm:px-6 sm:py-8">
-        {/* Organizer announcements live in the Messages tab now so
-            they don't repeat above every other tab. */}
-
-        {/* Slim applicant context: organizer's response message + any
-            actionable CTA. The hero badge already announces the
-            decision, so there's no celebratory framing here. */}
-        {showStatusCard && ownApplicationStatus && (
-          <ApplicantContext
-            status={ownApplicationStatus}
-            responseMessage={ownResponseMessage}
-            eventId={event.id}
-            hasAssignedTable={hasAssignedTable}
-            waitlistEnabled={event.waitlistEnabled ?? false}
-          />
-        )}
-
+        {/* Per-tab content — the response message and any
+            applicant-only CTAs are surfaced inside the Messages
+            (and Overview as a fallback) tabs, not above every tab. */}
         {children}
       </main>
     </div>
-  );
-}
-
-interface ApplicantContextProps {
-  status: ApplicationStatus;
-  responseMessage: string | null;
-  eventId: string;
-  hasAssignedTable: boolean;
-  waitlistEnabled: boolean;
-}
-
-// Slim applicant context strip. Renders only when there's something
-// useful to surface — the organizer's response message, a "Show me
-// my table" deeplink, or the join-waitlist CTA. The full status
-// (Accepted / Waitlisted / Not selected) is already announced by the
-// hero's badge, so we don't repeat the headline.
-function ApplicantContext({
-  status,
-  responseMessage,
-  eventId,
-  hasAssignedTable,
-  waitlistEnabled,
-}: ApplicantContextProps) {
-  const showShowTable = status === "accepted" && hasAssignedTable;
-  const showWaitlistJoin = status === "rejected" && waitlistEnabled;
-  const hasContent = Boolean(responseMessage) || showShowTable || showWaitlistJoin;
-  if (!hasContent) return null;
-  return (
-    <Card className="mb-6 p-5 md:p-6">
-      {responseMessage && (
-        <div>
-          <p className="mb-2 text-[10.5px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
-            Message from the organizer
-          </p>
-          <Markdown source={responseMessage} className="text-foreground" />
-        </div>
-      )}
-      {(showShowTable || showWaitlistJoin) && (
-        <div className="mt-4 flex flex-wrap items-center gap-2">
-          {showShowTable && (
-            <Button
-              size="sm"
-              nativeButton={false}
-              render={
-                <Link href={`/events/${eventId}/floor-plan?focus=table`}>
-                  <MapPinned className="size-4" />
-                  Show me my table
-                </Link>
-              }
-            />
-          )}
-          {showWaitlistJoin && <JoinWaitlistButton eventId={eventId} />}
-        </div>
-      )}
-    </Card>
   );
 }
 

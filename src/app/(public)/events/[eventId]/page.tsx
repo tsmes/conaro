@@ -2,6 +2,7 @@ import Link from "next/link";
 import { CalendarDays, MapPin, Users } from "lucide-react";
 
 import { getEventViewerContext } from "@/lib/events/event-context";
+import { ApplicantContext } from "@/components/events/applicant-context";
 import { ApplyButton } from "@/components/events/apply-button";
 import { Card } from "@/components/ui/card";
 import { Markdown } from "@/components/ui/markdown";
@@ -35,9 +36,26 @@ export default async function EventOverviewPage({
     .filter(Boolean)
     .join(", ");
 
+  // Fallback applicant context for viewers who can't reach the
+  // Messages tab (rejected / waitlisted artists). Accepted artists
+  // see the same block on /messages instead, so we don't double up.
+  const showApplicantFallback =
+    ctx.ownApplicationStatus === "rejected" ||
+    ctx.ownApplicationStatus === "waitlisted";
+  const applicantFallback = showApplicantFallback ? (
+    <ApplicantContext
+      status={ctx.ownApplicationStatus!}
+      responseMessage={ctx.ownResponseMessage}
+      eventId={event.id}
+      hasAssignedTable={false}
+      waitlistEnabled={event.waitlistEnabled ?? false}
+    />
+  ) : null;
+
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
       <div className="min-w-0 space-y-6">
+        {applicantFallback}
         {event.description && (
           <Card className="p-6 md:p-8">
             <Overline>About this event</Overline>

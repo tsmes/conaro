@@ -3,8 +3,10 @@ import { notFound } from "next/navigation";
 import {
   getCachedThreadForArtist,
   getEventViewerContext,
+  hasAssignedTableForViewer,
 } from "@/lib/events/event-context";
 import { getEventAnnouncements } from "@/lib/events/announcements";
+import { ApplicantContext } from "@/components/events/applicant-context";
 import { EventThread } from "@/components/events/event-thread";
 import { Card } from "@/components/ui/card";
 import { Markdown } from "@/components/ui/markdown";
@@ -22,9 +24,10 @@ export default async function MessagesPage({ params }: MessagesPageProps) {
   if (!ctx.isAcceptedToEvent || !ctx.artistProfileId) notFound();
   const artistProfileId = ctx.artistProfileId;
 
-  const [thread, announcements] = await Promise.all([
+  const [thread, announcements, hasAssignedTable] = await Promise.all([
     getCachedThreadForArtist(ctx.event.id, artistProfileId),
     getEventAnnouncements(ctx.event.id),
+    hasAssignedTableForViewer(ctx),
   ]);
   if (!thread) notFound();
 
@@ -39,6 +42,15 @@ export default async function MessagesPage({ params }: MessagesPageProps) {
 
   return (
     <div className="space-y-6">
+      {ctx.ownApplicationStatus && (
+        <ApplicantContext
+          status={ctx.ownApplicationStatus}
+          responseMessage={ctx.ownResponseMessage}
+          eventId={ctx.event.id}
+          hasAssignedTable={hasAssignedTable}
+          waitlistEnabled={ctx.event.waitlistEnabled ?? false}
+        />
+      )}
       <Card className="p-6 md:p-8">
         <p className="mb-4 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
           Messages
