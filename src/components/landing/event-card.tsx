@@ -55,6 +55,36 @@ function isApplicationOpen(event: LandingEvent, today: Date): boolean {
   return close.getTime() >= today.getTime();
 }
 
+function daysUntilStart(eventStartDate: string, today: Date): number {
+  const start = new Date(`${eventStartDate}T00:00:00`);
+  const todayMidnight = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate()
+  );
+  return Math.round(
+    (start.getTime() - todayMidnight.getTime()) / 86_400_000
+  );
+}
+
+function CountdownBlock({ days }: { days: number }) {
+  const display =
+    days < 0 ? "Now" : days === 0 ? "Today" : days.toString();
+  const showLabel = days > 0;
+  return (
+    <div className="hidden w-24 shrink-0 flex-col items-center justify-center border-l border-border bg-muted/20 p-4 sm:flex">
+      <div className="font-heading text-4xl font-extrabold leading-none tracking-tight">
+        {display}
+      </div>
+      {showLabel && (
+        <div className="mt-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+          {days === 1 ? "Day" : "Days"} to go
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function EventCard({ event, viewer, artistContext }: EventCardProps) {
   const isArtist = viewer === "artist";
   const today = new Date();
@@ -70,6 +100,8 @@ export function EventCard({ event, viewer, artistContext }: EventCardProps) {
 
   const showContextStrip =
     isArtist && (hasApplication || isOpenCallToFollowedConvention);
+
+  const days = daysUntilStart(event.eventStartDate, today);
 
   return (
     <Card className="overflow-hidden p-0">
@@ -173,6 +205,7 @@ export function EventCard({ event, viewer, artistContext }: EventCardProps) {
             )}
           </div>
         </div>
+        <CountdownBlock days={days} />
       </div>
     </Card>
   );
