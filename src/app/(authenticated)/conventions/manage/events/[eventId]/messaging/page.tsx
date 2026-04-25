@@ -2,7 +2,7 @@ import { redirect, notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { getOrganizerEvent } from "@/lib/conventions/queries";
 import { AnnouncementsEditor } from "@/components/conventions/announcements-editor";
-import { getEventAnnouncements } from "@/app/(authenticated)/conventions/manage/events/[eventId]/announcements/actions";
+import { getEventAnnouncements } from "@/lib/events/announcements";
 import { ThreadInbox } from "@/components/conventions/thread-inbox";
 import { getOrganizerInboxWithMessages } from "@/lib/threads/queries";
 import { Card } from "@/components/ui/card";

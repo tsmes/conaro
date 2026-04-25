@@ -8,7 +8,7 @@ import {
   shouldShowMessagesTab,
 } from "@/lib/events/event-context";
 import { storage } from "@/lib/storage";
-import { getEventAnnouncements } from "@/app/(authenticated)/conventions/manage/events/[eventId]/announcements/actions";
+import { getEventAnnouncements } from "@/lib/events/announcements";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

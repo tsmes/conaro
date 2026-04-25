@@ -1,6 +1,6 @@
 "use server";
 
-import { and, desc, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
@@ -197,29 +197,5 @@ export async function deleteEventAnnouncement(
   revalidatePath(`/conventions/manage/events/${eventId}`);
   revalidatePath(`/events/${eventId}`);
   return { success: true };
-}
-
-export async function getEventAnnouncements(
-  eventId: string
-): Promise<
-  {
-    id: string;
-    subject: string;
-    body: string;
-    createdAt: Date;
-    updatedAt: Date;
-  }[]
-> {
-  return db
-    .select({
-      id: eventAnnouncements.id,
-      subject: eventAnnouncements.subject,
-      body: eventAnnouncements.body,
-      createdAt: eventAnnouncements.createdAt,
-      updatedAt: eventAnnouncements.updatedAt,
-    })
-    .from(eventAnnouncements)
-    .where(eq(eventAnnouncements.eventId, eventId))
-    .orderBy(desc(eventAnnouncements.createdAt));
 }
 
