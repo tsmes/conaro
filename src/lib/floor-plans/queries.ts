@@ -9,6 +9,8 @@ import type {
 import { applications } from "@/lib/db/schema/applications";
 import { profiles } from "@/lib/db/schema/profiles";
 import { artistProfiles } from "@/lib/db/schema/artist-profiles";
+import { portfolioImages } from "@/lib/db/schema/portfolio-images";
+import { storage } from "@/lib/storage";
 import {
   parseSocialLinks,
   type SocialLink,
@@ -167,6 +169,12 @@ export async function getAcceptedArtistsForEvent(
     .sort((a, b) => a.displayName.localeCompare(b.displayName));
 }
 
+export interface FloorPlanArtistImage {
+  id: string;
+  url: string;
+  caption: string | null;
+}
+
 export interface FloorPlanArtist {
   applicationId: string;
   displayName: string;
@@ -174,6 +182,7 @@ export interface FloorPlanArtist {
   bio: string | null;
   websiteUrl: string | null;
   socialLinks: SocialLink[];
+  images: FloorPlanArtistImage[];
   standLabel: string;
   roomId: string;
 }
@@ -204,6 +213,7 @@ export async function getArtistsForFloorPlan(
   const rows = await db
     .select({
       applicationId: applications.id,
+      profileId: applications.profileId,
       displayName: profiles.displayName,
       pronouns: artistProfiles.pronouns,
       bio: artistProfiles.bio,
@@ -218,6 +228,47 @@ export async function getArtistsForFloorPlan(
     )
     .where(inArray(applications.id, ids));
 
+  // Pull a small portfolio sample per artist so the info card has
+  // something to look at. One round-trip; we group + cap in JS.
+  const profileIds = rows.map((r) => r.profileId);
+  const imagesByProfile = new Map<string, FloorPlanArtistImage[]>();
+  if (profileIds.length > 0) {
+    const imageRows = await db
+      .select({
+        id: portfolioImages.id,
+        profileId: portfolioImages.profileId,
+        storagePath: portfolioImages.storagePath,
+        caption: portfolioImages.caption,
+        section: portfolioImages.section,
+        sortOrder: portfolioImages.sortOrder,
+      })
+      .from(portfolioImages)
+      .where(inArray(portfolioImages.profileId, profileIds));
+
+    const sectionRank: Record<string, number> = {
+      promo: 0,
+      product: 1,
+      previous_stand: 2,
+    };
+    for (const profileId of profileIds) {
+      const ours = imageRows
+        .filter((i) => i.profileId === profileId)
+        .sort((a, b) => {
+          const ra = sectionRank[a.section] ?? 9;
+          const rb = sectionRank[b.section] ?? 9;
+          if (ra !== rb) return ra - rb;
+          return a.sortOrder - b.sortOrder;
+        })
+        .slice(0, 4)
+        .map<FloorPlanArtistImage>((i) => ({
+          id: i.id,
+          url: storage.getUrl(i.storagePath),
+          caption: i.caption,
+        }));
+      imagesByProfile.set(profileId, ours);
+    }
+  }
+
   return rows
     .map((r) => {
       const meta = assignmentMeta.get(r.applicationId);
@@ -229,6 +280,7 @@ export async function getArtistsForFloorPlan(
         bio: r.bio ?? null,
         websiteUrl: r.websiteUrl ?? null,
         socialLinks: parseSocialLinks(r.socialLinks),
+        images: imagesByProfile.get(r.profileId) ?? [],
         standLabel: meta.standLabel,
         roomId: meta.roomId,
       } satisfies FloorPlanArtist;

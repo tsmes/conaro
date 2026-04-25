@@ -228,8 +228,15 @@ interface ArtistInfoCardProps {
 
 function ArtistInfoCard({ artist, onClose, onFocus }: ArtistInfoCardProps) {
   if (!artist) return null;
-  const { displayName, pronouns, bio, websiteUrl, socialLinks, standLabel } =
-    artist;
+  const {
+    displayName,
+    pronouns,
+    bio,
+    websiteUrl,
+    socialLinks,
+    images,
+    standLabel,
+  } = artist;
   return (
     <Card className="absolute right-3 top-3 z-20 w-[min(320px,calc(100%-1.5rem))] overflow-hidden p-0 shadow-lg">
       <div className="flex items-start gap-3 p-4">
@@ -255,6 +262,27 @@ function ArtistInfoCard({ artist, onClose, onFocus }: ArtistInfoCardProps) {
           <X className="size-4" />
         </button>
       </div>
+      {images.length > 0 && (
+        <div className="grid grid-cols-4 gap-1 px-2 pb-2">
+          {images.map((img) => (
+            <a
+              key={img.id}
+              href={img.url}
+              target="_blank"
+              rel="noreferrer"
+              className="group/thumb relative aspect-square overflow-hidden rounded-md bg-muted"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={img.url}
+                alt={img.caption ?? `${displayName} portfolio`}
+                loading="lazy"
+                className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover/thumb:scale-105"
+              />
+            </a>
+          ))}
+        </div>
+      )}
       {bio && (
         <p className="line-clamp-4 px-4 pb-3 text-[13px] leading-relaxed text-foreground">
           {bio}
