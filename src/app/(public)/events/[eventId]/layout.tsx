@@ -15,14 +15,11 @@ import {
   shouldShowMessagesTab,
   shouldShowPracticalTab,
 } from "@/lib/events/event-context";
-import { getEventAnnouncements } from "@/lib/events/announcements";
 import { getAcceptedArtistsForEvent } from "@/lib/floor-plans/queries";
 import { pickCoverGradient } from "@/lib/landing/cover-gradient";
 import { storage } from "@/lib/storage";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
-import { Markdown } from "@/components/ui/markdown";
 import { FollowButton } from "@/components/conventions/follow-button";
 import { ApplicationStatusCard } from "@/components/events/application-status-card";
 import { ArtistEventTabsNav } from "@/components/events/artist-event-tabs-nav";
@@ -56,7 +53,6 @@ export default async function EventLayout({
     isFollowingConvention,
     ownApplicationStatus,
     ownResponseMessage,
-    isAcceptedToEvent,
   } = ctx;
   const isLoggedIn = Boolean(session?.user);
 
@@ -81,14 +77,12 @@ export default async function EventLayout({
   // marquee is only meaningful once results are out — skip the query
   // before then.
   const [
-    announcements,
     showFloorPlan,
     showMessages,
     showArtists,
     hasAssignedTable,
     acceptedArtists,
   ] = await Promise.all([
-    isAcceptedToEvent ? getEventAnnouncements(event.id) : Promise.resolve([]),
     shouldShowFloorPlanTab(ctx),
     shouldShowMessagesTab(ctx),
     shouldShowArtistsTab(ctx),
@@ -290,40 +284,8 @@ export default async function EventLayout({
       </div>
 
       <main className="mx-auto max-w-[1240px] px-4 py-6 sm:px-6 sm:py-8">
-        {/* Announcements */}
-        {isAcceptedToEvent && announcements.length > 0 && (
-          <section className="mb-6 space-y-4">
-            <div className="flex items-center gap-2">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
-                Organizer updates
-              </p>
-              <span className="font-mono text-[11px] text-muted-foreground">
-                {announcements.length}
-              </span>
-            </div>
-            <div className="space-y-3">
-              {announcements.map((a) => {
-                const edited =
-                  a.updatedAt.getTime() - a.createdAt.getTime() > 1000;
-                return (
-                  <Card key={a.id} className="p-5">
-                    <h3 className="font-heading text-lg font-bold leading-tight">
-                      {a.subject}
-                    </h3>
-                    <p className="mt-1 font-mono text-[11px] text-muted-foreground">
-                      {formatDateNo(a.createdAt.toISOString().slice(0, 10))}
-                      {edited && " · edited"}
-                    </p>
-                    <Markdown
-                      source={a.body}
-                      className="mt-3 text-foreground"
-                    />
-                  </Card>
-                );
-              })}
-            </div>
-          </section>
-        )}
+        {/* Organizer announcements live in the Messages tab now so
+            they don't repeat above every other tab. */}
 
         {/* Application status card stays pinned at the top of the
             content area for accepted/rejected/waitlisted artists. */}
