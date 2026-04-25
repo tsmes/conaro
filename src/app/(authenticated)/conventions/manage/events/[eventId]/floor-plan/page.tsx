@@ -6,6 +6,7 @@ import {
   getFloorPlanForEvent,
 } from "@/lib/floor-plans/queries";
 import { FloorPlanEditor } from "@/components/floor-plans/floor-plan-editor";
+import { FloorPlanPublishControls } from "@/components/floor-plans/floor-plan-publish-controls";
 
 interface FloorPlanPageProps {
   params: Promise<{ eventId: string }>;
@@ -44,6 +45,12 @@ export default async function FloorPlanPage({
           details; fill in width/depth on any size you want to place here.
         </p>
       </div>
+      <FloorPlanPublishControls
+        eventId={event.id}
+        eventStatus={event.status}
+        floorPlanPublishedAt={event.floorPlanPublishedAt}
+        floorPlanAutoPublishDaysBefore={event.floorPlanAutoPublishDaysBefore}
+      />
       <FloorPlanEditor
         eventId={event.id}
         initialPlan={floorPlan}
