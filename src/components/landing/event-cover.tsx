@@ -51,7 +51,7 @@ export function EventCover({
 
   const layoutClass =
     variant === "card"
-      ? "hidden sm:flex w-32 shrink-0 flex-col justify-between p-4"
+      ? "hidden sm:flex w-[168px] shrink-0 flex-col justify-between p-5"
       : "min-h-[180px] flex flex-col justify-between p-5";
 
   return (
@@ -87,7 +87,12 @@ export function EventCover({
         <div className="text-[10.5px] font-bold tracking-[0.14em] uppercase opacity-85">
           {stamp.month}
         </div>
-        <div className="font-heading text-[32px] leading-none font-extrabold tracking-[-0.03em]">
+        <div
+          className={cn(
+            "font-heading font-extrabold leading-none tracking-[-0.03em]",
+            variant === "card" ? "text-[36px]" : "text-[40px]"
+          )}
+        >
           {stamp.day}
         </div>
       </div>

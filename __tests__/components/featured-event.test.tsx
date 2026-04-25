@@ -36,7 +36,7 @@ describe("FeaturedEvent", () => {
   it("renders the countdown to event start", () => {
     render(<FeaturedEvent event={baseEvent} viewer="public" />);
     expect(screen.getByTestId("featured-countdown")).toHaveTextContent(
-      "24 days"
+      "24days"
     );
   });
 
@@ -50,7 +50,7 @@ describe("FeaturedEvent", () => {
     expect(screen.getByTestId("featured-countdown")).toHaveTextContent("Today");
   });
 
-  it("renders 'Tomorrow' for an event starting tomorrow", () => {
+  it("renders '1 day' for an event starting tomorrow", () => {
     render(
       <FeaturedEvent
         event={{ ...baseEvent, eventStartDate: "2026-04-22" }}
@@ -58,7 +58,7 @@ describe("FeaturedEvent", () => {
       />
     );
     expect(screen.getByTestId("featured-countdown")).toHaveTextContent(
-      "Tomorrow"
+      "1day"
     );
   });
 
@@ -110,8 +110,8 @@ describe("FeaturedEvent", () => {
     expect(screen.getByText("Pending")).toBeInTheDocument();
   });
 
-  it("renders the View event CTA", () => {
+  it("renders the Event details CTA", () => {
     render(<FeaturedEvent event={baseEvent} viewer="public" />);
-    expect(screen.getByText(/View event/i)).toBeInTheDocument();
+    expect(screen.getByText(/Event details/i)).toBeInTheDocument();
   });
 });

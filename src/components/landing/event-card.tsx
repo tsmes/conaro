@@ -9,6 +9,9 @@ import {
 } from "@/lib/landing/data";
 import { formatDateRangeNo } from "@/lib/utils/format-date-no";
 import { artistVisibleStatus } from "@/lib/applications/artist-visible-status";
+import { pickCoverGradient } from "@/lib/landing/cover-gradient";
+import { storage } from "@/lib/storage";
+import { cn } from "@/lib/utils";
 import { EventCover } from "./event-cover";
 import { EventContextStrip } from "./event-context-strip";
 import { FollowButton } from "./follow-button";
@@ -72,15 +75,96 @@ function CountdownBlock({ days }: { days: number }) {
     days < 0 ? "Now" : days === 0 ? "Today" : days.toString();
   const showLabel = days > 0;
   return (
-    <div className="hidden w-24 shrink-0 flex-col items-center justify-center border-l border-border bg-muted/20 p-4 sm:flex">
-      <div className="font-heading text-4xl font-extrabold leading-none tracking-tight">
+    <div className="hidden shrink-0 flex-col items-center justify-center bg-muted/40 px-6 md:flex">
+      <span
+        className={cn(
+          "font-heading font-extrabold leading-none tracking-[-0.06em] text-foreground",
+          // Big countdown panel — large numerals match the design's
+          // "days to go" treatment. Drop a touch on huge values to
+          // keep it from overflowing on 4-digit day counts.
+          display.length >= 4 ? "text-[80px]" : "text-[120px]"
+        )}
+      >
         {display}
-      </div>
+      </span>
       {showLabel && (
-        <div className="mt-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-          {days === 1 ? "Day" : "Days"} to go
-        </div>
+        <span className="mt-2 text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
+          Days to go
+        </span>
       )}
+    </div>
+  );
+}
+
+function dateStampSmall(iso: string): { day: string; month: string } {
+  const [, , dayStr] = iso.split("-");
+  const month = new Date(`${iso}T00:00:00`).toLocaleDateString(undefined, {
+    month: "short",
+  });
+  return {
+    day: String(Number.parseInt(dayStr ?? "1", 10)),
+    month: month.toUpperCase(),
+  };
+}
+
+function MobileTopStripe({
+  conventionId,
+  conventionName,
+  logoPath,
+  eventStartDate,
+  days,
+}: {
+  conventionId: string;
+  conventionName: string;
+  logoPath: string | null;
+  eventStartDate: string;
+  days: number;
+}) {
+  const stamp = dateStampSmall(eventStartDate);
+  const hasLogo = Boolean(logoPath);
+  const gradientClass = hasLogo ? null : pickCoverGradient(conventionId);
+  const initials = (() => {
+    const parts = conventionName.trim().split(/\s+/).slice(0, 2);
+    return parts.map((p) => p[0]?.toUpperCase() ?? "").join("") || "?";
+  })();
+  const countdown =
+    days < 0 ? "Now" : days === 0 ? "Today" : `in ${days}d`;
+  return (
+    <div
+      className={cn(
+        "relative flex items-center gap-3 px-4 py-3 text-white sm:hidden",
+        gradientClass
+      )}
+      style={
+        hasLogo && logoPath
+          ? {
+              backgroundImage: `url(${storage.getUrl(logoPath)})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }
+          : undefined
+      }
+    >
+      {hasLogo && (
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/30 to-black/50"
+        />
+      )}
+      <div className="relative flex items-baseline gap-1.5">
+        <span className="font-heading text-[26px] font-extrabold leading-none tracking-[-0.02em]">
+          {stamp.day}
+        </span>
+        <span className="text-[10.5px] font-bold uppercase tracking-[0.14em] opacity-90">
+          {stamp.month}
+        </span>
+      </div>
+      <span className="relative ml-1 truncate font-mono text-[11px] opacity-90">
+        {countdown}
+      </span>
+      <span className="relative ml-auto grid size-7 place-items-center rounded-md bg-black/30 text-[10px] font-bold tracking-tight backdrop-blur-sm">
+        {initials}
+      </span>
     </div>
   );
 }
@@ -104,7 +188,14 @@ export function EventCard({ event, viewer, artistContext }: EventCardProps) {
   const days = daysUntilStart(event.eventStartDate, today);
 
   return (
-    <Card className="overflow-hidden p-0">
+    <Card className="overflow-hidden p-0 transition-shadow hover:shadow-lg">
+      <MobileTopStripe
+        conventionId={event.conventionId}
+        conventionName={event.conventionName}
+        logoPath={event.conventionLogoPath}
+        eventStartDate={event.eventStartDate}
+        days={days}
+      />
       <div className="flex">
         <EventCover
           conventionId={event.conventionId}
