@@ -62,9 +62,13 @@ interface FloorPlanCanvasProps {
   editable: boolean;
   onChange?: (next: FloorPlan) => void;
   highlightApplicationId?: string;
-  /** When true, the highlighted table's halo briefly pulses on
-   *  mount before settling back to the static highlight. */
-  pulseHighlight?: boolean;
+  /** Number that increments on each focus action. When it changes
+   *  the canvas re-centres on the highlighted table at zoom 1.6×
+   *  and the halo pulses for ~2 s. */
+  focusToken?: number;
+  /** Viewer-mode click on an assigned table — opens an info card
+   *  populated from the artist's profile data. */
+  onAssignedTableTap?: (applicationId: string) => void;
   /** Outlines the selected table; arrow-key nudging in the parent
    *  moves it. */
   selectedTableId?: string | null;
@@ -78,7 +82,8 @@ export function FloorPlanCanvas({
   editable,
   onChange,
   highlightApplicationId,
-  pulseHighlight = false,
+  focusToken = 0,
+  onAssignedTableTap,
   selectedTableId,
   onSelectTable,
 }: FloorPlanCanvasProps) {
@@ -317,11 +322,12 @@ export function FloorPlanCanvas({
     lastPinchDistRef.current = 0;
   }, []);
 
-  // Auto-focus on the highlighted table when "Show me my table" is
-  // active. Centres the table at scale 1.6 so the artist sees their
-  // stand without hunting through the room.
+  // Auto-focus on the highlighted table when the focus token bumps
+  // (URL ?focus=table on first paint, or the parent's search triggers
+  // a re-focus). Centres the table at scale 1.6 so the artist sees
+  // their stand without hunting through the room.
   useEffect(() => {
-    if (!panZoomEnabled || !pulseHighlight || !highlightApplicationId) return;
+    if (!panZoomEnabled || !focusToken || !highlightApplicationId) return;
     const target = tablesInRoom.find(
       (t) => t.assignment?.applicationId === highlightApplicationId
     );
@@ -337,10 +343,10 @@ export function FloorPlanCanvas({
       y: stageHeight / 2 - cy * targetScale,
     });
     // Scale + sizeById intentionally not in deps — we re-run when
-    // the trigger flips or the highlight target changes, not on
+    // the focus token bumps or the highlight target changes, not on
     // every container resize.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [panZoomEnabled, pulseHighlight, highlightApplicationId]);
+  }, [panZoomEnabled, focusToken, highlightApplicationId]);
 
   return (
     <div
@@ -511,6 +517,16 @@ export function FloorPlanCanvas({
                     }
                   }}
                   onTap={() => onSelectTable?.(table.id)}
+                  onClick={(e) => {
+                    if (
+                      !editable &&
+                      onAssignedTableTap &&
+                      table.assignment
+                    ) {
+                      e.cancelBubble = true;
+                      onAssignedTableTap(table.assignment.applicationId);
+                    }
+                  }}
                   onDragEnd={(e) =>
                     handleTableDragEnd(
                       table.id,
@@ -523,12 +539,15 @@ export function FloorPlanCanvas({
                   }
                 >
                   {/* Highlight halo (rendered under the rect when viewer
-                      is the assigned artist) */}
+                      is the assigned artist). focusToken-keyed so it
+                      remounts when the parent bumps a re-focus, which
+                      re-runs the pulse animation cleanly. */}
                   {highlight && (
                     <HighlightHalo
+                      key={`halo-${focusToken}`}
                       wPx={wPx}
                       hPx={hPx}
-                      pulse={pulseHighlight}
+                      pulse={focusToken > 0}
                     />
                   )}
                   {/* Selection ring (editor only) — dashed outline that

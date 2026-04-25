@@ -4,6 +4,7 @@ import {
   getCachedFloorPlan,
   getEventViewerContext,
 } from "@/lib/events/event-context";
+import { getArtistsForFloorPlan } from "@/lib/floor-plans/queries";
 import { PublicFloorPlanView } from "@/components/floor-plans/public-floor-plan-view";
 import { Card } from "@/components/ui/card";
 
@@ -27,6 +28,7 @@ export default async function FloorPlanPage({
     ctx.ownApplicationStatus === "accepted" && ctx.ownApplicationId
       ? ctx.ownApplicationId
       : undefined;
+  const artists = await getArtistsForFloorPlan(plan);
 
   return (
     <Card className="p-6 md:p-8">
@@ -41,8 +43,9 @@ export default async function FloorPlanPage({
       <PublicFloorPlanView
         plan={plan}
         tableSizeOptions={ctx.event.tableSizeOptions ?? []}
+        artists={artists}
         highlightApplicationId={highlightApplicationId}
-        pulseHighlight={focus === "table"}
+        initialPulse={focus === "table"}
       />
     </Card>
   );

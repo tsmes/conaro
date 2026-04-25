@@ -8,6 +8,11 @@ import type {
 } from "@/lib/db/schema/events";
 import { applications } from "@/lib/db/schema/applications";
 import { profiles } from "@/lib/db/schema/profiles";
+import { artistProfiles } from "@/lib/db/schema/artist-profiles";
+import {
+  parseSocialLinks,
+  type SocialLink,
+} from "@/lib/artist-profile/social-links";
 
 export interface ResolvedAssignment {
   applicationId: string;
@@ -159,5 +164,75 @@ export async function getAcceptedArtistsForEvent(
         (r.answers as { tableSizeOptionId?: string } | null)
           ?.tableSizeOptionId ?? null,
     }))
+    .sort((a, b) => a.displayName.localeCompare(b.displayName));
+}
+
+export interface FloorPlanArtist {
+  applicationId: string;
+  displayName: string;
+  pronouns: string | null;
+  bio: string | null;
+  websiteUrl: string | null;
+  socialLinks: SocialLink[];
+  standLabel: string;
+  roomId: string;
+}
+
+// Enriched artist data for the public floor-plan viewer: bio +
+// social links joined onto the assignments already on the plan.
+// Returns an empty list if no plan is loaded or no tables are
+// assigned. Sorted by display name so search results are stable.
+export async function getArtistsForFloorPlan(
+  plan: ResolvedFloorPlan | null
+): Promise<FloorPlanArtist[]> {
+  if (!plan) return [];
+  const assignmentMeta = new Map<
+    string,
+    { standLabel: string; roomId: string }
+  >();
+  for (const t of plan.tables) {
+    if (t.assignment) {
+      assignmentMeta.set(t.assignment.applicationId, {
+        standLabel: t.label,
+        roomId: t.roomId,
+      });
+    }
+  }
+  if (assignmentMeta.size === 0) return [];
+
+  const ids = [...assignmentMeta.keys()];
+  const rows = await db
+    .select({
+      applicationId: applications.id,
+      displayName: profiles.displayName,
+      pronouns: artistProfiles.pronouns,
+      bio: artistProfiles.bio,
+      websiteUrl: artistProfiles.websiteUrl,
+      socialLinks: artistProfiles.socialLinks,
+    })
+    .from(applications)
+    .innerJoin(profiles, eq(profiles.id, applications.profileId))
+    .leftJoin(
+      artistProfiles,
+      eq(artistProfiles.profileId, applications.profileId)
+    )
+    .where(inArray(applications.id, ids));
+
+  return rows
+    .map((r) => {
+      const meta = assignmentMeta.get(r.applicationId);
+      if (!meta) return null;
+      return {
+        applicationId: r.applicationId,
+        displayName: r.displayName,
+        pronouns: r.pronouns ?? null,
+        bio: r.bio ?? null,
+        websiteUrl: r.websiteUrl ?? null,
+        socialLinks: parseSocialLinks(r.socialLinks),
+        standLabel: meta.standLabel,
+        roomId: meta.roomId,
+      } satisfies FloorPlanArtist;
+    })
+    .filter((a): a is FloorPlanArtist => a !== null)
     .sort((a, b) => a.displayName.localeCompare(b.displayName));
 }
