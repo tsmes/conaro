@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import {
@@ -73,31 +74,34 @@ export default async function ArtistsPage({ params }: ArtistsPageProps) {
           const stand = standByApplication.get(a.applicationId);
           const coverClass = pickCoverGradient(a.applicationId);
           return (
-            <Card
+            <Link
               key={a.applicationId}
-              className="overflow-hidden p-3 transition hover:shadow-lg"
+              href={`/events/${eventId}/artists/${a.applicationId}`}
+              className="group block focus:outline-none"
             >
-              <div
-                className={cn(
-                  "relative aspect-square overflow-hidden rounded-[10px]",
-                  coverClass
+              <Card className="overflow-hidden p-3 transition group-hover:border-primary/50 group-hover:shadow-lg group-focus-visible:ring-2 group-focus-visible:ring-ring">
+                <div
+                  className={cn(
+                    "relative aspect-square overflow-hidden rounded-[10px]",
+                    coverClass
+                  )}
+                >
+                  <div className="absolute bottom-2 left-2 font-heading text-[28px] font-extrabold leading-none tracking-tight text-white">
+                    {initialsFor(a.displayName)}
+                  </div>
+                </div>
+                <div className="mt-3">
+                  <div className="font-heading text-[14px] font-extrabold leading-tight">
+                    {a.displayName}
+                  </div>
+                </div>
+                {stand && (
+                  <div className="mt-2 font-mono text-[11.5px] text-muted-foreground">
+                    Stand {stand}
+                  </div>
                 )}
-              >
-                <div className="absolute bottom-2 left-2 font-heading text-[28px] font-extrabold leading-none tracking-tight text-white">
-                  {initialsFor(a.displayName)}
-                </div>
-              </div>
-              <div className="mt-3">
-                <div className="font-heading text-[14px] font-extrabold leading-tight">
-                  {a.displayName}
-                </div>
-              </div>
-              {stand && (
-                <div className="mt-2 font-mono text-[11.5px] text-muted-foreground">
-                  Stand {stand}
-                </div>
-              )}
-            </Card>
+              </Card>
+            </Link>
           );
         })}
       </div>
