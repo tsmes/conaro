@@ -93,46 +93,53 @@ export default async function EventLayout({
 
   return (
     <div>
-      {/* Full-bleed hero. With a banner uploaded, the photo is the
-          background and the gradient is hidden; the dark overlay
-          gets stronger so white text stays legible on busy images.
-          Without a banner the conv. gradient sets the mood. */}
-      <section className="relative overflow-hidden text-white">
-        {bannerUrl ? (
-          <>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
+      {/* Hero. On md+ the optional banner is the full-bleed
+          background of the title block and a dark overlay keeps
+          text legible. On mobile the banner is rendered as its
+          own top media strip (uncropped) above the title block,
+          which then sits on the convention gradient — the wide
+          banner + narrow viewport mismatch otherwise cropped the
+          photo to a vertical sliver. */}
+      <section className="overflow-hidden text-white">
+        {bannerUrl && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={bannerUrl}
+            alt=""
+            aria-hidden
+            className="block aspect-[16/9] w-full object-cover sm:aspect-[5/2] md:hidden"
+          />
+        )}
+        <div className="relative">
+          {bannerUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={bannerUrl}
               alt=""
               aria-hidden
-              className="absolute inset-0 h-full w-full object-cover"
+              className="absolute inset-0 hidden h-full w-full object-cover md:block"
             />
-            <div
-              className="absolute inset-0"
-              aria-hidden
-              style={{
-                background:
-                  "linear-gradient(to bottom, rgba(0,0,0,.30) 0%, rgba(0,0,0,.55) 100%)",
-              }}
-            />
-          </>
-        ) : (
-          <>
-            <div
-              className={cn("absolute inset-0", heroGradientClass)}
-              aria-hidden
-            />
-            <div
-              className="absolute inset-0"
-              aria-hidden
-              style={{
-                background:
-                  "radial-gradient(120% 80% at 80% 20%, rgba(255,255,255,.18), transparent 60%), linear-gradient(to bottom, rgba(0,0,0,0) 30%, rgba(0,0,0,.45) 100%)",
-              }}
-            />
-          </>
-        )}
-        <div className="relative mx-auto max-w-[1240px] px-4 py-10 sm:px-6 sm:py-14 md:py-16">
+          )}
+          <div
+            className={cn(
+              "absolute inset-0",
+              // On md+ the photo replaces the gradient; on mobile
+              // the gradient backs the title block below the strip.
+              bannerUrl ? "md:hidden" : "",
+              heroGradientClass
+            )}
+            aria-hidden
+          />
+          <div
+            className="absolute inset-0"
+            aria-hidden
+            style={{
+              background: bannerUrl
+                ? "linear-gradient(to bottom, rgba(0,0,0,.30) 0%, rgba(0,0,0,.55) 100%)"
+                : "radial-gradient(120% 80% at 80% 20%, rgba(255,255,255,.18), transparent 60%), linear-gradient(to bottom, rgba(0,0,0,0) 30%, rgba(0,0,0,.45) 100%)",
+            }}
+          />
+          <div className="relative mx-auto max-w-[1240px] px-4 py-10 sm:px-6 sm:py-14 md:py-16">
           {/* Breadcrumb / back */}
           <nav
             aria-label="Breadcrumb"
@@ -275,6 +282,7 @@ export default async function EventLayout({
               </div>
             )}
           </div>
+        </div>
         </div>
         {acceptedArtists.length > 0 && (
           <ArtistMarquee artists={acceptedArtists} />
