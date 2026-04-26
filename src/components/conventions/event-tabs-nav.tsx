@@ -42,6 +42,16 @@ export function EventTabsNav({
       isActive: pathname.startsWith(`${base}/applications`),
     },
     {
+      href: `${base}/programme`,
+      label: "Programme",
+      isActive: pathname.startsWith(`${base}/programme`),
+    },
+    {
+      href: `${base}/guests`,
+      label: "Guests",
+      isActive: pathname.startsWith(`${base}/guests`),
+    },
+    {
       href: `${base}/messaging`,
       label: "Messaging",
       isActive: pathname.startsWith(`${base}/messaging`),
