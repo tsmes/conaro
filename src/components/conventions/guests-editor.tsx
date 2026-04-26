@@ -147,7 +147,6 @@ export function GuestsEditor({
                 <div className="grid gap-4 md:grid-cols-[140px_1fr]">
                   <GuestImageField
                     eventId={eventId}
-                    guestId={guest.id}
                     imagePath={guest.imagePath}
                     onChange={(imagePath) =>
                       updateGuest(index, { imagePath })
@@ -308,14 +307,12 @@ export function GuestsEditor({
 
 interface GuestImageFieldProps {
   eventId: string;
-  guestId: string;
   imagePath?: string;
   onChange: (imagePath: string | undefined) => void;
 }
 
 function GuestImageField({
   eventId,
-  guestId,
   imagePath,
   onChange,
 }: GuestImageFieldProps) {
@@ -329,7 +326,6 @@ function GuestImageField({
     setError(null);
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("guestId", guestId);
     try {
       const res = await fetch(`/api/events/${eventId}/guests/image`, {
         method: "POST",

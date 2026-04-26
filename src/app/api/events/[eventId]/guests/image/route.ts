@@ -9,7 +9,6 @@ import { getOrganizerEvent } from "@/lib/conventions/queries";
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const ALLOWED_FORMATS = ["jpeg", "png", "webp"];
-const GUEST_ID_PATTERN = /^[a-zA-Z0-9-]{1,64}$/;
 
 interface RouteParams {
   params: Promise<{ eventId: string }>;
@@ -28,14 +27,6 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   }
 
   const formData = await request.formData();
-  const guestId = formData.get("guestId")?.toString() ?? "";
-  if (!GUEST_ID_PATTERN.test(guestId)) {
-    return NextResponse.json(
-      { error: "Invalid guest id" },
-      { status: 400 }
-    );
-  }
-
   const raw = formData.get("file");
   if (!raw || !(raw instanceof File)) {
     return NextResponse.json({ error: "No file provided" }, { status: 400 });
@@ -63,7 +54,13 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     );
   }
 
-  const storagePath = `events/${event.id}/guests/${guestId}.webp`;
+  // Generate the storage key server-side so a caller can't address
+  // an arbitrary path within this event's guests directory and
+  // overwrite a different guest's image. Each upload is a fresh
+  // key; the saveGuests action's orphan-cleanup pass deletes
+  // anything no longer referenced by the persisted guests array.
+  const uploadId = crypto.randomUUID();
+  const storagePath = `events/${event.id}/guests/${uploadId}.webp`;
   try {
     const processed = await processImage(buffer);
     await storage.upload(storagePath, processed.data, "image/webp");
