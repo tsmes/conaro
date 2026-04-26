@@ -66,7 +66,24 @@ export default async function EventLayout({
   const conventionLogoUrl = event.conventionLogoPath
     ? storage.getUrl(event.conventionLogoPath)
     : null;
-  const bannerUrl = event.bannerPath ? storage.getUrl(event.bannerPath) : null;
+  // Effective branding cascades event → convention → built-in.
+  // Each field is resolved independently, so an event can override
+  // (say) just the header colour while still inheriting the
+  // convention's banner.
+  const effectiveBannerPath =
+    event.bannerPath ?? event.conventionBannerPath ?? null;
+  const effectiveBannerMobilePath =
+    event.bannerMobilePath ??
+    event.conventionBannerMobilePath ??
+    effectiveBannerPath;
+  const effectiveHeaderColor =
+    event.headerColor ?? event.conventionHeaderColor ?? null;
+  const bannerUrl = effectiveBannerPath
+    ? storage.getUrl(effectiveBannerPath)
+    : null;
+  const bannerMobileUrl = effectiveBannerMobilePath
+    ? storage.getUrl(effectiveBannerMobilePath)
+    : null;
   const heroGradientClass = pickCoverGradient(event.conventionId);
 
   // Run every layout-side fetch in parallel. The accepted-artists
@@ -101,10 +118,10 @@ export default async function EventLayout({
           banner + narrow viewport mismatch otherwise cropped the
           photo to a vertical sliver. */}
       <section className="overflow-hidden text-white">
-        {bannerUrl && (
+        {bannerMobileUrl && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={bannerUrl}
+            src={bannerMobileUrl}
             alt=""
             aria-hidden
             className="block aspect-[16/9] w-full object-cover sm:aspect-[5/2] md:hidden"
@@ -120,14 +137,22 @@ export default async function EventLayout({
               className="absolute inset-0 hidden h-full w-full object-cover md:block"
             />
           )}
+          {/* Coloured backdrop. effectiveHeaderColor wins when set;
+              otherwise the convention-keyed gradient stands in.
+              When a desktop banner is uploaded, this layer is
+              hidden on md+ (the photo replaces it) but stays on
+              mobile to back the title block under the strip. */}
           <div
             className={cn(
               "absolute inset-0",
-              // On md+ the photo replaces the gradient; on mobile
-              // the gradient backs the title block below the strip.
               bannerUrl ? "md:hidden" : "",
-              heroGradientClass
+              effectiveHeaderColor ? "" : heroGradientClass
             )}
+            style={
+              effectiveHeaderColor
+                ? { backgroundColor: effectiveHeaderColor }
+                : undefined
+            }
             aria-hidden
           />
           <div
