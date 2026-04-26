@@ -10,8 +10,15 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { storage } from "@/lib/storage";
 import { cn } from "@/lib/utils";
+
+// Client-safe URL helper. The storage adapter lives server-side
+// (it imports fs/promises for the local backend), so we can't
+// import it from a client component without breaking the build.
+// Mirrors `LocalStorageAdapter#getUrl`.
+function uploadUrl(key: string): string {
+  return `/api/uploads/${key}`;
+}
 
 interface GuestsEditorProps {
   eventId: string;
@@ -343,7 +350,7 @@ function GuestImageField({
     }
   };
 
-  const previewUrl = imagePath ? storage.getUrl(imagePath) : null;
+  const previewUrl = imagePath ? uploadUrl(imagePath) : null;
 
   return (
     <div className="space-y-1.5">

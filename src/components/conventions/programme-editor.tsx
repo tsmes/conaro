@@ -144,11 +144,15 @@ export function ProgrammeEditor({
                     />
                   </Field>
                   <Field
-                    label="Start time"
+                    label="Start time (HH:mm)"
                     error={fieldError(index, "startTime")}
                   >
                     <Input
-                      type="time"
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="10:00"
+                      pattern="^([01][0-9]|2[0-3]):[0-5][0-9]$"
+                      maxLength={5}
                       value={item.startTime}
                       onChange={(e) =>
                         updateItem(index, { startTime: e.target.value })
@@ -156,11 +160,15 @@ export function ProgrammeEditor({
                     />
                   </Field>
                   <Field
-                    label="End time (optional)"
+                    label="End time (HH:mm, optional)"
                     error={fieldError(index, "endTime")}
                   >
                     <Input
-                      type="time"
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="11:00"
+                      pattern="^([01][0-9]|2[0-3]):[0-5][0-9]$"
+                      maxLength={5}
                       value={item.endTime ?? ""}
                       onChange={(e) =>
                         updateItem(index, {
