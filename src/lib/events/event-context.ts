@@ -220,6 +220,20 @@ export async function shouldShowMessagesTab(
   return Boolean(thread);
 }
 
+/** Helper for the layout's tabs nav: should the Programme tab be
+ *  shown? Visible whenever the event has any programme items. */
+export function shouldShowProgrammeTab(ctx: EventViewerContext): boolean {
+  const items = ctx.event.programme;
+  return Array.isArray(items) && items.length > 0;
+}
+
+/** Helper for the layout's tabs nav: should the Guests tab be
+ *  shown? Visible whenever the event has at least one guest. */
+export function shouldShowGuestsTab(ctx: EventViewerContext): boolean {
+  const guests = ctx.event.guests;
+  return Array.isArray(guests) && guests.length > 0;
+}
+
 /** Helper for the layout's tabs nav: should the Artists tab be
  *  shown? Once results are published and at least one artist has
  *  been accepted, the public gets a confirmed-artists gallery. */
