@@ -345,10 +345,17 @@ function ArtistInfoCard({ artist, onClose, onFocus }: ArtistInfoCardProps) {
 }
 
 function SocialChip({ label, url }: { label: string; url: string }) {
-  const isHttp = /^https?:\/\//i.test(url);
+  // Mirror the guest-card chip behaviour: honour mailto + http(s)
+  // schemes as-is, only prepend https:// for bare-domain inputs.
+  // Avoids the previous "prepend https:// onto mailto:" → broken
+  // mailto-https compound URL.
+  const trimmed = url.trim();
+  const safe = /^(https?:\/\/|mailto:)/i.test(trimmed)
+    ? trimmed
+    : `https://${trimmed}`;
   return (
     <a
-      href={isHttp ? url : `https://${url}`}
+      href={safe}
       target="_blank"
       rel="noreferrer"
       className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-2.5 py-1 text-[11.5px] font-semibold text-foreground transition hover:bg-muted"

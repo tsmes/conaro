@@ -26,6 +26,10 @@ interface GuestsEditorProps {
 }
 
 interface SocialDraft {
+  // Client-only stable key so React can track row identity across
+  // inserts/removes — index keys cause focus to jump to the wrong
+  // input when an earlier row is deleted.
+  _key: string;
   type: string;
   url: string;
 }
@@ -44,15 +48,19 @@ function newId(): string {
 }
 
 function toDraft(g: Guest): GuestDraft {
-  return { ...g, socialLinks: g.socialLinks ?? [] };
+  return {
+    ...g,
+    socialLinks: (g.socialLinks ?? []).map((s) => ({ ...s, _key: newId() })),
+  };
 }
 
 function toGuest(d: GuestDraft): Guest {
   // Drop empty social rows on serialise so the server doesn't see
-  // `{type: "Instagram", url: ""}` ghosts.
-  const cleaned = d.socialLinks.filter(
-    (s) => s.type.trim().length > 0 && s.url.trim().length > 0
-  );
+  // `{type: "Instagram", url: ""}` ghosts. Strip `_key` — it's a
+  // UI-only handle, not part of the persisted shape.
+  const cleaned = d.socialLinks
+    .filter((s) => s.type.trim().length > 0 && s.url.trim().length > 0)
+    .map(({ _key: _, ...rest }) => rest);
   return { ...d, socialLinks: cleaned.length > 0 ? cleaned : undefined };
 }
 
@@ -413,7 +421,8 @@ function SocialLinksField({ links, onChange }: SocialLinksFieldProps) {
     onChange(links.map((l, i) => (i === idx ? { ...l, ...patch } : l)));
   const remove = (idx: number) =>
     onChange(links.filter((_, i) => i !== idx));
-  const add = () => onChange([...links, { type: "Instagram", url: "" }]);
+  const add = () =>
+    onChange([...links, { _key: newId(), type: "Instagram", url: "" }]);
 
   return (
     <div className="space-y-1.5">
@@ -422,7 +431,7 @@ function SocialLinksField({ links, onChange }: SocialLinksFieldProps) {
       </Label>
       <div className="space-y-2">
         {links.map((link, idx) => (
-          <div key={idx} className="flex items-center gap-2">
+          <div key={link._key} className="flex items-center gap-2">
             <Input
               type="text"
               value={link.type}

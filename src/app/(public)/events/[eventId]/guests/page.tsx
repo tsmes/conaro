@@ -77,9 +77,12 @@ function GuestCard({ guest }: { guest: Guest }) {
           aria-hidden
           className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-black/55 to-transparent"
         />
+        {/* Backdrop-blur + soft border keeps the badge legible on
+            both bright and dark portraits — bare bg-white/90
+            disappears against light photos. */}
         <Badge
           variant="default"
-          className="absolute left-3 top-3 bg-white/90 text-foreground"
+          className="absolute left-3 top-3 border border-black/10 bg-white/85 text-foreground backdrop-blur-sm dark:border-white/15 dark:bg-card/85 dark:text-foreground"
         >
           {title}
         </Badge>
@@ -122,10 +125,17 @@ function GuestCard({ guest }: { guest: Guest }) {
 }
 
 function SocialChip({ label, url }: { label: string; url: string }) {
-  const isHttp = /^https?:\/\//i.test(url);
+  // Zod now rejects URLs that aren't http(s)/mailto, so anything
+  // that lands here is one of those three. Honour the scheme as-is
+  // — the previous "prepend https://" fallback turned mailto into
+  // "https://mailto:…" (broken) and could have prefixed surprises.
+  const trimmed = url.trim();
+  const safe = /^(https?:\/\/|mailto:)/i.test(trimmed)
+    ? trimmed
+    : `https://${trimmed}`;
   return (
     <a
-      href={isHttp ? url : `https://${url}`}
+      href={safe}
       target="_blank"
       rel="noreferrer"
       className="inline-flex items-center gap-1 rounded-full border border-border bg-card px-2.5 py-1 text-[11.5px] font-semibold text-foreground transition hover:bg-muted"

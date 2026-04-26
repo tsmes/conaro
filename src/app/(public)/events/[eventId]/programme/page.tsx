@@ -59,11 +59,20 @@ export default async function ProgrammePage({ params }: ProgrammePageProps) {
               {formatDateNo(day.date)}
             </p>
             <div className="font-heading text-[16px] font-extrabold">
-              {new Date(`${day.date}T00:00:00`).toLocaleDateString(undefined, {
-                weekday: "long",
-                month: "long",
-                day: "numeric",
-              })}
+              {/* Parse with explicit Z + format with timeZone:"UTC"
+                  so the weekday is deterministic regardless of the
+                  server's container timezone. Otherwise a server
+                  in EST and one in JST disagree on what
+                  "2026-07-15T00:00:00" means. */}
+              {new Date(`${day.date}T00:00:00Z`).toLocaleDateString(
+                "en-US",
+                {
+                  weekday: "long",
+                  month: "long",
+                  day: "numeric",
+                  timeZone: "UTC",
+                }
+              )}
             </div>
           </div>
           <ul className="divide-y divide-border">
