@@ -136,16 +136,24 @@ export interface AcceptedArtistForPlanner {
   applicationId: string;
   displayName: string;
   requestedTableSizeOptionId: string | null;
+  /** Storage key (not URL) of the top-ranked portfolio image, or
+   *  null if the artist has no portfolio. The Artists tab uses this
+   *  for the card cover; the planner dialog and the marquee ignore
+   *  it. Pulling it here avoids an extra round-trip on the artist
+   *  list page. */
+  coverImagePath: string | null;
 }
 
 // Every accepted artist on the event, shaped for the assign-artist
-// dialog. Ordered by displayName so the list is stable between renders.
+// dialog and the public Artists tab. Ordered by displayName so the
+// list is stable between renders.
 export async function getAcceptedArtistsForEvent(
   eventId: string
 ): Promise<AcceptedArtistForPlanner[]> {
   const rows = await db
     .select({
       applicationId: applications.id,
+      profileId: applications.profileId,
       displayName: profiles.displayName,
       answers: applications.answers,
     })
@@ -158,6 +166,40 @@ export async function getAcceptedArtistsForEvent(
       )
     );
 
+  // Pull every portfolio image for the matched profiles in one
+  // round-trip and pick the highest-ranked one per profile in JS.
+  // Same section-priority rule as the floor-plan info card.
+  const profileIds = rows.map((r) => r.profileId);
+  const coverByProfile = new Map<string, string>();
+  if (profileIds.length > 0) {
+    const imageRows = await db
+      .select({
+        profileId: portfolioImages.profileId,
+        storagePath: portfolioImages.storagePath,
+        section: portfolioImages.section,
+        sortOrder: portfolioImages.sortOrder,
+      })
+      .from(portfolioImages)
+      .where(inArray(portfolioImages.profileId, profileIds));
+
+    const sectionRank: Record<string, number> = {
+      promo: 0,
+      product: 1,
+      previous_stand: 2,
+    };
+    const sortedByPriority = imageRows.slice().sort((a, b) => {
+      const ra = sectionRank[a.section] ?? 9;
+      const rb = sectionRank[b.section] ?? 9;
+      if (ra !== rb) return ra - rb;
+      return a.sortOrder - b.sortOrder;
+    });
+    for (const img of sortedByPriority) {
+      if (!coverByProfile.has(img.profileId)) {
+        coverByProfile.set(img.profileId, img.storagePath);
+      }
+    }
+  }
+
   return rows
     .map((r) => ({
       applicationId: r.applicationId,
@@ -165,6 +207,7 @@ export async function getAcceptedArtistsForEvent(
       requestedTableSizeOptionId:
         (r.answers as { tableSizeOptionId?: string } | null)
           ?.tableSizeOptionId ?? null,
+      coverImagePath: coverByProfile.get(r.profileId) ?? null,
     }))
     .sort((a, b) => a.displayName.localeCompare(b.displayName));
 }

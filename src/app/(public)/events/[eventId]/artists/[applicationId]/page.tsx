@@ -146,6 +146,12 @@ export default async function ArtistDetailPage({
   const fallbackGradient = pickCoverGradient(artist.applicationId);
   const initials = initialsFor(artist.displayName);
   const hasLinks = Boolean(artist.websiteUrl) || artist.socialLinks.length > 0;
+  // Use the top-ranked portfolio image as the hero on the left;
+  // fall back to the gradient + initials when the artist hasn't
+  // uploaded a portfolio yet. The grid below the card then renders
+  // the rest, so the same image isn't shown twice.
+  const heroImage = artist.images[0] ?? null;
+  const galleryImages = heroImage ? artist.images.slice(1) : artist.images;
 
   return (
     <div className="space-y-6">
@@ -161,14 +167,25 @@ export default async function ArtistDetailPage({
           <div
             className={cn(
               "relative aspect-[4/5] overflow-hidden md:aspect-auto md:h-full md:min-h-[420px]",
-              fallbackGradient
+              heroImage ? "bg-muted" : fallbackGradient
             )}
           >
-            <div className="absolute inset-0 grid place-items-center">
-              <span className="font-heading text-[88px] font-extrabold tracking-tight text-white opacity-90">
-                {initials}
-              </span>
-            </div>
+            {heroImage ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={heroImage.url}
+                alt={
+                  heroImage.caption ?? `${artist.displayName} portfolio cover`
+                }
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+            ) : (
+              <div className="absolute inset-0 grid place-items-center">
+                <span className="font-heading text-[88px] font-extrabold tracking-tight text-white opacity-90">
+                  {initials}
+                </span>
+              </div>
+            )}
             {standLabel && (
               <Badge
                 variant="default"
@@ -212,13 +229,13 @@ export default async function ArtistDetailPage({
         </div>
       </Card>
 
-      {artist.images.length > 0 && (
+      {galleryImages.length > 0 && (
         <section className="space-y-3">
           <h2 className="font-heading text-[18px] font-extrabold tracking-tight">
             Portfolio
           </h2>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-            {artist.images.map((img) => (
+            {galleryImages.map((img) => (
               <a
                 key={img.id}
                 href={img.url}

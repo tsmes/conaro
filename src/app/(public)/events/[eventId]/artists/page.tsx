@@ -8,6 +8,7 @@ import {
 import { getAcceptedArtistsForEvent } from "@/lib/floor-plans/queries";
 import { Card } from "@/components/ui/card";
 import { pickCoverGradient } from "@/lib/landing/cover-gradient";
+import { storage } from "@/lib/storage";
 import { cn } from "@/lib/utils";
 
 interface ArtistsPageProps {
@@ -72,6 +73,9 @@ export default async function ArtistsPage({ params }: ArtistsPageProps) {
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
         {sorted.map((a) => {
           const stand = standByApplication.get(a.applicationId);
+          const coverUrl = a.coverImagePath
+            ? storage.getUrl(a.coverImagePath)
+            : null;
           const coverClass = pickCoverGradient(a.applicationId);
           return (
             <Link
@@ -83,12 +87,34 @@ export default async function ArtistsPage({ params }: ArtistsPageProps) {
                 <div
                   className={cn(
                     "relative aspect-square overflow-hidden rounded-[10px]",
-                    coverClass
+                    // Gradient is only the fallback when no portfolio
+                    // image exists. With one, it sits behind the
+                    // image (briefly visible while it loads).
+                    coverUrl ? "bg-muted" : coverClass
                   )}
                 >
-                  <div className="absolute bottom-2 left-2 font-heading text-[28px] font-extrabold leading-none tracking-tight text-white">
-                    {initialsFor(a.displayName)}
-                  </div>
+                  {coverUrl ? (
+                    <>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={coverUrl}
+                        alt={`${a.displayName} portfolio cover`}
+                        loading="lazy"
+                        className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                      />
+                      <div
+                        aria-hidden
+                        className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-black/55 to-transparent"
+                      />
+                      <div className="absolute bottom-2 left-2 font-heading text-[28px] font-extrabold leading-none tracking-tight text-white drop-shadow">
+                        {initialsFor(a.displayName)}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="absolute bottom-2 left-2 font-heading text-[28px] font-extrabold leading-none tracking-tight text-white">
+                      {initialsFor(a.displayName)}
+                    </div>
+                  )}
                 </div>
                 <div className="mt-3">
                   <div className="font-heading text-[14px] font-extrabold leading-tight">
