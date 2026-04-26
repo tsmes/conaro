@@ -13,6 +13,13 @@ export const conventions = pgTable("conventions", {
   description: text("description"),
   websiteUrl: text("website_url"),
   logoPath: text("logo_path"),
+  // Branding overrides inherited by every event of the convention.
+  // Null means "use the built-in default" (random gradient + no
+  // banner). Events can override either field individually.
+  // headerColor stores #rrggbb.
+  headerColor: text("header_color"),
+  bannerPath: text("banner_path"),
+  bannerMobilePath: text("banner_mobile_path"),
   guidelines: text("guidelines"),
   acceptanceMessage: text("acceptance_message"),
   rejectionMessage: text("rejection_message"),

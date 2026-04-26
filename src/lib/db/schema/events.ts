@@ -133,10 +133,16 @@ export const events = pgTable(
       .references(() => conventions.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
     description: text("description"),
-    // Storage key (not URL) for the optional hero banner shown on
-    // the public event page. When null the hero falls back to the
-    // convention-keyed gradient.
+    // Storage keys (not URLs) for the optional hero banner shown
+    // on the public event page. When null on both, the hero falls
+    // back to the convention's banner (if any) and then to the
+    // built-in gradient. bannerMobilePath is shown in the mobile
+    // top-strip; falls back to bannerPath when null. headerColor
+    // (#rrggbb) replaces the auto-picked gradient when set; same
+    // event → convention → built-in fallback chain.
     bannerPath: text("banner_path"),
+    bannerMobilePath: text("banner_mobile_path"),
+    headerColor: text("header_color"),
     status: eventStatusEnum("status").notNull().default("draft"),
     eventStartDate: date("event_start_date", { mode: "string" }).notNull(),
     eventEndDate: date("event_end_date", { mode: "string" }),
