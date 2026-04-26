@@ -14,7 +14,7 @@ Spec: `.claude/plans/programme-and-guests-spec.md`
 
 ## Tasks
 
-### 1. Schema columns + event-context plumbing
+### 1. ✅ Schema columns + event-context plumbing
 Adds the two JSONB columns to `events`, generates the migration, threads the new fields through the shared event-viewer context loader.
 
 **Requirements:** REQ-P1, REQ-G1 (foundation)
@@ -39,7 +39,7 @@ Adds the two JSONB columns to `events`, generates the migration, threads the new
 
 ---
 
-### 2. Tab-gating helpers in `event-context.ts`
+### 2. ✅ Tab-gating helpers in `event-context.ts`
 Adds `shouldShowProgrammeTab(ctx)` and `shouldShowGuestsTab(ctx)` so the layout can decide which tabs to render.
 
 **Requirements:** REQ-P3, REQ-G4 (foundation)
@@ -53,7 +53,7 @@ Adds `shouldShowProgrammeTab(ctx)` and `shouldShowGuestsTab(ctx)` so the layout 
 
 ---
 
-### 3. Public Programme tab
+### 3. ✅ Public Programme tab
 New routed page `/events/[eventId]/programme` that groups items by date, sorts by startTime, renders the design hand-off's table-style schedule. Adds the tab to `ArtistEventTabsNav`.
 
 **Requirements:** REQ-P3, REQ-P4, REQ-P6
@@ -75,7 +75,7 @@ New routed page `/events/[eventId]/programme` that groups items by date, sorts b
 
 ---
 
-### 4. Public Guests tab
+### 4. ✅ Public Guests tab
 New routed page `/events/[eventId]/guests` rendering each guest as a card. Adds the tab to `ArtistEventTabsNav`.
 
 **Requirements:** REQ-G4, REQ-G5, REQ-G6
@@ -97,7 +97,7 @@ New routed page `/events/[eventId]/guests` rendering each guest as a card. Adds 
 
 ---
 
-### 5. Programme save action + Zod validation
+### 5. ✅ Programme save action + Zod validation
 Server action `saveProgramme(prev, formData)` validates and writes the full array.
 
 **Requirements:** REQ-P1, REQ-P2, REQ-P5
@@ -123,7 +123,7 @@ Server action `saveProgramme(prev, formData)` validates and writes the full arra
 
 ---
 
-### 6. Programme organizer editor
+### 6. ✅ Programme organizer editor
 Client editor that adds / edits / deletes / reorders items and saves via the action. Adds the tab to `EventTabsNav` and the routed page.
 
 **Requirements:** REQ-P2
@@ -144,7 +144,7 @@ Client editor that adds / edits / deletes / reorders items and saves via the act
 
 ---
 
-### 7. Guest image upload route
+### 7. ✅ Guest image upload route
 REST endpoint that accepts a multipart upload and returns a storage key. Mirrors the convention-logo route.
 
 **Requirements:** REQ-G3 (foundation)
@@ -163,7 +163,7 @@ REST endpoint that accepts a multipart upload and returns a storage key. Mirrors
 
 ---
 
-### 8. Guests save action + Zod validation
+### 8. ✅ Guests save action + Zod validation
 Mirrors task 5 for guests, plus the orphan-image cleanup.
 
 **Requirements:** REQ-G1, REQ-G2, REQ-G3 (deletion side)
@@ -182,7 +182,7 @@ Mirrors task 5 for guests, plus the orphan-image cleanup.
 
 ---
 
-### 9. Guests organizer editor
+### 9. ✅ Guests organizer editor
 Client editor with a per-guest image-upload widget and inline social-link rows. Adds the tab to `EventTabsNav` and the routed page.
 
 **Requirements:** REQ-G2, REQ-G3 (UX side)
