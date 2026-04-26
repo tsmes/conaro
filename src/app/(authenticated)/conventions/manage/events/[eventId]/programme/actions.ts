@@ -1,6 +1,6 @@
 "use server";
 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 import { auth } from "@/lib/auth";
@@ -103,7 +103,14 @@ export async function saveProgramme(
     await db
       .update(events)
       .set({ programme: next, updatedAt: new Date() })
-      .where(eq(events.id, event.id));
+      // Re-assert convention ownership in the WHERE for
+      // defence-in-depth — same pattern the floor-plan actions use.
+      .where(
+        and(
+          eq(events.id, event.id),
+          eq(events.conventionId, event.conventionId)
+        )
+      );
   } catch {
     return { error: "Failed to save programme. Please try again." };
   }

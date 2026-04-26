@@ -1,6 +1,6 @@
 "use server";
 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 import { auth } from "@/lib/auth";
@@ -51,8 +51,12 @@ function revalidateAll(eventId: string, conventionId: string): void {
 
 // Only delete storage keys we know belong to this event's guests
 // directory — defensive guard so a malicious payload can't wipe
-// unrelated files via the orphan-cleanup path.
+// unrelated files via the orphan-cleanup path. Also rejects any
+// path containing ".." so a key like "events/<id>/guests/../../x"
+// can't escape the sandbox if the storage adapter doesn't already
+// normalise.
 function isEventGuestImagePath(eventId: string, path: string): boolean {
+  if (path.includes("..")) return false;
   return path.startsWith(`events/${eventId}/guests/`);
 }
 
@@ -106,16 +110,25 @@ export async function saveGuests(
     await db
       .update(events)
       .set({ guests: next, updatedAt: new Date() })
-      .where(eq(events.id, event.id));
+      // Re-assert convention ownership in the WHERE for
+      // defence-in-depth — same pattern the floor-plan actions use.
+      .where(
+        and(
+          eq(events.id, event.id),
+          eq(events.conventionId, event.conventionId)
+        )
+      );
   } catch {
     return { error: "Failed to save guests. Please try again." };
   }
 
   // Best-effort cleanup; errors are not surfaced because the DB
   // write has already succeeded and a stale storage key is benign.
-  for (const path of orphans) {
-    await storage.delete(path).catch(() => {});
-  }
+  // Run deletes in parallel so a long list of orphans doesn't
+  // gate the response on N sequential round-trips.
+  await Promise.all(
+    orphans.map((path) => storage.delete(path).catch(() => {}))
+  );
 
   revalidateAll(event.id, event.conventionId);
   return { success: true };
