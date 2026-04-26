@@ -15,8 +15,10 @@ import {
 } from "@/app/(authenticated)/conventions/manage/events/actions";
 import { EventForm } from "@/components/conventions/event-form";
 import { EventStatusControls } from "@/components/conventions/event-status-controls";
+import { EventBannerUpload } from "@/components/conventions/event-banner-upload";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { storage } from "@/lib/storage";
 
 interface EventDetailPageProps {
   params: Promise<{ eventId: string }>;
@@ -64,6 +66,27 @@ export default async function EventDetailPage({
                 Field configuration
               </Link>
             }
+          />
+        </div>
+      </Card>
+
+      <Card className="p-6 md:p-8">
+        <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
+          Banner
+        </p>
+        <h2 className="mt-2 font-heading text-xl font-bold tracking-tight">
+          Hero banner
+        </h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Optional — replaces the gradient on the public event page.
+        </p>
+        <div className="mt-6">
+          <EventBannerUpload
+            eventId={event.id}
+            currentBannerUrl={
+              event.bannerPath ? storage.getUrl(event.bannerPath) : null
+            }
+            eventName={event.name}
           />
         </div>
       </Card>

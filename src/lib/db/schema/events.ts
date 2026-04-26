@@ -133,6 +133,10 @@ export const events = pgTable(
       .references(() => conventions.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
     description: text("description"),
+    // Storage key (not URL) for the optional hero banner shown on
+    // the public event page. When null the hero falls back to the
+    // convention-keyed gradient.
+    bannerPath: text("banner_path"),
     status: eventStatusEnum("status").notNull().default("draft"),
     eventStartDate: date("event_start_date", { mode: "string" }).notNull(),
     eventEndDate: date("event_end_date", { mode: "string" }),

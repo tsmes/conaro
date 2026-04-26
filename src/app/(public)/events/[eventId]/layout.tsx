@@ -66,6 +66,7 @@ export default async function EventLayout({
   const conventionLogoUrl = event.conventionLogoPath
     ? storage.getUrl(event.conventionLogoPath)
     : null;
+  const bannerUrl = event.bannerPath ? storage.getUrl(event.bannerPath) : null;
   const heroGradientClass = pickCoverGradient(event.conventionId);
 
   // Run every layout-side fetch in parallel. The accepted-artists
@@ -92,21 +93,45 @@ export default async function EventLayout({
 
   return (
     <div>
-      {/* Full-bleed hero. The conv. gradient sets the mood; a soft
-          dark overlay keeps white text legible on warm covers. */}
+      {/* Full-bleed hero. With a banner uploaded, the photo is the
+          background and the gradient is hidden; the dark overlay
+          gets stronger so white text stays legible on busy images.
+          Without a banner the conv. gradient sets the mood. */}
       <section className="relative overflow-hidden text-white">
-        <div
-          className={cn("absolute inset-0", heroGradientClass)}
-          aria-hidden
-        />
-        <div
-          className="absolute inset-0"
-          aria-hidden
-          style={{
-            background:
-              "radial-gradient(120% 80% at 80% 20%, rgba(255,255,255,.18), transparent 60%), linear-gradient(to bottom, rgba(0,0,0,0) 30%, rgba(0,0,0,.45) 100%)",
-          }}
-        />
+        {bannerUrl ? (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={bannerUrl}
+              alt=""
+              aria-hidden
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+            <div
+              className="absolute inset-0"
+              aria-hidden
+              style={{
+                background:
+                  "linear-gradient(to bottom, rgba(0,0,0,.30) 0%, rgba(0,0,0,.55) 100%)",
+              }}
+            />
+          </>
+        ) : (
+          <>
+            <div
+              className={cn("absolute inset-0", heroGradientClass)}
+              aria-hidden
+            />
+            <div
+              className="absolute inset-0"
+              aria-hidden
+              style={{
+                background:
+                  "radial-gradient(120% 80% at 80% 20%, rgba(255,255,255,.18), transparent 60%), linear-gradient(to bottom, rgba(0,0,0,0) 30%, rgba(0,0,0,.45) 100%)",
+              }}
+            />
+          </>
+        )}
         <div className="relative mx-auto max-w-[1240px] px-4 py-10 sm:px-6 sm:py-14 md:py-16">
           {/* Breadcrumb / back */}
           <nav

@@ -46,6 +46,7 @@ async function loadEventRow(eventId: string) {
       id: events.id,
       name: events.name,
       description: events.description,
+      bannerPath: events.bannerPath,
       status: events.status,
       eventStartDate: events.eventStartDate,
       eventEndDate: events.eventEndDate,
