@@ -11,8 +11,10 @@ import {
   getEventViewerContext,
   shouldShowArtistsTab,
   shouldShowFloorPlanTab,
+  shouldShowGuestsTab,
   shouldShowMessagesTab,
   shouldShowPracticalTab,
+  shouldShowProgrammeTab,
 } from "@/lib/events/event-context";
 import { getAcceptedArtistsForEvent } from "@/lib/floor-plans/queries";
 import { pickCoverGradient } from "@/lib/landing/cover-gradient";
@@ -79,6 +81,10 @@ export default async function EventLayout({
         : Promise.resolve([]),
     ]);
   const showPractical = shouldShowPracticalTab(ctx);
+  const showProgramme = shouldShowProgrammeTab(ctx);
+  const showGuests = shouldShowGuestsTab(ctx);
+  const programmeCount = ctx.event.programme?.length;
+  const guestsCount = ctx.event.guests?.length;
 
   const venueLine = [event.venueCity, event.venueCountry]
     .filter(Boolean)
@@ -259,7 +265,11 @@ export default async function EventLayout({
             showMessages={showMessages}
             showArtists={showArtists}
             showPractical={showPractical}
+            showProgramme={showProgramme}
+            showGuests={showGuests}
             artistsCount={acceptedArtists.length}
+            programmeCount={programmeCount}
+            guestsCount={guestsCount}
           />
         </div>
       </div>

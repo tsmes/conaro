@@ -10,7 +10,11 @@ interface ArtistEventTabsNavProps {
   showMessages: boolean;
   showArtists?: boolean;
   showPractical?: boolean;
+  showProgramme?: boolean;
+  showGuests?: boolean;
   artistsCount?: number;
+  programmeCount?: number;
+  guestsCount?: number;
 }
 
 interface Tab {
@@ -26,7 +30,11 @@ export function ArtistEventTabsNav({
   showMessages,
   showArtists = false,
   showPractical = false,
+  showProgramme = false,
+  showGuests = false,
   artistsCount,
+  programmeCount,
+  guestsCount,
 }: ArtistEventTabsNavProps) {
   const pathname = usePathname();
   const base = `/events/${eventId}`;
@@ -44,6 +52,22 @@ export function ArtistEventTabsNav({
       matchPath: (p) => p === base,
     },
   ];
+  if (showProgramme) {
+    tabs.push({
+      href: `${base}/programme`,
+      label: "Programme",
+      count: programmeCount,
+      matchPath: (p) => p === `${base}/programme`,
+    });
+  }
+  if (showGuests) {
+    tabs.push({
+      href: `${base}/guests`,
+      label: "Guests",
+      count: guestsCount,
+      matchPath: (p) => p === `${base}/guests`,
+    });
+  }
   if (showArtists) {
     tabs.push({
       href: `${base}/artists`,
