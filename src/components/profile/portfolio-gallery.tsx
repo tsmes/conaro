@@ -262,7 +262,12 @@ export function PortfolioGallery({
       )}
 
       {images.length > 0 && (
+        // Explicit id so dnd-kit's internal useUniqueId doesn't
+        // produce a different "DndDescribedBy-N" between server and
+        // client renders when multiple PortfolioGallery instances
+        // mount on the same page (one per section).
         <DndContext
+          id={`portfolio-${section}`}
           sensors={sensors}
           collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}
