@@ -7,8 +7,13 @@ import { processImage } from "@/lib/storage/image";
 import { getOrganizerEvent } from "@/lib/conventions/queries";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
-const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
-const ALLOWED_FORMATS = ["jpeg", "png", "webp"];
+const ALLOWED_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/avif",
+];
+const ALLOWED_FORMATS = ["jpeg", "png", "webp", "avif", "heif"];
 
 interface RouteParams {
   params: Promise<{ eventId: string }>;
@@ -34,7 +39,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
   if (!ALLOWED_TYPES.includes(raw.type)) {
     return NextResponse.json(
-      { error: "Invalid file type. Accepted: JPEG, PNG, WebP" },
+      { error: "Invalid file type. Accepted: JPEG, PNG, WebP, AVIF" },
       { status: 400 }
     );
   }

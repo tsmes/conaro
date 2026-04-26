@@ -3,7 +3,12 @@
 import { useCallback, useRef, useState } from "react";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
-const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const ALLOWED_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/avif",
+];
 
 interface ImageUploadZoneProps {
   disabled: boolean;
@@ -21,7 +26,7 @@ export function ImageUploadZone({ disabled, onUpload }: ImageUploadZoneProps) {
       setError(null);
 
       if (!ALLOWED_TYPES.includes(file.type)) {
-        setError("Invalid file type. Accepted: JPEG, PNG, WebP");
+        setError("Invalid file type. Accepted: JPEG, PNG, WebP, AVIF");
         return;
       }
 
@@ -97,7 +102,7 @@ export function ImageUploadZone({ disabled, onUpload }: ImageUploadZoneProps) {
         <input
           ref={inputRef}
           type="file"
-          accept="image/jpeg,image/png,image/webp"
+          accept="image/jpeg,image/png,image/webp,image/avif"
           onChange={handleFileSelect}
           className="hidden"
           disabled={disabled || uploading}
@@ -114,7 +119,7 @@ export function ImageUploadZone({ disabled, onUpload }: ImageUploadZoneProps) {
               Drop an image here or click to browse
             </p>
             <p className="mt-1 text-xs text-muted-foreground">
-              JPEG, PNG, or WebP up to 10 MB
+              JPEG, PNG, WebP, or AVIF up to 10 MB
             </p>
           </>
         )}

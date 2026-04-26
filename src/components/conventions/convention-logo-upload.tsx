@@ -4,7 +4,12 @@ import { useCallback, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
-const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const ALLOWED_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/avif",
+];
 
 interface ConventionLogoUploadProps {
   currentLogoUrl: string | null;
@@ -24,7 +29,7 @@ export function ConventionLogoUpload({
     setError(null);
 
     if (!ALLOWED_TYPES.includes(file.type)) {
-      setError("Invalid file type. Accepted: JPEG, PNG, WebP");
+      setError("Invalid file type. Accepted: JPEG, PNG, WebP, AVIF");
       return;
     }
 
@@ -82,7 +87,7 @@ export function ConventionLogoUpload({
       <input
         ref={inputRef}
         type="file"
-        accept="image/jpeg,image/png,image/webp"
+        accept="image/jpeg,image/png,image/webp,image/avif"
         onChange={handleFileSelect}
         className="hidden"
         disabled={uploading}
@@ -102,7 +107,7 @@ export function ConventionLogoUpload({
       </Button>
 
       <p className="text-xs text-muted-foreground">
-        JPEG, PNG, or WebP. Max 5 MB.
+        JPEG, PNG, WebP, or AVIF. Max 5 MB.
       </p>
 
       {error && (

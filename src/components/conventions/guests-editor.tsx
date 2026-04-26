@@ -378,7 +378,7 @@ function GuestImageField({
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/jpeg,image/png,image/webp"
+        accept="image/jpeg,image/png,image/webp,image/avif"
         className="hidden"
         onChange={(e) => handleFile(e.target.files?.[0])}
       />

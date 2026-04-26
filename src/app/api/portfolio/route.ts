@@ -13,8 +13,16 @@ import { processImage } from "@/lib/storage/image";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
 const MAX_IMAGES = 20;
-const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
-const ALLOWED_FORMATS = ["jpeg", "png", "webp"];
+const ALLOWED_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/avif",
+];
+// sharp's metadata().format reports "heif" for AVIF files on some
+// versions (AVIF is a HEIF variant). Whitelist both so we don't
+// reject valid AVIF uploads.
+const ALLOWED_FORMATS = ["jpeg", "png", "webp", "avif", "heif"];
 const VALID_SECTIONS = portfolioSectionEnum.enumValues as readonly PortfolioSection[];
 
 function parseSection(value: FormDataEntryValue | null): PortfolioSection {
@@ -42,7 +50,7 @@ export async function POST(request: NextRequest) {
 
   if (!ALLOWED_TYPES.includes(raw.type)) {
     return NextResponse.json(
-      { error: "Invalid file type. Accepted: JPEG, PNG, WebP" },
+      { error: "Invalid file type. Accepted: JPEG, PNG, WebP, AVIF" },
       { status: 400 }
     );
   }
