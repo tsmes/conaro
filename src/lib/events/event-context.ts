@@ -70,6 +70,8 @@ async function loadEventRow(eventId: string) {
       assistantFeeNok: events.assistantFeeNok,
       floorPlanPublishedAt: events.floorPlanPublishedAt,
       floorPlanAutoPublishDaysBefore: events.floorPlanAutoPublishDaysBefore,
+      programme: events.programme,
+      guests: events.guests,
       conventionId: events.conventionId,
       conventionName: conventions.name,
       conventionLogoPath: conventions.logoPath,

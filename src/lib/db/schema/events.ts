@@ -92,6 +92,36 @@ export interface FloorPlan {
   labels?: FloorPlanLabel[];
 }
 
+// Programme schedule. Stored as a flat array; the public tab groups
+// items by date and sorts by startTime in JS. Times are HH:mm
+// (24-hour). Date is YYYY-MM-DD and must fall within the event's
+// start/end range — enforced at save time.
+export interface ProgrammeItem {
+  id: string;
+  date: string;
+  startTime: string;
+  endTime?: string;
+  title: string;
+  room?: string;
+  speaker?: string;
+}
+
+// Featured guest. Title is free text (e.g. "Guest of honour",
+// "Workshop host") so organizers can phrase the role themselves;
+// the v1 grid doesn't carry a separate spotlight flag. imagePath is
+// the storage key returned by the upload route, not a URL.
+export interface Guest {
+  id: string;
+  name: string;
+  title: string;
+  role?: string;
+  pronouns?: string;
+  bio?: string;
+  imagePath?: string;
+  websiteUrl?: string;
+  socialLinks?: { type: string; url: string }[];
+}
+
 export const events = pgTable(
   "events",
   {
@@ -137,6 +167,8 @@ export const events = pgTable(
     floorPlanAutoPublishDaysBefore: integer(
       "floor_plan_auto_publish_days_before"
     ),
+    programme: jsonb("programme").$type<ProgrammeItem[]>(),
+    guests: jsonb("guests").$type<Guest[]>(),
     createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
   },
