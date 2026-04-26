@@ -16,6 +16,7 @@ import {
 import { EventForm } from "@/components/conventions/event-form";
 import { EventStatusControls } from "@/components/conventions/event-status-controls";
 import { BannerUpload } from "@/components/conventions/banner-upload";
+import { HeaderColorPicker } from "@/components/conventions/header-color-picker";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { storage } from "@/lib/storage";
@@ -72,15 +73,33 @@ export default async function EventDetailPage({
 
       <Card className="p-6 md:p-8">
         <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
-          Banner
+          Branding
         </p>
         <h2 className="mt-2 font-heading text-xl font-bold tracking-tight">
-          Hero banner
+          Header & banner
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">
           Optional — overrides the convention default on the public event page.
         </p>
-        <div className="mt-6 grid gap-6 md:grid-cols-2">
+
+        <div className="mt-6">
+          <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
+            Header colour
+          </p>
+          <p className="mt-1 text-[12.5px] text-muted-foreground">
+            Replaces the auto-picked gradient on the event hero. Leave clear
+            to inherit the convention default.
+          </p>
+          <div className="mt-3">
+            <HeaderColorPicker
+              endpoint={`/api/events/${event.id}/header-color`}
+              initialColor={event.headerColor}
+              label="Event header colour"
+            />
+          </div>
+        </div>
+
+        <div className="mt-8 grid gap-6 md:grid-cols-2">
           <div>
             <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
               Desktop
