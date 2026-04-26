@@ -108,6 +108,49 @@ describe("saveProgramme", () => {
     expect(row.programme).toBeNull();
   });
 
+  it("rejects calendar-invalid dates like 2026-13-99", async () => {
+    const event = await setupAuthorized();
+    const result = await saveProgramme(
+      {},
+      buildFormData({
+        eventId: event.id,
+        programme: JSON.stringify([
+          { ...VALID_ITEM, date: "2026-13-99" },
+        ]),
+      })
+    );
+    expect(result.fieldErrors?.["0.date"]).toBeDefined();
+  });
+
+  it("normalises empty optional fields to undefined", async () => {
+    const event = await setupAuthorized();
+    await saveProgramme(
+      {},
+      buildFormData({
+        eventId: event.id,
+        programme: JSON.stringify([
+          {
+            id: "p1",
+            date: "2026-07-15",
+            startTime: "10:00",
+            title: "Welcome",
+            endTime: "",
+            room: "",
+            speaker: "",
+          },
+        ]),
+      })
+    );
+    const [row] = await db
+      .select({ programme: events.programme })
+      .from(events)
+      .where(eq(events.id, event.id));
+    const stored = row.programme?.[0];
+    expect(stored?.endTime).toBeUndefined();
+    expect(stored?.room).toBeUndefined();
+    expect(stored?.speaker).toBeUndefined();
+  });
+
   it("rejects items with bad time format", async () => {
     const event = await setupAuthorized();
     const result = await saveProgramme(

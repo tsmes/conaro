@@ -107,6 +107,55 @@ describe("saveGuests", () => {
     expect(row.guests).toBeNull();
   });
 
+  it("normalises empty optional fields to undefined", async () => {
+    const event = await setupAuthorized();
+    await saveGuests(
+      {},
+      buildFormData({
+        eventId: event.id,
+        guests: JSON.stringify([
+          {
+            ...VALID_GUEST,
+            role: "",
+            pronouns: "",
+            bio: "",
+            imagePath: "",
+            websiteUrl: "",
+          },
+        ]),
+      })
+    );
+    const [row] = await db
+      .select({ guests: events.guests })
+      .from(events)
+      .where(eq(events.id, event.id));
+    const stored = row.guests?.[0];
+    expect(stored?.role).toBeUndefined();
+    expect(stored?.pronouns).toBeUndefined();
+    expect(stored?.bio).toBeUndefined();
+    expect(stored?.imagePath).toBeUndefined();
+    expect(stored?.websiteUrl).toBeUndefined();
+  });
+
+  it("rejects social links with non-http/mailto schemes", async () => {
+    const event = await setupAuthorized();
+    const result = await saveGuests(
+      {},
+      buildFormData({
+        eventId: event.id,
+        guests: JSON.stringify([
+          {
+            ...VALID_GUEST,
+            socialLinks: [
+              { type: "Sneaky", url: "javascript:alert(1)" },
+            ],
+          },
+        ]),
+      })
+    );
+    expect(result.fieldErrors?.["0.socialLinks.0.url"]).toBeDefined();
+  });
+
   it("rejects guests with empty name", async () => {
     const event = await setupAuthorized();
     const result = await saveGuests(

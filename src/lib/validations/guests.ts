@@ -1,22 +1,37 @@
 import { z } from "zod";
 
+// preprocess() runs before the inner schema's optional check, so
+// "" → undefined happens consistently. The fluent
+// `.optional().or(z.literal(""))` form accepts "" through the
+// optional branch and silently lands empty strings in JSONB.
 const optionalString = (max: number) =>
-  z
-    .string()
-    .max(max)
-    .optional()
-    .or(z.literal("").transform(() => undefined));
+  z.preprocess(
+    (v) => (typeof v === "string" && v.trim() === "" ? undefined : v),
+    z.string().max(max).optional()
+  );
 
-const optionalUrl = z
+const optionalUrl = z.preprocess(
+  (v) => (typeof v === "string" && v.trim() === "" ? undefined : v),
+  z.string().url("Enter a full URL (https://…)").max(500).optional()
+);
+
+// Social link URLs are stored as a single text column on artist
+// profiles too; we accept http(s) / mailto here so a guest can list
+// "mailto:hello@…" alongside profile URLs. Any other scheme
+// (javascript:, data:, …) is rejected to keep the public viewer's
+// <a href> safe to render without scheme escaping.
+const socialUrlSchema = z
   .string()
-  .url("Enter a full URL (https://…)")
+  .min(1)
   .max(500)
-  .optional()
-  .or(z.literal("").transform(() => undefined));
+  .refine(
+    (v) => /^(https?:\/\/|mailto:)/i.test(v.trim()),
+    "Use a full URL (https://…) or mailto:"
+  );
 
 export const socialLinkSchema = z.object({
   type: z.string().min(1).max(40),
-  url: z.string().min(1).max(500),
+  url: socialUrlSchema,
 });
 
 export const guestSchema = z.object({
