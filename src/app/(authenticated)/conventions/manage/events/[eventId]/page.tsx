@@ -15,7 +15,7 @@ import {
 } from "@/app/(authenticated)/conventions/manage/events/actions";
 import { EventForm } from "@/components/conventions/event-form";
 import { EventStatusControls } from "@/components/conventions/event-status-controls";
-import { EventBannerUpload } from "@/components/conventions/event-banner-upload";
+import { BannerUpload } from "@/components/conventions/banner-upload";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { storage } from "@/lib/storage";
@@ -78,16 +78,45 @@ export default async function EventDetailPage({
           Hero banner
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Optional — replaces the gradient on the public event page.
+          Optional — overrides the convention default on the public event page.
         </p>
-        <div className="mt-6">
-          <EventBannerUpload
-            eventId={event.id}
-            currentBannerUrl={
-              event.bannerPath ? storage.getUrl(event.bannerPath) : null
-            }
-            eventName={event.name}
-          />
+        <div className="mt-6 grid gap-6 md:grid-cols-2">
+          <div>
+            <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
+              Desktop
+            </p>
+            <div className="mt-3">
+              <BannerUpload
+                endpoint={`/api/events/${event.id}/banner`}
+                currentBannerUrl={
+                  event.bannerPath ? storage.getUrl(event.bannerPath) : null
+                }
+                altLabel={`${event.name} banner`}
+                previewAspectClass="aspect-[4/1]"
+                hint="Wide hero — JPEG, PNG, WebP, or AVIF. Max 8 MB. 4:1 works best."
+                placeholderHint="No event banner — falls back to the convention default, then to the gradient."
+              />
+            </div>
+          </div>
+          <div>
+            <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
+              Mobile
+            </p>
+            <div className="mt-3">
+              <BannerUpload
+                endpoint={`/api/events/${event.id}/banner-mobile`}
+                currentBannerUrl={
+                  event.bannerMobilePath
+                    ? storage.getUrl(event.bannerMobilePath)
+                    : null
+                }
+                altLabel={`${event.name} mobile banner`}
+                previewAspectClass="aspect-[16/9]"
+                hint="Optional — used for the mobile top strip. Falls back to the desktop banner if unset. Square or 16:9 reads best."
+                placeholderHint="No mobile banner — the desktop banner is shown on phones."
+              />
+            </div>
+          </div>
         </div>
       </Card>
 

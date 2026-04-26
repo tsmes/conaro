@@ -4,6 +4,7 @@ import { useCallback, useRef, useState } from "react";
 import { Trash2, Upload } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 const MAX_FILE_SIZE = 8 * 1024 * 1024; // 8 MB
 const ALLOWED_TYPES = [
@@ -13,17 +14,25 @@ const ALLOWED_TYPES = [
   "image/avif",
 ];
 
-interface EventBannerUploadProps {
-  eventId: string;
+interface BannerUploadProps {
+  /** Endpoint that handles POST (multipart `file`) and DELETE. */
+  endpoint: string;
   currentBannerUrl: string | null;
-  eventName: string;
+  altLabel: string;
+  /** Tailwind aspect class for the preview + placeholder, e.g. "aspect-[4/1]". */
+  previewAspectClass: string;
+  hint: string;
+  placeholderHint: string;
 }
 
-export function EventBannerUpload({
-  eventId,
+export function BannerUpload({
+  endpoint,
   currentBannerUrl,
-  eventName,
-}: EventBannerUploadProps) {
+  altLabel,
+  previewAspectClass,
+  hint,
+  placeholderHint,
+}: BannerUploadProps) {
   const [bannerUrl, setBannerUrl] = useState(currentBannerUrl);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -47,7 +56,7 @@ export function EventBannerUpload({
         const formData = new FormData();
         formData.append("file", file);
 
-        const response = await fetch(`/api/events/${eventId}/banner`, {
+        const response = await fetch(endpoint, {
           method: "POST",
           body: formData,
         });
@@ -65,16 +74,14 @@ export function EventBannerUpload({
         setBusy(false);
       }
     },
-    [eventId]
+    [endpoint]
   );
 
   const handleRemove = useCallback(async () => {
     setError(null);
     setBusy(true);
     try {
-      const response = await fetch(`/api/events/${eventId}/banner`, {
-        method: "DELETE",
-      });
+      const response = await fetch(endpoint, { method: "DELETE" });
       if (!response.ok) {
         const data = await response.json().catch(() => null);
         setError(data?.error ?? "Remove failed");
@@ -86,7 +93,7 @@ export function EventBannerUpload({
     } finally {
       setBusy(false);
     }
-  }, [eventId]);
+  }, [endpoint]);
 
   const handleFileSelect = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -103,12 +110,20 @@ export function EventBannerUpload({
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={bannerUrl}
-          alt={`${eventName} banner`}
-          className="aspect-[4/1] w-full rounded-lg object-cover"
+          alt={altLabel}
+          className={cn(
+            "w-full rounded-lg object-cover",
+            previewAspectClass
+          )}
         />
       ) : (
-        <div className="grid aspect-[4/1] w-full place-items-center rounded-lg border border-dashed border-muted-foreground/30 bg-muted/30 text-[12px] text-muted-foreground">
-          No banner — the public hero falls back to the convention gradient.
+        <div
+          className={cn(
+            "grid w-full place-items-center rounded-lg border border-dashed border-muted-foreground/30 bg-muted/30 px-4 text-center text-[12px] text-muted-foreground",
+            previewAspectClass
+          )}
+        >
+          {placeholderHint}
         </div>
       )}
 
@@ -150,10 +165,7 @@ export function EventBannerUpload({
         )}
       </div>
 
-      <p className="text-[11.5px] text-muted-foreground">
-        Wide hero image — JPEG, PNG, WebP, or AVIF. Max 8 MB. Use a 4:1
-        aspect ratio for best results.
-      </p>
+      <p className="text-[11.5px] text-muted-foreground">{hint}</p>
 
       {error && (
         <p role="alert" className="text-[12px] text-destructive">
