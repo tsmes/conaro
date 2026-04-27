@@ -88,7 +88,7 @@ function CountdownBlock({ days }: { days: number }) {
         {display}
       </span>
       {showLabel && (
-        <span className="mt-2 text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
+        <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
           Days to go
         </span>
       )}
