@@ -20,6 +20,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import type { PortfolioSection } from "@/lib/db/schema/portfolio-images";
 import { ImageUploadZone } from "./image-upload-zone";
 
@@ -127,6 +128,9 @@ export function PortfolioGallery({
 }: PortfolioGalleryProps) {
   const [images, setImages] = useState(initialImages);
   const [error, setError] = useState<string | null>(null);
+  // Image to delete when the confirm dialog resolves. null while
+  // the dialog is closed.
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const resolvedCaptionPlaceholder =
     captionPlaceholder ?? DEFAULT_CAPTION_PLACEHOLDER[section];
 
@@ -167,9 +171,13 @@ export function PortfolioGallery({
     [section]
   );
 
-  const handleDelete = useCallback(async (imageId: string) => {
-    if (!window.confirm("Delete this image? This cannot be undone.")) return;
+  // Tile click → open the confirm dialog. The actual delete runs
+  // in `executeDelete` once the user confirms in the dialog.
+  const handleDelete = useCallback((imageId: string) => {
+    setConfirmDeleteId(imageId);
+  }, []);
 
+  const executeDelete = useCallback(async (imageId: string) => {
     setError(null);
     try {
       const response = await fetch("/api/portfolio", {
@@ -293,6 +301,20 @@ export function PortfolioGallery({
       )}
 
       <ImageUploadZone disabled={disableUpload} onUpload={handleUpload} />
+
+      <ConfirmDialog
+        open={confirmDeleteId !== null}
+        onOpenChange={(open) => {
+          if (!open) setConfirmDeleteId(null);
+        }}
+        title="Delete this image?"
+        description="This cannot be undone."
+        confirmLabel="Delete"
+        destructive
+        onConfirm={() => {
+          if (confirmDeleteId) executeDelete(confirmDeleteId);
+        }}
+      />
     </div>
   );
 }

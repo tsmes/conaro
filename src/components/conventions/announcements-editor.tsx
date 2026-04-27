@@ -1,9 +1,10 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useRef, useState } from "react";
 import { Megaphone, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Markdown } from "@/components/ui/markdown";
@@ -162,27 +163,34 @@ function DeleteButton({
     deleteEventAnnouncement,
     {}
   );
+  const formRef = useRef<HTMLFormElement>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   return (
-    <form
-      action={formAction}
-      onSubmit={(e) => {
-        if (!window.confirm("Delete this announcement?")) {
-          e.preventDefault();
-        }
-      }}
-    >
-      <input type="hidden" name="eventId" value={eventId} />
-      <input type="hidden" name="announcementId" value={announcement.id} />
-      <Button
-        type="submit"
-        variant="ghost"
-        size="icon-sm"
-        aria-label="Delete announcement"
-        disabled={pending}
-      >
-        <Trash2 className="size-3.5" />
-      </Button>
-    </form>
+    <>
+      <form ref={formRef} action={formAction}>
+        <input type="hidden" name="eventId" value={eventId} />
+        <input type="hidden" name="announcementId" value={announcement.id} />
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon-sm"
+          aria-label="Delete announcement"
+          disabled={pending}
+          onClick={() => setConfirmOpen(true)}
+        >
+          <Trash2 className="size-3.5" />
+        </Button>
+      </form>
+      <ConfirmDialog
+        open={confirmOpen}
+        onOpenChange={setConfirmOpen}
+        title="Delete this announcement?"
+        description="This cannot be undone."
+        confirmLabel="Delete"
+        destructive
+        onConfirm={() => formRef.current?.requestSubmit()}
+      />
+    </>
   );
 }
 
