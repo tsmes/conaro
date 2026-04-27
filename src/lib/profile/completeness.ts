@@ -1,18 +1,9 @@
-interface ProfileData {
-  displayName: string;
-}
-
-interface ArtistProfileData {
-  contactEmail: string | null;
-  realName: string | null;
-  phone: string | null;
-  bio: string | null;
-  websiteUrl: string | null;
-  socialLinks: string | null;
-  helpers: number | null;
-  accessibilityNeeds: string | null;
-  notes: string | null;
-}
+import { PROFILE_FIELDS } from "@/lib/db/field-registry";
+import {
+  isFieldFilled,
+  type ArtistProfileData,
+  type ProfileData,
+} from "@/lib/applications/validation";
 
 interface SectionStatus {
   complete: boolean;
@@ -27,64 +18,85 @@ export interface CompletenessResult {
   overall: number;
 }
 
+// Drive completeness off the same FIELD_REGISTRY + isFieldFilled
+// used by the apply-flow validator. Adding a field to the registry
+// (and the artist profile UI) automatically updates the dashboard
+// indicator — no separate "list of fields to count" to keep in
+// sync. The registry-vs-profile invariant is enforced by
+// __tests__/unit/lib/field-registry-profile-match.test.ts.
 export function computeCompleteness(
   profile: ProfileData | undefined,
   artistProfile: ArtistProfileData | undefined,
   imageCount: number
 ): CompletenessResult {
-  // Basic info: displayName and contactEmail are required, others are optional
-  const basicFields = [
-    { value: profile?.displayName, required: true },
-    { value: artistProfile?.contactEmail, required: true },
-    { value: artistProfile?.realName, required: false },
-    { value: artistProfile?.phone, required: false },
-    { value: artistProfile?.bio, required: false },
-    { value: artistProfile?.websiteUrl, required: false },
-    { value: artistProfile?.socialLinks, required: false },
-  ];
-
-  const basicFilled = basicFields.filter((f) => !!f.value).length;
-  const basicRequiredFilled = basicFields
-    .filter((f) => f.required)
-    .every((f) => !!f.value);
-
-  // Logistics: no required fields, complete when any field is filled
-  const logisticsFields = [
-    artistProfile?.helpers !== null &&
-      artistProfile?.helpers !== undefined &&
-      artistProfile.helpers > 0,
-    !!artistProfile?.accessibilityNeeds,
-    !!artistProfile?.notes,
-  ];
-
-  const logisticsFilled = logisticsFields.filter(Boolean).length;
-
-  // Portfolio: complete when at least 1 image
-  const portfolioFilled = Math.min(imageCount, 1);
-
-  const basic: SectionStatus = {
-    complete: basicRequiredFilled,
-    filled: basicFilled,
-    total: basicFields.length,
+  // No profile yet → everything empty. The page should already
+  // redirect / scaffold a profile in this case, but guard anyway.
+  const safeProfile: ProfileData = profile ?? { displayName: "" };
+  const safeArtistProfile: ArtistProfileData = artistProfile ?? {
+    realName: null,
+    pronouns: null,
+    contactEmail: null,
+    phone: null,
+    bio: null,
+    websiteUrl: null,
+    socialLinks: null,
+    helpers: null,
+    accessibilityNeeds: null,
+    notes: null,
+    priceRangeMinNok: null,
+    priceRangeMaxNok: null,
+    genres: null,
+    mediums: null,
   };
 
+  let basicTotal = 0;
+  let basicFilled = 0;
+  let basicRequiredAllFilled = true;
+  let logisticsTotal = 0;
+  let logisticsFilled = 0;
+  let portfolioTotal = 0;
+  let portfolioFilled = 0;
+
+  for (const field of PROFILE_FIELDS) {
+    const filled = isFieldFilled(
+      field,
+      safeProfile,
+      safeArtistProfile,
+      imageCount
+    );
+    if (field.section === "basic") {
+      basicTotal += 1;
+      if (filled) basicFilled += 1;
+      if (field.required && !filled) basicRequiredAllFilled = false;
+    } else if (field.section === "logistics") {
+      logisticsTotal += 1;
+      if (filled) logisticsFilled += 1;
+    } else if (field.section === "portfolio") {
+      portfolioTotal += 1;
+      if (filled) portfolioFilled += 1;
+    }
+  }
+
+  const basic: SectionStatus = {
+    complete: basicRequiredAllFilled,
+    filled: basicFilled,
+    total: basicTotal,
+  };
   const logistics: SectionStatus = {
     complete: logisticsFilled > 0,
     filled: logisticsFilled,
-    total: logisticsFields.length,
+    total: logisticsTotal,
   };
-
   const portfolio: SectionStatus = {
-    complete: imageCount > 0,
-    filled: imageCount,
-    total: 20,
+    complete: portfolioFilled > 0,
+    filled: portfolioFilled,
+    total: portfolioTotal,
   };
 
-  // Overall: percentage of all countable fields filled across sections
-  // Basic (7 fields) + Logistics (4 fields) + Portfolio (1 point for having images)
-  const totalFields = basicFields.length + logisticsFields.length + 1;
+  const totalFields = basicTotal + logisticsTotal + portfolioTotal;
   const filledFields = basicFilled + logisticsFilled + portfolioFilled;
-  const overall = Math.round((filledFields / totalFields) * 100);
+  const overall =
+    totalFields === 0 ? 0 : Math.round((filledFields / totalFields) * 100);
 
   return { basic, logistics, portfolio, overall };
 }

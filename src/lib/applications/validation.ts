@@ -15,11 +15,11 @@ export type ValidationResult =
   | { valid: true }
   | { valid: false; missingFields: MissingField[] };
 
-interface ProfileData {
+export interface ProfileData {
   displayName: string;
 }
 
-interface ArtistProfileData {
+export interface ArtistProfileData {
   realName: string | null;
   pronouns: string | null;
   contactEmail: string | null;
@@ -36,7 +36,7 @@ interface ArtistProfileData {
   mediums?: string[] | null;
 }
 
-function isFieldFilled(
+export function isFieldFilled(
   field: FieldDefinition,
   profile: ProfileData,
   artistProfile: ArtistProfileData,
