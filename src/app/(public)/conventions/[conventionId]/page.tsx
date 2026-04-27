@@ -47,6 +47,7 @@ export default async function ConventionDetailPage({
   const session = await auth();
   const isArtist =
     session?.user?.profileId && session.user.role === "artist";
+  const isLoggedIn = Boolean(session?.user);
 
   const [allEvents, followResult] = await Promise.all([
     db
@@ -169,7 +170,11 @@ export default async function ConventionDetailPage({
         ) : (
           <div className="space-y-4">
             {upcomingEvents.map((event) => (
-              <ConventionEventRow key={event.id} event={event} />
+              <ConventionEventRow
+                key={event.id}
+                event={event}
+                isLoggedIn={isLoggedIn}
+              />
             ))}
           </div>
         )}
@@ -182,7 +187,12 @@ export default async function ConventionDetailPage({
           </h2>
           <div className="space-y-4">
             {pastEvents.map((event) => (
-              <ConventionEventRow key={event.id} event={event} muted />
+              <ConventionEventRow
+                key={event.id}
+                event={event}
+                isLoggedIn={isLoggedIn}
+                muted
+              />
             ))}
           </div>
         </section>
@@ -205,11 +215,16 @@ interface ConventionEventRowEvent {
 
 function ConventionEventRow({
   event,
+  isLoggedIn,
   muted = false,
 }: {
   event: ConventionEventRowEvent;
+  isLoggedIn: boolean;
   muted?: boolean;
 }) {
+  // Application-cycle status, opens / deadline copy and the
+  // ARTIST_STATUS_LABELS badge are all artist-flow signals — public
+  // browsers don't need them. Only render for logged-in viewers.
   const statusInfo = ARTIST_STATUS_LABELS[
     event.status as keyof typeof ARTIST_STATUS_LABELS
   ] ?? {
@@ -237,10 +252,13 @@ function ConventionEventRow({
                 {[event.venueCity, event.venueCountry].filter(Boolean).join(", ")}
               </span>
             )}
-            {event.status === "published" && event.applicationOpenDate && (
-              <span>Opens {formatDateNo(event.applicationOpenDate)}</span>
-            )}
-            {event.status === "accepting_applications" &&
+            {isLoggedIn &&
+              event.status === "published" &&
+              event.applicationOpenDate && (
+                <span>Opens {formatDateNo(event.applicationOpenDate)}</span>
+              )}
+            {isLoggedIn &&
+              event.status === "accepting_applications" &&
               event.applicationCloseDate && (
                 <span className="font-semibold text-destructive">
                   Deadline {formatDateNo(event.applicationCloseDate)}
@@ -248,7 +266,9 @@ function ConventionEventRow({
               )}
           </div>
         </div>
-        <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
+        {isLoggedIn && (
+          <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
+        )}
       </Card>
     </Link>
   );
