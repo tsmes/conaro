@@ -150,7 +150,9 @@ export default async function EventOverviewPage({
                 </div>
               </div>
             )}
-            {event.availableStands && (
+            {/* Stand count is artist / organizer info — public
+                browsers don't need the inside-baseball figure. */}
+            {session?.user && event.availableStands && (
               <div className="flex gap-2.5">
                 <Users className="size-4 shrink-0 mt-0.5" />
                 <div className="min-w-0">

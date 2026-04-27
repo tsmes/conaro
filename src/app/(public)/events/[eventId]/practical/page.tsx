@@ -29,7 +29,12 @@ export default async function PracticalInfoPage({ params }: PracticalPageProps) 
   // to render, but defend on direct URL access.
   if (!shouldShowPracticalTab(ctx)) notFound();
 
-  const { event, isArtist } = ctx;
+  const { event, isArtist, session } = ctx;
+  // Setup / teardown windows and the amenities checklist are
+  // operations-side info — public visitors browsing the event don't
+  // need them and the inside-baseball labels add noise. Logged-in
+  // viewers (artists + organizers) still see everything.
+  const isLoggedIn = Boolean(session?.user);
   const amenities = event.amenities as Amenities | null;
   const venueLine = [event.venueCity, event.venueCountry]
     .filter(Boolean)
@@ -79,7 +84,7 @@ export default async function PracticalInfoPage({ params }: PracticalPageProps) 
         </Card>
       )}
 
-      {(event.setupTime || event.teardownTime) && (
+      {isLoggedIn && (event.setupTime || event.teardownTime) && (
         <Card className="p-5">
           <div className="mb-3 flex items-center gap-2">
             <div className="grid size-8 place-items-center rounded-[8px] bg-primary/10 text-primary">
@@ -106,7 +111,7 @@ export default async function PracticalInfoPage({ params }: PracticalPageProps) 
         </Card>
       )}
 
-      {amenityChips.length > 0 && (
+      {isLoggedIn && amenityChips.length > 0 && (
         <Card className="p-5">
           <div className="mb-3 flex items-center gap-2">
             <div className="grid size-8 place-items-center rounded-[8px] bg-primary/10 text-primary">
