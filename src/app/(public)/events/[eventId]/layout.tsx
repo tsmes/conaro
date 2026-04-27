@@ -124,7 +124,11 @@ export default async function EventLayout({
               src={bannerMobileUrl}
               alt=""
               aria-hidden
-              className="absolute inset-0 block h-full w-full object-cover md:hidden"
+              // object-top so organizers can extend the photo
+              // downwards (logo at the top, room for the title to
+              // overlay underneath). Default `center` would crop
+              // the logo away on tall heroes.
+              className="absolute inset-0 block h-full w-full object-cover object-top md:hidden"
             />
           )}
           {bannerUrl && (
@@ -133,7 +137,7 @@ export default async function EventLayout({
               src={bannerUrl}
               alt=""
               aria-hidden
-              className="absolute inset-0 hidden h-full w-full object-cover md:block"
+              className="absolute inset-0 hidden h-full w-full object-cover object-top md:block"
             />
           )}
           {/* Coloured backdrop only shows where there's no photo

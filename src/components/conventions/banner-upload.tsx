@@ -111,8 +111,11 @@ export function BannerUpload({
         <img
           src={bannerUrl}
           alt={altLabel}
+          // Anchor the preview to the top edge — mirrors how the
+          // public hero crops the photo so the editor preview
+          // accurately reflects what visitors will see.
           className={cn(
-            "w-full rounded-lg object-cover",
+            "w-full rounded-lg object-cover object-top",
             previewAspectClass
           )}
         />

@@ -112,7 +112,7 @@ export default async function EventDetailPage({
                 }
                 altLabel={`${event.name} banner`}
                 previewAspectClass="aspect-[4/1]"
-                hint="Wide hero — JPEG, PNG, WebP, or AVIF. Max 8 MB. 4:1 works best."
+                hint="Wide hero — JPEG, PNG, WebP, or AVIF. Max 8 MB. 4:1 works best. The image is anchored to the top edge, so put logos / focal points up top and leave room below for the title."
                 placeholderHint="No event banner — falls back to the convention default, then to the gradient."
               />
             </div>
@@ -131,7 +131,7 @@ export default async function EventDetailPage({
                 }
                 altLabel={`${event.name} mobile banner`}
                 previewAspectClass="aspect-[3/4]"
-                hint="Optional — sits behind the hero text on phones. A tall portrait crop (3:4 or 4:5) works best. Falls back to the desktop banner if unset."
+                hint="Optional — sits behind the hero text on phones, anchored to the top edge. A tall portrait crop (3:4 or 4:5) with logo / focal points up top works best. Falls back to the desktop banner if unset."
                 placeholderHint="No mobile banner — the desktop banner is shown on phones."
               />
             </div>
