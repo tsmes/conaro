@@ -75,7 +75,7 @@ function CountdownBlock({ days }: { days: number }) {
     days < 0 ? "Now" : days === 0 ? "Today" : days.toString();
   const showLabel = days > 0;
   return (
-    <div className="hidden shrink-0 flex-col items-center justify-center bg-muted/40 px-6 md:flex">
+    <div className="hidden shrink-0 flex-col items-center justify-center border-l border-border bg-muted px-6 md:flex">
       <span
         className={cn(
           "font-heading font-extrabold leading-none tracking-[-0.06em] text-foreground",
