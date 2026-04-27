@@ -226,10 +226,13 @@ async function run() {
       // Apply window: opens 60 days before, closes 14 days before.
       const opens = shiftDate(eventManifest.startDate, -60);
       const closes = shiftDate(eventManifest.startDate, -14);
+      const today = isoDaysFromNow(0);
       const status =
-        opens <= isoDaysFromNow(0)
+        closes < today
+          ? "reviewing"
+          : opens <= today
           ? "accepting_applications"
-          : "draft";
+          : "published";
 
       const programme = buildProgramme(eventManifest);
 

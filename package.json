@@ -14,6 +14,7 @@
     "db:seed": "node --env-file .env.local node_modules/.bin/tsx scripts/seed-selection.ts",
     "db:seed:artists": "node --env-file .env.local node_modules/.bin/tsx scripts/seed-artists.ts",
     "db:seed:conventions": "node --env-file .env.local node_modules/.bin/tsx scripts/seed-conventions.ts",
+    "db:seed:reset": "node --env-file .env.local node_modules/.bin/tsx scripts/seed-reset.ts",
     "db:seed:event": "node --env-file .env.local node_modules/.bin/tsx scripts/seed-event.ts",
     "db:seed:apply": "node --env-file .env.local node_modules/.bin/tsx scripts/seed-apply.ts",
     "test": "node --env-file .env.test node_modules/.bin/vitest run",
