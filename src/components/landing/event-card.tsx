@@ -78,7 +78,12 @@ function CountdownBlock({ days }: { days: number }) {
     <div className="hidden shrink-0 flex-col items-center justify-center border-l border-border bg-primary/15 px-6 md:flex">
       <span
         className={cn(
-          "font-heading font-extrabold leading-[1] tracking-[-0.06em] text-foreground",
+          // leading-[0.8] clamps the line box tighter than the
+          // font's natural glyph metrics, so the "Days to go"
+          // label below sits visually flush with the digit
+          // baseline instead of with a pocket of font-internal
+          // whitespace beneath the number.
+          "font-heading font-extrabold leading-[0.8] tracking-[-0.06em] text-foreground",
           // Big countdown panel — large numerals match the design's
           // "days to go" treatment. Drop a touch on huge values to
           // keep it from overflowing on 4-digit day counts.
