@@ -12,11 +12,340 @@
       "endDate": "2026-10-11",
       "venueCity": "Larvik",
       "venueCountry": "NO",
-      "venueName": "Bølgen Kulturhus"
+      "venueName": "Bølgen Kulturhus",
+      "guests": [
+        {
+          "name": "Eirik Rønning",
+          "title": "MC",
+          "role": "Cosplay competition host",
+          "pronouns": "he/him",
+          "bio": "Bergen-based cosplayer specialising in armour and prop fabrication. Runs the Nordic Armour Workshop for new makers.",
+          "photo": "4.jpg",
+          "websiteUrl": "https://example.com/eirikronning",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/eirikronning"
+            }
+          ]
+        },
+        {
+          "name": "Linnea Tveit",
+          "title": "Featured guest",
+          "role": "Workshop host: armour fabrication",
+          "pronouns": "they/them",
+          "bio": "Oslo manga artist whose serial 'Halvtimes' won the 2024 Sproing nominee shortlist.",
+          "photo": "6.jpg",
+          "websiteUrl": "https://example.com/linneatveit",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/linneatveit"
+            }
+          ]
+        },
+        {
+          "name": "Ingrid Halvorsen",
+          "title": "Featured guest",
+          "role": "Workshop host: digital inking",
+          "pronouns": "she/they",
+          "bio": "Trondheim illustrator working in ink and risograph; stories about queer joy and slow mornings.",
+          "photo": "8.jpg",
+          "websiteUrl": "https://example.com/ingridhalvorsen",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/ingridhalvorsen"
+            }
+          ]
+        },
+        {
+          "name": "Vegard Holmen",
+          "title": "Spotlight",
+          "role": "Manga artist",
+          "pronouns": "he/they",
+          "bio": "Self-published comics writer; long-running webcomic 'Fjordwalker' wraps its sixth volume this year.",
+          "photo": "6.jpg",
+          "websiteUrl": "https://example.com/vegardholmen",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/vegardholmen"
+            }
+          ]
+        },
+        {
+          "name": "Synne Aune",
+          "title": "Panellist",
+          "role": "Game design Q&A",
+          "pronouns": "she/her",
+          "bio": "Stavanger watercolourist chasing folk-horror aesthetics. Zines printed in small runs.",
+          "photo": "8.jpg",
+          "websiteUrl": "https://example.com/synneaune",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/synneaune"
+            }
+          ]
+        },
+        {
+          "name": "Espen Vang",
+          "title": "Panellist",
+          "role": "Self-publishing in Norway",
+          "pronouns": "he/him",
+          "bio": "Game designer at a small Bergen indie studio; teaches a beginners' track at NTNU.",
+          "photo": "10.jpg",
+          "websiteUrl": "https://example.com/espenvang",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/espenvang"
+            }
+          ]
+        }
+      ],
+      "programme": [
+        {
+          "date": "2026-10-09",
+          "startTime": "10:00",
+          "endTime": "10:30",
+          "title": "Doors open & registration",
+          "room": "Foyer"
+        },
+        {
+          "date": "2026-10-09",
+          "startTime": "10:45",
+          "endTime": "11:15",
+          "title": "Opening ceremony",
+          "room": "Main stage"
+        },
+        {
+          "date": "2026-10-09",
+          "startTime": "11:30",
+          "endTime": "12:30",
+          "title": "Cosplay competition — categories briefing",
+          "room": "Main stage",
+          "speaker": "Synne Aune"
+        },
+        {
+          "date": "2026-10-09",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Workshop: armour fabrication basics",
+          "room": "Workshop A",
+          "speaker": "Linnea Tveit"
+        },
+        {
+          "date": "2026-10-09",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Panel: self-publishing in Norway",
+          "room": "Panel room 1",
+          "speaker": "Espen Vang"
+        },
+        {
+          "date": "2026-10-09",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Workshop: digital inking",
+          "room": "Workshop B",
+          "speaker": "Vegard Holmen"
+        },
+        {
+          "date": "2026-10-09",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Q&A: voice acting",
+          "room": "Panel room 1",
+          "speaker": "Espen Vang"
+        },
+        {
+          "date": "2026-10-09",
+          "startTime": "15:00",
+          "endTime": "16:30",
+          "title": "Cosplay competition — main show",
+          "room": "Main stage",
+          "speaker": "Linnea Tveit"
+        },
+        {
+          "date": "2026-10-09",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Workshop: watercolour basics",
+          "room": "Workshop A",
+          "speaker": "Eirik Rønning"
+        },
+        {
+          "date": "2026-10-09",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Manga spotlight",
+          "room": "Panel room 1",
+          "speaker": "Espen Vang"
+        },
+        {
+          "date": "2026-10-09",
+          "startTime": "17:30",
+          "endTime": "18:30",
+          "title": "Idol stage",
+          "room": "Main stage",
+          "speaker": "Vegard Holmen"
+        },
+        {
+          "date": "2026-10-09",
+          "startTime": "19:00",
+          "endTime": "20:00",
+          "title": "Closing & afterparty announcement",
+          "room": "Main stage"
+        },
+        {
+          "date": "2026-10-10",
+          "startTime": "10:00",
+          "endTime": "10:30",
+          "title": "Doors open & registration",
+          "room": "Foyer"
+        },
+        {
+          "date": "2026-10-10",
+          "startTime": "11:00",
+          "endTime": "12:00",
+          "title": "Workshop: digital inking",
+          "room": "Workshop",
+          "speaker": "Vegard Holmen"
+        },
+        {
+          "date": "2026-10-10",
+          "startTime": "12:30",
+          "endTime": "13:30",
+          "title": "Panel: self-publishing in Norway",
+          "room": "Panel room",
+          "speaker": "Linnea Tveit"
+        },
+        {
+          "date": "2026-10-10",
+          "startTime": "14:00",
+          "endTime": "15:30",
+          "title": "Cosplay competition",
+          "room": "Main stage",
+          "speaker": "Espen Vang"
+        },
+        {
+          "date": "2026-10-10",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Manga spotlight",
+          "room": "Panel room",
+          "speaker": "Linnea Tveit"
+        },
+        {
+          "date": "2026-10-10",
+          "startTime": "17:30",
+          "endTime": "18:00",
+          "title": "Closing",
+          "room": "Main stage"
+        },
+        {
+          "date": "2026-10-11",
+          "startTime": "10:00",
+          "endTime": "10:30",
+          "title": "Doors open & registration",
+          "room": "Foyer"
+        },
+        {
+          "date": "2026-10-11",
+          "startTime": "10:45",
+          "endTime": "11:15",
+          "title": "Opening ceremony",
+          "room": "Main stage"
+        },
+        {
+          "date": "2026-10-11",
+          "startTime": "11:30",
+          "endTime": "12:30",
+          "title": "Cosplay competition — categories briefing",
+          "room": "Main stage",
+          "speaker": "Linnea Tveit"
+        },
+        {
+          "date": "2026-10-11",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Workshop: armour fabrication basics",
+          "room": "Workshop A",
+          "speaker": "Eirik Rønning"
+        },
+        {
+          "date": "2026-10-11",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Panel: self-publishing in Norway",
+          "room": "Panel room 1",
+          "speaker": "Ingrid Halvorsen"
+        },
+        {
+          "date": "2026-10-11",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Workshop: digital inking",
+          "room": "Workshop B",
+          "speaker": "Synne Aune"
+        },
+        {
+          "date": "2026-10-11",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Q&A: voice acting",
+          "room": "Panel room 1",
+          "speaker": "Ingrid Halvorsen"
+        },
+        {
+          "date": "2026-10-11",
+          "startTime": "15:00",
+          "endTime": "16:30",
+          "title": "Cosplay competition — main show",
+          "room": "Main stage",
+          "speaker": "Eirik Rønning"
+        },
+        {
+          "date": "2026-10-11",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Workshop: watercolour basics",
+          "room": "Workshop A",
+          "speaker": "Espen Vang"
+        },
+        {
+          "date": "2026-10-11",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Manga spotlight",
+          "room": "Panel room 1",
+          "speaker": "Ingrid Halvorsen"
+        },
+        {
+          "date": "2026-10-11",
+          "startTime": "17:30",
+          "endTime": "18:30",
+          "title": "Idol stage",
+          "room": "Main stage",
+          "speaker": "Ingrid Halvorsen"
+        },
+        {
+          "date": "2026-10-11",
+          "startTime": "19:00",
+          "endTime": "20:00",
+          "title": "Closing & afterparty announcement",
+          "room": "Main stage"
+        }
+      ]
     }
   ],
   "assets": {
-    "logo": { "file": "logo.webp", "source": "https://images.squarespace-cdn.com/content/v1/64a16bf403ae256a2d53ce49/88913e2f-bcca-40c8-9df3-7291feea4089/b14_logo-lockup-finished_date.png?format=1500w" },
+    "logo": {
+      "file": "logo.webp",
+      "source": "https://images.squarespace-cdn.com/content/v1/64a16bf403ae256a2d53ce49/88913e2f-bcca-40c8-9df3-7291feea4089/b14_logo-lockup-finished_date.png?format=1500w"
+    },
     "banner": null,
     "bannerMobile": null
   },

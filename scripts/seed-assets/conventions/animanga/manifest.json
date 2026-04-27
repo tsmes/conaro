@@ -12,11 +12,92 @@
       "endDate": null,
       "venueCity": "Arendal",
       "venueCountry": "NO",
-      "venueName": "Arendal Bibliotek"
+      "venueName": "Arendal Bibliotek",
+      "guests": [
+        {
+          "name": "Kristoffer Skaar",
+          "title": "Featured guest",
+          "role": "Workshop host: clay sculpting",
+          "pronouns": "they/them",
+          "bio": "Tabletop designer; author of 'Aldermark', a Nordic-folklore RPG.",
+          "photo": "1.jpg",
+          "websiteUrl": "https://example.com/kristofferskaar",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/kristofferskaar"
+            }
+          ]
+        },
+        {
+          "name": "Maja Brekke",
+          "title": "Spotlight",
+          "role": "Comics writer",
+          "pronouns": "she/they",
+          "bio": "Plushie and soft-sculpture maker specialising in original characters.",
+          "photo": "3.jpg",
+          "websiteUrl": "https://example.com/majabrekke",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/majabrekke"
+            }
+          ]
+        },
+        {
+          "name": "Sigrid Solheim",
+          "title": "Panellist",
+          "role": "Voice acting Q&A",
+          "pronouns": "he/they",
+          "bio": "Pixel-art studio lead; known for the cult retro-RPG 'Ravnehjem'.",
+          "photo": "5.jpg",
+          "websiteUrl": "https://example.com/sigridsolheim",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/sigridsolheim"
+            }
+          ]
+        },
+        {
+          "name": "Eirik Mjøen",
+          "title": "Performer",
+          "role": "Idol stage compère",
+          "pronouns": "she/her",
+          "bio": "Bergen-based cosplayer specialising in armour and prop fabrication. Runs the Nordic Armour Workshop for new makers.",
+          "photo": "7.jpg",
+          "websiteUrl": "https://example.com/eirikmjoen",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/eirikmjoen"
+            }
+          ]
+        },
+        {
+          "name": "Linnea Sandvik",
+          "title": "Guest of honour",
+          "role": "Cosplay judge",
+          "pronouns": "he/him",
+          "bio": "Oslo manga artist whose serial 'Halvtimes' won the 2024 Sproing nominee shortlist.",
+          "photo": "9.jpg",
+          "websiteUrl": "https://example.com/linneasandvik",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/linneasandvik"
+            }
+          ]
+        }
+      ],
+      "programme": []
     }
   ],
   "assets": {
-    "logo": { "file": "logo.jpg", "source": "https://animanga.no/wp-content/uploads/2022/07/animanga-logo2022.jpg" },
+    "logo": {
+      "file": "logo.jpg",
+      "source": "https://animanga.no/wp-content/uploads/2022/07/animanga-logo2022.jpg"
+    },
     "banner": null,
     "bannerMobile": null
   },

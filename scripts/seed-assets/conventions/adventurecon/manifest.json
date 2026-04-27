@@ -12,7 +12,333 @@
       "endDate": "2026-07-12",
       "venueCity": "Bergen",
       "venueCountry": "NO",
-      "venueName": "Åsane Kulturhus"
+      "venueName": "Åsane Kulturhus",
+      "guests": [
+        {
+          "name": "Halvard Holmen",
+          "title": "Performer",
+          "role": "Idol stage compère",
+          "pronouns": "he/him",
+          "bio": "Voice actor whose Norwegian dub credits include three current streaming shows.",
+          "photo": "11.jpg",
+          "websiteUrl": "https://example.com/halvardholmen",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/halvardholmen"
+            }
+          ]
+        },
+        {
+          "name": "Jorunn Aune",
+          "title": "Guest of honour",
+          "role": "Cosplay judge",
+          "pronouns": "they/them",
+          "bio": "Costume judge with twelve years on the Nordic competition circuit.",
+          "photo": "1.jpg",
+          "websiteUrl": "https://example.com/jorunnaune",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/jorunnaune"
+            }
+          ]
+        },
+        {
+          "name": "Kristoffer Vang",
+          "title": "Featured guest",
+          "role": "Workshop host: watercolour basics",
+          "pronouns": "she/they",
+          "bio": "Embroidery artist working with mythological motifs; small-batch only.",
+          "photo": "3.jpg",
+          "websiteUrl": "https://example.com/kristoffervang",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/kristoffervang"
+            }
+          ]
+        },
+        {
+          "name": "Maja Fjeldstad",
+          "title": "Featured guest",
+          "role": "Workshop host: clay sculpting",
+          "pronouns": "he/they",
+          "bio": "Comics editor and panel host; fluent in mid-aughts shōnen references.",
+          "photo": "5.jpg",
+          "websiteUrl": "https://example.com/majafjeldstad",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/majafjeldstad"
+            }
+          ]
+        },
+        {
+          "name": "Sigrid Sæther",
+          "title": "Spotlight",
+          "role": "Comics writer",
+          "pronouns": "she/her",
+          "bio": "3D printing technician moonlighting as a prop-builder for stage productions.",
+          "photo": "7.jpg",
+          "websiteUrl": "https://example.com/sigridsaether",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/sigridsaether"
+            }
+          ]
+        },
+        {
+          "name": "Ingvild Kalland",
+          "title": "Panellist",
+          "role": "Voice acting Q&A",
+          "pronouns": "he/him",
+          "bio": "Idol-stage host whose own group performs across Norway and Sweden.",
+          "photo": "5.jpg",
+          "websiteUrl": "https://example.com/ingvildkalland",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/ingvildkalland"
+            }
+          ]
+        }
+      ],
+      "programme": [
+        {
+          "date": "2026-07-10",
+          "startTime": "10:00",
+          "endTime": "10:30",
+          "title": "Doors open & registration",
+          "room": "Foyer"
+        },
+        {
+          "date": "2026-07-10",
+          "startTime": "10:45",
+          "endTime": "11:15",
+          "title": "Opening ceremony",
+          "room": "Main stage"
+        },
+        {
+          "date": "2026-07-10",
+          "startTime": "11:30",
+          "endTime": "12:30",
+          "title": "Cosplay competition — categories briefing",
+          "room": "Main stage",
+          "speaker": "Jorunn Aune"
+        },
+        {
+          "date": "2026-07-10",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Workshop: armour fabrication basics",
+          "room": "Workshop A",
+          "speaker": "Sigrid Sæther"
+        },
+        {
+          "date": "2026-07-10",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Panel: self-publishing in Norway",
+          "room": "Panel room 1",
+          "speaker": "Kristoffer Vang"
+        },
+        {
+          "date": "2026-07-10",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Workshop: digital inking",
+          "room": "Workshop B",
+          "speaker": "Kristoffer Vang"
+        },
+        {
+          "date": "2026-07-10",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Q&A: voice acting",
+          "room": "Panel room 1",
+          "speaker": "Kristoffer Vang"
+        },
+        {
+          "date": "2026-07-10",
+          "startTime": "15:00",
+          "endTime": "16:30",
+          "title": "Cosplay competition — main show",
+          "room": "Main stage",
+          "speaker": "Sigrid Sæther"
+        },
+        {
+          "date": "2026-07-10",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Workshop: watercolour basics",
+          "room": "Workshop A",
+          "speaker": "Maja Fjeldstad"
+        },
+        {
+          "date": "2026-07-10",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Manga spotlight",
+          "room": "Panel room 1",
+          "speaker": "Kristoffer Vang"
+        },
+        {
+          "date": "2026-07-10",
+          "startTime": "17:30",
+          "endTime": "18:30",
+          "title": "Idol stage",
+          "room": "Main stage",
+          "speaker": "Halvard Holmen"
+        },
+        {
+          "date": "2026-07-10",
+          "startTime": "19:00",
+          "endTime": "20:00",
+          "title": "Closing & afterparty announcement",
+          "room": "Main stage"
+        },
+        {
+          "date": "2026-07-11",
+          "startTime": "10:00",
+          "endTime": "10:30",
+          "title": "Doors open & registration",
+          "room": "Foyer"
+        },
+        {
+          "date": "2026-07-11",
+          "startTime": "11:00",
+          "endTime": "12:00",
+          "title": "Workshop: digital inking",
+          "room": "Workshop",
+          "speaker": "Ingvild Kalland"
+        },
+        {
+          "date": "2026-07-11",
+          "startTime": "12:30",
+          "endTime": "13:30",
+          "title": "Panel: self-publishing in Norway",
+          "room": "Panel room",
+          "speaker": "Maja Fjeldstad"
+        },
+        {
+          "date": "2026-07-11",
+          "startTime": "14:00",
+          "endTime": "15:30",
+          "title": "Cosplay competition",
+          "room": "Main stage",
+          "speaker": "Ingvild Kalland"
+        },
+        {
+          "date": "2026-07-11",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Manga spotlight",
+          "room": "Panel room",
+          "speaker": "Maja Fjeldstad"
+        },
+        {
+          "date": "2026-07-11",
+          "startTime": "17:30",
+          "endTime": "18:00",
+          "title": "Closing",
+          "room": "Main stage"
+        },
+        {
+          "date": "2026-07-12",
+          "startTime": "10:00",
+          "endTime": "10:30",
+          "title": "Doors open & registration",
+          "room": "Foyer"
+        },
+        {
+          "date": "2026-07-12",
+          "startTime": "10:45",
+          "endTime": "11:15",
+          "title": "Opening ceremony",
+          "room": "Main stage"
+        },
+        {
+          "date": "2026-07-12",
+          "startTime": "11:30",
+          "endTime": "12:30",
+          "title": "Cosplay competition — categories briefing",
+          "room": "Main stage",
+          "speaker": "Maja Fjeldstad"
+        },
+        {
+          "date": "2026-07-12",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Workshop: armour fabrication basics",
+          "room": "Workshop A",
+          "speaker": "Kristoffer Vang"
+        },
+        {
+          "date": "2026-07-12",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Panel: self-publishing in Norway",
+          "room": "Panel room 1",
+          "speaker": "Sigrid Sæther"
+        },
+        {
+          "date": "2026-07-12",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Workshop: digital inking",
+          "room": "Workshop B",
+          "speaker": "Halvard Holmen"
+        },
+        {
+          "date": "2026-07-12",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Q&A: voice acting",
+          "room": "Panel room 1",
+          "speaker": "Sigrid Sæther"
+        },
+        {
+          "date": "2026-07-12",
+          "startTime": "15:00",
+          "endTime": "16:30",
+          "title": "Cosplay competition — main show",
+          "room": "Main stage",
+          "speaker": "Halvard Holmen"
+        },
+        {
+          "date": "2026-07-12",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Workshop: watercolour basics",
+          "room": "Workshop A",
+          "speaker": "Jorunn Aune"
+        },
+        {
+          "date": "2026-07-12",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Manga spotlight",
+          "room": "Panel room 1",
+          "speaker": "Sigrid Sæther"
+        },
+        {
+          "date": "2026-07-12",
+          "startTime": "17:30",
+          "endTime": "18:30",
+          "title": "Idol stage",
+          "room": "Main stage",
+          "speaker": "Kristoffer Vang"
+        },
+        {
+          "date": "2026-07-12",
+          "startTime": "19:00",
+          "endTime": "20:00",
+          "title": "Closing & afterparty announcement",
+          "room": "Main stage"
+        }
+      ]
     }
   ],
   "assets": {
@@ -27,5 +353,5 @@
   ],
   "scrapedAt": "2026-04-27",
   "notes": "adventurecon.no currently resolves to a one.com domain-parking page. The Wayback Machine has older snapshots referencing assets at impro.usercontent.one (logo `AdventureCon_Logo_Main_NoBorder___serialized2.png`, photo `DSC7633.jpg`) but those origin URLs return 503 today. Logo + banner left null until images can be retrieved manually (e.g. from the Facebook page cover or from a fresh Wayback capture). Description and 2026 dates synthesised from search snippets — venue Åsane Kulturhus is the historical host, unconfirmed for 2026.",
-  "skip": true
+  "skip": false
 }

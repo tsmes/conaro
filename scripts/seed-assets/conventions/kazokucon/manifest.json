@@ -12,12 +12,298 @@
       "endDate": "2026-05-24",
       "venueCity": "Oslo",
       "venueCountry": "NO",
-      "venueName": "Frogner Kultursenter"
+      "venueName": "Frogner Kultursenter",
+      "guests": [
+        {
+          "name": "Ingvild Fjeldstad",
+          "title": "Panellist",
+          "role": "Self-publishing in Norway",
+          "pronouns": "they/them",
+          "bio": "Oslo manga artist whose serial 'Halvtimes' won the 2024 Sproing nominee shortlist.",
+          "photo": "6.jpg",
+          "websiteUrl": "https://example.com/ingvildfjeldstad",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/ingvildfjeldstad"
+            }
+          ]
+        },
+        {
+          "name": "Marius Sæther",
+          "title": "MC",
+          "role": "Cosplay competition host",
+          "pronouns": "she/they",
+          "bio": "Trondheim illustrator working in ink and risograph; stories about queer joy and slow mornings.",
+          "photo": "8.jpg",
+          "websiteUrl": "https://example.com/mariussaether",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/mariussaether"
+            }
+          ]
+        },
+        {
+          "name": "Saga Kalland",
+          "title": "Featured guest",
+          "role": "Workshop host: armour fabrication",
+          "pronouns": "he/they",
+          "bio": "Self-published comics writer; long-running webcomic 'Fjordwalker' wraps its sixth volume this year.",
+          "photo": "10.jpg",
+          "websiteUrl": "https://example.com/sagakalland",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/sagakalland"
+            }
+          ]
+        },
+        {
+          "name": "Vegard Bakken",
+          "title": "Featured guest",
+          "role": "Workshop host: digital inking",
+          "pronouns": "she/her",
+          "bio": "Stavanger watercolourist chasing folk-horror aesthetics. Zines printed in small runs.",
+          "photo": "12.jpg",
+          "websiteUrl": "https://example.com/vegardbakken",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/vegardbakken"
+            }
+          ]
+        },
+        {
+          "name": "Synne Bjørndal",
+          "title": "Spotlight",
+          "role": "Manga artist",
+          "pronouns": "he/him",
+          "bio": "Game designer at a small Bergen indie studio; teaches a beginners' track at NTNU.",
+          "photo": "2.jpg",
+          "websiteUrl": "https://example.com/synnebjorndal",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/synnebjorndal"
+            }
+          ]
+        },
+        {
+          "name": "Mathias Rinde",
+          "title": "Panellist",
+          "role": "Game design Q&A",
+          "pronouns": "they/them",
+          "bio": "Voice actor whose Norwegian dub credits include three current streaming shows.",
+          "photo": "12.jpg",
+          "websiteUrl": "https://example.com/mathiasrinde",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/mathiasrinde"
+            }
+          ]
+        }
+      ],
+      "programme": [
+        {
+          "date": "2026-05-23",
+          "startTime": "10:00",
+          "endTime": "10:30",
+          "title": "Doors open & registration",
+          "room": "Foyer"
+        },
+        {
+          "date": "2026-05-23",
+          "startTime": "10:45",
+          "endTime": "11:15",
+          "title": "Opening ceremony",
+          "room": "Main stage"
+        },
+        {
+          "date": "2026-05-23",
+          "startTime": "11:30",
+          "endTime": "12:30",
+          "title": "Cosplay competition — categories briefing",
+          "room": "Main stage",
+          "speaker": "Saga Kalland"
+        },
+        {
+          "date": "2026-05-23",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Workshop: armour fabrication basics",
+          "room": "Workshop A",
+          "speaker": "Vegard Bakken"
+        },
+        {
+          "date": "2026-05-23",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Panel: self-publishing in Norway",
+          "room": "Panel room 1",
+          "speaker": "Vegard Bakken"
+        },
+        {
+          "date": "2026-05-23",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Workshop: digital inking",
+          "room": "Workshop B",
+          "speaker": "Mathias Rinde"
+        },
+        {
+          "date": "2026-05-23",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Q&A: voice acting",
+          "room": "Panel room 1",
+          "speaker": "Vegard Bakken"
+        },
+        {
+          "date": "2026-05-23",
+          "startTime": "15:00",
+          "endTime": "16:30",
+          "title": "Cosplay competition — main show",
+          "room": "Main stage",
+          "speaker": "Vegard Bakken"
+        },
+        {
+          "date": "2026-05-23",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Workshop: watercolour basics",
+          "room": "Workshop A",
+          "speaker": "Ingvild Fjeldstad"
+        },
+        {
+          "date": "2026-05-23",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Manga spotlight",
+          "room": "Panel room 1",
+          "speaker": "Vegard Bakken"
+        },
+        {
+          "date": "2026-05-23",
+          "startTime": "17:30",
+          "endTime": "18:30",
+          "title": "Idol stage",
+          "room": "Main stage",
+          "speaker": "Mathias Rinde"
+        },
+        {
+          "date": "2026-05-23",
+          "startTime": "19:00",
+          "endTime": "20:00",
+          "title": "Closing & afterparty announcement",
+          "room": "Main stage"
+        },
+        {
+          "date": "2026-05-24",
+          "startTime": "10:00",
+          "endTime": "10:30",
+          "title": "Doors open & registration",
+          "room": "Foyer"
+        },
+        {
+          "date": "2026-05-24",
+          "startTime": "10:45",
+          "endTime": "11:15",
+          "title": "Opening ceremony",
+          "room": "Main stage"
+        },
+        {
+          "date": "2026-05-24",
+          "startTime": "11:30",
+          "endTime": "12:30",
+          "title": "Cosplay competition — categories briefing",
+          "room": "Main stage",
+          "speaker": "Vegard Bakken"
+        },
+        {
+          "date": "2026-05-24",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Workshop: armour fabrication basics",
+          "room": "Workshop A",
+          "speaker": "Synne Bjørndal"
+        },
+        {
+          "date": "2026-05-24",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Panel: self-publishing in Norway",
+          "room": "Panel room 1",
+          "speaker": "Synne Bjørndal"
+        },
+        {
+          "date": "2026-05-24",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Workshop: digital inking",
+          "room": "Workshop B",
+          "speaker": "Ingvild Fjeldstad"
+        },
+        {
+          "date": "2026-05-24",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Q&A: voice acting",
+          "room": "Panel room 1",
+          "speaker": "Synne Bjørndal"
+        },
+        {
+          "date": "2026-05-24",
+          "startTime": "15:00",
+          "endTime": "16:30",
+          "title": "Cosplay competition — main show",
+          "room": "Main stage",
+          "speaker": "Synne Bjørndal"
+        },
+        {
+          "date": "2026-05-24",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Workshop: watercolour basics",
+          "room": "Workshop A",
+          "speaker": "Vegard Bakken"
+        },
+        {
+          "date": "2026-05-24",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Manga spotlight",
+          "room": "Panel room 1",
+          "speaker": "Synne Bjørndal"
+        },
+        {
+          "date": "2026-05-24",
+          "startTime": "17:30",
+          "endTime": "18:30",
+          "title": "Idol stage",
+          "room": "Main stage",
+          "speaker": "Ingvild Fjeldstad"
+        },
+        {
+          "date": "2026-05-24",
+          "startTime": "19:00",
+          "endTime": "20:00",
+          "title": "Closing & afterparty announcement",
+          "room": "Main stage"
+        }
+      ]
     }
   ],
   "assets": {
-    "logo": { "file": "logo.png", "source": "https://static.wixstatic.com/media/f555b9_506a993340c64959a291e3575df65cf6~mv2.png" },
-    "banner": { "file": "banner.png", "source": "https://static.wixstatic.com/media/f555b9_e0bbb4f5280748399338061c78dd1e92~mv2.png" },
+    "logo": {
+      "file": "logo.png",
+      "source": "https://static.wixstatic.com/media/f555b9_506a993340c64959a291e3575df65cf6~mv2.png"
+    },
+    "banner": {
+      "file": "banner.png",
+      "source": "https://static.wixstatic.com/media/f555b9_e0bbb4f5280748399338061c78dd1e92~mv2.png"
+    },
     "bannerMobile": null
   },
   "scrapedFrom": [

@@ -13,12 +13,81 @@
       "endDate": null,
       "venueCity": "Trondheim",
       "venueCountry": "NO",
-      "venueName": "Rosenborg Skole"
+      "venueName": "Rosenborg Skole",
+      "guests": [
+        {
+          "name": "Saga Rønning",
+          "title": "MC",
+          "role": "Cosplay competition host",
+          "pronouns": "he/they",
+          "bio": "Embroidery artist working with mythological motifs; small-batch only.",
+          "photo": "8.jpg",
+          "websiteUrl": "https://example.com/sagaronning",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/sagaronning"
+            }
+          ]
+        },
+        {
+          "name": "Vegard Tveit",
+          "title": "Featured guest",
+          "role": "Workshop host: armour fabrication",
+          "pronouns": "she/her",
+          "bio": "Comics editor and panel host; fluent in mid-aughts shōnen references.",
+          "photo": "10.jpg",
+          "websiteUrl": "https://example.com/vegardtveit",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/vegardtveit"
+            }
+          ]
+        },
+        {
+          "name": "Synne Halvorsen",
+          "title": "Featured guest",
+          "role": "Workshop host: digital inking",
+          "pronouns": "he/him",
+          "bio": "3D printing technician moonlighting as a prop-builder for stage productions.",
+          "photo": "12.jpg",
+          "websiteUrl": "https://example.com/synnehalvorsen",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/synnehalvorsen"
+            }
+          ]
+        },
+        {
+          "name": "Espen Holmen",
+          "title": "Spotlight",
+          "role": "Manga artist",
+          "pronouns": "they/them",
+          "bio": "Idol-stage host whose own group performs across Norway and Sweden.",
+          "photo": "2.jpg",
+          "websiteUrl": "https://example.com/espenholmen",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/espenholmen"
+            }
+          ]
+        }
+      ],
+      "programme": []
     }
   ],
   "assets": {
-    "logo": { "file": "logo.jpg", "source": "https://i0.wp.com/hexconspillfestival.org/wp-content/uploads/2023/04/cropped-NettLogo-1.jpg" },
-    "banner": { "file": "banner.jpg", "source": "https://hexconspillfestival.org/wp-content/uploads/2025/06/cropped-WebHeader2025.jpg" },
+    "logo": {
+      "file": "logo.jpg",
+      "source": "https://i0.wp.com/hexconspillfestival.org/wp-content/uploads/2023/04/cropped-NettLogo-1.jpg"
+    },
+    "banner": {
+      "file": "banner.jpg",
+      "source": "https://hexconspillfestival.org/wp-content/uploads/2025/06/cropped-WebHeader2025.jpg"
+    },
     "bannerMobile": null
   },
   "scrapedFrom": [

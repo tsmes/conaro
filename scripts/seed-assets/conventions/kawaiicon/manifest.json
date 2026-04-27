@@ -12,11 +12,340 @@
       "endDate": "2027-04-11",
       "venueCity": "Porsgrunn",
       "venueCountry": "NO",
-      "venueName": "Ælvespeilet"
+      "venueName": "Ælvespeilet",
+      "guests": [
+        {
+          "name": "Joakim Solheim",
+          "title": "Featured guest",
+          "role": "Workshop host: watercolour basics",
+          "pronouns": "she/they",
+          "bio": "Costume judge with twelve years on the Nordic competition circuit.",
+          "photo": "7.jpg",
+          "websiteUrl": "https://example.com/joakimsolheim",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/joakimsolheim"
+            }
+          ]
+        },
+        {
+          "name": "Ida Mjøen",
+          "title": "Featured guest",
+          "role": "Workshop host: clay sculpting",
+          "pronouns": "he/they",
+          "bio": "Embroidery artist working with mythological motifs; small-batch only.",
+          "photo": "9.jpg",
+          "websiteUrl": "https://example.com/idamjoen",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/idamjoen"
+            }
+          ]
+        },
+        {
+          "name": "Tobias Sandvik",
+          "title": "Spotlight",
+          "role": "Comics writer",
+          "pronouns": "she/her",
+          "bio": "Comics editor and panel host; fluent in mid-aughts shōnen references.",
+          "photo": "11.jpg",
+          "websiteUrl": "https://example.com/tobiassandvik",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/tobiassandvik"
+            }
+          ]
+        },
+        {
+          "name": "Frida Velde",
+          "title": "Panellist",
+          "role": "Voice acting Q&A",
+          "pronouns": "he/him",
+          "bio": "3D printing technician moonlighting as a prop-builder for stage productions.",
+          "photo": "1.jpg",
+          "websiteUrl": "https://example.com/fridavelde",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/fridavelde"
+            }
+          ]
+        },
+        {
+          "name": "Kristoffer Lien",
+          "title": "Performer",
+          "role": "Idol stage compère",
+          "pronouns": "they/them",
+          "bio": "Idol-stage host whose own group performs across Norway and Sweden.",
+          "photo": "11.jpg",
+          "websiteUrl": "https://example.com/kristofferlien",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/kristofferlien"
+            }
+          ]
+        },
+        {
+          "name": "Maja Rønning",
+          "title": "Guest of honour",
+          "role": "Cosplay judge",
+          "pronouns": "she/they",
+          "bio": "Tabletop designer; author of 'Aldermark', a Nordic-folklore RPG.",
+          "photo": "1.jpg",
+          "websiteUrl": "https://example.com/majaronning",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/majaronning"
+            }
+          ]
+        }
+      ],
+      "programme": [
+        {
+          "date": "2027-04-09",
+          "startTime": "10:00",
+          "endTime": "10:30",
+          "title": "Doors open & registration",
+          "room": "Foyer"
+        },
+        {
+          "date": "2027-04-09",
+          "startTime": "10:45",
+          "endTime": "11:15",
+          "title": "Opening ceremony",
+          "room": "Main stage"
+        },
+        {
+          "date": "2027-04-09",
+          "startTime": "11:30",
+          "endTime": "12:30",
+          "title": "Cosplay competition — categories briefing",
+          "room": "Main stage",
+          "speaker": "Frida Velde"
+        },
+        {
+          "date": "2027-04-09",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Workshop: armour fabrication basics",
+          "room": "Workshop A",
+          "speaker": "Tobias Sandvik"
+        },
+        {
+          "date": "2027-04-09",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Panel: self-publishing in Norway",
+          "room": "Panel room 1",
+          "speaker": "Kristoffer Lien"
+        },
+        {
+          "date": "2027-04-09",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Workshop: digital inking",
+          "room": "Workshop B",
+          "speaker": "Tobias Sandvik"
+        },
+        {
+          "date": "2027-04-09",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Q&A: voice acting",
+          "room": "Panel room 1",
+          "speaker": "Kristoffer Lien"
+        },
+        {
+          "date": "2027-04-09",
+          "startTime": "15:00",
+          "endTime": "16:30",
+          "title": "Cosplay competition — main show",
+          "room": "Main stage",
+          "speaker": "Joakim Solheim"
+        },
+        {
+          "date": "2027-04-09",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Workshop: watercolour basics",
+          "room": "Workshop A",
+          "speaker": "Frida Velde"
+        },
+        {
+          "date": "2027-04-09",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Manga spotlight",
+          "room": "Panel room 1",
+          "speaker": "Kristoffer Lien"
+        },
+        {
+          "date": "2027-04-09",
+          "startTime": "17:30",
+          "endTime": "18:30",
+          "title": "Idol stage",
+          "room": "Main stage",
+          "speaker": "Tobias Sandvik"
+        },
+        {
+          "date": "2027-04-09",
+          "startTime": "19:00",
+          "endTime": "20:00",
+          "title": "Closing & afterparty announcement",
+          "room": "Main stage"
+        },
+        {
+          "date": "2027-04-10",
+          "startTime": "10:00",
+          "endTime": "10:30",
+          "title": "Doors open & registration",
+          "room": "Foyer"
+        },
+        {
+          "date": "2027-04-10",
+          "startTime": "11:00",
+          "endTime": "12:00",
+          "title": "Workshop: digital inking",
+          "room": "Workshop",
+          "speaker": "Tobias Sandvik"
+        },
+        {
+          "date": "2027-04-10",
+          "startTime": "12:30",
+          "endTime": "13:30",
+          "title": "Panel: self-publishing in Norway",
+          "room": "Panel room",
+          "speaker": "Joakim Solheim"
+        },
+        {
+          "date": "2027-04-10",
+          "startTime": "14:00",
+          "endTime": "15:30",
+          "title": "Cosplay competition",
+          "room": "Main stage",
+          "speaker": "Kristoffer Lien"
+        },
+        {
+          "date": "2027-04-10",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Manga spotlight",
+          "room": "Panel room",
+          "speaker": "Joakim Solheim"
+        },
+        {
+          "date": "2027-04-10",
+          "startTime": "17:30",
+          "endTime": "18:00",
+          "title": "Closing",
+          "room": "Main stage"
+        },
+        {
+          "date": "2027-04-11",
+          "startTime": "10:00",
+          "endTime": "10:30",
+          "title": "Doors open & registration",
+          "room": "Foyer"
+        },
+        {
+          "date": "2027-04-11",
+          "startTime": "10:45",
+          "endTime": "11:15",
+          "title": "Opening ceremony",
+          "room": "Main stage"
+        },
+        {
+          "date": "2027-04-11",
+          "startTime": "11:30",
+          "endTime": "12:30",
+          "title": "Cosplay competition — categories briefing",
+          "room": "Main stage",
+          "speaker": "Joakim Solheim"
+        },
+        {
+          "date": "2027-04-11",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Workshop: armour fabrication basics",
+          "room": "Workshop A",
+          "speaker": "Frida Velde"
+        },
+        {
+          "date": "2027-04-11",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Panel: self-publishing in Norway",
+          "room": "Panel room 1",
+          "speaker": "Ida Mjøen"
+        },
+        {
+          "date": "2027-04-11",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Workshop: digital inking",
+          "room": "Workshop B",
+          "speaker": "Frida Velde"
+        },
+        {
+          "date": "2027-04-11",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Q&A: voice acting",
+          "room": "Panel room 1",
+          "speaker": "Ida Mjøen"
+        },
+        {
+          "date": "2027-04-11",
+          "startTime": "15:00",
+          "endTime": "16:30",
+          "title": "Cosplay competition — main show",
+          "room": "Main stage",
+          "speaker": "Maja Rønning"
+        },
+        {
+          "date": "2027-04-11",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Workshop: watercolour basics",
+          "room": "Workshop A",
+          "speaker": "Tobias Sandvik"
+        },
+        {
+          "date": "2027-04-11",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Manga spotlight",
+          "room": "Panel room 1",
+          "speaker": "Ida Mjøen"
+        },
+        {
+          "date": "2027-04-11",
+          "startTime": "17:30",
+          "endTime": "18:30",
+          "title": "Idol stage",
+          "room": "Main stage",
+          "speaker": "Ida Mjøen"
+        },
+        {
+          "date": "2027-04-11",
+          "startTime": "19:00",
+          "endTime": "20:00",
+          "title": "Closing & afterparty announcement",
+          "room": "Main stage"
+        }
+      ]
     }
   ],
   "assets": {
-    "logo": { "file": "logo.jpg", "source": "https://static.wixstatic.com/media/7b5039_57899b8f183c4a278c8e0752c66fa72e~mv2.jpg" },
+    "logo": {
+      "file": "logo.jpg",
+      "source": "https://static.wixstatic.com/media/7b5039_57899b8f183c4a278c8e0752c66fa72e~mv2.jpg"
+    },
     "banner": null,
     "bannerMobile": null
   },

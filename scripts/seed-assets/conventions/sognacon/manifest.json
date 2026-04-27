@@ -12,11 +12,264 @@
       "endDate": "2027-02-28",
       "venueCity": "Sogndal",
       "venueCountry": "NO",
-      "venueName": "Sogndal Kulturhus"
+      "venueName": "Sogndal Kulturhus",
+      "guests": [
+        {
+          "name": "Marius Sandvik",
+          "title": "Featured guest",
+          "role": "Workshop host: clay sculpting",
+          "pronouns": "he/him",
+          "bio": "Voice actor whose Norwegian dub credits include three current streaming shows.",
+          "photo": "1.jpg",
+          "websiteUrl": "https://example.com/mariussandvik",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/mariussandvik"
+            }
+          ]
+        },
+        {
+          "name": "Saga Velde",
+          "title": "Spotlight",
+          "role": "Comics writer",
+          "pronouns": "they/them",
+          "bio": "Costume judge with twelve years on the Nordic competition circuit.",
+          "photo": "3.jpg",
+          "websiteUrl": "https://example.com/sagavelde",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/sagavelde"
+            }
+          ]
+        },
+        {
+          "name": "Linnea Lien",
+          "title": "Panellist",
+          "role": "Voice acting Q&A",
+          "pronouns": "she/they",
+          "bio": "Embroidery artist working with mythological motifs; small-batch only.",
+          "photo": "1.jpg",
+          "websiteUrl": "https://example.com/linnealien",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/linnealien"
+            }
+          ]
+        },
+        {
+          "name": "Ingrid Rønning",
+          "title": "Performer",
+          "role": "Idol stage compère",
+          "pronouns": "he/they",
+          "bio": "Comics editor and panel host; fluent in mid-aughts shōnen references.",
+          "photo": "3.jpg",
+          "websiteUrl": "https://example.com/ingridronning",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/ingridronning"
+            }
+          ]
+        }
+      ],
+      "programme": [
+        {
+          "date": "2027-02-27",
+          "startTime": "10:00",
+          "endTime": "10:30",
+          "title": "Doors open & registration",
+          "room": "Foyer"
+        },
+        {
+          "date": "2027-02-27",
+          "startTime": "10:45",
+          "endTime": "11:15",
+          "title": "Opening ceremony",
+          "room": "Main stage"
+        },
+        {
+          "date": "2027-02-27",
+          "startTime": "11:30",
+          "endTime": "12:30",
+          "title": "Cosplay competition — categories briefing",
+          "room": "Main stage",
+          "speaker": "Saga Velde"
+        },
+        {
+          "date": "2027-02-27",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Workshop: armour fabrication basics",
+          "room": "Workshop A",
+          "speaker": "Linnea Lien"
+        },
+        {
+          "date": "2027-02-27",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Panel: self-publishing in Norway",
+          "room": "Panel room 1",
+          "speaker": "Linnea Lien"
+        },
+        {
+          "date": "2027-02-27",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Workshop: digital inking",
+          "room": "Workshop B",
+          "speaker": "Linnea Lien"
+        },
+        {
+          "date": "2027-02-27",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Q&A: voice acting",
+          "room": "Panel room 1",
+          "speaker": "Marius Sandvik"
+        },
+        {
+          "date": "2027-02-27",
+          "startTime": "15:00",
+          "endTime": "16:30",
+          "title": "Cosplay competition — main show",
+          "room": "Main stage",
+          "speaker": "Linnea Lien"
+        },
+        {
+          "date": "2027-02-27",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Workshop: watercolour basics",
+          "room": "Workshop A",
+          "speaker": "Saga Velde"
+        },
+        {
+          "date": "2027-02-27",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Manga spotlight",
+          "room": "Panel room 1",
+          "speaker": "Linnea Lien"
+        },
+        {
+          "date": "2027-02-27",
+          "startTime": "17:30",
+          "endTime": "18:30",
+          "title": "Idol stage",
+          "room": "Main stage",
+          "speaker": "Linnea Lien"
+        },
+        {
+          "date": "2027-02-27",
+          "startTime": "19:00",
+          "endTime": "20:00",
+          "title": "Closing & afterparty announcement",
+          "room": "Main stage"
+        },
+        {
+          "date": "2027-02-28",
+          "startTime": "10:00",
+          "endTime": "10:30",
+          "title": "Doors open & registration",
+          "room": "Foyer"
+        },
+        {
+          "date": "2027-02-28",
+          "startTime": "10:45",
+          "endTime": "11:15",
+          "title": "Opening ceremony",
+          "room": "Main stage"
+        },
+        {
+          "date": "2027-02-28",
+          "startTime": "11:30",
+          "endTime": "12:30",
+          "title": "Cosplay competition — categories briefing",
+          "room": "Main stage",
+          "speaker": "Linnea Lien"
+        },
+        {
+          "date": "2027-02-28",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Workshop: armour fabrication basics",
+          "room": "Workshop A",
+          "speaker": "Saga Velde"
+        },
+        {
+          "date": "2027-02-28",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Panel: self-publishing in Norway",
+          "room": "Panel room 1",
+          "speaker": "Ingrid Rønning"
+        },
+        {
+          "date": "2027-02-28",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Workshop: digital inking",
+          "room": "Workshop B",
+          "speaker": "Ingrid Rønning"
+        },
+        {
+          "date": "2027-02-28",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Q&A: voice acting",
+          "room": "Panel room 1",
+          "speaker": "Saga Velde"
+        },
+        {
+          "date": "2027-02-28",
+          "startTime": "15:00",
+          "endTime": "16:30",
+          "title": "Cosplay competition — main show",
+          "room": "Main stage",
+          "speaker": "Saga Velde"
+        },
+        {
+          "date": "2027-02-28",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Workshop: watercolour basics",
+          "room": "Workshop A",
+          "speaker": "Linnea Lien"
+        },
+        {
+          "date": "2027-02-28",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Manga spotlight",
+          "room": "Panel room 1",
+          "speaker": "Ingrid Rønning"
+        },
+        {
+          "date": "2027-02-28",
+          "startTime": "17:30",
+          "endTime": "18:30",
+          "title": "Idol stage",
+          "room": "Main stage",
+          "speaker": "Saga Velde"
+        },
+        {
+          "date": "2027-02-28",
+          "startTime": "19:00",
+          "endTime": "20:00",
+          "title": "Closing & afterparty announcement",
+          "room": "Main stage"
+        }
+      ]
     }
   ],
   "assets": {
-    "logo": { "file": "logo.png", "source": "https://cdn.sanity.io/images/6hcnmhdb/production/261f0f94239d13d66141ec4cd20abc502a015e0a-960x540.png" },
+    "logo": {
+      "file": "logo.png",
+      "source": "https://cdn.sanity.io/images/6hcnmhdb/production/261f0f94239d13d66141ec4cd20abc502a015e0a-960x540.png"
+    },
     "banner": null,
     "bannerMobile": null
   },

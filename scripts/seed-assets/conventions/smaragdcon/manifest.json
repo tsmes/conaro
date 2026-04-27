@@ -12,15 +12,98 @@
       "endDate": null,
       "venueCity": "Eidsvoll",
       "venueCountry": "NO",
-      "venueName": "Panorama kulturhus"
+      "venueName": "Panorama kulturhus",
+      "guests": [
+        {
+          "name": "Kaja Kalland",
+          "title": "Featured guest",
+          "role": "Workshop host: digital inking",
+          "pronouns": "she/her",
+          "bio": "Tabletop designer; author of 'Aldermark', a Nordic-folklore RPG.",
+          "photo": "12.jpg",
+          "websiteUrl": "https://example.com/kajakalland",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/kajakalland"
+            }
+          ]
+        },
+        {
+          "name": "Joakim Bakken",
+          "title": "Spotlight",
+          "role": "Manga artist",
+          "pronouns": "he/him",
+          "bio": "Plushie and soft-sculpture maker specialising in original characters.",
+          "photo": "2.jpg",
+          "websiteUrl": "https://example.com/joakimbakken",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/joakimbakken"
+            }
+          ]
+        },
+        {
+          "name": "Ida Bjørndal",
+          "title": "Panellist",
+          "role": "Game design Q&A",
+          "pronouns": "they/them",
+          "bio": "Pixel-art studio lead; known for the cult retro-RPG 'Ravnehjem'.",
+          "photo": "4.jpg",
+          "websiteUrl": "https://example.com/idabjorndal",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/idabjorndal"
+            }
+          ]
+        },
+        {
+          "name": "Halvard Rinde",
+          "title": "Panellist",
+          "role": "Self-publishing in Norway",
+          "pronouns": "she/they",
+          "bio": "Bergen-based cosplayer specialising in armour and prop fabrication. Runs the Nordic Armour Workshop for new makers.",
+          "photo": "2.jpg",
+          "websiteUrl": "https://example.com/halvardrinde",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/halvardrinde"
+            }
+          ]
+        },
+        {
+          "name": "Jorunn Nordheim",
+          "title": "MC",
+          "role": "Cosplay competition host",
+          "pronouns": "he/they",
+          "bio": "Oslo manga artist whose serial 'Halvtimes' won the 2024 Sproing nominee shortlist.",
+          "photo": "4.jpg",
+          "websiteUrl": "https://example.com/jorunnnordheim",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/jorunnnordheim"
+            }
+          ]
+        }
+      ],
+      "programme": []
     }
   ],
   "assets": {
     "logo": null,
-    "banner": { "file": "banner.png", "source": "https://images.squarespace-cdn.com/content/v1/65554167993c2070427b06f3/4a9f5544-8815-42da-8f60-dffb8175d3fc/SmaragdCon+2026+-+Enchanted+Forest+%281920+x+1080+px%29.png" },
+    "banner": {
+      "file": "banner.png",
+      "source": "https://images.squarespace-cdn.com/content/v1/65554167993c2070427b06f3/4a9f5544-8815-42da-8f60-dffb8175d3fc/SmaragdCon+2026+-+Enchanted+Forest+%281920+x+1080+px%29.png"
+    },
     "bannerMobile": null
   },
-  "scrapedFrom": ["https://www.smaragdcon.com/"],
+  "scrapedFrom": [
+    "https://www.smaragdcon.com/"
+  ],
   "scrapedAt": "2026-04-27",
   "notes": "SmaragdCon 2026 (theme: Enchanted Forest) is announced on the front page with venues Panorama kulturhus + Eidsvoll bibliotek, but specific dates were not visible on the homepage and could not be located via search — left null. No standalone logo asset was exposed; only the announcement banner was available.",
   "skip": false

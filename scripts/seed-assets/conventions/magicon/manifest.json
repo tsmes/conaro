@@ -12,12 +12,268 @@
       "endDate": "2026-06-21",
       "venueCity": "Oslo",
       "venueCountry": "NO",
-      "venueName": "Oslo Konserthus"
+      "venueName": "Oslo Konserthus",
+      "guests": [
+        {
+          "name": "Kristoffer Vang",
+          "title": "Panellist",
+          "role": "Voice acting Q&A",
+          "pronouns": "he/they",
+          "bio": "Oslo manga artist whose serial 'Halvtimes' won the 2024 Sproing nominee shortlist.",
+          "photo": "1.jpg",
+          "websiteUrl": "https://example.com/kristoffervang",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/kristoffervang"
+            }
+          ]
+        },
+        {
+          "name": "Maja Fjeldstad",
+          "title": "Performer",
+          "role": "Idol stage compère",
+          "pronouns": "she/her",
+          "bio": "Trondheim illustrator working in ink and risograph; stories about queer joy and slow mornings.",
+          "photo": "3.jpg",
+          "websiteUrl": "https://example.com/majafjeldstad",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/majafjeldstad"
+            }
+          ]
+        },
+        {
+          "name": "Sigrid Sæther",
+          "title": "Guest of honour",
+          "role": "Cosplay judge",
+          "pronouns": "he/him",
+          "bio": "Self-published comics writer; long-running webcomic 'Fjordwalker' wraps its sixth volume this year.",
+          "photo": "5.jpg",
+          "websiteUrl": "https://example.com/sigridsaether",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/sigridsaether"
+            }
+          ]
+        },
+        {
+          "name": "Eirik Kalland",
+          "title": "Featured guest",
+          "role": "Workshop host: watercolour basics",
+          "pronouns": "they/them",
+          "bio": "Stavanger watercolourist chasing folk-horror aesthetics. Zines printed in small runs.",
+          "photo": "7.jpg",
+          "websiteUrl": "https://example.com/eirikkalland",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/eirikkalland"
+            }
+          ]
+        }
+      ],
+      "programme": [
+        {
+          "date": "2026-06-20",
+          "startTime": "10:00",
+          "endTime": "10:30",
+          "title": "Doors open & registration",
+          "room": "Foyer"
+        },
+        {
+          "date": "2026-06-20",
+          "startTime": "10:45",
+          "endTime": "11:15",
+          "title": "Opening ceremony",
+          "room": "Main stage"
+        },
+        {
+          "date": "2026-06-20",
+          "startTime": "11:30",
+          "endTime": "12:30",
+          "title": "Cosplay competition — categories briefing",
+          "room": "Main stage",
+          "speaker": "Maja Fjeldstad"
+        },
+        {
+          "date": "2026-06-20",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Workshop: armour fabrication basics",
+          "room": "Workshop A",
+          "speaker": "Sigrid Sæther"
+        },
+        {
+          "date": "2026-06-20",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Panel: self-publishing in Norway",
+          "room": "Panel room 1",
+          "speaker": "Sigrid Sæther"
+        },
+        {
+          "date": "2026-06-20",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Workshop: digital inking",
+          "room": "Workshop B",
+          "speaker": "Sigrid Sæther"
+        },
+        {
+          "date": "2026-06-20",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Q&A: voice acting",
+          "room": "Panel room 1",
+          "speaker": "Kristoffer Vang"
+        },
+        {
+          "date": "2026-06-20",
+          "startTime": "15:00",
+          "endTime": "16:30",
+          "title": "Cosplay competition — main show",
+          "room": "Main stage",
+          "speaker": "Sigrid Sæther"
+        },
+        {
+          "date": "2026-06-20",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Workshop: watercolour basics",
+          "room": "Workshop A",
+          "speaker": "Maja Fjeldstad"
+        },
+        {
+          "date": "2026-06-20",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Manga spotlight",
+          "room": "Panel room 1",
+          "speaker": "Sigrid Sæther"
+        },
+        {
+          "date": "2026-06-20",
+          "startTime": "17:30",
+          "endTime": "18:30",
+          "title": "Idol stage",
+          "room": "Main stage",
+          "speaker": "Sigrid Sæther"
+        },
+        {
+          "date": "2026-06-20",
+          "startTime": "19:00",
+          "endTime": "20:00",
+          "title": "Closing & afterparty announcement",
+          "room": "Main stage"
+        },
+        {
+          "date": "2026-06-21",
+          "startTime": "10:00",
+          "endTime": "10:30",
+          "title": "Doors open & registration",
+          "room": "Foyer"
+        },
+        {
+          "date": "2026-06-21",
+          "startTime": "10:45",
+          "endTime": "11:15",
+          "title": "Opening ceremony",
+          "room": "Main stage"
+        },
+        {
+          "date": "2026-06-21",
+          "startTime": "11:30",
+          "endTime": "12:30",
+          "title": "Cosplay competition — categories briefing",
+          "room": "Main stage",
+          "speaker": "Sigrid Sæther"
+        },
+        {
+          "date": "2026-06-21",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Workshop: armour fabrication basics",
+          "room": "Workshop A",
+          "speaker": "Maja Fjeldstad"
+        },
+        {
+          "date": "2026-06-21",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Panel: self-publishing in Norway",
+          "room": "Panel room 1",
+          "speaker": "Eirik Kalland"
+        },
+        {
+          "date": "2026-06-21",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Workshop: digital inking",
+          "room": "Workshop B",
+          "speaker": "Eirik Kalland"
+        },
+        {
+          "date": "2026-06-21",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Q&A: voice acting",
+          "room": "Panel room 1",
+          "speaker": "Maja Fjeldstad"
+        },
+        {
+          "date": "2026-06-21",
+          "startTime": "15:00",
+          "endTime": "16:30",
+          "title": "Cosplay competition — main show",
+          "room": "Main stage",
+          "speaker": "Maja Fjeldstad"
+        },
+        {
+          "date": "2026-06-21",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Workshop: watercolour basics",
+          "room": "Workshop A",
+          "speaker": "Sigrid Sæther"
+        },
+        {
+          "date": "2026-06-21",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Manga spotlight",
+          "room": "Panel room 1",
+          "speaker": "Eirik Kalland"
+        },
+        {
+          "date": "2026-06-21",
+          "startTime": "17:30",
+          "endTime": "18:30",
+          "title": "Idol stage",
+          "room": "Main stage",
+          "speaker": "Maja Fjeldstad"
+        },
+        {
+          "date": "2026-06-21",
+          "startTime": "19:00",
+          "endTime": "20:00",
+          "title": "Closing & afterparty announcement",
+          "room": "Main stage"
+        }
+      ]
     }
   ],
   "assets": {
-    "logo": { "file": "logo.avif", "source": "https://www.magicon.no/wp-content/uploads/2024/09/Magicon-Logo.avif" },
-    "banner": { "file": "banner.png", "source": "https://www.magicon.no/wp-content/uploads/2025/06/Magicon-Vanguard_logodate.png" },
+    "logo": {
+      "file": "logo.avif",
+      "source": "https://www.magicon.no/wp-content/uploads/2024/09/Magicon-Logo.avif"
+    },
+    "banner": {
+      "file": "banner.png",
+      "source": "https://www.magicon.no/wp-content/uploads/2025/06/Magicon-Vanguard_logodate.png"
+    },
     "bannerMobile": null
   },
   "scrapedFrom": [

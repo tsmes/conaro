@@ -4,12 +4,7 @@ Specification: `.claude/plans/seed-conventions-spec.md` / GitHub issue #12.
 
 ## Phase A — Asset bundle on disk
 
-`scripts/seed-assets/conventions/<slug>/` with `manifest.json`, `logo.<ext>`, `banner.<ext>`, optional `banner-mobile.<ext>`. Schema documented in `scripts/seed-assets/conventions/README.md`. Today's status:
-
-- **Complete (manifest + logo + banner)**: magicon, harucon, hexcon, kawaiicon, metrocon, mizucon, norcon, retromessa, sognacon, torucon, constellation, furnavia (12)
-- **In progress this session**: fredrikstad-sci-fi-festival, kazokucon, pokecon (manifests just written), banzaicon (manifest written), animanga (manifest written), spillexpo (assets downloaded, manifest pending), adventurecon (assets downloading from web.archive — may need fallback)
-- **Stub-only (assets unavailable)**: t-con (no public site), riscon (Instagram-only), unagicon (site 403), fandomatics (FB-only)
-- **Partial**: smaragdcon (banner only, no logo), conpassion (banner only, no logo)
+`scripts/seed-assets/conventions/<slug>/` with `manifest.json`, `logo.<ext>`, `banner.<ext>`, optional `banner-mobile.<ext>`. Schema documented in `scripts/seed-assets/conventions/README.md`.
 
 Phase A finishes when every slug in the spec list has a folder with at minimum a `manifest.json`. Slugs without images are valid — the seeder skips asset upload for them and inserts the convention row with `logoPath = NULL` so the design system's gradient fallback renders.
 
@@ -17,8 +12,31 @@ Phase A finishes when every slug in the spec list has a folder with at minimum a
 
 - [x] A1. Replace `pokecon` assets with real PokéCon Norway logo + banner.
 - [x] A2. Write manifest for `fredrikstad-sci-fi-festival`, `kazokucon`, `pokecon`, `banzaicon`, `animanga`.
-- [ ] A3. Try to fetch SpillExpo + AdventureCon assets via browser-style curl / Wayback. (SpillExpo: success. AdventureCon: site is parked, Wayback snapshots return 404; fall back to manifest-only.)
-- [ ] A4. Write manifest stubs for `spillexpo`, `adventurecon`, `fandomatics`.
+- [x] A3. Fetch SpillExpo + AdventureCon assets. (SpillExpo: success. AdventureCon: site parked, falls back to manifest-only.)
+- [x] A4. Write manifest stubs for `spillexpo`, `adventurecon`, `fandomatics`.
+- [x] A5. Audit and remove photo-as-banner files; keep only real branded logos/banners.
+- [x] A6. Bump 5 past-dated events (ConPASSION, HaruCon, KawaiiCon, SognaCon, Unagicon) to 2027 weekend dates with original duration.
+
+Phase A committed at 355ab790.
+
+## Phase A2 — Guests + programme bundle
+
+Decision (from user): all 25 cons get synthetic-but-plausible guests and programmes; guest photos are curated CC0 stock portraits shared via a small bundled set.
+
+- `scripts/seed-assets/guests/` ships ~12 CC0 portrait JPGs (`1.jpg` … `12.jpg`) plus a `LICENSES.md` recording each source URL + license.
+- Each manifest's `events[]` entries gain optional `guests[]` and `programme[]` arrays:
+  - `guests[].photo` is the bundled portrait filename (e.g. `"3.jpg"`); the seeder uploads it to `events/<eventId>/guests/<uuid>.webp` via `processImage()`.
+  - `guests[].name`, `title`, `role?`, `pronouns?`, `bio?`, `websiteUrl?`, `socialLinks?[{type,url}]` mirror `Guest` in `src/lib/db/schema/events.ts`.
+  - `programme[].date` (YYYY-MM-DD, must fall inside the event window), `startTime` (HH:mm), `endTime?`, `title`, `room?`, `speaker?`. Mirrors `ProgrammeItem`.
+- Manifests are written so a manifest with empty `guests: []` / `programme: []` is valid — the seeder skips inserting and the org can populate via UI.
+- Synthetic data style: realistic Norwegian artist/cosplayer-style names, plausible roles (Cosplay judge, Workshop host: watercolour, Manga artist spotlight, Game design panel, Voice actor Q&A, etc.), generic con schedule (registration → opening → panels → cosplay contest → workshops → closing) lightly themed per con.
+
+### Tasks
+
+- [ ] A2.1. Curate 12 CC0 portraits from Pexels/Unsplash; write `LICENSES.md`.
+- [ ] A2.2. Extend manifest README with `guests[]` and `programme[]` schema.
+- [ ] A2.3. Add Zod schema entries for the new fields and update `loadConventionManifests()`.
+- [ ] A2.4. Author guests + programme entries for all 25 manifests (4–6 guests, 10–18 programme items per event day).
 
 ## Phase B — `npm run db:seed:conventions`
 
@@ -35,6 +53,8 @@ Main loop per manifest:
 2. Upsert the `conventions` row keyed on `organizerId`. Update fields from manifest (`name`, `description`, `websiteUrl`, `headerColor` if present).
 3. For each asset (logo / banner / bannerMobile): if file exists, upload it; if not, skip and leave path NULL.
 4. For each event in `manifest.events`, upsert by `(conventionId, name)` — create with `buildDefaultFieldRequirements()`, status `accepting_applications` if `applicationOpenDate` would be in the past, otherwise `draft`. Skip events with `null` startDate (they're informational only).
+5. For each guest in the event's manifest `guests[]`: upload `photo` (if present) to `events/<eventId>/guests/<uuid>.webp` via `processImage()`, then write the resulting `Guest` object into `events.guests` JSONB column. Replace the array on each run (idempotent).
+6. Write the event's manifest `programme[]` array verbatim into `events.programme` JSONB column.
 
 Idempotency: using upsert-by-organizer-email guarantees a re-run reuses the same convention row; logo/banner storage paths are stable (`conventions/<id>/logo.webp`) so re-uploading just overwrites.
 

@@ -12,12 +12,187 @@
       "endDate": null,
       "venueCity": "Grimstad",
       "venueCountry": "NO",
-      "venueName": "Grimstad bibliotek"
+      "venueName": "Grimstad bibliotek",
+      "guests": [
+        {
+          "name": "Sondre Sæther",
+          "title": "Performer",
+          "role": "Idol stage compère",
+          "pronouns": "she/they",
+          "bio": "Oslo manga artist whose serial 'Halvtimes' won the 2024 Sproing nominee shortlist.",
+          "photo": "3.jpg",
+          "websiteUrl": "https://example.com/sondresaether",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/sondresaether"
+            }
+          ]
+        },
+        {
+          "name": "Mari Kalland",
+          "title": "Guest of honour",
+          "role": "Cosplay judge",
+          "pronouns": "he/they",
+          "bio": "Trondheim illustrator working in ink and risograph; stories about queer joy and slow mornings.",
+          "photo": "5.jpg",
+          "websiteUrl": "https://example.com/marikalland",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/marikalland"
+            }
+          ]
+        },
+        {
+          "name": "Henrik Bakken",
+          "title": "Featured guest",
+          "role": "Workshop host: watercolour basics",
+          "pronouns": "she/her",
+          "bio": "Self-published comics writer; long-running webcomic 'Fjordwalker' wraps its sixth volume this year.",
+          "photo": "7.jpg",
+          "websiteUrl": "https://example.com/henrikbakken",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/henrikbakken"
+            }
+          ]
+        },
+        {
+          "name": "Kaja Bjørndal",
+          "title": "Featured guest",
+          "role": "Workshop host: clay sculpting",
+          "pronouns": "he/him",
+          "bio": "Stavanger watercolourist chasing folk-horror aesthetics. Zines printed in small runs.",
+          "photo": "9.jpg",
+          "websiteUrl": "https://example.com/kajabjorndal",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/kajabjorndal"
+            }
+          ]
+        },
+        {
+          "name": "Joakim Rinde",
+          "title": "Spotlight",
+          "role": "Comics writer",
+          "pronouns": "they/them",
+          "bio": "Game designer at a small Bergen indie studio; teaches a beginners' track at NTNU.",
+          "photo": "11.jpg",
+          "websiteUrl": "https://example.com/joakimrinde",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/joakimrinde"
+            }
+          ]
+        }
+      ],
+      "programme": [
+        {
+          "date": "2027-04-24",
+          "startTime": "10:00",
+          "endTime": "10:30",
+          "title": "Doors open & registration",
+          "room": "Foyer"
+        },
+        {
+          "date": "2027-04-24",
+          "startTime": "10:45",
+          "endTime": "11:15",
+          "title": "Opening ceremony",
+          "room": "Main stage"
+        },
+        {
+          "date": "2027-04-24",
+          "startTime": "11:30",
+          "endTime": "12:30",
+          "title": "Cosplay competition — categories briefing",
+          "room": "Main stage",
+          "speaker": "Sondre Sæther"
+        },
+        {
+          "date": "2027-04-24",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Workshop: armour fabrication basics",
+          "room": "Workshop A",
+          "speaker": "Mari Kalland"
+        },
+        {
+          "date": "2027-04-24",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Panel: self-publishing in Norway",
+          "room": "Panel room 1",
+          "speaker": "Mari Kalland"
+        },
+        {
+          "date": "2027-04-24",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Workshop: digital inking",
+          "room": "Workshop B",
+          "speaker": "Kaja Bjørndal"
+        },
+        {
+          "date": "2027-04-24",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Q&A: voice acting",
+          "room": "Panel room 1",
+          "speaker": "Henrik Bakken"
+        },
+        {
+          "date": "2027-04-24",
+          "startTime": "15:00",
+          "endTime": "16:30",
+          "title": "Cosplay competition — main show",
+          "room": "Main stage",
+          "speaker": "Kaja Bjørndal"
+        },
+        {
+          "date": "2027-04-24",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Workshop: watercolour basics",
+          "room": "Workshop A",
+          "speaker": "Joakim Rinde"
+        },
+        {
+          "date": "2027-04-24",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Manga spotlight",
+          "room": "Panel room 1",
+          "speaker": "Joakim Rinde"
+        },
+        {
+          "date": "2027-04-24",
+          "startTime": "17:30",
+          "endTime": "18:30",
+          "title": "Idol stage",
+          "room": "Main stage",
+          "speaker": "Mari Kalland"
+        },
+        {
+          "date": "2027-04-24",
+          "startTime": "19:00",
+          "endTime": "20:00",
+          "title": "Closing & afterparty announcement",
+          "room": "Main stage"
+        }
+      ]
     }
   ],
   "assets": {
     "logo": null,
-    "banner": { "file": "banner.png", "source": "https://static.wixstatic.com/media/054625_acaa438ca1cc4dfe8c5cdd190cf44ea3~mv2.png" },
+    "banner": {
+      "file": "banner.png",
+      "source": "https://static.wixstatic.com/media/054625_acaa438ca1cc4dfe8c5cdd190cf44ea3~mv2.png"
+    },
     "bannerMobile": null
   },
   "scrapedFrom": [

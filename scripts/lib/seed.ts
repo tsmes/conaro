@@ -20,6 +20,7 @@ import {
 
 export const SEED_PASSWORD = "seed-pass-123";
 export const SEED_ARTIST_DOMAIN = "seed-artist.conaro.test";
+export const SEED_ORGANIZER_DOMAIN = "seed-organizer.conaro.test";
 
 const FIRST_NAMES = [
   "Mika", "Jun", "Clara", "Marcus", "Isolde", "Rafael", "Fenna", "Priya",
@@ -213,6 +214,62 @@ export async function ensureSeedArtist(
 
 export async function getHashedSeedPassword(): Promise<string> {
   return hashPassword(SEED_PASSWORD);
+}
+
+export interface SeedOrganizerIds {
+  userId: string;
+  profileId: string;
+  email: string;
+  created: boolean;
+}
+
+// Idempotent: looks up the organizer profile by email; creates the
+// users + profiles rows if missing. Returns the profile id you'll use
+// as the conventions.organizerId FK.
+export async function ensureSeedOrganizer(
+  args: { slug: string; name: string },
+  passwordHash: string
+): Promise<SeedOrganizerIds> {
+  const email = `seed-organizer-${args.slug}@${SEED_ORGANIZER_DOMAIN}`;
+
+  const [existingUser] = await db
+    .select()
+    .from(users)
+    .where(eq(users.email, email));
+
+  if (existingUser) {
+    const [existingProfile] = await db
+      .select()
+      .from(profiles)
+      .where(eq(profiles.userId, existingUser.id));
+    return {
+      userId: existingUser.id,
+      profileId: existingProfile.id,
+      email,
+      created: false,
+    };
+  }
+
+  const [user] = await db
+    .insert(users)
+    .values({ email, name: args.name, password: passwordHash })
+    .returning();
+
+  const [profile] = await db
+    .insert(profiles)
+    .values({
+      userId: user.id,
+      role: "organizer",
+      displayName: args.name,
+    })
+    .returning();
+
+  return {
+    userId: user.id,
+    profileId: profile.id,
+    email,
+    created: true,
+  };
 }
 
 // Returns numeric arg or the default; e.g. parseCountArg("25", 10) -> 25.

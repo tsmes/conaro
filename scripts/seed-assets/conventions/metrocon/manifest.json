@@ -13,12 +13,295 @@
       "endDate": "2026-10-04",
       "venueCity": "Stavanger",
       "venueCountry": "NO",
-      "venueName": "Clarion Hotel Energy"
+      "venueName": "Clarion Hotel Energy",
+      "guests": [
+        {
+          "name": "Saga Brekke",
+          "title": "Panellist",
+          "role": "Self-publishing in Norway",
+          "pronouns": "he/they",
+          "bio": "Plushie and soft-sculpture maker specialising in original characters.",
+          "photo": "2.jpg",
+          "websiteUrl": "https://example.com/sagabrekke",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/sagabrekke"
+            }
+          ]
+        },
+        {
+          "name": "Linnea Solheim",
+          "title": "MC",
+          "role": "Cosplay competition host",
+          "pronouns": "she/her",
+          "bio": "Pixel-art studio lead; known for the cult retro-RPG 'Ravnehjem'.",
+          "photo": "12.jpg",
+          "websiteUrl": "https://example.com/linneasolheim",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/linneasolheim"
+            }
+          ]
+        },
+        {
+          "name": "Ingrid Mjøen",
+          "title": "Featured guest",
+          "role": "Workshop host: armour fabrication",
+          "pronouns": "he/him",
+          "bio": "Bergen-based cosplayer specialising in armour and prop fabrication. Runs the Nordic Armour Workshop for new makers.",
+          "photo": "2.jpg",
+          "websiteUrl": "https://example.com/ingridmjoen",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/ingridmjoen"
+            }
+          ]
+        },
+        {
+          "name": "Mathias Sandvik",
+          "title": "Featured guest",
+          "role": "Workshop host: digital inking",
+          "pronouns": "they/them",
+          "bio": "Oslo manga artist whose serial 'Halvtimes' won the 2024 Sproing nominee shortlist.",
+          "photo": "4.jpg",
+          "websiteUrl": "https://example.com/mathiassandvik",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/mathiassandvik"
+            }
+          ]
+        },
+        {
+          "name": "Astrid Velde",
+          "title": "Spotlight",
+          "role": "Manga artist",
+          "pronouns": "she/they",
+          "bio": "Trondheim illustrator working in ink and risograph; stories about queer joy and slow mornings.",
+          "photo": "6.jpg",
+          "websiteUrl": "https://example.com/astridvelde",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/astridvelde"
+            }
+          ]
+        },
+        {
+          "name": "Sondre Lien",
+          "title": "Panellist",
+          "role": "Game design Q&A",
+          "pronouns": "he/they",
+          "bio": "Self-published comics writer; long-running webcomic 'Fjordwalker' wraps its sixth volume this year.",
+          "photo": "8.jpg",
+          "websiteUrl": "https://example.com/sondrelien",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/sondrelien"
+            }
+          ]
+        }
+      ],
+      "programme": [
+        {
+          "date": "2026-10-03",
+          "startTime": "10:00",
+          "endTime": "10:30",
+          "title": "Doors open & registration",
+          "room": "Foyer"
+        },
+        {
+          "date": "2026-10-03",
+          "startTime": "10:45",
+          "endTime": "11:15",
+          "title": "Opening ceremony",
+          "room": "Main stage"
+        },
+        {
+          "date": "2026-10-03",
+          "startTime": "11:30",
+          "endTime": "12:30",
+          "title": "Cosplay competition — categories briefing",
+          "room": "Main stage",
+          "speaker": "Saga Brekke"
+        },
+        {
+          "date": "2026-10-03",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Workshop: armour fabrication basics",
+          "room": "Workshop A",
+          "speaker": "Linnea Solheim"
+        },
+        {
+          "date": "2026-10-03",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Panel: self-publishing in Norway",
+          "room": "Panel room 1",
+          "speaker": "Linnea Solheim"
+        },
+        {
+          "date": "2026-10-03",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Workshop: digital inking",
+          "room": "Workshop B",
+          "speaker": "Sondre Lien"
+        },
+        {
+          "date": "2026-10-03",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Q&A: voice acting",
+          "room": "Panel room 1",
+          "speaker": "Linnea Solheim"
+        },
+        {
+          "date": "2026-10-03",
+          "startTime": "15:00",
+          "endTime": "16:30",
+          "title": "Cosplay competition — main show",
+          "room": "Main stage",
+          "speaker": "Sondre Lien"
+        },
+        {
+          "date": "2026-10-03",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Workshop: watercolour basics",
+          "room": "Workshop A",
+          "speaker": "Astrid Velde"
+        },
+        {
+          "date": "2026-10-03",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Manga spotlight",
+          "room": "Panel room 1",
+          "speaker": "Linnea Solheim"
+        },
+        {
+          "date": "2026-10-03",
+          "startTime": "17:30",
+          "endTime": "18:30",
+          "title": "Idol stage",
+          "room": "Main stage",
+          "speaker": "Linnea Solheim"
+        },
+        {
+          "date": "2026-10-03",
+          "startTime": "19:00",
+          "endTime": "20:00",
+          "title": "Closing & afterparty announcement",
+          "room": "Main stage"
+        },
+        {
+          "date": "2026-10-04",
+          "startTime": "10:00",
+          "endTime": "10:30",
+          "title": "Doors open & registration",
+          "room": "Foyer"
+        },
+        {
+          "date": "2026-10-04",
+          "startTime": "10:45",
+          "endTime": "11:15",
+          "title": "Opening ceremony",
+          "room": "Main stage"
+        },
+        {
+          "date": "2026-10-04",
+          "startTime": "11:30",
+          "endTime": "12:30",
+          "title": "Cosplay competition — categories briefing",
+          "room": "Main stage",
+          "speaker": "Linnea Solheim"
+        },
+        {
+          "date": "2026-10-04",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Workshop: armour fabrication basics",
+          "room": "Workshop A",
+          "speaker": "Ingrid Mjøen"
+        },
+        {
+          "date": "2026-10-04",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Panel: self-publishing in Norway",
+          "room": "Panel room 1",
+          "speaker": "Ingrid Mjøen"
+        },
+        {
+          "date": "2026-10-04",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Workshop: digital inking",
+          "room": "Workshop B",
+          "speaker": "Ingrid Mjøen"
+        },
+        {
+          "date": "2026-10-04",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Q&A: voice acting",
+          "room": "Panel room 1",
+          "speaker": "Ingrid Mjøen"
+        },
+        {
+          "date": "2026-10-04",
+          "startTime": "15:00",
+          "endTime": "16:30",
+          "title": "Cosplay competition — main show",
+          "room": "Main stage",
+          "speaker": "Saga Brekke"
+        },
+        {
+          "date": "2026-10-04",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Workshop: watercolour basics",
+          "room": "Workshop A",
+          "speaker": "Mathias Sandvik"
+        },
+        {
+          "date": "2026-10-04",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Manga spotlight",
+          "room": "Panel room 1",
+          "speaker": "Ingrid Mjøen"
+        },
+        {
+          "date": "2026-10-04",
+          "startTime": "17:30",
+          "endTime": "18:30",
+          "title": "Idol stage",
+          "room": "Main stage",
+          "speaker": "Ingrid Mjøen"
+        },
+        {
+          "date": "2026-10-04",
+          "startTime": "19:00",
+          "endTime": "20:00",
+          "title": "Closing & afterparty announcement",
+          "room": "Main stage"
+        }
+      ]
     }
   ],
   "assets": {
-    "logo": { "file": "logo.svg", "source": "https://cdn.prod.website-files.com/5d9c7fda59eb4725acd73894/5e2dcc1ed2e0679d50b371f9_Metroconlogo-10.svg" },
-    "banner":  null,
+    "logo": {
+      "file": "logo.svg",
+      "source": "https://cdn.prod.website-files.com/5d9c7fda59eb4725acd73894/5e2dcc1ed2e0679d50b371f9_Metroconlogo-10.svg"
+    },
+    "banner": null,
     "bannerMobile": null
   },
   "scrapedFrom": [

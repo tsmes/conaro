@@ -12,7 +12,287 @@
       "endDate": "2027-03-28",
       "venueCity": "Ålesund",
       "venueCountry": "NO",
-      "venueName": "Parken kulturhus"
+      "venueName": "Parken kulturhus",
+      "guests": [
+        {
+          "name": "Mathias Bakken",
+          "title": "Panellist",
+          "role": "Voice acting Q&A",
+          "pronouns": "he/they",
+          "bio": "Trondheim illustrator working in ink and risograph; stories about queer joy and slow mornings.",
+          "photo": "1.jpg",
+          "websiteUrl": "https://example.com/mathiasbakken",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/mathiasbakken"
+            }
+          ]
+        },
+        {
+          "name": "Synne Bjørndal",
+          "title": "Performer",
+          "role": "Idol stage compère",
+          "pronouns": "she/her",
+          "bio": "Self-published comics writer; long-running webcomic 'Fjordwalker' wraps its sixth volume this year.",
+          "photo": "11.jpg",
+          "websiteUrl": "https://example.com/synnebjorndal",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/synnebjorndal"
+            }
+          ]
+        },
+        {
+          "name": "Espen Rinde",
+          "title": "Guest of honour",
+          "role": "Cosplay judge",
+          "pronouns": "he/him",
+          "bio": "Stavanger watercolourist chasing folk-horror aesthetics. Zines printed in small runs.",
+          "photo": "1.jpg",
+          "websiteUrl": "https://example.com/espenrinde",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/espenrinde"
+            }
+          ]
+        },
+        {
+          "name": "Ronja Nordheim",
+          "title": "Featured guest",
+          "role": "Workshop host: watercolour basics",
+          "pronouns": "they/them",
+          "bio": "Game designer at a small Bergen indie studio; teaches a beginners' track at NTNU.",
+          "photo": "3.jpg",
+          "websiteUrl": "https://example.com/ronjanordheim",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/ronjanordheim"
+            }
+          ]
+        },
+        {
+          "name": "Aksel Aas",
+          "title": "Featured guest",
+          "role": "Workshop host: clay sculpting",
+          "pronouns": "she/they",
+          "bio": "Voice actor whose Norwegian dub credits include three current streaming shows.",
+          "photo": "5.jpg",
+          "websiteUrl": "https://example.com/akselaas",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/akselaas"
+            }
+          ]
+        },
+        {
+          "name": "Iselin Lien",
+          "title": "Spotlight",
+          "role": "Comics writer",
+          "pronouns": "he/they",
+          "bio": "Costume judge with twelve years on the Nordic competition circuit.",
+          "photo": "7.jpg",
+          "websiteUrl": "https://example.com/iselinlien",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/iselinlien"
+            }
+          ]
+        }
+      ],
+      "programme": [
+        {
+          "date": "2027-03-27",
+          "startTime": "10:00",
+          "endTime": "10:30",
+          "title": "Doors open & registration",
+          "room": "Foyer"
+        },
+        {
+          "date": "2027-03-27",
+          "startTime": "10:45",
+          "endTime": "11:15",
+          "title": "Opening ceremony",
+          "room": "Main stage"
+        },
+        {
+          "date": "2027-03-27",
+          "startTime": "11:30",
+          "endTime": "12:30",
+          "title": "Cosplay competition — categories briefing",
+          "room": "Main stage",
+          "speaker": "Aksel Aas"
+        },
+        {
+          "date": "2027-03-27",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Workshop: armour fabrication basics",
+          "room": "Workshop A",
+          "speaker": "Ronja Nordheim"
+        },
+        {
+          "date": "2027-03-27",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Panel: self-publishing in Norway",
+          "room": "Panel room 1",
+          "speaker": "Iselin Lien"
+        },
+        {
+          "date": "2027-03-27",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Workshop: digital inking",
+          "room": "Workshop B",
+          "speaker": "Iselin Lien"
+        },
+        {
+          "date": "2027-03-27",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Q&A: voice acting",
+          "room": "Panel room 1",
+          "speaker": "Iselin Lien"
+        },
+        {
+          "date": "2027-03-27",
+          "startTime": "15:00",
+          "endTime": "16:30",
+          "title": "Cosplay competition — main show",
+          "room": "Main stage",
+          "speaker": "Iselin Lien"
+        },
+        {
+          "date": "2027-03-27",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Workshop: watercolour basics",
+          "room": "Workshop A",
+          "speaker": "Aksel Aas"
+        },
+        {
+          "date": "2027-03-27",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Manga spotlight",
+          "room": "Panel room 1",
+          "speaker": "Iselin Lien"
+        },
+        {
+          "date": "2027-03-27",
+          "startTime": "17:30",
+          "endTime": "18:30",
+          "title": "Idol stage",
+          "room": "Main stage",
+          "speaker": "Synne Bjørndal"
+        },
+        {
+          "date": "2027-03-27",
+          "startTime": "19:00",
+          "endTime": "20:00",
+          "title": "Closing & afterparty announcement",
+          "room": "Main stage"
+        },
+        {
+          "date": "2027-03-28",
+          "startTime": "10:00",
+          "endTime": "10:30",
+          "title": "Doors open & registration",
+          "room": "Foyer"
+        },
+        {
+          "date": "2027-03-28",
+          "startTime": "10:45",
+          "endTime": "11:15",
+          "title": "Opening ceremony",
+          "room": "Main stage"
+        },
+        {
+          "date": "2027-03-28",
+          "startTime": "11:30",
+          "endTime": "12:30",
+          "title": "Cosplay competition — categories briefing",
+          "room": "Main stage",
+          "speaker": "Synne Bjørndal"
+        },
+        {
+          "date": "2027-03-28",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Workshop: armour fabrication basics",
+          "room": "Workshop A",
+          "speaker": "Aksel Aas"
+        },
+        {
+          "date": "2027-03-28",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Panel: self-publishing in Norway",
+          "room": "Panel room 1",
+          "speaker": "Espen Rinde"
+        },
+        {
+          "date": "2027-03-28",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Workshop: digital inking",
+          "room": "Workshop B",
+          "speaker": "Mathias Bakken"
+        },
+        {
+          "date": "2027-03-28",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Q&A: voice acting",
+          "room": "Panel room 1",
+          "speaker": "Espen Rinde"
+        },
+        {
+          "date": "2027-03-28",
+          "startTime": "15:00",
+          "endTime": "16:30",
+          "title": "Cosplay competition — main show",
+          "room": "Main stage",
+          "speaker": "Mathias Bakken"
+        },
+        {
+          "date": "2027-03-28",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Workshop: watercolour basics",
+          "room": "Workshop A",
+          "speaker": "Ronja Nordheim"
+        },
+        {
+          "date": "2027-03-28",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Manga spotlight",
+          "room": "Panel room 1",
+          "speaker": "Espen Rinde"
+        },
+        {
+          "date": "2027-03-28",
+          "startTime": "17:30",
+          "endTime": "18:30",
+          "title": "Idol stage",
+          "room": "Main stage",
+          "speaker": "Espen Rinde"
+        },
+        {
+          "date": "2027-03-28",
+          "startTime": "19:00",
+          "endTime": "20:00",
+          "title": "Closing & afterparty announcement",
+          "room": "Main stage"
+        }
+      ]
     }
   ],
   "assets": {
@@ -27,5 +307,5 @@
   ],
   "scrapedAt": "2026-04-27",
   "notes": "unagicon.com returned HTTP 403 to the fetcher on every attempt, so no images could be pulled from the official site. Event metadata (Deep Sea, 28-29 March 2026, Parken kulturhus) was confirmed via search-result snippets and the happeningnext + fjordnorway listings. Note: this event already happened by today (2026-04-27); the next Unagicon edition is not yet announced. Logo and banner left null — needs manual asset upload.",
-  "skip": true
+  "skip": false
 }

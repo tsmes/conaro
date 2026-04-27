@@ -13,12 +13,436 @@
       "endDate": "2026-10-31",
       "venueCity": "Sarpsborg",
       "venueCountry": "NO",
-      "venueName": "Quality Hotel Sarpsborg"
+      "venueName": "Quality Hotel Sarpsborg",
+      "guests": [
+        {
+          "name": "Marius Bakken",
+          "title": "Panellist",
+          "role": "Voice acting Q&A",
+          "pronouns": "she/her",
+          "bio": "Embroidery artist working with mythological motifs; small-batch only.",
+          "photo": "1.jpg",
+          "websiteUrl": "https://example.com/mariusbakken",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/mariusbakken"
+            }
+          ]
+        },
+        {
+          "name": "Saga Bjørndal",
+          "title": "Performer",
+          "role": "Idol stage compère",
+          "pronouns": "he/him",
+          "bio": "Comics editor and panel host; fluent in mid-aughts shōnen references.",
+          "photo": "3.jpg",
+          "websiteUrl": "https://example.com/sagabjorndal",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/sagabjorndal"
+            }
+          ]
+        },
+        {
+          "name": "Vegard Rinde",
+          "title": "Guest of honour",
+          "role": "Cosplay judge",
+          "pronouns": "they/them",
+          "bio": "3D printing technician moonlighting as a prop-builder for stage productions.",
+          "photo": "5.jpg",
+          "websiteUrl": "https://example.com/vegardrinde",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/vegardrinde"
+            }
+          ]
+        },
+        {
+          "name": "Synne Nordheim",
+          "title": "Featured guest",
+          "role": "Workshop host: watercolour basics",
+          "pronouns": "she/they",
+          "bio": "Idol-stage host whose own group performs across Norway and Sweden.",
+          "photo": "7.jpg",
+          "websiteUrl": "https://example.com/synnenordheim",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/synnenordheim"
+            }
+          ]
+        },
+        {
+          "name": "Mathias Aas",
+          "title": "Featured guest",
+          "role": "Workshop host: clay sculpting",
+          "pronouns": "he/they",
+          "bio": "Tabletop designer; author of 'Aldermark', a Nordic-folklore RPG.",
+          "photo": "5.jpg",
+          "websiteUrl": "https://example.com/mathiasaas",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/mathiasaas"
+            }
+          ]
+        },
+        {
+          "name": "Astrid Lien",
+          "title": "Spotlight",
+          "role": "Comics writer",
+          "pronouns": "she/her",
+          "bio": "Plushie and soft-sculpture maker specialising in original characters.",
+          "photo": "7.jpg",
+          "websiteUrl": "https://example.com/astridlien",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/astridlien"
+            }
+          ]
+        }
+      ],
+      "programme": [
+        {
+          "date": "2026-10-27",
+          "startTime": "10:00",
+          "endTime": "10:30",
+          "title": "Doors open & registration",
+          "room": "Foyer"
+        },
+        {
+          "date": "2026-10-27",
+          "startTime": "10:45",
+          "endTime": "11:15",
+          "title": "Opening ceremony",
+          "room": "Main stage"
+        },
+        {
+          "date": "2026-10-27",
+          "startTime": "11:30",
+          "endTime": "12:30",
+          "title": "Cosplay competition — categories briefing",
+          "room": "Main stage",
+          "speaker": "Synne Nordheim"
+        },
+        {
+          "date": "2026-10-27",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Workshop: armour fabrication basics",
+          "room": "Workshop A",
+          "speaker": "Vegard Rinde"
+        },
+        {
+          "date": "2026-10-27",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Panel: self-publishing in Norway",
+          "room": "Panel room 1",
+          "speaker": "Mathias Aas"
+        },
+        {
+          "date": "2026-10-27",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Workshop: digital inking",
+          "room": "Workshop B",
+          "speaker": "Marius Bakken"
+        },
+        {
+          "date": "2026-10-27",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Q&A: voice acting",
+          "room": "Panel room 1",
+          "speaker": "Mathias Aas"
+        },
+        {
+          "date": "2026-10-27",
+          "startTime": "15:00",
+          "endTime": "16:30",
+          "title": "Cosplay competition — main show",
+          "room": "Main stage",
+          "speaker": "Marius Bakken"
+        },
+        {
+          "date": "2026-10-27",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Workshop: watercolour basics",
+          "room": "Workshop A",
+          "speaker": "Saga Bjørndal"
+        },
+        {
+          "date": "2026-10-27",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Manga spotlight",
+          "room": "Panel room 1",
+          "speaker": "Mathias Aas"
+        },
+        {
+          "date": "2026-10-27",
+          "startTime": "17:30",
+          "endTime": "18:30",
+          "title": "Idol stage",
+          "room": "Main stage",
+          "speaker": "Vegard Rinde"
+        },
+        {
+          "date": "2026-10-27",
+          "startTime": "19:00",
+          "endTime": "20:00",
+          "title": "Closing & afterparty announcement",
+          "room": "Main stage"
+        },
+        {
+          "date": "2026-10-28",
+          "startTime": "10:00",
+          "endTime": "10:30",
+          "title": "Doors open & registration",
+          "room": "Foyer"
+        },
+        {
+          "date": "2026-10-28",
+          "startTime": "11:00",
+          "endTime": "12:00",
+          "title": "Workshop: digital inking",
+          "room": "Workshop",
+          "speaker": "Synne Nordheim"
+        },
+        {
+          "date": "2026-10-28",
+          "startTime": "12:30",
+          "endTime": "13:30",
+          "title": "Panel: self-publishing in Norway",
+          "room": "Panel room",
+          "speaker": "Astrid Lien"
+        },
+        {
+          "date": "2026-10-28",
+          "startTime": "14:00",
+          "endTime": "15:30",
+          "title": "Cosplay competition",
+          "room": "Main stage",
+          "speaker": "Saga Bjørndal"
+        },
+        {
+          "date": "2026-10-28",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Manga spotlight",
+          "room": "Panel room",
+          "speaker": "Astrid Lien"
+        },
+        {
+          "date": "2026-10-28",
+          "startTime": "17:30",
+          "endTime": "18:00",
+          "title": "Closing",
+          "room": "Main stage"
+        },
+        {
+          "date": "2026-10-29",
+          "startTime": "10:00",
+          "endTime": "10:30",
+          "title": "Doors open & registration",
+          "room": "Foyer"
+        },
+        {
+          "date": "2026-10-29",
+          "startTime": "11:00",
+          "endTime": "12:00",
+          "title": "Workshop: digital inking",
+          "room": "Workshop",
+          "speaker": "Mathias Aas"
+        },
+        {
+          "date": "2026-10-29",
+          "startTime": "12:30",
+          "endTime": "13:30",
+          "title": "Panel: self-publishing in Norway",
+          "room": "Panel room",
+          "speaker": "Marius Bakken"
+        },
+        {
+          "date": "2026-10-29",
+          "startTime": "14:00",
+          "endTime": "15:30",
+          "title": "Cosplay competition",
+          "room": "Main stage",
+          "speaker": "Vegard Rinde"
+        },
+        {
+          "date": "2026-10-29",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Manga spotlight",
+          "room": "Panel room",
+          "speaker": "Marius Bakken"
+        },
+        {
+          "date": "2026-10-29",
+          "startTime": "17:30",
+          "endTime": "18:00",
+          "title": "Closing",
+          "room": "Main stage"
+        },
+        {
+          "date": "2026-10-30",
+          "startTime": "10:00",
+          "endTime": "10:30",
+          "title": "Doors open & registration",
+          "room": "Foyer"
+        },
+        {
+          "date": "2026-10-30",
+          "startTime": "11:00",
+          "endTime": "12:00",
+          "title": "Workshop: digital inking",
+          "room": "Workshop",
+          "speaker": "Mathias Aas"
+        },
+        {
+          "date": "2026-10-30",
+          "startTime": "12:30",
+          "endTime": "13:30",
+          "title": "Panel: self-publishing in Norway",
+          "room": "Panel room",
+          "speaker": "Vegard Rinde"
+        },
+        {
+          "date": "2026-10-30",
+          "startTime": "14:00",
+          "endTime": "15:30",
+          "title": "Cosplay competition",
+          "room": "Main stage",
+          "speaker": "Marius Bakken"
+        },
+        {
+          "date": "2026-10-30",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Manga spotlight",
+          "room": "Panel room",
+          "speaker": "Vegard Rinde"
+        },
+        {
+          "date": "2026-10-30",
+          "startTime": "17:30",
+          "endTime": "18:00",
+          "title": "Closing",
+          "room": "Main stage"
+        },
+        {
+          "date": "2026-10-31",
+          "startTime": "10:00",
+          "endTime": "10:30",
+          "title": "Doors open & registration",
+          "room": "Foyer"
+        },
+        {
+          "date": "2026-10-31",
+          "startTime": "10:45",
+          "endTime": "11:15",
+          "title": "Opening ceremony",
+          "room": "Main stage"
+        },
+        {
+          "date": "2026-10-31",
+          "startTime": "11:30",
+          "endTime": "12:30",
+          "title": "Cosplay competition — categories briefing",
+          "room": "Main stage",
+          "speaker": "Vegard Rinde"
+        },
+        {
+          "date": "2026-10-31",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Workshop: armour fabrication basics",
+          "room": "Workshop A",
+          "speaker": "Saga Bjørndal"
+        },
+        {
+          "date": "2026-10-31",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Panel: self-publishing in Norway",
+          "room": "Panel room 1",
+          "speaker": "Synne Nordheim"
+        },
+        {
+          "date": "2026-10-31",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Workshop: digital inking",
+          "room": "Workshop B",
+          "speaker": "Astrid Lien"
+        },
+        {
+          "date": "2026-10-31",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Q&A: voice acting",
+          "room": "Panel room 1",
+          "speaker": "Synne Nordheim"
+        },
+        {
+          "date": "2026-10-31",
+          "startTime": "15:00",
+          "endTime": "16:30",
+          "title": "Cosplay competition — main show",
+          "room": "Main stage",
+          "speaker": "Saga Bjørndal"
+        },
+        {
+          "date": "2026-10-31",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Workshop: watercolour basics",
+          "room": "Workshop A",
+          "speaker": "Vegard Rinde"
+        },
+        {
+          "date": "2026-10-31",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Manga spotlight",
+          "room": "Panel room 1",
+          "speaker": "Synne Nordheim"
+        },
+        {
+          "date": "2026-10-31",
+          "startTime": "17:30",
+          "endTime": "18:30",
+          "title": "Idol stage",
+          "room": "Main stage",
+          "speaker": "Synne Nordheim"
+        },
+        {
+          "date": "2026-10-31",
+          "startTime": "19:00",
+          "endTime": "20:00",
+          "title": "Closing & afterparty announcement",
+          "room": "Main stage"
+        }
+      ]
     }
   ],
   "assets": {
-    "logo": { "file": "logo.svg", "source": "https://furnavia.org/assets/GemRed-CUhSp_rY.svg" },
-    "banner": { "file": "banner.avif", "source": "https://furnavia.org/Ytdg_oBH8no.avif" },
+    "logo": {
+      "file": "logo.svg",
+      "source": "https://furnavia.org/assets/GemRed-CUhSp_rY.svg"
+    },
+    "banner": {
+      "file": "banner.avif",
+      "source": "https://furnavia.org/Ytdg_oBH8no.avif"
+    },
     "bannerMobile": null
   },
   "scrapedFrom": [

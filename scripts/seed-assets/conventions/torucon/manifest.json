@@ -13,7 +13,272 @@
       "endDate": "2026-08-09",
       "venueCity": "Trondheim",
       "venueCountry": "NO",
-      "venueName": "Clarion Hotel Trondheim"
+      "venueName": "Clarion Hotel Trondheim",
+      "guests": [
+        {
+          "name": "Vegard Aas",
+          "title": "Guest of honour",
+          "role": "Cosplay judge",
+          "pronouns": "she/they",
+          "bio": "Plushie and soft-sculpture maker specialising in original characters.",
+          "photo": "9.jpg",
+          "websiteUrl": "https://example.com/vegardaas",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/vegardaas"
+            }
+          ]
+        },
+        {
+          "name": "Synne Lien",
+          "title": "Featured guest",
+          "role": "Workshop host: watercolour basics",
+          "pronouns": "he/they",
+          "bio": "Pixel-art studio lead; known for the cult retro-RPG 'Ravnehjem'.",
+          "photo": "11.jpg",
+          "websiteUrl": "https://example.com/synnelien",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/synnelien"
+            }
+          ]
+        },
+        {
+          "name": "Espen Holte",
+          "title": "Featured guest",
+          "role": "Workshop host: clay sculpting",
+          "pronouns": "she/her",
+          "bio": "Bergen-based cosplayer specialising in armour and prop fabrication. Runs the Nordic Armour Workshop for new makers.",
+          "photo": "1.jpg",
+          "websiteUrl": "https://example.com/espenholte",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/espenholte"
+            }
+          ]
+        },
+        {
+          "name": "Ronja Sundby",
+          "title": "Spotlight",
+          "role": "Comics writer",
+          "pronouns": "he/him",
+          "bio": "Oslo manga artist whose serial 'Halvtimes' won the 2024 Sproing nominee shortlist.",
+          "photo": "3.jpg",
+          "websiteUrl": "https://example.com/ronjasundby",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/ronjasundby"
+            }
+          ]
+        },
+        {
+          "name": "Sondre Skaar",
+          "title": "Panellist",
+          "role": "Voice acting Q&A",
+          "pronouns": "they/them",
+          "bio": "Trondheim illustrator working in ink and risograph; stories about queer joy and slow mornings.",
+          "photo": "1.jpg",
+          "websiteUrl": "https://example.com/sondreskaar",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/sondreskaar"
+            }
+          ]
+        }
+      ],
+      "programme": [
+        {
+          "date": "2026-08-08",
+          "startTime": "10:00",
+          "endTime": "10:30",
+          "title": "Doors open & registration",
+          "room": "Foyer"
+        },
+        {
+          "date": "2026-08-08",
+          "startTime": "10:45",
+          "endTime": "11:15",
+          "title": "Opening ceremony",
+          "room": "Main stage"
+        },
+        {
+          "date": "2026-08-08",
+          "startTime": "11:30",
+          "endTime": "12:30",
+          "title": "Cosplay competition — categories briefing",
+          "room": "Main stage",
+          "speaker": "Vegard Aas"
+        },
+        {
+          "date": "2026-08-08",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Workshop: armour fabrication basics",
+          "room": "Workshop A",
+          "speaker": "Ronja Sundby"
+        },
+        {
+          "date": "2026-08-08",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Panel: self-publishing in Norway",
+          "room": "Panel room 1",
+          "speaker": "Synne Lien"
+        },
+        {
+          "date": "2026-08-08",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Workshop: digital inking",
+          "room": "Workshop B",
+          "speaker": "Sondre Skaar"
+        },
+        {
+          "date": "2026-08-08",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Q&A: voice acting",
+          "room": "Panel room 1",
+          "speaker": "Espen Holte"
+        },
+        {
+          "date": "2026-08-08",
+          "startTime": "15:00",
+          "endTime": "16:30",
+          "title": "Cosplay competition — main show",
+          "room": "Main stage",
+          "speaker": "Vegard Aas"
+        },
+        {
+          "date": "2026-08-08",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Workshop: watercolour basics",
+          "room": "Workshop A",
+          "speaker": "Sondre Skaar"
+        },
+        {
+          "date": "2026-08-08",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Manga spotlight",
+          "room": "Panel room 1",
+          "speaker": "Sondre Skaar"
+        },
+        {
+          "date": "2026-08-08",
+          "startTime": "17:30",
+          "endTime": "18:30",
+          "title": "Idol stage",
+          "room": "Main stage",
+          "speaker": "Ronja Sundby"
+        },
+        {
+          "date": "2026-08-08",
+          "startTime": "19:00",
+          "endTime": "20:00",
+          "title": "Closing & afterparty announcement",
+          "room": "Main stage"
+        },
+        {
+          "date": "2026-08-09",
+          "startTime": "10:00",
+          "endTime": "10:30",
+          "title": "Doors open & registration",
+          "room": "Foyer"
+        },
+        {
+          "date": "2026-08-09",
+          "startTime": "10:45",
+          "endTime": "11:15",
+          "title": "Opening ceremony",
+          "room": "Main stage"
+        },
+        {
+          "date": "2026-08-09",
+          "startTime": "11:30",
+          "endTime": "12:30",
+          "title": "Cosplay competition — categories briefing",
+          "room": "Main stage",
+          "speaker": "Synne Lien"
+        },
+        {
+          "date": "2026-08-09",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Workshop: armour fabrication basics",
+          "room": "Workshop A",
+          "speaker": "Ronja Sundby"
+        },
+        {
+          "date": "2026-08-09",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Panel: self-publishing in Norway",
+          "room": "Panel room 1",
+          "speaker": "Espen Holte"
+        },
+        {
+          "date": "2026-08-09",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Workshop: digital inking",
+          "room": "Workshop B",
+          "speaker": "Synne Lien"
+        },
+        {
+          "date": "2026-08-09",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Q&A: voice acting",
+          "room": "Panel room 1",
+          "speaker": "Ronja Sundby"
+        },
+        {
+          "date": "2026-08-09",
+          "startTime": "15:00",
+          "endTime": "16:30",
+          "title": "Cosplay competition — main show",
+          "room": "Main stage",
+          "speaker": "Synne Lien"
+        },
+        {
+          "date": "2026-08-09",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Workshop: watercolour basics",
+          "room": "Workshop A",
+          "speaker": "Espen Holte"
+        },
+        {
+          "date": "2026-08-09",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Manga spotlight",
+          "room": "Panel room 1",
+          "speaker": "Vegard Aas"
+        },
+        {
+          "date": "2026-08-09",
+          "startTime": "17:30",
+          "endTime": "18:30",
+          "title": "Idol stage",
+          "room": "Main stage",
+          "speaker": "Sondre Skaar"
+        },
+        {
+          "date": "2026-08-09",
+          "startTime": "19:00",
+          "endTime": "20:00",
+          "title": "Closing & afterparty announcement",
+          "room": "Main stage"
+        }
+      ]
     }
   ],
   "assets": {

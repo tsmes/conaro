@@ -13,7 +13,257 @@
       "endDate": "2026-08-16",
       "venueCity": "Sandefjord",
       "venueCountry": "NO",
-      "venueName": "Runarhallen, Klavenesveien 20"
+      "venueName": "Runarhallen, Klavenesveien 20",
+      "guests": [
+        {
+          "name": "Astrid Mjøen",
+          "title": "MC",
+          "role": "Cosplay competition host",
+          "pronouns": "she/her",
+          "bio": "Costume judge with twelve years on the Nordic competition circuit.",
+          "photo": "8.jpg",
+          "websiteUrl": "https://example.com/astridmjoen",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/astridmjoen"
+            }
+          ]
+        },
+        {
+          "name": "Sondre Sandvik",
+          "title": "Featured guest",
+          "role": "Workshop host: armour fabrication",
+          "pronouns": "he/him",
+          "bio": "Embroidery artist working with mythological motifs; small-batch only.",
+          "photo": "10.jpg",
+          "websiteUrl": "https://example.com/sondresandvik",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/sondresandvik"
+            }
+          ]
+        },
+        {
+          "name": "Mari Velde",
+          "title": "Featured guest",
+          "role": "Workshop host: digital inking",
+          "pronouns": "they/them",
+          "bio": "Comics editor and panel host; fluent in mid-aughts shōnen references.",
+          "photo": "12.jpg",
+          "websiteUrl": "https://example.com/marivelde",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/marivelde"
+            }
+          ]
+        },
+        {
+          "name": "Aksel Lien",
+          "title": "Spotlight",
+          "role": "Manga artist",
+          "pronouns": "she/they",
+          "bio": "3D printing technician moonlighting as a prop-builder for stage productions.",
+          "photo": "10.jpg",
+          "websiteUrl": "https://example.com/aksellien",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/aksellien"
+            }
+          ]
+        }
+      ],
+      "programme": [
+        {
+          "date": "2026-08-15",
+          "startTime": "10:00",
+          "endTime": "10:30",
+          "title": "Doors open & registration",
+          "room": "Foyer"
+        },
+        {
+          "date": "2026-08-15",
+          "startTime": "10:45",
+          "endTime": "11:15",
+          "title": "Opening ceremony",
+          "room": "Main stage"
+        },
+        {
+          "date": "2026-08-15",
+          "startTime": "11:30",
+          "endTime": "12:30",
+          "title": "Cosplay competition — categories briefing",
+          "room": "Main stage",
+          "speaker": "Mari Velde"
+        },
+        {
+          "date": "2026-08-15",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Workshop: armour fabrication basics",
+          "room": "Workshop A",
+          "speaker": "Sondre Sandvik"
+        },
+        {
+          "date": "2026-08-15",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Panel: self-publishing in Norway",
+          "room": "Panel room 1",
+          "speaker": "Aksel Lien"
+        },
+        {
+          "date": "2026-08-15",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Workshop: digital inking",
+          "room": "Workshop B",
+          "speaker": "Aksel Lien"
+        },
+        {
+          "date": "2026-08-15",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Q&A: voice acting",
+          "room": "Panel room 1",
+          "speaker": "Sondre Sandvik"
+        },
+        {
+          "date": "2026-08-15",
+          "startTime": "15:00",
+          "endTime": "16:30",
+          "title": "Cosplay competition — main show",
+          "room": "Main stage",
+          "speaker": "Sondre Sandvik"
+        },
+        {
+          "date": "2026-08-15",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Workshop: watercolour basics",
+          "room": "Workshop A",
+          "speaker": "Mari Velde"
+        },
+        {
+          "date": "2026-08-15",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Manga spotlight",
+          "room": "Panel room 1",
+          "speaker": "Aksel Lien"
+        },
+        {
+          "date": "2026-08-15",
+          "startTime": "17:30",
+          "endTime": "18:30",
+          "title": "Idol stage",
+          "room": "Main stage",
+          "speaker": "Sondre Sandvik"
+        },
+        {
+          "date": "2026-08-15",
+          "startTime": "19:00",
+          "endTime": "20:00",
+          "title": "Closing & afterparty announcement",
+          "room": "Main stage"
+        },
+        {
+          "date": "2026-08-16",
+          "startTime": "10:00",
+          "endTime": "10:30",
+          "title": "Doors open & registration",
+          "room": "Foyer"
+        },
+        {
+          "date": "2026-08-16",
+          "startTime": "10:45",
+          "endTime": "11:15",
+          "title": "Opening ceremony",
+          "room": "Main stage"
+        },
+        {
+          "date": "2026-08-16",
+          "startTime": "11:30",
+          "endTime": "12:30",
+          "title": "Cosplay competition — categories briefing",
+          "room": "Main stage",
+          "speaker": "Aksel Lien"
+        },
+        {
+          "date": "2026-08-16",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Workshop: armour fabrication basics",
+          "room": "Workshop A",
+          "speaker": "Astrid Mjøen"
+        },
+        {
+          "date": "2026-08-16",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Panel: self-publishing in Norway",
+          "room": "Panel room 1",
+          "speaker": "Astrid Mjøen"
+        },
+        {
+          "date": "2026-08-16",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Workshop: digital inking",
+          "room": "Workshop B",
+          "speaker": "Astrid Mjøen"
+        },
+        {
+          "date": "2026-08-16",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Q&A: voice acting",
+          "room": "Panel room 1",
+          "speaker": "Mari Velde"
+        },
+        {
+          "date": "2026-08-16",
+          "startTime": "15:00",
+          "endTime": "16:30",
+          "title": "Cosplay competition — main show",
+          "room": "Main stage",
+          "speaker": "Astrid Mjøen"
+        },
+        {
+          "date": "2026-08-16",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Workshop: watercolour basics",
+          "room": "Workshop A",
+          "speaker": "Aksel Lien"
+        },
+        {
+          "date": "2026-08-16",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Manga spotlight",
+          "room": "Panel room 1",
+          "speaker": "Astrid Mjøen"
+        },
+        {
+          "date": "2026-08-16",
+          "startTime": "17:30",
+          "endTime": "18:30",
+          "title": "Idol stage",
+          "room": "Main stage",
+          "speaker": "Astrid Mjøen"
+        },
+        {
+          "date": "2026-08-16",
+          "startTime": "19:00",
+          "endTime": "20:00",
+          "title": "Closing & afterparty announcement",
+          "room": "Main stage"
+        }
+      ]
     }
   ],
   "assets": {

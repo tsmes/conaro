@@ -13,11 +13,279 @@
       "endDate": "2027-02-21",
       "venueCity": "Asker",
       "venueCountry": "NO",
-      "venueName": "Asker Kulturhus"
+      "venueName": "Asker Kulturhus",
+      "guests": [
+        {
+          "name": "Kaja Mjøen",
+          "title": "Featured guest",
+          "role": "Workshop host: digital inking",
+          "pronouns": "he/they",
+          "bio": "Tabletop designer; author of 'Aldermark', a Nordic-folklore RPG.",
+          "photo": "12.jpg",
+          "websiteUrl": "https://example.com/kajamjoen",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/kajamjoen"
+            }
+          ]
+        },
+        {
+          "name": "Joakim Sandvik",
+          "title": "Spotlight",
+          "role": "Manga artist",
+          "pronouns": "she/her",
+          "bio": "Plushie and soft-sculpture maker specialising in original characters.",
+          "photo": "2.jpg",
+          "websiteUrl": "https://example.com/joakimsandvik",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/joakimsandvik"
+            }
+          ]
+        },
+        {
+          "name": "Ida Velde",
+          "title": "Panellist",
+          "role": "Game design Q&A",
+          "pronouns": "he/him",
+          "bio": "Pixel-art studio lead; known for the cult retro-RPG 'Ravnehjem'.",
+          "photo": "4.jpg",
+          "websiteUrl": "https://example.com/idavelde",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/idavelde"
+            }
+          ]
+        },
+        {
+          "name": "Tobias Lien",
+          "title": "Panellist",
+          "role": "Self-publishing in Norway",
+          "pronouns": "they/them",
+          "bio": "Bergen-based cosplayer specialising in armour and prop fabrication. Runs the Nordic Armour Workshop for new makers.",
+          "photo": "2.jpg",
+          "websiteUrl": "https://example.com/tobiaslien",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/tobiaslien"
+            }
+          ]
+        },
+        {
+          "name": "Jorunn Rønning",
+          "title": "MC",
+          "role": "Cosplay competition host",
+          "pronouns": "she/they",
+          "bio": "Oslo manga artist whose serial 'Halvtimes' won the 2024 Sproing nominee shortlist.",
+          "photo": "4.jpg",
+          "websiteUrl": "https://example.com/jorunnronning",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/jorunnronning"
+            }
+          ]
+        }
+      ],
+      "programme": [
+        {
+          "date": "2027-02-20",
+          "startTime": "10:00",
+          "endTime": "10:30",
+          "title": "Doors open & registration",
+          "room": "Foyer"
+        },
+        {
+          "date": "2027-02-20",
+          "startTime": "10:45",
+          "endTime": "11:15",
+          "title": "Opening ceremony",
+          "room": "Main stage"
+        },
+        {
+          "date": "2027-02-20",
+          "startTime": "11:30",
+          "endTime": "12:30",
+          "title": "Cosplay competition — categories briefing",
+          "room": "Main stage",
+          "speaker": "Kaja Mjøen"
+        },
+        {
+          "date": "2027-02-20",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Workshop: armour fabrication basics",
+          "room": "Workshop A",
+          "speaker": "Jorunn Rønning"
+        },
+        {
+          "date": "2027-02-20",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Panel: self-publishing in Norway",
+          "room": "Panel room 1",
+          "speaker": "Joakim Sandvik"
+        },
+        {
+          "date": "2027-02-20",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Workshop: digital inking",
+          "room": "Workshop B",
+          "speaker": "Ida Velde"
+        },
+        {
+          "date": "2027-02-20",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Q&A: voice acting",
+          "room": "Panel room 1",
+          "speaker": "Ida Velde"
+        },
+        {
+          "date": "2027-02-20",
+          "startTime": "15:00",
+          "endTime": "16:30",
+          "title": "Cosplay competition — main show",
+          "room": "Main stage",
+          "speaker": "Tobias Lien"
+        },
+        {
+          "date": "2027-02-20",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Workshop: watercolour basics",
+          "room": "Workshop A",
+          "speaker": "Kaja Mjøen"
+        },
+        {
+          "date": "2027-02-20",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Manga spotlight",
+          "room": "Panel room 1",
+          "speaker": "Jorunn Rønning"
+        },
+        {
+          "date": "2027-02-20",
+          "startTime": "17:30",
+          "endTime": "18:30",
+          "title": "Idol stage",
+          "room": "Main stage",
+          "speaker": "Joakim Sandvik"
+        },
+        {
+          "date": "2027-02-20",
+          "startTime": "19:00",
+          "endTime": "20:00",
+          "title": "Closing & afterparty announcement",
+          "room": "Main stage"
+        },
+        {
+          "date": "2027-02-21",
+          "startTime": "10:00",
+          "endTime": "10:30",
+          "title": "Doors open & registration",
+          "room": "Foyer"
+        },
+        {
+          "date": "2027-02-21",
+          "startTime": "10:45",
+          "endTime": "11:15",
+          "title": "Opening ceremony",
+          "room": "Main stage"
+        },
+        {
+          "date": "2027-02-21",
+          "startTime": "11:30",
+          "endTime": "12:30",
+          "title": "Cosplay competition — categories briefing",
+          "room": "Main stage",
+          "speaker": "Joakim Sandvik"
+        },
+        {
+          "date": "2027-02-21",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Workshop: armour fabrication basics",
+          "room": "Workshop A",
+          "speaker": "Jorunn Rønning"
+        },
+        {
+          "date": "2027-02-21",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Panel: self-publishing in Norway",
+          "room": "Panel room 1",
+          "speaker": "Ida Velde"
+        },
+        {
+          "date": "2027-02-21",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Workshop: digital inking",
+          "room": "Workshop B",
+          "speaker": "Kaja Mjøen"
+        },
+        {
+          "date": "2027-02-21",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Q&A: voice acting",
+          "room": "Panel room 1",
+          "speaker": "Tobias Lien"
+        },
+        {
+          "date": "2027-02-21",
+          "startTime": "15:00",
+          "endTime": "16:30",
+          "title": "Cosplay competition — main show",
+          "room": "Main stage",
+          "speaker": "Jorunn Rønning"
+        },
+        {
+          "date": "2027-02-21",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Workshop: watercolour basics",
+          "room": "Workshop A",
+          "speaker": "Tobias Lien"
+        },
+        {
+          "date": "2027-02-21",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Manga spotlight",
+          "room": "Panel room 1",
+          "speaker": "Kaja Mjøen"
+        },
+        {
+          "date": "2027-02-21",
+          "startTime": "17:30",
+          "endTime": "18:30",
+          "title": "Idol stage",
+          "room": "Main stage",
+          "speaker": "Ida Velde"
+        },
+        {
+          "date": "2027-02-21",
+          "startTime": "19:00",
+          "endTime": "20:00",
+          "title": "Closing & afterparty announcement",
+          "room": "Main stage"
+        }
+      ]
     }
   ],
   "assets": {
-    "logo": { "file": "logo.png", "source": "https://images.squarespace-cdn.com/content/v1/6035bc070ee90a7fece20593/1614137690334-FJEHOP8MZQ57RS3UWDFK/logogjennomsiktig0stjerne.png?format=1500w" },
+    "logo": {
+      "file": "logo.png",
+      "source": "https://images.squarespace-cdn.com/content/v1/6035bc070ee90a7fece20593/1614137690334-FJEHOP8MZQ57RS3UWDFK/logogjennomsiktig0stjerne.png?format=1500w"
+    },
     "banner": null,
     "bannerMobile": null
   },

@@ -7,7 +7,10 @@
   "description": "Fandomatics Norway is a small Stavanger-based fandom community/convention organisation. Its main public footprint is a Facebook page; no working `.no` or `.com` domain was reachable, and it is not listed on RosterCon, FanCons.com, MagiCon's community page, or Cosplay.no's convention index.",
   "events": [],
   "assets": {
-    "logo": { "file": "logo.png", "source": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQhjP3b-b321uI-ug6-HdLjiY2e6K_2-ZRHKQ&s" },
+    "logo": {
+      "file": "logo.png",
+      "source": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQhjP3b-b321uI-ug6-HdLjiY2e6K_2-ZRHKQ&s"
+    },
     "banner": null,
     "bannerMobile": null
   },

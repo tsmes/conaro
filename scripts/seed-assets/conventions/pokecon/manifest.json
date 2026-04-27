@@ -12,11 +12,294 @@
       "endDate": "2026-06-07",
       "venueCity": "Kristiansand",
       "venueCountry": "NO",
-      "venueName": "Travparken Messehall"
+      "venueName": "Travparken Messehall",
+      "guests": [
+        {
+          "name": "Ida Halvorsen",
+          "title": "Featured guest",
+          "role": "Workshop host: armour fabrication",
+          "pronouns": "she/her",
+          "bio": "Game designer at a small Bergen indie studio; teaches a beginners' track at NTNU.",
+          "photo": "2.jpg",
+          "websiteUrl": "https://example.com/idahalvorsen",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/idahalvorsen"
+            }
+          ]
+        },
+        {
+          "name": "Tobias Holmen",
+          "title": "Featured guest",
+          "role": "Workshop host: digital inking",
+          "pronouns": "he/him",
+          "bio": "Voice actor whose Norwegian dub credits include three current streaming shows.",
+          "photo": "4.jpg",
+          "websiteUrl": "https://example.com/tobiasholmen",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/tobiasholmen"
+            }
+          ]
+        },
+        {
+          "name": "Frida Aune",
+          "title": "Spotlight",
+          "role": "Manga artist",
+          "pronouns": "they/them",
+          "bio": "Costume judge with twelve years on the Nordic competition circuit.",
+          "photo": "6.jpg",
+          "websiteUrl": "https://example.com/fridaaune",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/fridaaune"
+            }
+          ]
+        },
+        {
+          "name": "Olav Vang",
+          "title": "Panellist",
+          "role": "Game design Q&A",
+          "pronouns": "she/they",
+          "bio": "Embroidery artist working with mythological motifs; small-batch only.",
+          "photo": "8.jpg",
+          "websiteUrl": "https://example.com/olavvang",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/olavvang"
+            }
+          ]
+        },
+        {
+          "name": "Maja Fjeldstad",
+          "title": "Panellist",
+          "role": "Self-publishing in Norway",
+          "pronouns": "he/they",
+          "bio": "Comics editor and panel host; fluent in mid-aughts shōnen references.",
+          "photo": "6.jpg",
+          "websiteUrl": "https://example.com/majafjeldstad",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/majafjeldstad"
+            }
+          ]
+        },
+        {
+          "name": "Sigrid Sæther",
+          "title": "MC",
+          "role": "Cosplay competition host",
+          "pronouns": "she/her",
+          "bio": "3D printing technician moonlighting as a prop-builder for stage productions.",
+          "photo": "8.jpg",
+          "websiteUrl": "https://example.com/sigridsaether",
+          "socialLinks": [
+            {
+              "type": "instagram",
+              "url": "https://instagram.com/sigridsaether"
+            }
+          ]
+        }
+      ],
+      "programme": [
+        {
+          "date": "2026-06-06",
+          "startTime": "10:00",
+          "endTime": "10:30",
+          "title": "Doors open & registration",
+          "room": "Foyer"
+        },
+        {
+          "date": "2026-06-06",
+          "startTime": "10:45",
+          "endTime": "11:15",
+          "title": "Opening ceremony",
+          "room": "Main stage"
+        },
+        {
+          "date": "2026-06-06",
+          "startTime": "11:30",
+          "endTime": "12:30",
+          "title": "Cosplay competition — categories briefing",
+          "room": "Main stage",
+          "speaker": "Maja Fjeldstad"
+        },
+        {
+          "date": "2026-06-06",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Workshop: armour fabrication basics",
+          "room": "Workshop A",
+          "speaker": "Olav Vang"
+        },
+        {
+          "date": "2026-06-06",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Panel: self-publishing in Norway",
+          "room": "Panel room 1",
+          "speaker": "Sigrid Sæther"
+        },
+        {
+          "date": "2026-06-06",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Workshop: digital inking",
+          "room": "Workshop B",
+          "speaker": "Tobias Holmen"
+        },
+        {
+          "date": "2026-06-06",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Q&A: voice acting",
+          "room": "Panel room 1",
+          "speaker": "Sigrid Sæther"
+        },
+        {
+          "date": "2026-06-06",
+          "startTime": "15:00",
+          "endTime": "16:30",
+          "title": "Cosplay competition — main show",
+          "room": "Main stage",
+          "speaker": "Tobias Holmen"
+        },
+        {
+          "date": "2026-06-06",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Workshop: watercolour basics",
+          "room": "Workshop A",
+          "speaker": "Frida Aune"
+        },
+        {
+          "date": "2026-06-06",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Manga spotlight",
+          "room": "Panel room 1",
+          "speaker": "Sigrid Sæther"
+        },
+        {
+          "date": "2026-06-06",
+          "startTime": "17:30",
+          "endTime": "18:30",
+          "title": "Idol stage",
+          "room": "Main stage",
+          "speaker": "Olav Vang"
+        },
+        {
+          "date": "2026-06-06",
+          "startTime": "19:00",
+          "endTime": "20:00",
+          "title": "Closing & afterparty announcement",
+          "room": "Main stage"
+        },
+        {
+          "date": "2026-06-07",
+          "startTime": "10:00",
+          "endTime": "10:30",
+          "title": "Doors open & registration",
+          "room": "Foyer"
+        },
+        {
+          "date": "2026-06-07",
+          "startTime": "10:45",
+          "endTime": "11:15",
+          "title": "Opening ceremony",
+          "room": "Main stage"
+        },
+        {
+          "date": "2026-06-07",
+          "startTime": "11:30",
+          "endTime": "12:30",
+          "title": "Cosplay competition — categories briefing",
+          "room": "Main stage",
+          "speaker": "Sigrid Sæther"
+        },
+        {
+          "date": "2026-06-07",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Workshop: armour fabrication basics",
+          "room": "Workshop A",
+          "speaker": "Ida Halvorsen"
+        },
+        {
+          "date": "2026-06-07",
+          "startTime": "12:00",
+          "endTime": "13:00",
+          "title": "Panel: self-publishing in Norway",
+          "room": "Panel room 1",
+          "speaker": "Ida Halvorsen"
+        },
+        {
+          "date": "2026-06-07",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Workshop: digital inking",
+          "room": "Workshop B",
+          "speaker": "Frida Aune"
+        },
+        {
+          "date": "2026-06-07",
+          "startTime": "13:30",
+          "endTime": "14:30",
+          "title": "Q&A: voice acting",
+          "room": "Panel room 1",
+          "speaker": "Ida Halvorsen"
+        },
+        {
+          "date": "2026-06-07",
+          "startTime": "15:00",
+          "endTime": "16:30",
+          "title": "Cosplay competition — main show",
+          "room": "Main stage",
+          "speaker": "Frida Aune"
+        },
+        {
+          "date": "2026-06-07",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Workshop: watercolour basics",
+          "room": "Workshop A",
+          "speaker": "Tobias Holmen"
+        },
+        {
+          "date": "2026-06-07",
+          "startTime": "16:00",
+          "endTime": "17:00",
+          "title": "Manga spotlight",
+          "room": "Panel room 1",
+          "speaker": "Ida Halvorsen"
+        },
+        {
+          "date": "2026-06-07",
+          "startTime": "17:30",
+          "endTime": "18:30",
+          "title": "Idol stage",
+          "room": "Main stage",
+          "speaker": "Maja Fjeldstad"
+        },
+        {
+          "date": "2026-06-07",
+          "startTime": "19:00",
+          "endTime": "20:00",
+          "title": "Closing & afterparty announcement",
+          "room": "Main stage"
+        }
+      ]
     }
   ],
   "assets": {
-    "logo": { "file": "logo.png", "source": "https://static.wixstatic.com/media/56490a_062a152ef47d43bc8a90e2b71b6bcce7~mv2.png" },
+    "logo": {
+      "file": "logo.png",
+      "source": "https://static.wixstatic.com/media/56490a_062a152ef47d43bc8a90e2b71b6bcce7~mv2.png"
+    },
     "banner": null,
     "bannerMobile": null
   },
