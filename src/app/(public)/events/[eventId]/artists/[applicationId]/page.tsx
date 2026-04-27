@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { ArrowLeft, ExternalLink, MapPin } from "lucide-react";
 import { and, eq } from "drizzle-orm";
 
 import { getCachedFloorPlan, getEventViewerContext } from "@/lib/events/event-context";
@@ -206,6 +206,18 @@ export default async function ArtistDetailPage({
                 </p>
               )}
             </div>
+            {/* Deep-link to the floor plan with this artist's table
+                pulsing. Only render when the plan is published and
+                the artist actually has a stand on it. */}
+            {standLabel && ctx.event.floorPlanPublishedAt && (
+              <Link
+                href={`/events/${eventId}/floor-plan?artist=${artist.applicationId}&focus=table`}
+                className="inline-flex w-fit items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-[12.5px] font-semibold text-foreground transition hover:bg-muted"
+              >
+                <MapPin className="size-3.5" />
+                Show on floor plan
+              </Link>
+            )}
             {artist.bio && (
               <div className="text-[14.5px] leading-relaxed text-foreground">
                 <Markdown source={artist.bio} />

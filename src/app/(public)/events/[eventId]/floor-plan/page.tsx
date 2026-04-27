@@ -10,24 +10,39 @@ import { Card } from "@/components/ui/card";
 
 interface FloorPlanPageProps {
   params: Promise<{ eventId: string }>;
-  searchParams: Promise<{ focus?: string }>;
+  /** `artist` deep-links to a specific artist's table (used by the
+   *  artist detail page's "Show on floor plan" button). `focus=table`
+   *  triggers the initial pulse animation. */
+  searchParams: Promise<{ focus?: string; artist?: string }>;
 }
 
 export default async function FloorPlanPage({
   params,
   searchParams,
 }: FloorPlanPageProps) {
-  const [{ eventId }, { focus }] = await Promise.all([params, searchParams]);
+  const [{ eventId }, { focus, artist }] = await Promise.all([
+    params,
+    searchParams,
+  ]);
   const ctx = await getEventViewerContext(eventId);
 
   if (!ctx.event.floorPlanPublishedAt) notFound();
   const plan = await getCachedFloorPlan(ctx.event.id);
   if (!plan || plan.tables.length === 0) notFound();
 
+  // Deep-link override (?artist=<applicationId>) wins over the
+  // viewer-self heuristic; only honour it when the application is
+  // actually placed on this plan.
+  const artistOnPlan =
+    artist &&
+    plan.tables.some((t) => t.assignment?.applicationId === artist)
+      ? artist
+      : null;
   const highlightApplicationId =
-    ctx.ownApplicationStatus === "accepted" && ctx.ownApplicationId
+    artistOnPlan ??
+    (ctx.ownApplicationStatus === "accepted" && ctx.ownApplicationId
       ? ctx.ownApplicationId
-      : undefined;
+      : undefined);
   const artists = await getArtistsForFloorPlan(plan);
 
   return (
@@ -37,7 +52,9 @@ export default async function FloorPlanPage({
       </p>
       {highlightApplicationId && (
         <p className="mb-3 text-sm text-muted-foreground">
-          Your table is outlined in violet.
+          {artistOnPlan
+            ? "Highlighted table is outlined in violet."
+            : "Your table is outlined in violet."}
         </p>
       )}
       <PublicFloorPlanView
