@@ -56,8 +56,19 @@ describe("EventCard", () => {
     expect(screen.queryByTestId("follow-button")).not.toBeInTheDocument();
   });
 
-  it("public viewer sees the 'Applications open' badge for accepting events", () => {
+  it("public viewer does not see the 'Applications open' badge — apply meta is artist-only", () => {
     render(<EventCard event={baseEvent} viewer="public" />);
+    expect(screen.queryByText(/Applications open/i)).not.toBeInTheDocument();
+  });
+
+  it("artist viewer with no application sees the 'Applications open' badge for accepting events", () => {
+    render(
+      <EventCard
+        event={baseEvent}
+        viewer="artist"
+        artistContext={{ applicationStatus: null, isFollowingConvention: false }}
+      />
+    );
     expect(screen.getByText(/Applications open/i)).toBeInTheDocument();
   });
 

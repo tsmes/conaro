@@ -25,11 +25,11 @@ import { PublicRail } from "@/components/landing/public-rail";
 type LandingViewer = "public" | "artist" | "organizer";
 
 interface HomePageProps {
-  searchParams: Promise<{ filter?: string; country?: string }>;
+  searchParams: Promise<{ filter?: string; city?: string }>;
 }
 
 const ARTIST_FILTERS = new Set(["all", "following", "open", "applications"]);
-const PUBLIC_FILTERS = new Set(["all", "3m", "country"]);
+const PUBLIC_FILTERS = new Set(["all", "3m", "city"]);
 
 function pickViewer(role: string | undefined): LandingViewer {
   if (role === "artist") return "artist";
@@ -81,7 +81,7 @@ function applyPrimaryFilter(
         (e) => new Date(`${e.eventStartDate}T00:00:00Z`).getTime() <= cutoff
       );
     }
-    // 'country' has no primary filter effect — country chips do the work
+    // 'city' has no primary filter effect — city chips do the work
   }
   return events;
 }
@@ -94,7 +94,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const allowedFilters = viewer === "artist" ? ARTIST_FILTERS : PUBLIC_FILTERS;
   const activeFilter =
     params.filter && allowedFilters.has(params.filter) ? params.filter : "all";
-  const activeCountry = params.country?.trim() || null;
+  const activeCity = params.city?.trim() || null;
 
   const allEvents = await getUpcomingEvents();
 
@@ -137,22 +137,24 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         .split(/\s+/)[0] || null;
   }
 
-  // Primary filter, then derive available countries, then country filter.
+  // Primary filter, then derive available cities, then city filter.
+  // Norway-only positioning means we filter at city granularity now;
+  // the previous country-level filter assumed a Nordics scope.
   const afterPrimary = applyPrimaryFilter(
     allEvents,
     viewer,
     activeFilter,
     artistContext
   );
-  const availableCountries = Array.from(
+  const availableCities = Array.from(
     new Set(
       afterPrimary
-        .map((e) => e.venueCountry)
+        .map((e) => e.venueCity)
         .filter((c): c is string => Boolean(c))
     )
   ).sort();
-  const filtered = activeCountry
-    ? afterPrimary.filter((e) => e.venueCountry === activeCountry)
+  const filtered = activeCity
+    ? afterPrimary.filter((e) => e.venueCity === activeCity)
     : afterPrimary;
 
   const [featured, ...rest] = filtered;
@@ -166,8 +168,8 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         viewer={viewer}
         firstName={firstName}
         activeFilter={activeFilter}
-        activeCountry={activeCountry}
-        availableCountries={availableCountries}
+        activeCity={activeCity}
+        availableCities={availableCities}
       />
 
       <div className="mt-2 grid grid-cols-1 gap-6 xl:grid-cols-[1fr_320px]">
@@ -262,7 +264,8 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           <PublicRail
             events={afterPrimary}
             viewer={railViewer}
-            activeCountry={activeCountry}
+            activeCity={activeCity}
+            availableCities={availableCities}
           />
         )}
       </div>

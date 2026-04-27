@@ -1,5 +1,5 @@
 import { FilterChips, type FilterOption } from "./filter-chips";
-import { CountryChips } from "./country-chips";
+import { CityChips } from "./city-chips";
 
 export type LandingViewer = "public" | "artist" | "organizer";
 
@@ -7,8 +7,8 @@ export interface LandingHeaderProps {
   viewer: LandingViewer;
   firstName: string | null;
   activeFilter: string;
-  activeCountry: string | null;
-  availableCountries: string[];
+  activeCity: string | null;
+  availableCities: string[];
 }
 
 const ARTIST_FILTERS: FilterOption[] = [
@@ -25,15 +25,15 @@ const ARTIST_FILTERS: FilterOption[] = [
 const PUBLIC_FILTERS: FilterOption[] = [
   { value: "all", label: "All upcoming", href: "/" },
   { value: "3m", label: "Next 3 months", href: "/?filter=3m" },
-  { value: "country", label: "By country", href: "/?filter=country" },
+  { value: "city", label: "By city", href: "/?filter=city" },
 ];
 
 export function LandingHeader({
   viewer,
   firstName,
   activeFilter,
-  activeCountry,
-  availableCountries,
+  activeCity,
+  availableCities,
 }: LandingHeaderProps) {
   const isArtist = viewer === "artist";
   const overline = isArtist
@@ -41,11 +41,11 @@ export function LandingHeader({
     : "Events";
   const subhead = isArtist
     ? "Open calls, your applications and the shows you're following \u2014 all in one place."
-    : "Upcoming conventions across the Nordics. Browse freely \u2014 no account needed.";
+    : "Upcoming conventions across Norway. Browse freely \u2014 no account needed.";
 
   const options = isArtist ? ARTIST_FILTERS : PUBLIC_FILTERS;
-  const showCountryChips =
-    !isArtist && (activeFilter === "country" || activeCountry !== null);
+  const showCityChips =
+    !isArtist && (activeFilter === "city" || activeCity !== null);
 
   return (
     <section className="space-y-4 pb-3 pt-5 sm:space-y-5 sm:pb-4 sm:pt-8">
@@ -68,10 +68,10 @@ export function LandingHeader({
           <FilterChips options={options} activeValue={activeFilter} />
         </div>
       </div>
-      {showCountryChips && (
-        <CountryChips
-          availableCountries={availableCountries}
-          activeCountry={activeCountry}
+      {showCityChips && (
+        <CityChips
+          availableCities={availableCities}
+          activeCity={activeCity}
         />
       )}
     </section>

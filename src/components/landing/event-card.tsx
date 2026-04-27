@@ -228,7 +228,10 @@ export function EventCard({ event, viewer, artistContext }: EventCardProps) {
                     artistContext.applicationStatus,
                     event.status
                   )}
-                {!hasApplication && open && (
+                {/* "Applications open" only matters to artists who could
+                    actually apply — public visitors don't need the
+                    inside-baseball badge. */}
+                {isArtist && !hasApplication && open && (
                   <Badge variant="default">Applications open</Badge>
                 )}
               </div>

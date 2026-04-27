@@ -84,6 +84,10 @@ export function FeaturedEvent({
   artistContext,
 }: FeaturedEventProps) {
   const isArtist = viewer === "artist";
+  // Application status + stand count are artist / organizer concerns;
+  // the public-facing browse experience doesn't need them and the
+  // jargon ("Reviewing", "Stands") reads as inside-baseball.
+  const showApplyMeta = viewer !== "public";
   const today = new Date();
   const days = daysUntil(event.eventStartDate, today);
   const venue =
@@ -173,29 +177,32 @@ export function FeaturedEvent({
               icon={<MapPin className="size-3.5" />}
               label="Venue"
               value={venue}
-              sub={event.venueCountry ?? "Nordics"}
+              sub={event.venueCountry ?? "Norway"}
             />
-            <MetaCell
-              icon={<CalendarDays className="size-3.5" />}
-              label="Applications"
-              value={appsState.value}
-              sub={appsState.sub}
-            />
-            {standsTotal !== null ? (
+            {showApplyMeta && (
               <MetaCell
-                icon={<Users className="size-3.5" />}
-                label="Stands"
-                value={`${standsTotal}`}
-                sub="available"
-              />
-            ) : (
-              <MetaCell
-                icon={<Ticket className="size-3.5" />}
-                label="Format"
-                value="Artist alley"
-                sub="see event details"
+                icon={<CalendarDays className="size-3.5" />}
+                label="Applications"
+                value={appsState.value}
+                sub={appsState.sub}
               />
             )}
+            {showApplyMeta &&
+              (standsTotal !== null ? (
+                <MetaCell
+                  icon={<Users className="size-3.5" />}
+                  label="Stands"
+                  value={`${standsTotal}`}
+                  sub="available"
+                />
+              ) : (
+                <MetaCell
+                  icon={<Ticket className="size-3.5" />}
+                  label="Format"
+                  value="Artist alley"
+                  sub="see event details"
+                />
+              ))}
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
