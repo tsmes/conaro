@@ -84,7 +84,7 @@ function CountdownBlock({ days }: { days: number }) {
         // the "Days to go" label below sits visually flush with
         // the digit baseline instead of floating below a pocket
         // of font-internal whitespace.
-        style={{ lineHeight: 0.8 }}
+        style={{ lineHeight: 0.9 }}
         className={cn(
           "font-heading font-extrabold tracking-[-0.06em] text-foreground",
           display.length >= 4 ? "text-[80px]" : "text-[120px]"
