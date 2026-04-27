@@ -130,8 +130,8 @@ export default async function EventDetailPage({
                     : null
                 }
                 altLabel={`${event.name} mobile banner`}
-                previewAspectClass="aspect-[16/9]"
-                hint="Optional — used for the mobile top strip. Falls back to the desktop banner if unset. Square or 16:9 reads best."
+                previewAspectClass="aspect-[3/4]"
+                hint="Optional — sits behind the hero text on phones. A tall portrait crop (3:4 or 4:5) works best. Falls back to the desktop banner if unset."
                 placeholderHint="No mobile banner — the desktop banner is shown on phones."
               />
             </div>

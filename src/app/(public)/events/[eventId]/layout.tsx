@@ -110,24 +110,23 @@ export default async function EventLayout({
 
   return (
     <div>
-      {/* Hero. On md+ the optional banner is the full-bleed
-          background of the title block and a dark overlay keeps
-          text legible. On mobile the banner is rendered as its
-          own top media strip (uncropped) above the title block,
-          which then sits on the convention gradient — the wide
-          banner + narrow viewport mismatch otherwise cropped the
-          photo to a vertical sliver. */}
+      {/* Hero. The optional banner sits behind the title block on
+          every breakpoint and a dark overlay keeps text legible.
+          The mobile banner asset is shown < md (typically a tall
+          / portrait crop), the desktop banner from md+. When
+          neither asset is uploaded we fall back to the
+          effectiveHeaderColor or the auto-picked gradient. */}
       <section className="overflow-hidden text-white">
-        {bannerMobileUrl && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={bannerMobileUrl}
-            alt=""
-            aria-hidden
-            className="block aspect-[16/9] w-full object-cover sm:aspect-[5/2] md:hidden"
-          />
-        )}
         <div className="relative">
+          {bannerMobileUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={bannerMobileUrl}
+              alt=""
+              aria-hidden
+              className="absolute inset-0 block h-full w-full object-cover md:hidden"
+            />
+          )}
           {bannerUrl && (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -137,14 +136,13 @@ export default async function EventLayout({
               className="absolute inset-0 hidden h-full w-full object-cover md:block"
             />
           )}
-          {/* Coloured backdrop. effectiveHeaderColor wins when set;
-              otherwise the convention-keyed gradient stands in.
-              When a desktop banner is uploaded, this layer is
-              hidden on md+ (the photo replaces it) but stays on
-              mobile to back the title block under the strip. */}
+          {/* Coloured backdrop only shows where there's no photo
+              to back: hidden < md when a mobile banner exists,
+              hidden md+ when a desktop banner exists. */}
           <div
             className={cn(
               "absolute inset-0",
+              bannerMobileUrl ? "hidden md:block" : "",
               bannerUrl ? "md:hidden" : "",
               effectiveHeaderColor ? "" : heroGradientClass
             )}
@@ -155,11 +153,22 @@ export default async function EventLayout({
             }
             aria-hidden
           />
+          {/* Dark overlay. Stronger when a photo is showing on this
+              breakpoint, softer when only the gradient is. */}
           <div
-            className="absolute inset-0"
+            className="absolute inset-0 hidden md:block"
             aria-hidden
             style={{
               background: bannerUrl
+                ? "linear-gradient(to bottom, rgba(0,0,0,.30) 0%, rgba(0,0,0,.55) 100%)"
+                : "radial-gradient(120% 80% at 80% 20%, rgba(255,255,255,.18), transparent 60%), linear-gradient(to bottom, rgba(0,0,0,0) 30%, rgba(0,0,0,.45) 100%)",
+            }}
+          />
+          <div
+            className="absolute inset-0 md:hidden"
+            aria-hidden
+            style={{
+              background: bannerMobileUrl
                 ? "linear-gradient(to bottom, rgba(0,0,0,.30) 0%, rgba(0,0,0,.55) 100%)"
                 : "radial-gradient(120% 80% at 80% 20%, rgba(255,255,255,.18), transparent 60%), linear-gradient(to bottom, rgba(0,0,0,0) 30%, rgba(0,0,0,.45) 100%)",
             }}

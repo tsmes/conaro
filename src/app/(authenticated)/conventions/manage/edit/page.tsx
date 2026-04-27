@@ -158,8 +158,8 @@ export default async function EditConventionPage() {
                       : null
                   }
                   altLabel={`${convention.name} mobile banner`}
-                  previewAspectClass="aspect-[16/9]"
-                  hint="Optional — used in the mobile top strip. Falls back to the desktop banner if unset."
+                  previewAspectClass="aspect-[3/4]"
+                  hint="Optional — sits behind the hero text on phones. A tall portrait crop (3:4 or 4:5) works best. Falls back to the desktop banner if unset."
                   placeholderHint="No mobile banner — the desktop banner is shown on phones."
                 />
               </div>
