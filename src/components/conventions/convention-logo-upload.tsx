@@ -55,7 +55,11 @@ export function ConventionLogoUpload({
         return;
       }
 
-      setLogoUrl(data.url);
+      // The server reuses the same storage path on replace, so the
+      // URL doesn't change and the browser keeps the cached bytes.
+      // Append a per-upload version param so the <img src> changes
+      // and the browser re-fetches.
+      setLogoUrl(`${data.url}?v=${Date.now()}`);
     } catch {
       setError("Upload failed. Please try again.");
     } finally {

@@ -67,7 +67,11 @@ export function BannerUpload({
           return;
         }
 
-        setBannerUrl(data.url);
+        // The server reuses the same storage path on replace, so
+        // the URL doesn't change and the browser keeps the cached
+        // bytes. Append a per-upload version param so React's
+        // <img src> changes and the browser re-fetches.
+        setBannerUrl(`${data.url}?v=${Date.now()}`);
       } catch {
         setError("Upload failed. Please try again.");
       } finally {
