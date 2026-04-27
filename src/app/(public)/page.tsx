@@ -61,7 +61,15 @@ function applyPrimaryFilter(
       return events.filter((e) => ctx.followedConventionIds.has(e.conventionId));
     }
     if (filter === "open") {
-      return events.filter((e) => isOpenForApplications(e, todayMs));
+      // "Open to apply" means events the artist *can* still apply to:
+      // accepting applications AND no application of any status from
+      // this artist yet. Otherwise events showed up here right after
+      // the artist submitted them — confusing alongside My applications.
+      return events.filter(
+        (e) =>
+          isOpenForApplications(e, todayMs) &&
+          !ctx.applicationsByEventId.has(e.id)
+      );
     }
     if (filter === "applications") {
       return events.filter((e) => ctx.applicationsByEventId.has(e.id));
