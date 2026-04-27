@@ -52,77 +52,82 @@ export default async function EventOverviewPage({
     />
   ) : null;
 
-  return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-      <div className="min-w-0 space-y-6">
-        {applicantFallback}
-        {event.description && (
-          <Card className="p-6 md:p-8">
-            <Overline>About this event</Overline>
-            <div className="mt-3">
-              <Markdown
-                source={event.description}
-                className="text-foreground"
-              />
-            </div>
-          </Card>
-        )}
-
-        {event.conventionDescription && (
-          <Card className="p-6 md:p-8">
-            <Overline>About the convention</Overline>
-            <div className="mt-3">
-              <Markdown
-                source={event.conventionDescription}
-                className="text-muted-foreground"
-              />
-            </div>
-          </Card>
-        )}
-
-        {isAccepting && (
-          <Card className="p-6 md:p-8">
-            <Overline>Apply</Overline>
-            <div className="mt-4">
-              {isArtist ? (
-                <ApplyButton
-                  eventId={event.id}
-                  hasExistingApplication={hasExistingApplication}
-                  validationResult={validationResult}
-                  guidelines={
-                    event.guidelinesOverride ?? event.conventionGuidelines ?? null
-                  }
-                  fieldRequirements={event.fieldRequirements}
-                  tableSizeOptions={event.tableSizeOptions ?? []}
-                  maxAssistants={event.maxAssistants ?? 0}
-                  assistantFeeNok={event.assistantFeeNok ?? null}
-                />
-              ) : session?.user ? (
-                <p className="text-sm text-muted-foreground">
-                  Only artist accounts can apply to events.
-                </p>
-              ) : (
-                <p className="text-sm text-muted-foreground">
-                  <Link
-                    href="/login"
-                    className="font-semibold text-primary underline underline-offset-4"
-                  >
-                    Log in
-                  </Link>{" "}
-                  or{" "}
-                  <Link
-                    href="/for-artists"
-                    className="font-semibold text-primary underline underline-offset-4"
-                  >
-                    learn more
-                  </Link>{" "}
-                  about applying as an artist.
-                </p>
-              )}
-            </div>
-          </Card>
+  // The Apply card lives at the bottom of the page (full-width
+  // below the two-column grid) so the description + practical
+  // info read first; the CTA punctuates the page rather than
+  // competing with the right rail on lg+.
+  const applyCard = isAccepting ? (
+    <Card className="p-6 md:p-8">
+      <Overline>Apply</Overline>
+      <div className="mt-4">
+        {isArtist ? (
+          <ApplyButton
+            eventId={event.id}
+            hasExistingApplication={hasExistingApplication}
+            validationResult={validationResult}
+            guidelines={
+              event.guidelinesOverride ?? event.conventionGuidelines ?? null
+            }
+            fieldRequirements={event.fieldRequirements}
+            tableSizeOptions={event.tableSizeOptions ?? []}
+            maxAssistants={event.maxAssistants ?? 0}
+            assistantFeeNok={event.assistantFeeNok ?? null}
+          />
+        ) : session?.user ? (
+          <p className="text-sm text-muted-foreground">
+            Only artist accounts can apply to events.
+          </p>
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            <Link
+              href="/login"
+              className="font-semibold text-primary underline underline-offset-4"
+            >
+              Log in
+            </Link>{" "}
+            or{" "}
+            <Link
+              href="/for-artists"
+              className="font-semibold text-primary underline underline-offset-4"
+            >
+              learn more
+            </Link>{" "}
+            about applying as an artist.
+          </p>
         )}
       </div>
+    </Card>
+  ) : null;
+
+  return (
+    <div className="space-y-6">
+      <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+        <div className="min-w-0 space-y-6">
+          {applicantFallback}
+          {event.description && (
+            <Card className="p-6 md:p-8">
+              <Overline>About this event</Overline>
+              <div className="mt-3">
+                <Markdown
+                  source={event.description}
+                  className="text-foreground"
+                />
+              </div>
+            </Card>
+          )}
+
+          {event.conventionDescription && (
+            <Card className="p-6 md:p-8">
+              <Overline>About the convention</Overline>
+              <div className="mt-3">
+                <Markdown
+                  source={event.conventionDescription}
+                  className="text-muted-foreground"
+                />
+              </div>
+            </Card>
+          )}
+        </div>
 
       {/* Right rail — quick facts */}
       <aside className="space-y-4">
@@ -177,7 +182,9 @@ export default async function EventOverviewPage({
             </p>
           </Card>
         )}
-      </aside>
+        </aside>
+      </div>
+      {applyCard}
     </div>
   );
 }
