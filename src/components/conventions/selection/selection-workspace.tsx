@@ -266,6 +266,14 @@ export function SelectionWorkspace({
     const index = filtered.findIndex((a) => a.id === id);
     setDeepIndex(index >= 0 ? index : 0);
     setLayout("stacked");
+    // Layout switch alone leaves the page at its prior scroll
+    // offset — clicking an applicant from far down the gallery
+    // / table dropped the user below the just-opened Deep Review
+    // content. Bring them back to the top so the new layout is
+    // immediately visible.
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   }
 
   function handleConfirmPayment(id: string) {
