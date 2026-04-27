@@ -48,7 +48,7 @@ export default async function ConventionDetailPage({
   const isArtist =
     session?.user?.profileId && session.user.role === "artist";
 
-  const [openEvents, followResult] = await Promise.all([
+  const [allEvents, followResult] = await Promise.all([
     db
       .select({
         id: events.id,
@@ -82,6 +82,19 @@ export default async function ConventionDetailPage({
   ]);
 
   const isFollowing = followResult.length > 0;
+
+  // Split events into upcoming vs past so the directory tells the
+  // convention's story chronologically — both lists are public so
+  // browsers can review previous editions without signing in.
+  // Single-day events fall back to start date for the "still future"
+  // check; sort upcoming ascending, past descending (most recent first).
+  const todayIso = new Date().toISOString().slice(0, 10);
+  const upcomingEvents = allEvents
+    .filter((e) => (e.eventEndDate ?? e.eventStartDate) >= todayIso)
+    .sort((a, b) => a.eventStartDate.localeCompare(b.eventStartDate));
+  const pastEvents = allEvents
+    .filter((e) => (e.eventEndDate ?? e.eventStartDate) < todayIso)
+    .sort((a, b) => b.eventStartDate.localeCompare(a.eventStartDate));
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-12 md:px-8">
@@ -146,76 +159,97 @@ export default async function ConventionDetailPage({
 
       <section className="mt-12 space-y-4">
         <h2 className="font-heading text-2xl font-bold tracking-tight">
-          Events
+          Upcoming events
         </h2>
 
-        {openEvents.length === 0 ? (
+        {upcomingEvents.length === 0 ? (
           <Card className="p-6 text-sm text-muted-foreground">
-            No events to show.
+            No upcoming events to show.
           </Card>
         ) : (
           <div className="space-y-4">
-            {openEvents.map((event) => {
-              const statusInfo = ARTIST_STATUS_LABELS[event.status] ?? {
-                label: event.status,
-                variant: "outline" as const,
-              };
-
-              return (
-                <Link
-                  key={event.id}
-                  href={`/events/${event.id}`}
-                  className="block"
-                >
-                  <Card
-                    interactive
-                    className="flex flex-col gap-3 p-6 md:flex-row md:items-center md:justify-between"
-                  >
-                    <div className="space-y-2">
-                      <h3 className="font-heading text-lg font-bold tracking-tight">
-                        {event.name}
-                      </h3>
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-                        <span className="inline-flex items-center gap-1.5">
-                          <CalendarDays className="size-4" />
-                          {formatDateRangeNo(
-                            event.eventStartDate,
-                            event.eventEndDate
-                          )}
-                        </span>
-                        {(event.venueCity || event.venueCountry) && (
-                          <span className="inline-flex items-center gap-1.5">
-                            <MapPin className="size-4" />
-                            {[event.venueCity, event.venueCountry]
-                              .filter(Boolean)
-                              .join(", ")}
-                          </span>
-                        )}
-                        {event.status === "published" &&
-                          event.applicationOpenDate && (
-                            <span>
-                              Opens {formatDateNo(event.applicationOpenDate)}
-                            </span>
-                          )}
-                        {event.status === "accepting_applications" &&
-                          event.applicationCloseDate && (
-                            <span className="font-semibold text-destructive">
-                              Deadline{" "}
-                              {formatDateNo(event.applicationCloseDate)}
-                            </span>
-                          )}
-                      </div>
-                    </div>
-                    <Badge variant={statusInfo.variant}>
-                      {statusInfo.label}
-                    </Badge>
-                  </Card>
-                </Link>
-              );
-            })}
+            {upcomingEvents.map((event) => (
+              <ConventionEventRow key={event.id} event={event} />
+            ))}
           </div>
         )}
       </section>
+
+      {pastEvents.length > 0 && (
+        <section className="mt-12 space-y-4">
+          <h2 className="font-heading text-2xl font-bold tracking-tight">
+            Previous events
+          </h2>
+          <div className="space-y-4">
+            {pastEvents.map((event) => (
+              <ConventionEventRow key={event.id} event={event} muted />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
+  );
+}
+
+interface ConventionEventRowEvent {
+  id: string;
+  name: string;
+  status: keyof typeof ARTIST_STATUS_LABELS | string;
+  eventStartDate: string;
+  eventEndDate: string | null;
+  venueCity: string | null;
+  venueCountry: string | null;
+  applicationOpenDate: string | null;
+  applicationCloseDate: string | null;
+}
+
+function ConventionEventRow({
+  event,
+  muted = false,
+}: {
+  event: ConventionEventRowEvent;
+  muted?: boolean;
+}) {
+  const statusInfo = ARTIST_STATUS_LABELS[
+    event.status as keyof typeof ARTIST_STATUS_LABELS
+  ] ?? {
+    label: event.status,
+    variant: "outline" as const,
+  };
+  return (
+    <Link href={`/events/${event.id}`} className="block">
+      <Card
+        interactive
+        className={`flex flex-col gap-3 p-6 md:flex-row md:items-center md:justify-between ${muted ? "opacity-80" : ""}`}
+      >
+        <div className="space-y-2">
+          <h3 className="font-heading text-lg font-bold tracking-tight">
+            {event.name}
+          </h3>
+          <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+            <span className="inline-flex items-center gap-1.5">
+              <CalendarDays className="size-4" />
+              {formatDateRangeNo(event.eventStartDate, event.eventEndDate)}
+            </span>
+            {(event.venueCity || event.venueCountry) && (
+              <span className="inline-flex items-center gap-1.5">
+                <MapPin className="size-4" />
+                {[event.venueCity, event.venueCountry].filter(Boolean).join(", ")}
+              </span>
+            )}
+            {event.status === "published" && event.applicationOpenDate && (
+              <span>Opens {formatDateNo(event.applicationOpenDate)}</span>
+            )}
+            {event.status === "accepting_applications" &&
+              event.applicationCloseDate && (
+                <span className="font-semibold text-destructive">
+                  Deadline {formatDateNo(event.applicationCloseDate)}
+                </span>
+              )}
+          </div>
+        </div>
+        <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
+      </Card>
+    </Link>
   );
 }

@@ -3,7 +3,12 @@ import { authConfig } from "@/lib/auth/config";
 import { NextResponse } from "next/server";
 
 const artistRoutes = ["/dashboard"];
-const organizerRoutes = ["/conventions"];
+// Only the organizer admin surfaces require auth — /conventions
+// (directory) and /conventions/<id> (detail) live in the (public)
+// route group and must stay accessible without a session. Including
+// the bare "/conventions" prefix here previously redirected every
+// public visitor to /login.
+const organizerRoutes = ["/conventions/manage"];
 const authRoutes = ["/login", "/register"];
 
 const { auth } = NextAuth(authConfig);
