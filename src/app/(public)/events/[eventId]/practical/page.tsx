@@ -29,7 +29,7 @@ export default async function PracticalInfoPage({ params }: PracticalPageProps) 
   // to render, but defend on direct URL access.
   if (!shouldShowPracticalTab(ctx)) notFound();
 
-  const { event } = ctx;
+  const { event, isArtist } = ctx;
   const amenities = event.amenities as Amenities | null;
   const venueLine = [event.venueCity, event.venueCountry]
     .filter(Boolean)
@@ -131,7 +131,12 @@ export default async function PracticalInfoPage({ params }: PracticalPageProps) 
         </Card>
       )}
 
-      {(event.availableStands || event.tableDimensions || event.priceInfo) && (
+      {/* Stand counts, table dimensions and pricing are only
+          relevant to artists deciding whether to apply. Hide for
+          public visitors and organizers — they see this info in
+          their own surfaces. */}
+      {isArtist &&
+        (event.availableStands || event.tableDimensions || event.priceInfo) && (
         <Card className="p-5">
           <div className="mb-3 flex items-center gap-2">
             <div className="grid size-8 place-items-center rounded-[8px] bg-primary/10 text-primary">
