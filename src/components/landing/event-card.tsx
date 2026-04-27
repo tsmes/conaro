@@ -132,7 +132,10 @@ function MobileTopStripe({
   return (
     <div
       className={cn(
-        "relative flex items-center gap-3 px-4 py-3 text-white sm:hidden",
+        // Mobile top section. Bumped vertical padding + min height
+        // by ~50% so the logo / gradient gets more visual weight
+        // at the top of each upcoming-event card.
+        "relative flex min-h-[84px] items-center gap-3 px-4 py-5 text-white sm:hidden",
         gradientClass
       )}
       style={

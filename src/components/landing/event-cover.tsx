@@ -52,11 +52,7 @@ export function EventCover({
   const layoutClass =
     variant === "card"
       ? "hidden sm:flex w-[168px] shrink-0 flex-col justify-between p-5"
-      // Hero cover only stretches when stacked on mobile (md+ it's
-      // a side panel and fills the row regardless). Bump the
-      // mobile minimum so the logo + date stamp gets the visual
-      // weight it deserves at the top of the page.
-      : "min-h-[270px] md:min-h-[180px] flex flex-col justify-between p-5";
+      : "min-h-[180px] flex flex-col justify-between p-5";
 
   return (
     <div
