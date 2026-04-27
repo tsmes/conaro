@@ -294,10 +294,13 @@ export default async function EventLayout({
                 )}
               </div>
             </div>
-            {/* Days-to-go card on the right */}
+            {/* Days-to-go card on the right. Backdrop is a dark
+                tint (not bg-white/12) so the white "X days" reads
+                cleanly even when the hero sits on a light header
+                colour or a light upper region of the banner photo. */}
             {showCountdown && (
               <div className="lg:text-right">
-                <div className="inline-flex flex-col gap-1 rounded-[14px] border border-white/25 bg-white/12 px-5 py-4 backdrop-blur-md">
+                <div className="inline-flex flex-col gap-1 rounded-[14px] border border-white/25 bg-black/35 px-5 py-4 backdrop-blur-md">
                   <div className="text-[10.5px] font-bold uppercase tracking-[0.16em] text-white/80">
                     Doors open in
                   </div>
