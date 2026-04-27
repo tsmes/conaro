@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
+import { CheckCircle2 } from "lucide-react";
 import type { MissingField } from "@/lib/applications/validation";
 import type {
   FieldRequirements,
@@ -40,11 +40,15 @@ export function ApplyButton({
   assistantFeeNok,
 }: ApplyButtonProps) {
   if (hasExistingApplication) {
+    // success-container / on-success-container tokens are wired up
+    // in both light and dark themes (globals.css), so contrast +
+    // saturation stays sensible on either side. Switching off the
+    // bare bg-green-500/10 + dark Badge pairing that read as a
+    // grey-on-mint pill in light mode and washed out in dark.
     return (
-      <div className="rounded-md bg-green-500/10 p-4 text-center">
-        <Badge variant="default" className="text-sm">
-          Already Applied
-        </Badge>
+      <div className="flex items-center justify-center gap-2 rounded-md bg-success-container px-4 py-3 text-on-success-container">
+        <CheckCircle2 className="size-4" />
+        <span className="text-sm font-semibold">Already applied</span>
       </div>
     );
   }
