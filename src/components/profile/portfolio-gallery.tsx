@@ -77,6 +77,14 @@ function SortableImage({
     opacity: isDragging ? 0.5 : 1,
   };
 
+  // Local draft for the caption. The parent's `image.caption` can
+  // change after a save round-trip and Base UI warns when an
+  // uncontrolled FieldControl receives a different default after
+  // mount — controlling the input here sidesteps that, and the
+  // user's typed text remains source-of-truth until blur fires
+  // onCaptionChange to push it up.
+  const [captionDraft, setCaptionDraft] = useState(image.caption ?? "");
+
   return (
     <div ref={setNodeRef} style={style} className="space-y-2">
       <div className="group relative aspect-square overflow-hidden rounded-lg border bg-muted">
@@ -108,10 +116,11 @@ function SortableImage({
       {allowCaption && (
         <Input
           aria-label={`Caption for ${image.filename}`}
-          defaultValue={image.caption ?? ""}
+          value={captionDraft}
+          onChange={(e) => setCaptionDraft(e.target.value)}
           placeholder={captionPlaceholder}
           className="h-8 text-[12.5px]"
-          onBlur={(e) => onCaptionChange(image.id, e.target.value)}
+          onBlur={() => onCaptionChange(image.id, captionDraft)}
         />
       )}
     </div>
