@@ -23,6 +23,7 @@ interface GalleryLayoutProps {
   selected: Set<string>;
   onToggleSelect: (id: string) => void;
   onTogglePin: (id: string, pinned: boolean) => void;
+  onOpenDeep: (id: string) => void;
   onSetStatus: (id: string, status: "accepted" | "rejected") => void;
   onConfirmPayment: (id: string) => void;
   onRevoke: (id: string) => void;
@@ -38,6 +39,7 @@ export function GalleryLayout({
   selected,
   onToggleSelect,
   onTogglePin,
+  onOpenDeep,
   onSetStatus,
   onConfirmPayment,
   onRevoke,
@@ -69,8 +71,40 @@ export function GalleryLayout({
         return (
           <div
             key={applicant.id}
+            role="button"
+            tabIndex={0}
+            // Tile click → open Deep Review (or toggle bulk select
+            // when in bulk mode). Inner buttons / inputs / links
+            // stop the bubble naturally via the closest() guard
+            // below, so pin / accept / reject etc. continue to
+            // work without per-control stopPropagation calls.
+            onClick={(e) => {
+              const interactive = (e.target as HTMLElement).closest(
+                'button, a, input, [role="button"]'
+              );
+              if (interactive && interactive !== e.currentTarget) return;
+              if (bulkMode && !readOnly) {
+                onToggleSelect(applicant.id);
+              } else {
+                onOpenDeep(applicant.id);
+              }
+            }}
+            onKeyDown={(e) => {
+              if (e.key !== "Enter" && e.key !== " ") return;
+              const interactive = (e.target as HTMLElement).closest(
+                'button, a, input, [role="button"]'
+              );
+              if (interactive && interactive !== e.currentTarget) return;
+              e.preventDefault();
+              if (bulkMode && !readOnly) {
+                onToggleSelect(applicant.id);
+              } else {
+                onOpenDeep(applicant.id);
+              }
+            }}
+            aria-label={`Open ${applicant.displayName} in deep review`}
             className={cn(
-              "relative overflow-hidden rounded-2xl border border-border bg-card transition-all",
+              "group/tile relative cursor-pointer overflow-hidden rounded-2xl border border-border bg-card transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
               isSelected
                 ? "border-primary shadow-gallery ring-2 ring-primary/25"
                 : "hover:shadow-gallery"

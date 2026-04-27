@@ -93,9 +93,21 @@ export function TableLayout({
           return (
             <div
               key={applicant.id}
+              // Whole-row click opens Deep Review (matches the gallery
+              // tile click). Inner buttons / inputs short-circuit via
+              // the closest() guard so they keep their own behaviour.
+              onClick={(e) => {
+                if (bulkMode) return;
+                const interactive = (e.target as HTMLElement).closest(
+                  'button, a, input, [role="button"]'
+                );
+                if (interactive && interactive !== e.currentTarget) return;
+                onOpenDeep(applicant.id);
+              }}
               className={cn(
                 "grid items-center gap-3 border-b border-border px-5 py-3 last:border-b-0",
                 gridCols,
+                bulkMode ? "" : "cursor-pointer hover:bg-muted/50",
                 isSelected && "bg-primary-container/50"
               )}
             >

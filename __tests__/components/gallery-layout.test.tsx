@@ -76,6 +76,7 @@ function defaultProps(overrides: Partial<React.ComponentProps<typeof GalleryLayo
     selected: new Set<string>(),
     onToggleSelect: () => {},
     onTogglePin: () => {},
+    onOpenDeep: () => {},
     onSetStatus: () => {},
     onConfirmPayment: () => {},
     onRevoke: () => {},

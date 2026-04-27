@@ -376,6 +376,7 @@ export function SelectionWorkspace({
               selected={selected}
               onToggleSelect={handleToggleSelect}
               onTogglePin={handleTogglePin}
+              onOpenDeep={handleOpenDeep}
               onSetStatus={handleSetStatus}
               onConfirmPayment={handleConfirmPayment}
               onRevoke={handleRevoke}
