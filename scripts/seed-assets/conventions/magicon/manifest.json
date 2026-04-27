@@ -1,0 +1,30 @@
+{
+  "slug": "magicon",
+  "name": "MagiCon",
+  "websiteUrl": "https://www.magicon.no/",
+  "city": "Oslo",
+  "country": "NO",
+  "description": "MagiCon is a multi-fandom convention based in the Oslo area, launched in 2022 and created for nerds, by nerds. The event covers cosplay, drag, board games, roleplay, J-pop, video games and other corners of pop culture.\n\nThe 2026 edition, MagiCon Vanguard, takes place at Oslo Konserthus and features international guests from animation, gaming and voice acting.",
+  "events": [
+    {
+      "name": "MagiCon Vanguard 2026",
+      "startDate": "2026-06-20",
+      "endDate": "2026-06-21",
+      "venueCity": "Oslo",
+      "venueCountry": "NO",
+      "venueName": "Oslo Konserthus"
+    }
+  ],
+  "assets": {
+    "logo": { "file": "logo.avif", "source": "https://www.magicon.no/wp-content/uploads/2024/09/Magicon-Logo.avif" },
+    "banner": { "file": "banner.png", "source": "https://www.magicon.no/wp-content/uploads/2025/06/Magicon-Vanguard_logodate.png" },
+    "bannerMobile": null
+  },
+  "scrapedFrom": [
+    "https://www.magicon.no/",
+    "https://www.rostercon.com/en/event-convention/magicon-norway-2026"
+  ],
+  "scrapedAt": "2026-04-27",
+  "notes": "magicon.no blocks WebFetch (403); homepage was fetched via curl with a browser UA + Referer to retrieve images. Banner is the 2026 'Vanguard' hero with the date overlay — works as a banner but is taller than 4:1. Description paraphrased from previously verified about-us copy plus the Roster Con 2026 listing.",
+  "skip": false
+}

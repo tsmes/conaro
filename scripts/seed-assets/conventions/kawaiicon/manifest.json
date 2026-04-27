@@ -1,0 +1,30 @@
+{
+  "slug": "kawaiicon",
+  "name": "KawaiiCon",
+  "websiteUrl": "https://www.kawaiicon.no/",
+  "city": "Porsgrunn",
+  "country": "NO",
+  "description": "KawaiiCon — \"det lille con-et med det store hjertet\" — is a cosplay event located in Porsgrunn at the cultural venue Ælvespeilet. The convention emphasises samhold, hygge, skaperglede og godt humør (community, coziness, creative joy and good spirits).\n\nProgramming covers anime, manga, comics, film, gaming and related interests. The convention deliberately avoids a fixed yearly theme so attendees can cosplay whatever they want or simply come as themselves.\n\nFounded in 2012 by Sara Henriksen, KawaiiCon now runs with more than 60 dedicated volunteers each year.",
+  "events": [
+    {
+      "name": "KawaiiCon 14",
+      "startDate": "2027-04-09",
+      "endDate": "2027-04-11",
+      "venueCity": "Porsgrunn",
+      "venueCountry": "NO",
+      "venueName": "Ælvespeilet"
+    }
+  ],
+  "assets": {
+    "logo": { "file": "logo.jpg", "source": "https://static.wixstatic.com/media/7b5039_57899b8f183c4a278c8e0752c66fa72e~mv2.jpg" },
+    "banner": null,
+    "bannerMobile": null
+  },
+  "scrapedFrom": [
+    "https://www.kawaiicon.no/",
+    "https://www.kawaiicon.no/om-oss"
+  ],
+  "scrapedAt": "2026-04-27",
+  "notes": "KawaiiCon 13 (10-12 April 2026) is the most recent listed edition; tickets sold out per the homepage. As of today (2026-04-27) the event has just passed and the next edition is not yet announced — kept on the manifest for context, organiser can update dates.",
+  "skip": false
+}

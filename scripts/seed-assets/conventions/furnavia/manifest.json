@@ -1,0 +1,30 @@
+{
+  "slug": "furnavia",
+  "name": "Furnavia",
+  "websiteUrl": "https://furnavia.org/",
+  "city": "Sarpsborg",
+  "country": "NO",
+  "description": "Furnavia is Norway's largest annual furry convention. The organisation caters primarily to the furry community — a community with a common interest in anthropomorphic animals — expressed through art, literature, music, media, movies, crafts, and costumes.\n\nThe convention was founded in 2020 and held its first event in September 2023. It has grown steadily, with 2025 reaching roughly 444 paying attendees, and acts as a social gathering point for both Norwegian and international furries.",
+  "headerColor": null,
+  "events": [
+    {
+      "name": "Furnavia 2026: Dice of Fate",
+      "startDate": "2026-10-27",
+      "endDate": "2026-10-31",
+      "venueCity": "Sarpsborg",
+      "venueCountry": "NO",
+      "venueName": "Quality Hotel Sarpsborg"
+    }
+  ],
+  "assets": {
+    "logo": { "file": "logo.svg", "source": "https://furnavia.org/assets/GemRed-CUhSp_rY.svg" },
+    "banner": { "file": "banner.avif", "source": "https://furnavia.org/Ytdg_oBH8no.avif" },
+    "bannerMobile": null
+  },
+  "scrapedFrom": [
+    "https://furnavia.org/"
+  ],
+  "scrapedAt": "2026-04-27",
+  "notes": "Different format than the more 'standard' anime cons — the Furnavia site uses gem-shaped iconography (GemRed/Green/Orange/Purple SVGs) instead of a traditional logo. Picked GemRed as the primary mark; if a wordmark logo is needed the seeder will probably want a manual replacement. Banner is the AVIF hero image served from the site root. Early/late attendance window is Oct 26 – Nov 1; main convention dates are Oct 27–31, 2026.",
+  "skip": false
+}

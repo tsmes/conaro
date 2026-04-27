@@ -1,0 +1,31 @@
+{
+  "slug": "mizucon",
+  "name": "Mizucon",
+  "websiteUrl": "https://www.mizucon.no/",
+  "city": "Oslo",
+  "country": "NO",
+  "description": "Mizucon is a fully fledged cosplay convention at sea, sailing from Oslo to Copenhagen. Partake in a cosplay convention while enjoying a vacation on a boat, with all the amenities and entertainment opportunities it entails.\n\nThe event combines a traditional anime / cosplay convention experience — competitions, panels and meet-ups — with the cruise format, so attendees travel together over a long weekend.",
+  "headerColor": "#982351",
+  "events": [
+    {
+      "name": "Mizucon 2026",
+      "startDate": "2026-10-23",
+      "endDate": "2026-10-25",
+      "venueCity": "Oslo",
+      "venueCountry": "NO",
+      "venueName": "Cruise ferry Oslo ↔ Copenhagen"
+    }
+  ],
+  "assets": {
+    "logo": { "file": "logo.png", "source": "https://mizucon.no/favicon.png" },
+    "banner": { "file": "banner.jpeg", "source": "https://mizucon.no/thumb_2026.jpeg" },
+    "bannerMobile": null
+  },
+  "scrapedFrom": [
+    "https://www.mizucon.no/",
+    "https://www.mizucon.no/competitions"
+  ],
+  "scrapedAt": "2026-04-27",
+  "notes": "Logo source is the site favicon (PNG) — the SvelteKit homepage doesn't expose a separate logo asset in the static HTML, so this is the cleanest image we could pull. Banner is the og:image (thumb_2026.jpeg) used for social sharing. Theme/header color is the site's theme-color meta (#982351). Dates and route confirmed via search results / Roster Con — cruise sails Oslo to Copenhagen and back, 23–25 October 2026. Verify image rights before publishing.",
+  "skip": false
+}

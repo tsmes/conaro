@@ -1,0 +1,31 @@
+{
+  "slug": "pokecon",
+  "name": "PokéCon Norway",
+  "websiteUrl": "https://www.pokemania.no/",
+  "city": "Kristiansand",
+  "country": "NO",
+  "description": "PokéCon is Norway's dedicated Pokémon convention, organised by the volunteer association Pokémania (Pokémania Samlekortforening). It centres on Pokémon TCG and Pokémon GO tournaments, but also features vendor stands, trading areas, cosplay, drawing stations, video-game zones and a café.\n\nThe convention was previously held in Oslo (most recently at Sagene Samfunnshus in 2024) but moved to Kristiansand in 2025 after venue difficulties in the capital.",
+  "events": [
+    {
+      "name": "PokéCon 2026",
+      "startDate": "2026-06-06",
+      "endDate": "2026-06-07",
+      "venueCity": "Kristiansand",
+      "venueCountry": "NO",
+      "venueName": "Travparken Messehall"
+    }
+  ],
+  "assets": {
+    "logo": { "file": "logo.png", "source": "https://static.wixstatic.com/media/56490a_062a152ef47d43bc8a90e2b71b6bcce7~mv2.png" },
+    "banner": null,
+    "bannerMobile": null
+  },
+  "scrapedFrom": [
+    "https://www.pokemania.no/",
+    "https://www.pokemania.no/about-5",
+    "https://spond.com/discover/en-gb/events/C7CE077899B54450906187BF5B45F51B"
+  ],
+  "scrapedAt": "2026-04-27",
+  "notes": "Logo is the official PokéCon Norway circular badge. Banner is a Halloween-themed seamless pattern of Pokémon line drawings used by the org as decorative artwork; not ideal as a header but works as a wide brand-tone image until something better is provided.",
+  "skip": false
+}

@@ -1,0 +1,33 @@
+{
+  "slug": "torucon",
+  "name": "Torucon",
+  "websiteUrl": "https://en.torucon.no/torucon",
+  "city": "Trondheim",
+  "country": "NO",
+  "description": "Torucon er en årlig festival for alle folk med fantastiske fritidssysler, fra sci-fi og fantasy til cosplay, laiv, japansk popkultur, K-pop, gaming og brett-/rollespill. Arrangementet ble grunnlagt i 2011 av en håndfull entusiaster og er i dag Norges største konvent i sitt slag, med rundt 2000 besøkende — fortsatt 100 % drevet av frivillige.\n\nI tillegg til hovedarrangementet i august arrangerer Torucon mindre events gjennom året, blant annet Halloween-eventet Toruween og minikonventet ToruJôl i juleperioden.",
+  "headerColor": null,
+  "events": [
+    {
+      "name": "Torucon 2026: Bubble Pop",
+      "startDate": "2026-08-08",
+      "endDate": "2026-08-09",
+      "venueCity": "Trondheim",
+      "venueCountry": "NO",
+      "venueName": "Clarion Hotel Trondheim"
+    }
+  ],
+  "assets": {
+    "logo": {
+      "file": "logo.webp",
+      "source": "https://torucon.no/wp-content/uploads/2025/10/logo.webp"
+    },
+    "banner": null,
+    "bannerMobile": null
+  },
+  "scrapedFrom": [
+    "https://en.torucon.no/torucon"
+  ],
+  "scrapedAt": "2026-04-27",
+  "notes": "Description blends the Norwegian tagline from torucon.no with the English about-text. Banner is a venue/cosplay photo from a previous year — should be acceptable as a hero but may want a fresher 2026 image once available.",
+  "skip": false
+}

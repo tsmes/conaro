@@ -1,0 +1,31 @@
+{
+  "slug": "harucon",
+  "name": "HaruCon Grimstad",
+  "websiteUrl": "https://harucongrimstad.wixsite.com/harucon",
+  "city": "Grimstad",
+  "country": "NO",
+  "description": "HaruCon is a free, family-friendly nerd-culture event hosted at Grimstad bibliotek. The convention gathers fans of anime, manga, cosplay, fantasy and gaming for a weekend of panels, workshops and competitions.\n\nThe programme is aimed at youth and includes cosplay contests and various smaller competitions across the library's spaces.",
+  "events": [
+    {
+      "name": "HaruCon 2027",
+      "startDate": "2027-04-24",
+      "endDate": null,
+      "venueCity": "Grimstad",
+      "venueCountry": "NO",
+      "venueName": "Grimstad bibliotek"
+    }
+  ],
+  "assets": {
+    "logo": null,
+    "banner": { "file": "banner.png", "source": "https://static.wixstatic.com/media/054625_acaa438ca1cc4dfe8c5cdd190cf44ea3~mv2.png" },
+    "bannerMobile": null
+  },
+  "scrapedFrom": [
+    "https://harucongrimstad.wixsite.com/harucon",
+    "https://grimstadbibliotek.no/arrangementer/harucon/",
+    "https://www.facebook.com/HaruConGrimstad/"
+  ],
+  "scrapedAt": "2026-04-27",
+  "notes": "No standalone .no domain — site is on Wix. Logo is the small site mark from the Wix header (200x200 PNG); banner is the FB cover image used as the hero on the homepage (1200x628). Single-day event listing — only the 2026-04-25 date was confirmed across sources, so endDate is null. Description paraphrased from the Wix about copy and Grimstad bibliotek's event page.",
+  "skip": false
+}

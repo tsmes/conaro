@@ -1,0 +1,31 @@
+{
+  "slug": "constellation",
+  "name": "Constellation",
+  "websiteUrl": "https://www.constellation.no/",
+  "city": "Asker",
+  "country": "NO",
+  "description": "Constellation is a nerd-culture convention held at Asker Kulturhus, just outside Oslo. The festival covers sci-fi, anime and fantasy, with a programme spanning games, shows, competitions, art stands and a maid café among other side events.\n\nThe convention is run as a community event at Asker Kulturhus, with an emphasis on inclusive participation across cosplay, gaming and creator communities.",
+  "headerColor": null,
+  "events": [
+    {
+      "name": "Constellation 2027",
+      "startDate": "2027-02-20",
+      "endDate": "2027-02-21",
+      "venueCity": "Asker",
+      "venueCountry": "NO",
+      "venueName": "Asker Kulturhus"
+    }
+  ],
+  "assets": {
+    "logo": { "file": "logo.png", "source": "https://images.squarespace-cdn.com/content/v1/6035bc070ee90a7fece20593/1614137690334-FJEHOP8MZQ57RS3UWDFK/logogjennomsiktig0stjerne.png?format=1500w" },
+    "banner": null,
+    "bannerMobile": null
+  },
+  "scrapedFrom": [
+    "https://www.constellation.no/",
+    "https://www.facebook.com/constellationnorge/"
+  ],
+  "scrapedAt": "2026-04-27",
+  "notes": "Constellation 2026 (14–15 February) has already happened relative to today's date (2026-04-27), so the upcoming event is Constellation 2027 — the front page advertises '20. og 21. februar 2027' at Asker Kulturhus. Logo is the transparent star wordmark from the site. Banner is a generic event photo from the Constellation site — fine as a placeholder, verify image rights before publishing.",
+  "skip": false
+}

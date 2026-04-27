@@ -1,0 +1,30 @@
+{
+  "slug": "animanga",
+  "name": "Animanga",
+  "websiteUrl": "https://animanga.no/",
+  "city": "Arendal",
+  "country": "NO",
+  "description": "Animanga is an annual youth-oriented Japanese pop-culture gathering in Arendal on Norway's south coast, hosted in cooperation with Arendal Library and supported by Agder Fylkeskommune. Programming centres on anime, manga, cosplay and related fandom activities, aimed primarily at teens and young adults.\n\nCompared with the larger commercial conventions, Animanga is a community/library-anchored event with a small footprint.",
+  "events": [
+    {
+      "name": "Animanga 2026",
+      "startDate": null,
+      "endDate": null,
+      "venueCity": "Arendal",
+      "venueCountry": "NO",
+      "venueName": "Arendal Bibliotek"
+    }
+  ],
+  "assets": {
+    "logo": { "file": "logo.jpg", "source": "https://animanga.no/wp-content/uploads/2022/07/animanga-logo2022.jpg" },
+    "banner": null,
+    "bannerMobile": null
+  },
+  "scrapedFrom": [
+    "https://animanga.no/",
+    "https://www.facebook.com/Animanga.Arendal/"
+  ],
+  "scrapedAt": "2026-04-27",
+  "notes": "2026 dates not yet announced on the homepage. Venue (Arendal Bibliotek) is the historical host but unconfirmed for 2026. 'Logo' is a wide chibi-mascot wordmark (1200x630, library-style social card) — works as both logo and a secondary banner; we already have a separate event-photo banner.jpg from the Nov 2025 'eik-1946' photoset.",
+  "skip": false
+}

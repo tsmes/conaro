@@ -1,0 +1,31 @@
+{
+  "slug": "spillexpo",
+  "name": "SpillExpo",
+  "websiteUrl": "https://spillexpo.no/",
+  "city": "Lillestrøm",
+  "country": "NO",
+  "description": "SpillExpo is Norway's largest gaming expo, run annually in the Oslo region. The expo combines exhibitor booths from publishers and retailers, tournaments, indie game showcases, retro gaming areas, cosplay competitions and entertainment-stage programming.\n\nIn recent years SpillExpo has expanded to incorporate Comic Con-style content, broadening its appeal beyond pure video games to wider geek culture.",
+  "events": [
+    {
+      "name": "SpillExpo Oslo 2026",
+      "startDate": "2026-11-13",
+      "endDate": "2026-11-15",
+      "venueCity": "Lillestrøm",
+      "venueCountry": "NO",
+      "venueName": "Nova Spektrum"
+    }
+  ],
+  "assets": {
+    "logo": { "file": "logo.png", "source": "https://spillexpo.no/wp-content/uploads/2022/06/Spillexpo-logo.png" },
+    "banner": null,
+    "bannerMobile": null
+  },
+  "scrapedFrom": [
+    "https://spillexpo.no/",
+    "https://tikkio.com/events/60681-spillexpo-oslo-2026",
+    "https://10times.com/spillexpo"
+  ],
+  "scrapedAt": "2026-04-27",
+  "notes": "Tagged as artist-alley-relevant in issue #12 with `(?)` (different format / lower priority). Banner is a stylised SpillExpo hero render from 2022; site doesn't expose a current 2026 banner asset.",
+  "skip": true
+}

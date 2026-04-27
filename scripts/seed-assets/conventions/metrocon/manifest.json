@@ -1,0 +1,30 @@
+{
+  "slug": "metrocon",
+  "name": "Metrocon Stavanger",
+  "websiteUrl": "https://www.metrocon.no/",
+  "city": "Stavanger",
+  "country": "NO",
+  "description": "Metrocon er et alkoholfritt popkulturelt arrangement som er åpent og trygt for alle aldre som vil møtes for fellesinteresser innenfor animasjon, spill og tegneserier — enten iført kostymer eller som vanlige besøkende.\n\nThe convention is run by the volunteer organisation Stavanger Cons, with a core crew that has worked on Metrocon and similar events for over ten years. Activities include cosplay competitions, board and role-playing games, a Super Smash tournament, an art / merch marketplace, and assorted side events.",
+  "headerColor": null,
+  "events": [
+    {
+      "name": "Metrocon 2026",
+      "startDate": "2026-10-03",
+      "endDate": "2026-10-04",
+      "venueCity": "Stavanger",
+      "venueCountry": "NO",
+      "venueName": "Clarion Hotel Energy"
+    }
+  ],
+  "assets": {
+    "logo": { "file": "logo.svg", "source": "https://cdn.prod.website-files.com/5d9c7fda59eb4725acd73894/5e2dcc1ed2e0679d50b371f9_Metroconlogo-10.svg" },
+    "banner":  null,
+    "bannerMobile": null
+  },
+  "scrapedFrom": [
+    "https://www.metrocon.no/"
+  ],
+  "scrapedAt": "2026-04-27",
+  "notes": "Front page banner reads 'Metrocon arrangeres 3-4. Oktober på Clarion Hotel Energy!' — page was last published 2026-04-15 so the dates are for Metrocon 2026. Search results indicate the 2026 theme is 'Cyber'. Banner image is the og:image (a 2024 event photo) — fine as a placeholder hero, but verify rights before publishing. Description is largely the site's own meta description, kept in Norwegian as written.",
+  "skip": false
+}

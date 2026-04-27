@@ -1,0 +1,31 @@
+{
+  "slug": "hexcon",
+  "name": "Hexcon",
+  "websiteUrl": "https://hexconspillfestival.org/",
+  "city": "Trondheim",
+  "country": "NO",
+  "description": "Hexcon is a game convention held annually in Trondheim, Norway, at the end of October or in early November. The festival is run by the gaming club Hexagon and covers board games, card games, role-playing games, live-action role-play (LARP), and miniature wargames.\n\nHexcon is one of Norway's longest-running gaming festivals — the 2024 edition celebrated the festival's 40th year. Recent editions have themed weekends (2024 'Jubilee', 2025 'Revolution'), with a community-driven programme of tournaments, open tables, and demos.",
+  "headerColor": null,
+  "events": [
+    {
+      "name": "Hexcon 2026",
+      "startDate": null,
+      "endDate": null,
+      "venueCity": "Trondheim",
+      "venueCountry": "NO",
+      "venueName": "Rosenborg Skole"
+    }
+  ],
+  "assets": {
+    "logo": { "file": "logo.jpg", "source": "https://i0.wp.com/hexconspillfestival.org/wp-content/uploads/2023/04/cropped-NettLogo-1.jpg" },
+    "banner": { "file": "banner.jpg", "source": "https://hexconspillfestival.org/wp-content/uploads/2025/06/cropped-WebHeader2025.jpg" },
+    "bannerMobile": null
+  },
+  "scrapedFrom": [
+    "https://hexconspillfestival.org/hexcon-game-convention/",
+    "https://hexagonspillklubb.org/2026/03/03/first-meeting-for-hexcon-2026/"
+  ],
+  "scrapedAt": "2026-04-27",
+  "notes": "Low-priority / different format: Hexcon is a tabletop gaming festival, not an anime/cosplay con, and the 2026 edition's exact dates were not yet announced at scrape time — the organiser blog confirms the 2026 committee just held its first meeting (March 2026). Historical pattern is late October / early November at Rosenborg Skole in Trondheim. Logo is the site's NettLogo (2023) — banner is the WebHeader2025 image still featured on the front page. Verify dates and image rights before seeding.",
+  "skip": false
+}

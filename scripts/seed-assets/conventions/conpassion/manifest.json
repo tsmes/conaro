@@ -1,0 +1,27 @@
+{
+  "slug": "conpassion",
+  "name": "ConPASSION",
+  "websiteUrl": "https://conpassion.carrd.co/",
+  "city": "Kristiansand",
+  "country": "NO",
+  "description": "ConPASSION is a festival with focus on cosplay, anime, gaming and all of nerd culture. The event centers on a theme of love and romantic narratives across various media, while also celebrating passion for hobbies and interests.\n\nAttendees can take part in competitions, an artist alley and idol fest activities in a family-friendly environment with strict safety guidelines.",
+  "events": [
+    {
+      "name": "ConPASSION 2027",
+      "startDate": "2027-02-06",
+      "endDate": "2027-02-07",
+      "venueCity": "Kristiansand",
+      "venueCountry": "NO",
+      "venueName": "Samsen Kulturhus"
+    }
+  ],
+  "assets": {
+    "logo": null,
+    "banner": { "file": "banner.jpg", "source": "https://conpassion.carrd.co/assets/images/image01.jpg" },
+    "bannerMobile": null
+  },
+  "scrapedFrom": ["https://conpassion.carrd.co/"],
+  "scrapedAt": "2026-04-27",
+  "notes": "No standalone logo image is exposed on the carrd site — only a hero/banner image was available. Description is paraphrased from the carrd front page; cosplay, anime, gaming and idol fest themes are advertised there directly.",
+  "skip": false
+}

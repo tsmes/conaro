@@ -1,0 +1,33 @@
+{
+  "slug": "retromessa",
+  "name": "Retromessa",
+  "websiteUrl": "https://www.retromessa.no/",
+  "city": "Sandefjord",
+  "country": "NO",
+  "description": "Retromessa er Nordens største retro-opplevelse for hele familien — en messe for gamle videospill og nostalgisk popkultur. Arrangementet rommer Norges mest omfattende samling av vintage spillkonsoller, datamaskiner, spill og historiske gamingartefakter, alt tilgjengelig for hands-on prøving.\n\nProgrammet inkluderer panelsamtaler med spesielle gjester fra spill- og mediebransjen, eget barneområde med blant annet pixel-perler og ansiktsmaling, og et stort marked der artister, forhandlere og hobbyister fra hele Norge selger retrospill, samleobjekter, merch og nostalgiske gjenstander.",
+  "headerColor": null,
+  "events": [
+    {
+      "name": "Retromessa 2026",
+      "startDate": "2026-08-15",
+      "endDate": "2026-08-16",
+      "venueCity": "Sandefjord",
+      "venueCountry": "NO",
+      "venueName": "Runarhallen, Klavenesveien 20"
+    }
+  ],
+  "assets": {
+    "logo": {
+      "file": "logo.png",
+      "source": "https://www.retromessa.no/logo2025-gradient-with-outline.png"
+    },
+    "banner": null,
+    "bannerMobile": null
+  },
+  "scrapedFrom": [
+    "https://www.retromessa.no/"
+  ],
+  "scrapedAt": "2026-04-27",
+  "notes": "Different format from cosplay/anime cons — primarily a retro-gaming and pop-culture market with vendor stands rather than artist applications, so seed value is mostly informational (low priority per request). Banner served by Sanity CDN as JPEG even though URL ends in .webp; saved as banner.jpg.",
+  "skip": false
+}

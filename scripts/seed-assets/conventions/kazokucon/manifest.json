@@ -1,0 +1,29 @@
+{
+  "slug": "kazokucon",
+  "name": "Kazokucon",
+  "websiteUrl": "https://www.kazokucon.no/",
+  "city": "Oslo",
+  "country": "NO",
+  "description": "Kazokucon is a small Oslo-based pop-culture and cosplay convention with a strong community-first ethos — the name plays on the Japanese word for \"family\". Programming spans anime, manga, fantasy, sci-fi, comics, video games, tabletop, cosplay and K-pop, with an emphasis on a cozy, welcoming atmosphere over scale.\n\nEditions are themed; the upcoming 2026 edition is branded \"Neon Age\".",
+  "events": [
+    {
+      "name": "Kazokucon 8 — Neon Age",
+      "startDate": "2026-05-23",
+      "endDate": "2026-05-24",
+      "venueCity": "Oslo",
+      "venueCountry": "NO",
+      "venueName": "Frogner Kultursenter"
+    }
+  ],
+  "assets": {
+    "logo": { "file": "logo.png", "source": "https://static.wixstatic.com/media/f555b9_506a993340c64959a291e3575df65cf6~mv2.png" },
+    "banner": { "file": "banner.png", "source": "https://static.wixstatic.com/media/f555b9_e0bbb4f5280748399338061c78dd1e92~mv2.png" },
+    "bannerMobile": null
+  },
+  "scrapedFrom": [
+    "https://www.kazokucon.no/"
+  ],
+  "scrapedAt": "2026-04-27",
+  "notes": "Logo is the standalone mascot icon; banner is the 2026 'Neon Age' wordmark hero with the mascot.",
+  "skip": false
+}

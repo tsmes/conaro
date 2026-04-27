@@ -1,0 +1,20 @@
+{
+  "slug": "fandomatics",
+  "name": "Fandomatics",
+  "websiteUrl": null,
+  "city": "Stavanger",
+  "country": "NO",
+  "description": "Fandomatics Norway is a small Stavanger-based fandom community/convention organisation. Its main public footprint is a Facebook page; no working `.no` or `.com` domain was reachable, and it is not listed on RosterCon, FanCons.com, MagiCon's community page, or Cosplay.no's convention index.",
+  "events": [],
+  "assets": {
+    "logo": { "file": "logo.png", "source": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQhjP3b-b321uI-ug6-HdLjiY2e6K_2-ZRHKQ&s" },
+    "banner": null,
+    "bannerMobile": null
+  },
+  "scrapedFrom": [
+    "https://www.facebook.com/FandomaticsNorway/"
+  ],
+  "scrapedAt": "2026-04-27",
+  "notes": "Weakest data of all 25 cons in scope. No public website found at fandomatics.no or fandomatics.com (both unreachable / not indexed). Group appears largely Facebook-only and possibly dormant. Ask the user whether to drop from seed data or seed as a placeholder.",
+  "skip": false
+}

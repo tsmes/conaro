@@ -1,0 +1,30 @@
+{
+  "slug": "sognacon",
+  "name": "SognaCon",
+  "websiteUrl": "https://www.sogndalkulturhus.no/informasjon/sognacon",
+  "city": "Sogndal",
+  "country": "NO",
+  "description": "SognaCon er Vestland sitt største Con — eit samlingspunkt for unge med interesse for anime, manga, cosplay, e-sport, gaming, spelutvikling, brettspel, rollespel og kortspel.\n\nArrangementet skal vere ein arena for å skape nye venskap, knyte kontakt med likesinna og oppleve fellesskap i trygge og inkluderande rammer. Programmet er skalert etter alder, med familievenlege aktivitetar tidleg på dagen og meir vaksent innhald for eldre ungdom utover kvelden.\n\nSognaCon vert arrangert av Sogndal Kulturhus, Sogndal bibliotek og lokale samarbeidspartnarar.",
+  "events": [
+    {
+      "name": "SognaCon 2027",
+      "startDate": "2027-02-27",
+      "endDate": "2027-02-28",
+      "venueCity": "Sogndal",
+      "venueCountry": "NO",
+      "venueName": "Sogndal Kulturhus"
+    }
+  ],
+  "assets": {
+    "logo": { "file": "logo.png", "source": "https://cdn.sanity.io/images/6hcnmhdb/production/261f0f94239d13d66141ec4cd20abc502a015e0a-960x540.png" },
+    "banner": null,
+    "bannerMobile": null
+  },
+  "scrapedFrom": [
+    "https://www.sogndalkulturhus.no/informasjon/sognacon",
+    "https://www.sogndalkulturhus.no/kulturprogram/KUL20250029"
+  ],
+  "scrapedAt": "2026-04-27",
+  "notes": "Logo and banner are pulled from Sanity CDN as served on the kulturhus page. The 'banner' is a small SVG logo-strip rather than a true wide hero — may need replacement with a richer banner during seeding review.",
+  "skip": false
+}

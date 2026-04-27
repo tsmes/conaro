@@ -1,0 +1,37 @@
+{
+  "slug": "norcon",
+  "name": "Norcon",
+  "websiteUrl": "https://www.norcon-sf.no/",
+  "city": "Oslo",
+  "country": "NO",
+  "description": "Norcon er en science fiction- og fantasy-kongress som har vært arrangert i Oslo med ujevne mellomrom siden 1975. Festivalen samler både norske og internasjonale æresgjester fra sjangerlitteraturen.\n\nNorcon 32 arrangeres 12.–14. juni 2026 på Realfagsbiblioteket (Vilhelm Bjerknes' hus) ved Universitetet i Oslo. Æresgjester inkluderer den amerikanske forfatteren Naomi Novik, den britiske fantasy-forfatteren Samantha Shannon, den norske forfatteren og illustratøren Thore Hansen, samt fan guest of honour Anette Lauen Borg.",
+  "headerColor": null,
+  "events": [
+    {
+      "name": "Norcon 32",
+      "startDate": "2026-06-12",
+      "endDate": "2026-06-14",
+      "venueCity": "Oslo",
+      "venueCountry": "NO",
+      "venueName": "Realfagsbiblioteket, Vilhelm Bjerknes' hus, Universitetet i Oslo"
+    }
+  ],
+  "assets": {
+    "logo": {
+      "file": "logo.png",
+      "source": "https://www.norcon-sf.no/wp-content/uploads/2025/10/Norcon-logo_dato-1024x679.png"
+    },
+    "banner": {
+      "file": "banner.png",
+      "source": "https://www.norcon-sf.no/wp-content/uploads/2025/09/IMG_3481-972x1024.png"
+    },
+    "bannerMobile": null
+  },
+  "scrapedFrom": [
+    "https://www.norcon-sf.no/",
+    "https://www.norcon-sf.no/information-in-english"
+  ],
+  "scrapedAt": "2026-04-27",
+  "notes": "Banner image is portrait-oriented (972x1024) rather than the ideal 4:1 hero — may need replacement or cropping. Description paraphrased from the Norwegian-language home page; no official English-language summary lifted verbatim.",
+  "skip": false
+}

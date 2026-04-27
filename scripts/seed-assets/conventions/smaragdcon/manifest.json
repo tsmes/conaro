@@ -1,0 +1,27 @@
+{
+  "slug": "smaragdcon",
+  "name": "SmaragdCon",
+  "websiteUrl": "https://www.smaragdcon.com/",
+  "city": "Eidsvoll",
+  "country": "NO",
+  "description": "SmaragdCon is a welcoming small cosplay convention located in Eidsvoll municipality, organised by young enthusiasts dedicated to creating engaging experiences for the local community.\n\nThe convention is run by Borgen cosplay and gaming club in collaboration with Ung Fritid at Eidsvoll kommune, with a focus on making a pleasant con experience — especially for those attending their first convention.",
+  "events": [
+    {
+      "name": "SmaragdCon 2026 — Enchanted Forest",
+      "startDate": null,
+      "endDate": null,
+      "venueCity": "Eidsvoll",
+      "venueCountry": "NO",
+      "venueName": "Panorama kulturhus"
+    }
+  ],
+  "assets": {
+    "logo": null,
+    "banner": { "file": "banner.png", "source": "https://images.squarespace-cdn.com/content/v1/65554167993c2070427b06f3/4a9f5544-8815-42da-8f60-dffb8175d3fc/SmaragdCon+2026+-+Enchanted+Forest+%281920+x+1080+px%29.png" },
+    "bannerMobile": null
+  },
+  "scrapedFrom": ["https://www.smaragdcon.com/"],
+  "scrapedAt": "2026-04-27",
+  "notes": "SmaragdCon 2026 (theme: Enchanted Forest) is announced on the front page with venues Panorama kulturhus + Eidsvoll bibliotek, but specific dates were not visible on the homepage and could not be located via search — left null. No standalone logo asset was exposed; only the announcement banner was available.",
+  "skip": false
+}

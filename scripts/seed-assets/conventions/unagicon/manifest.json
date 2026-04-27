@@ -1,0 +1,31 @@
+{
+  "slug": "unagicon",
+  "name": "Unagicon",
+  "websiteUrl": "https://www.unagicon.com/",
+  "city": "Ålesund",
+  "country": "NO",
+  "description": "Unagicon is an annual nerd-culture festival in Ålesund for everyone interested in comics and manga, anime, fantasy and sci-fi, cosplay, K-pop, gaming and board / role-playing games.\n\nThe convention invites guests every year to hold workshops, panels and judge competitions, and it aims to bring people together around their hobbies in a welcoming environment.",
+  "events": [
+    {
+      "name": "Unagicon 2027 — Deep Sea",
+      "startDate": "2027-03-27",
+      "endDate": "2027-03-28",
+      "venueCity": "Ålesund",
+      "venueCountry": "NO",
+      "venueName": "Parken kulturhus"
+    }
+  ],
+  "assets": {
+    "logo": null,
+    "banner": null,
+    "bannerMobile": null
+  },
+  "scrapedFrom": [
+    "https://www.unagicon.com/",
+    "https://happeningnext.com/event/unagicon-deep-sea-eid3a0dcde9jm",
+    "https://www.fjordnorway.com/en/events/unagicon-in-aalesund"
+  ],
+  "scrapedAt": "2026-04-27",
+  "notes": "unagicon.com returned HTTP 403 to the fetcher on every attempt, so no images could be pulled from the official site. Event metadata (Deep Sea, 28-29 March 2026, Parken kulturhus) was confirmed via search-result snippets and the happeningnext + fjordnorway listings. Note: this event already happened by today (2026-04-27); the next Unagicon edition is not yet announced. Logo and banner left null — needs manual asset upload.",
+  "skip": true
+}

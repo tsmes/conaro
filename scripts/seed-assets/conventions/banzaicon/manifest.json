@@ -1,0 +1,31 @@
+{
+  "slug": "banzaicon",
+  "name": "Banzaicon",
+  "websiteUrl": "https://www.banzaicon.no/",
+  "city": "Larvik",
+  "country": "NO",
+  "description": "Banzaicon is a long-running Norwegian pop-culture convention based in Larvik (Vestfold). It is a 3-day festival covering anime, manga, fantasy, sci-fi, film, TV, comics, video games, LARP, board games, cosplay and K-pop.\n\nEach edition has a theme; recent editions have been held at Bølgen Kulturhus in central Larvik.",
+  "events": [
+    {
+      "name": "Banzaicon 14 — & Mortals",
+      "startDate": "2026-10-09",
+      "endDate": "2026-10-11",
+      "venueCity": "Larvik",
+      "venueCountry": "NO",
+      "venueName": "Bølgen Kulturhus"
+    }
+  ],
+  "assets": {
+    "logo": { "file": "logo.webp", "source": "https://images.squarespace-cdn.com/content/v1/64a16bf403ae256a2d53ce49/88913e2f-bcca-40c8-9df3-7291feea4089/b14_logo-lockup-finished_date.png?format=1500w" },
+    "banner": null,
+    "bannerMobile": null
+  },
+  "scrapedFrom": [
+    "https://www.banzaicon.no/",
+    "https://www.banzaicon.no/about",
+    "https://animecons.com/events/schedule.php?year=2026"
+  ],
+  "scrapedAt": "2026-04-27",
+  "notes": "Logo is the BC14 lockup including theme '& Mortals' and date overlay '9.–11. Oktober' — keep that in mind when displaying alongside other event metadata. Banner is a stage photo from BC13 (cosplay performance). Squarespace CDN serves WebP transparently regardless of the .png/.jpg URL extension; both files saved as .webp.",
+  "skip": false
+}

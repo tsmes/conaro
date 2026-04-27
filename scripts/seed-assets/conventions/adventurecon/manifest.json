@@ -1,0 +1,31 @@
+{
+  "slug": "adventurecon",
+  "name": "AdventureCon",
+  "websiteUrl": "https://adventurecon.no/",
+  "city": "Bergen",
+  "country": "NO",
+  "description": "AdventureCon is a Bergen-based cosplay and geek-culture convention focused on community, friendship, creativity and games. Cosplay is core to the event but explicitly optional for attendees.\n\nThe convention is independent of (and unrelated to) the US 'Adventure Con' / 'AdventureCon' events. It runs in summer and uses cultural-centre venues in greater Bergen.",
+  "events": [
+    {
+      "name": "AdventureCon 2026",
+      "startDate": "2026-07-10",
+      "endDate": "2026-07-12",
+      "venueCity": "Bergen",
+      "venueCountry": "NO",
+      "venueName": "Åsane Kulturhus"
+    }
+  ],
+  "assets": {
+    "logo": null,
+    "banner": null,
+    "bannerMobile": null
+  },
+  "scrapedFrom": [
+    "https://www.facebook.com/people/AdventureCon/100093222620304/",
+    "https://www.lifeinnorway.net/major-events-in-bergen/",
+    "https://web.archive.org/web/2025*/https://adventurecon.no/"
+  ],
+  "scrapedAt": "2026-04-27",
+  "notes": "adventurecon.no currently resolves to a one.com domain-parking page. The Wayback Machine has older snapshots referencing assets at impro.usercontent.one (logo `AdventureCon_Logo_Main_NoBorder___serialized2.png`, photo `DSC7633.jpg`) but those origin URLs return 503 today. Logo + banner left null until images can be retrieved manually (e.g. from the Facebook page cover or from a fresh Wayback capture). Description and 2026 dates synthesised from search snippets — venue Åsane Kulturhus is the historical host, unconfirmed for 2026.",
+  "skip": true
+}

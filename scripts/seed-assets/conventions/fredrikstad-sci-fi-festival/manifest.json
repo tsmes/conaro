@@ -1,0 +1,30 @@
+{
+  "slug": "fredrikstad-sci-fi-festival",
+  "name": "Fredrikstad Sci-fi Festival",
+  "websiteUrl": "https://scififest.no/",
+  "city": "Fredrikstad",
+  "country": "NO",
+  "description": "Fredrikstad Sci-fi Festival (FSFF) is an annual sci-fi and pop-culture festival held in the old fortress town of Fredrikstad in southeastern Norway. The programme blends film screenings at Fredrikstad Kino with cosplay competitions, fan panels, workshops, gaming areas and a vendor hall.\n\nThe festival positions itself as a multi-day celebration of sci-fi, fantasy and geek culture, drawing attendees from across the Oslofjord region and welcoming both casual fans and dedicated cosplayers.",
+  "events": [
+    {
+      "name": "Fredrikstad Sci-fi Festival 2026",
+      "startDate": "2026-04-30",
+      "endDate": "2026-05-03",
+      "venueCity": "Fredrikstad",
+      "venueCountry": "NO",
+      "venueName": "Fredrikstad Kino"
+    }
+  ],
+  "assets": {
+    "logo": { "file": "logo.png", "source": "https://scififest.no/" },
+    "banner": { "file": "banner.jpg", "source": "https://scififest.no/" },
+    "bannerMobile": null
+  },
+  "scrapedFrom": [
+    "https://scififest.no/",
+    "https://visitfredrikstadhvaler.com/en/event/fredrikstad-scifi-festival-2026"
+  ],
+  "scrapedAt": "2026-04-27",
+  "notes": "Logo + banner were captured manually from earlier scraping; banner is the 2025 cyber-hooded promo art with 1.-4. mai 2025 overlay. Dates above are for the 2026 edition (Apr 30 – May 3) per visitfredrikstadhvaler.com listing.",
+  "skip": false
+}
