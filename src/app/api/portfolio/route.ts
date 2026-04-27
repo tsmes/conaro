@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { eq, and, count } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 import sharp from "sharp";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -135,6 +136,12 @@ export async function POST(request: NextRequest) {
     throw error;
   }
 
+  // The dashboard renders profile completeness server-side from
+  // the portfolio image count; without revalidation the route
+  // cache keeps showing the pre-upload count until a hard refresh.
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/profile");
+
   return NextResponse.json({
     ...image,
     url: storage.getUrl(storagePath),
@@ -182,6 +189,11 @@ export async function DELETE(request: NextRequest) {
   // Delete DB record first, then storage (orphaned file is better than orphaned record)
   await db.delete(portfolioImages).where(eq(portfolioImages.id, imageId));
   await storage.delete(image.storagePath).catch(() => {});
+
+  // Same revalidation rationale as the upload path — keep the
+  // dashboard's image-count-derived completeness fresh.
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/profile");
 
   return NextResponse.json({ success: true });
 }
