@@ -274,7 +274,7 @@ Update the four clamp sites in editor + canvas to clamp to the polygon when one 
 
 **Depends on:** 2, 5
 
-### 12. Manual verification + spec sign-off
+### 12. Manual verification + spec sign-off ⏳
 Walk through the spec's acceptance-criteria checklist; check off each box.
 
 **Requirements:** All
