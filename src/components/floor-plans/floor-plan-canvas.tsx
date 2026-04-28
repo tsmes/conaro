@@ -7,6 +7,8 @@ import type { KonvaEventObject } from "konva/lib/Node";
 import { Maximize2, Minus, Plus } from "lucide-react";
 import type { FloorPlan, TableSizeOption } from "@/lib/db/schema/events";
 import type { ResolvedFloorPlan } from "@/lib/floor-plans/queries";
+import { PolygonEditorLayer } from "./polygon-editor-layer";
+import type { Point } from "@/lib/floor-plans/geometry";
 
 const GRID_CM = 100;
 const DEFAULT_ROOM_SIZE_CM = { widthCm: 1000, heightCm: 700 };
@@ -234,6 +236,30 @@ export function FloorPlanCanvas({
         l.id === labelId ? { ...l, x: newX, y: newY } : l
       ),
     });
+  }
+
+  function handlePolygonChange(nextVertices: Point[]) {
+    if (!plan || !onChange || !activeRoom) return;
+    onChange({
+      rooms: plan.rooms.map((r) =>
+        r.id === activeRoom.id ? { ...r, vertices: nextVertices } : r
+      ),
+      tables: plan.tables.map((t) => ({
+        id: t.id,
+        label: t.label,
+        tableSizeOptionId: t.tableSizeOptionId,
+        roomId: t.roomId,
+        rotationDeg: t.rotationDeg,
+        x: t.x,
+        y: t.y,
+        assignedApplicationId: t.assignedApplicationId,
+      })),
+      labels: plan.labels,
+    });
+  }
+
+  function handlePolygonEdgeClick() {
+    // Wired up in Task 9 (edge-length popup).
   }
 
   const roomWidthPx = viewportCm.widthCm * scale;
@@ -660,6 +686,15 @@ export function FloorPlanCanvas({
               );
             })}
           </Layer>
+          {editable && viewMode === "design" && activeRoom && (
+            <PolygonEditorLayer
+              vertices={activeRoom.vertices ?? null}
+              paddingPx={PADDING_PX}
+              scale={scale}
+              onVerticesChange={handlePolygonChange}
+              onEdgeClick={handlePolygonEdgeClick}
+            />
+          )}
         </Stage>
         </div>
       )}

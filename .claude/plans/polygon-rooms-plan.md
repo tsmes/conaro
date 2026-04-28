@@ -130,7 +130,7 @@ Render the polygon outline whenever `vertices` exists, in every mode. The rect r
 
 **Depends on:** 1, 4
 
-### 6. `PolygonEditorLayer` scaffold + interactive vertices/edges
+### 6. `PolygonEditorLayer` scaffold + interactive vertices/edges ✅
 New Konva layer rendered only in design mode. Renders existing vertices as draggable Circles and edges as clickable Lines. No drawing flow yet — this task is just the substrate.
 
 **Requirements:** REQ-7, REQ-9 (substrate), REQ-10 (substrate)
