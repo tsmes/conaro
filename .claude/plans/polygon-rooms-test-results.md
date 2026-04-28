@@ -66,6 +66,17 @@ Out-of-scope items (deferred per spec):
 - Self-intersecting polygon detection.
 - Snap-to-grid.
 
+## Headless smoke checks (loop iteration)
+
+Attempted automated browser-driven UI verification via `manual-testing` skill — `agent-browser` is not installed in this environment, so the polygon drawing flow can't be exercised programmatically here. Lightweight reachability checks done via curl against the running dev server (`localhost:3000`):
+
+| Check | Result |
+|---|---|
+| Organizer floor-plan page returns auth redirect | ✅ HTTP 307 (login redirect, as expected for unauthenticated curl) |
+| Public floor-plan page on unpublished event returns 404 | ✅ HTTP 404 (publish gate working) |
+
+The 16 UI acceptance criteria still need a human-driven browser pass — see plan below.
+
 ## Manual Verification Plan
 
 To finish the spec sign-off, run these in a browser:
