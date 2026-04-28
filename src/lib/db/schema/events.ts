@@ -43,11 +43,12 @@ export interface TableSizeOption {
   depthCm?: number;
 }
 
-// Organizer-authored floor plan for the event. Rooms are axis-aligned
-// rectangles in centimetres; tables are axis-aligned rectangles that
-// reference a `tableSizeOptions[].id` for their real-world dimensions.
-// Assignments reference `applications.id` of accepted artists on this
-// event. The floor planner writes the whole shape on every save.
+// Organizer-authored floor plan for the event. Rooms have an axis-aligned
+// "canvas" rectangle (widthCm × heightCm) and an optional polygon outline
+// (`vertices`) drawn inside it for non-rectangular spaces. Tables reference
+// a `tableSizeOptions[].id` for their real-world dimensions. Assignments
+// reference `applications.id` of accepted artists on this event. The floor
+// planner writes the whole shape on every save.
 export interface FloorPlanRoom {
   id: string;
   name: string;
@@ -55,6 +56,11 @@ export interface FloorPlanRoom {
   y: number;
   widthCm: number;
   heightCm: number;
+  // Optional polygon outline. Coordinates are room-local (canvas top-left =
+  // (0, 0)), same convention tables/labels already use. Absent or fewer
+  // than 3 entries means "use the canvas rect as the room outline" — that's
+  // also how every existing pre-polygon room renders and clamps.
+  vertices?: { xCm: number; yCm: number }[];
 }
 
 // Tables are scoped to a room — `x`/`y` are room-local coordinates in cm

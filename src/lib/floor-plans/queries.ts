@@ -32,7 +32,9 @@ export interface ResolvedFloorPlanTable extends FloorPlanTable {
 // Reads a plan out of storage and backfills `roomId` on any legacy
 // table that predates the room-scoping change. Tables without a valid
 // roomId get pinned to the first room; if the plan has no rooms, such
-// tables are dropped (they can't render anywhere meaningful).
+// tables are dropped (they can't render anywhere meaningful). Rooms
+// are passed through as-is, so any optional `vertices` polygon survives
+// the migration unchanged.
 function migrateLegacyPlan(stored: FloorPlan): FloorPlan {
   const roomIds = new Set(stored.rooms.map((r) => r.id));
   const fallbackRoomId = stored.rooms[0]?.id ?? null;

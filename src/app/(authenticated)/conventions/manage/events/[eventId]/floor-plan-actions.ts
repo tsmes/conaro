@@ -11,6 +11,11 @@ import { getOrganizerEvent } from "@/lib/conventions/queries";
 import type { FloorPlan } from "@/lib/db/schema/events";
 import { type ActionState } from "@/lib/validations/auth";
 
+const vertexSchema = z.object({
+  xCm: z.number().int().min(0).max(10000),
+  yCm: z.number().int().min(0).max(10000),
+});
+
 const roomSchema = z.object({
   id: z.string().min(1),
   name: z.string().trim().min(1, "Room name is required").max(60),
@@ -18,6 +23,10 @@ const roomSchema = z.object({
   y: z.number().int().min(0),
   widthCm: z.number().int().min(10).max(10000),
   heightCm: z.number().int().min(10).max(10000),
+  // Optional polygon outline drawn inside the canvas rect. A polygon needs
+  // at least 3 vertices to enclose any area; we cap at 24 to keep the
+  // editor interactions and clamp loops bounded.
+  vertices: z.array(vertexSchema).min(3).max(24).optional(),
 });
 
 const tableSchema = z.object({

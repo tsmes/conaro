@@ -416,4 +416,141 @@ describe("saveFloorPlan", () => {
     );
     expect(result.error).toContain("Invalid");
   });
+
+  it("saves a polygon room with vertices", async () => {
+    const { profile, convention } = await createTestOrganizer();
+    const event = await createTestEvent(convention.id, {
+      tableSizeOptions: [sizeWithDims],
+    });
+    mockAuth.mockResolvedValue({
+      user: { id: "u", role: "organizer", profileId: profile.id },
+    });
+
+    const polygon = [
+      { xCm: 0, yCm: 0 },
+      { xCm: 800, yCm: 0 },
+      { xCm: 800, yCm: 300 },
+      { xCm: 400, yCm: 300 },
+      { xCm: 400, yCm: 500 },
+      { xCm: 0, yCm: 500 },
+    ];
+    const result = await submit({
+      eventId: event.id,
+      plan: {
+        rooms: [
+          {
+            id: "r-1",
+            name: "L-shaped hall",
+            x: 0,
+            y: 0,
+            widthCm: 800,
+            heightCm: 500,
+            vertices: polygon,
+          },
+        ],
+        tables: [],
+      },
+    });
+    expect(result.success).toBe(true);
+
+    const [row] = await db
+      .select({ floorPlan: events.floorPlan })
+      .from(events)
+      .where(eq(events.id, event.id));
+    expect(row.floorPlan?.rooms[0].vertices).toEqual(polygon);
+  });
+
+  it("rejects a polygon with fewer than 3 vertices", async () => {
+    const { profile, convention } = await createTestOrganizer();
+    const event = await createTestEvent(convention.id);
+    mockAuth.mockResolvedValue({
+      user: { id: "u", role: "organizer", profileId: profile.id },
+    });
+    const result = await submit({
+      eventId: event.id,
+      plan: {
+        rooms: [
+          {
+            id: "r-1",
+            name: "Tiny",
+            x: 0,
+            y: 0,
+            widthCm: 500,
+            heightCm: 500,
+            vertices: [
+              { xCm: 0, yCm: 0 },
+              { xCm: 500, yCm: 0 },
+            ],
+          },
+        ],
+        tables: [],
+      },
+    });
+    expect(result.error).toContain("validation failed");
+  });
+
+  it("rejects a polygon with out-of-range coordinates", async () => {
+    const { profile, convention } = await createTestOrganizer();
+    const event = await createTestEvent(convention.id);
+    mockAuth.mockResolvedValue({
+      user: { id: "u", role: "organizer", profileId: profile.id },
+    });
+    const result = await submit({
+      eventId: event.id,
+      plan: {
+        rooms: [
+          {
+            id: "r-1",
+            name: "Bad",
+            x: 0,
+            y: 0,
+            widthCm: 500,
+            heightCm: 500,
+            vertices: [
+              { xCm: 0, yCm: 0 },
+              { xCm: 500, yCm: 0 },
+              { xCm: -50, yCm: 500 },
+            ],
+          },
+        ],
+        tables: [],
+      },
+    });
+    expect(result.error).toContain("validation failed");
+  });
+
+  it("preserves vertices through migrateLegacyPlan on read", async () => {
+    const { profile, convention } = await createTestOrganizer();
+    const event = await createTestEvent(convention.id);
+    mockAuth.mockResolvedValue({
+      user: { id: "u", role: "organizer", profileId: profile.id },
+    });
+
+    const polygon = [
+      { xCm: 0, yCm: 0 },
+      { xCm: 600, yCm: 0 },
+      { xCm: 600, yCm: 400 },
+      { xCm: 0, yCm: 400 },
+    ];
+    await submit({
+      eventId: event.id,
+      plan: {
+        rooms: [
+          {
+            id: "r-1",
+            name: "Square",
+            x: 0,
+            y: 0,
+            widthCm: 600,
+            heightCm: 400,
+            vertices: polygon,
+          },
+        ],
+        tables: [],
+      },
+    });
+    const { getFloorPlanForEvent } = await import("@/lib/floor-plans/queries");
+    const resolved = await getFloorPlanForEvent(event.id);
+    expect(resolved?.rooms[0].vertices).toEqual(polygon);
+  });
 });
