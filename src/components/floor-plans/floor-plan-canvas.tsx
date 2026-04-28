@@ -8,7 +8,11 @@ import { Maximize2, Minus, Plus } from "lucide-react";
 import type { FloorPlan, TableSizeOption } from "@/lib/db/schema/events";
 import type { ResolvedFloorPlan } from "@/lib/floor-plans/queries";
 import { PolygonEditorLayer } from "./polygon-editor-layer";
-import type { Point } from "@/lib/floor-plans/geometry";
+import {
+  type Point,
+  snapToAxis,
+  snapToVertex,
+} from "@/lib/floor-plans/geometry";
 
 const GRID_CM = 100;
 const DEFAULT_ROOM_SIZE_CM = { widthCm: 1000, heightCm: 700 };
@@ -273,6 +277,7 @@ export function FloorPlanCanvas({
   const drawingMode =
     editable && viewMode === "design" && !activeRoom?.vertices;
   const VERTEX_SNAP_PX = 10;
+  const AXIS_SNAP_DEG = 5;
 
   // Convert a Stage pointer position (already in stage coordinates,
   // accounting for pan/zoom) into room-local centimetres. Returns null
@@ -284,12 +289,30 @@ export function FloorPlanCanvas({
     return { xCm: Math.round(xCm), yCm: Math.round(yCm) };
   }
 
+  // Apply snap rules to a candidate cm position during drawing. Vertex
+  // snap (to any already-placed vertex) wins; otherwise lock to the
+  // axis through the previous vertex when within tolerance.
+  function snapDuringDrawing(candidate: Point): Point {
+    const snapThresholdCm = VERTEX_SNAP_PX / scale;
+    const vertexHit = snapToVertex(
+      candidate,
+      drawingVertices,
+      snapThresholdCm
+    );
+    if (vertexHit) return vertexHit;
+    if (drawingVertices.length === 0) return candidate;
+    const prev = drawingVertices[drawingVertices.length - 1];
+    return snapToAxis(prev, candidate, AXIS_SNAP_DEG);
+  }
+
   function handleStageMouseMove(e: KonvaEventObject<MouseEvent>) {
     if (!drawingMode) return;
     const stage = e.target.getStage();
     const pos = stage?.getRelativePointerPosition();
     if (!pos) return;
-    setCursorCm(stagePointToCm(pos.x, pos.y));
+    const raw = stagePointToCm(pos.x, pos.y);
+    if (!raw) return;
+    setCursorCm(snapDuringDrawing(raw));
   }
 
   function handleStageClick(e: KonvaEventObject<MouseEvent | TouchEvent>) {
@@ -300,8 +323,8 @@ export function FloorPlanCanvas({
     const stage = e.target.getStage();
     const pos = stage?.getRelativePointerPosition();
     if (!pos) return;
-    const cm = stagePointToCm(pos.x, pos.y);
-    if (!cm) return;
+    const raw = stagePointToCm(pos.x, pos.y);
+    if (!raw) return;
 
     // Closing the polygon: cursor near the first placed vertex with
     // 3+ vertices already.
@@ -340,7 +363,8 @@ export function FloorPlanCanvas({
       }
     }
 
-    setDrawingVertices((prev) => [...prev, cm]);
+    const snapped = snapDuringDrawing(raw);
+    setDrawingVertices((prev) => [...prev, snapped]);
   }
 
   // Esc cancels in-progress draw; Backspace pops the last vertex.

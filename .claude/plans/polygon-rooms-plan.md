@@ -183,7 +183,7 @@ Click points to draw, click first vertex to close, Esc cancels, Backspace remove
 
 **Depends on:** 5, 6
 
-### 8. Snap to axis + snap to vertex during drawing and drag
+### 8. Snap to axis + snap to vertex during drawing and drag ✅
 Wire `geometry.snapToAxis` and `geometry.snapToVertex` into the in-progress segment and vertex drag.
 
 **Requirements:** REQ-8, REQ-9

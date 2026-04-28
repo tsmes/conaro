@@ -3,7 +3,13 @@
 import { Layer, Line, Circle } from "react-konva";
 import type { KonvaEventObject } from "konva/lib/Node";
 
-import type { Point } from "@/lib/floor-plans/geometry";
+import {
+  type Point,
+  snapToAxis,
+  snapToVertex,
+} from "@/lib/floor-plans/geometry";
+
+const AXIS_SNAP_DEG = 5;
 
 interface PolygonEditorLayerProps {
   /** Active room polygon in cm (room-local). `null` = no polygon yet. */
@@ -113,10 +119,36 @@ export function PolygonEditorLayer({
               }}
               onDragEnd={(e: KonvaEventObject<DragEvent>) => {
                 const node = e.target;
-                const xCm = Math.round((node.x() - paddingPx) / scale);
-                const yCm = Math.round((node.y() - paddingPx) / scale);
+                const candidate: Point = {
+                  xCm: Math.round((node.x() - paddingPx) / scale),
+                  yCm: Math.round((node.y() - paddingPx) / scale),
+                };
+                // Snap to other vertices first (excluding self), else
+                // lock to the previous vertex's axis. Mirrors the
+                // drawing-time snap so dragged corners line up cleanly.
+                const others = vertices.filter((_, idx) => idx !== i);
+                const snapThresholdCm = vertexSnapPx / scale;
+                const vertexHit = snapToVertex(
+                  candidate,
+                  others,
+                  snapThresholdCm
+                );
+                let snapped = candidate;
+                if (vertexHit) {
+                  snapped = vertexHit;
+                } else {
+                  const prevIndex = (i - 1 + vertices.length) % vertices.length;
+                  snapped = snapToAxis(
+                    vertices[prevIndex],
+                    candidate,
+                    AXIS_SNAP_DEG
+                  );
+                }
                 const next = vertices.slice();
-                next[i] = { xCm, yCm };
+                next[i] = {
+                  xCm: Math.round(snapped.xCm),
+                  yCm: Math.round(snapped.yCm),
+                };
                 onVerticesChange(next);
               }}
             />
