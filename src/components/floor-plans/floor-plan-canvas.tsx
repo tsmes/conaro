@@ -127,6 +127,19 @@ export function FloorPlanCanvas({
   // Smart-guide list active during a table drag. Cleared when no
   // guides are engaged or when drag ends.
   const [snapGuides, setSnapGuides] = useState<SnapGuide[] | null>(null);
+  // Tracks whether Alt is currently held during a table drag. A ref
+  // (not state) so the dragBoundFunc — which fires every mousemove —
+  // can read the latest value without forcing re-renders. Window
+  // keydown/keyup listeners are attached on dragStart and removed on
+  // dragEnd via altListenerCleanupRef.
+  const altPressedRef = useRef(false);
+  const altListenerCleanupRef = useRef<(() => void) | null>(null);
+  useEffect(() => {
+    return () => {
+      altListenerCleanupRef.current?.();
+      altListenerCleanupRef.current = null;
+    };
+  }, []);
   // View transform applied to the Stage. The base Stage already
   // fits the room to the container width; this transform sits on
   // top so viewers can pinch/wheel-zoom and drag-pan. Editor mode
@@ -815,6 +828,23 @@ export function FloorPlanCanvas({
                     const halfWCm = effWidthPx / 2 / scale;
                     const halfDCm = effDepthPx / 2 / scale;
 
+                    // Alt held → no snap, no guides. The table follows
+                    // the raw cursor (still subject to the canvas-rect
+                    // clamp below).
+                    if (altPressedRef.current) {
+                      setSnapGuides((prev) => (prev === null ? prev : null));
+                      return {
+                        x: Math.max(
+                          minCx,
+                          Math.min(maxCx, PADDING_PX + proposed.xCm * scale)
+                        ),
+                        y: Math.max(
+                          minCy,
+                          Math.min(maxCy, PADDING_PX + proposed.yCm * scale)
+                        ),
+                      };
+                    }
+
                     // Build snap targets from siblings in this room.
                     const others: SnapTarget[] = [];
                     for (const sibling of tablesInRoom) {
@@ -906,6 +936,22 @@ export function FloorPlanCanvas({
                       onAssignedTableTap(table.assignment.applicationId);
                     }
                   }}
+                  onDragStart={(e) => {
+                    altPressedRef.current = Boolean(e.evt.altKey);
+                    const onKeyDown = (event: KeyboardEvent) => {
+                      if (event.key === "Alt") altPressedRef.current = true;
+                    };
+                    const onKeyUp = (event: KeyboardEvent) => {
+                      if (event.key === "Alt") altPressedRef.current = false;
+                    };
+                    window.addEventListener("keydown", onKeyDown);
+                    window.addEventListener("keyup", onKeyUp);
+                    altListenerCleanupRef.current?.();
+                    altListenerCleanupRef.current = () => {
+                      window.removeEventListener("keydown", onKeyDown);
+                      window.removeEventListener("keyup", onKeyUp);
+                    };
+                  }}
                   onDragEnd={(e) => {
                     handleTableDragEnd(
                       table.id,
@@ -916,6 +962,9 @@ export function FloorPlanCanvas({
                       table.rotationDeg
                     );
                     setSnapGuides(null);
+                    altListenerCleanupRef.current?.();
+                    altListenerCleanupRef.current = null;
+                    altPressedRef.current = false;
                   }}
                 >
                   {/* Highlight halo (rendered under the rect when viewer
