@@ -6,17 +6,30 @@
 // All seed accounts share the same password and use the seed-* email
 // domains so purgeSeedArtists / purgeSeedOrganizer know what they own.
 
+import fs from "node:fs";
 import { eq } from "drizzle-orm";
 import { hashPassword } from "../../src/lib/auth/helpers";
 import { db } from "../../src/lib/db";
 import { artistProfiles } from "../../src/lib/db/schema/artist-profiles";
 import { users } from "../../src/lib/db/schema/auth";
 import { profiles } from "../../src/lib/db/schema/profiles";
+import {
+  portfolioImages,
+  type PortfolioSection,
+} from "../../src/lib/db/schema/portfolio-images";
 import { serializeSocialLinks } from "../../src/lib/artist-profile/social-links";
 import {
   GENRE_SUGGESTIONS,
   MEDIUM_SUGGESTIONS,
 } from "../../src/lib/artist-profile/tags";
+import { processImage } from "../../src/lib/storage/image";
+import { storage } from "../../src/lib/storage";
+import {
+  loadPortfolioPool,
+  resolvePortfolioImagePath,
+  type LoadedPortfolioPool,
+  type PortfolioImageEntry,
+} from "./portfolio-manifest";
 
 export const SEED_PASSWORD = "seed-pass-123";
 export const SEED_ARTIST_DOMAIN = "seed-artist.conaro.test";
@@ -80,6 +93,10 @@ export interface SeedArtistPlan {
   genres: string[];
   mediums: string[];
   socialLinksJson: string;
+  websiteUrl: string | null;
+  phone: string | null;
+  accessibilityNeeds: string | null;
+  notes: string | null;
 }
 
 function sampleSome<T>(list: readonly T[], count: number, seed: number): T[] {
@@ -104,13 +121,32 @@ export function planArtist(index: number): SeedArtistPlan {
 
   const socialCount = 1 + (index % 3);
   const platforms = sampleSome(SOCIAL_PLATFORMS, socialCount, index + 17);
-  const slug = firstName.toLowerCase();
+  const slug = firstName.toLowerCase().replace(/[^a-z]/g, "");
   const socialLinksJson = serializeSocialLinks(
     platforms.map((type) => ({
       type,
       url: `https://${type.toLowerCase().replace(/[^a-z]/g, "")}.example/${slug}`,
     }))
   );
+
+  // Roughly half the artists publish a website, ~30 % share a phone
+  // (organisers see this; the public profile doesn't), and a handful
+  // leave accessibility notes and a private message for organisers.
+  const websiteUrl = index % 2 === 0 ? `https://${slug}.example` : null;
+  const phone =
+    index % 3 === 0
+      ? `+47 ${String(400_00_000 + ((index * 91347) % 99_999_999)).slice(0, 3)} ${String(400_00_000 + ((index * 91347) % 99_999_999)).slice(3, 5)} ${String(400_00_000 + ((index * 91347) % 99_999_999)).slice(5, 8)}`
+      : null;
+  const accessibilityNeeds =
+    index % 7 === 0
+      ? "Prefer a stand close to a quiet zone — sensory breaks needed."
+      : index % 11 === 0
+      ? "Wheelchair access required (no step at table edge)."
+      : null;
+  const notes =
+    index % 5 === 0
+      ? "Returning vendor; happy to share table space with a friend if that helps with layout."
+      : null;
 
   return {
     index,
@@ -126,6 +162,10 @@ export function planArtist(index: number): SeedArtistPlan {
     genres: sampleSome(GENRE_SUGGESTIONS, 2 + (index % 3), index + 11),
     mediums: sampleSome(MEDIUM_SUGGESTIONS, 1 + (index % 3), index + 5),
     socialLinksJson,
+    websiteUrl,
+    phone,
+    accessibilityNeeds,
+    notes,
   };
 }
 
@@ -199,6 +239,10 @@ export async function ensureSeedArtist(
       genres: plan.genres,
       mediums: plan.mediums,
       socialLinks: plan.socialLinksJson || null,
+      websiteUrl: plan.websiteUrl,
+      phone: plan.phone,
+      accessibilityNeeds: plan.accessibilityNeeds,
+      notes: plan.notes,
     })
     .returning();
 
@@ -284,3 +328,84 @@ export function parseCountArg(
   }
   return n;
 }
+
+export interface SeedArtistPortfolioResult {
+  inserted: number;
+  bySection: Record<PortfolioSection, number>;
+}
+
+// Picks a deterministic, repeatable selection from the bundled CC0
+// portfolio pool, uploads each via processImage(), and replaces any
+// existing portfolio_images rows for this artist.
+export async function seedArtistPortfolio(
+  profileId: string,
+  index: number,
+  pool: LoadedPortfolioPool
+): Promise<SeedArtistPortfolioResult> {
+  // Drop existing portfolio rows so re-runs don't pile up duplicates.
+  // Storage objects from previous runs are left in place — the new
+  // upload writes a fresh uuid path so there's no collision.
+  await db.delete(portfolioImages).where(eq(portfolioImages.profileId, profileId));
+
+  // Section counts vary by index for visual variety: every artist
+  // gets 1–2 promo, 2–4 product, 1–2 previous_stand → 4–8 total.
+  const promoCount = 1 + (index % 2);
+  const productCount = 2 + (index % 3);
+  const standCount = 1 + ((index + 1) % 2);
+
+  const picks: { entry: PortfolioImageEntry; section: PortfolioSection }[] = [
+    ...pickFromSection(pool, "promo", promoCount, index + 7),
+    ...pickFromSection(pool, "product", productCount, index + 13),
+    ...pickFromSection(pool, "previous_stand", standCount, index + 19),
+  ];
+
+  const bySection: Record<PortfolioSection, number> = {
+    promo: 0,
+    product: 0,
+    previous_stand: 0,
+  };
+
+  for (let i = 0; i < picks.length; i += 1) {
+    const { entry, section } = picks[i];
+    const sourcePath = resolvePortfolioImagePath(entry.file);
+    const raw = fs.readFileSync(sourcePath);
+    const processed = await processImage(raw);
+    const imageId = crypto.randomUUID();
+    const storageKey = `portfolios/${profileId}/${imageId}.webp`;
+    await storage.upload(storageKey, processed.data, "image/webp");
+
+    await db.insert(portfolioImages).values({
+      id: imageId,
+      profileId,
+      filename: entry.file,
+      storagePath: storageKey,
+      mimeType: "image/webp",
+      width: processed.width,
+      height: processed.height,
+      sortOrder: i,
+      section,
+      caption: entry.caption ?? null,
+    });
+
+    bySection[section] += 1;
+  }
+
+  return { inserted: picks.length, bySection };
+}
+
+function pickFromSection(
+  pool: LoadedPortfolioPool,
+  section: PortfolioSection,
+  count: number,
+  seed: number
+): { entry: PortfolioImageEntry; section: PortfolioSection }[] {
+  const items = pool.bySection[section];
+  const out: { entry: PortfolioImageEntry; section: PortfolioSection }[] = [];
+  for (let i = 0; i < count; i += 1) {
+    const idx = (seed * (i + 11) + 5) % items.length;
+    out.push({ entry: items[idx], section });
+  }
+  return out;
+}
+
+export { loadPortfolioPool };

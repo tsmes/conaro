@@ -70,11 +70,32 @@ Add npm script `"db:seed:conventions": "tsx scripts/seed-conventions.ts"` to `pa
 
 ## Phase C — `db:seed:artists -- --with-portfolios`
 
-Out of scope for this session unless time permits — flag and defer if the user would rather review Phase B first. Sketch for posterity:
+User decision (from this session): default artist count bumps from 25 to 50, every artist gets a populated portfolio when the flag is set.
 
-- Add `scripts/seed-assets/artists/{1,2,3,...}/` with 4–8 royalty-free images each (or AI-generated set checked in once).
-- `--with-portfolios` flag in `seed-artists.ts`: after artist profile is upserted, pick a deterministic image bundle (e.g. `index % bundleCount`) and upload via `processImage()` into `portfolios/<profileId>/<imageId>.webp`, insert `portfolio_images` rows with the right `category` enum mix.
-- Idempotent: skip if the artist already has portfolio_images rows.
+- `scripts/seed-assets/portfolios/` ships a shared pool of CC0 art images
+  (digital illustration / painting / line art) plus a few "previous-stand"
+  booth photos. A small `manifest.json` maps each filename to its
+  `portfolio_section` (`promo` | `product` | `previous_stand`) so the
+  seeder splits them across the right sections.
+- Helper `seedArtistPortfolio(profileId, plan)` in `scripts/lib/seed.ts`:
+  picks 4–8 images deterministically from the pool based on the artist's
+  index, uploads each through `processImage()` to
+  `portfolios/<profileId>/<imageId>.webp`, inserts a `portfolio_images`
+  row with the matching section, sortOrder, and a generated caption.
+- `seed-artists.ts` gains a `--with-portfolios` flag (and `--portfolios-only`
+  for re-running just the upload step). Default behavior without the
+  flag is unchanged.
+- Idempotent: helper deletes existing portfolio_images for the artist
+  before re-inserting, so re-runs don't pile up duplicates.
+- `seed-reset.ts` already tears down portfolios via the cascade through
+  profiles → portfolio_images, so no extra cleanup needed.
+
+### Tasks
+
+- [ ] C1. Curate ~30–60 CC0 portfolio images under `scripts/seed-assets/portfolios/` plus `manifest.json` mapping section tags.
+- [ ] C2. Bump default artist count to 50 in `seed-artists.ts`.
+- [ ] C3. Implement `seedArtistPortfolio()` and `--with-portfolios` flag.
+- [ ] C4. Smoke-test: `npm run db:seed:reset && npm run db:seed:artists -- 50 --with-portfolios`.
 
 ## Phase D — Manual smoke test
 
