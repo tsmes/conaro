@@ -11,7 +11,6 @@ import { PolygonEditorLayer } from "./polygon-editor-layer";
 import { EdgeLengthPopup } from "./edge-length-popup";
 import {
   type Point,
-  clampToPolygon,
   edgeLengthCm,
   resizeEdge,
   snapToAxis,
@@ -175,26 +174,18 @@ export function FloorPlanCanvas({
     [tableSizeOptions]
   );
 
-  // Clamps a table's centre point to the room boundary. For polygon
-  // rooms we use point-in-polygon + project-to-edge so the table stays
-  // inside the actual outline; the half-extent slack ensures the
-  // table's bounding box also fits. For canvas-rect rooms we keep the
-  // existing axis-aligned clamp.
+  // Clamps a table's centre to the canvas-rect bounds. Polygon-aware
+  // clamping during drag was tried earlier but its iterative settle
+  // produced visible jitter on non-convex polygons — the polygon now
+  // serves as a visual reference only on this surface. Arrow-key
+  // nudge in the editor still uses polygon clamping where small
+  // discrete deltas keep it stable.
   function clampTableCenterToRoom(
     center: Point,
     halfWidthCm: number,
     halfDepthCm: number
   ): Point {
     if (!activeRoom) return center;
-    const polygon = activeRoom.vertices;
-    if (polygon && polygon.length >= 3) {
-      // Approximate "table fits inside polygon" by clamping the
-      // centre into a polygon shrunk by the table's half-extents is
-      // expensive; clamping the centre alone is good enough for the
-      // common rectangular-table case and leaves the user a clear
-      // visual cue (the table edge can graze the polygon edge).
-      return clampToPolygon(center, polygon);
-    }
     return {
       xCm: Math.max(
         halfWidthCm,
@@ -209,8 +200,6 @@ export function FloorPlanCanvas({
 
   function clampLabelCenterToRoom(center: Point): Point {
     if (!activeRoom) return center;
-    const polygon = activeRoom.vertices;
-    if (polygon && polygon.length >= 3) return clampToPolygon(center, polygon);
     return {
       xCm: Math.max(0, Math.min(activeRoom.widthCm, center.xCm)),
       yCm: Math.max(0, Math.min(activeRoom.heightCm, center.yCm)),

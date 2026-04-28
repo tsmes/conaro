@@ -4,7 +4,11 @@ import Link from "next/link";
 import { useState } from "react";
 import { Pencil, Plus, RotateCw, Tag, Trash2, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { FloorPlan, TableSizeOption } from "@/lib/db/schema/events";
+import type {
+  FloorPlan,
+  FloorPlanRoom,
+  TableSizeOption,
+} from "@/lib/db/schema/events";
 import type { AcceptedArtistEntry } from "./assign-artist-dialog";
 
 interface FloorPlanSidebarProps {
@@ -22,6 +26,24 @@ interface FloorPlanSidebarProps {
 
 function hasDims(size: TableSizeOption): boolean {
   return typeof size.widthCm === "number" && typeof size.depthCm === "number";
+}
+
+// Spawns a freshly added table at the canvas-rect centre. Polygon
+// rooms use the canvas as a positioning baseline — the polygon is a
+// visual reference, and the organizer drags the table into place from
+// there. Returns top-left cm so the result drops straight onto
+// FloorPlanTable.x/y.
+function pickInitialTablePosition(
+  room: FloorPlanRoom,
+  tableWidthCm: number,
+  tableDepthCm: number
+): { x: number; y: number } {
+  const halfW = tableWidthCm / 2;
+  const halfD = tableDepthCm / 2;
+  return {
+    x: Math.max(0, Math.round(room.widthCm / 2 - halfW)),
+    y: Math.max(0, Math.round(room.heightCm / 2 - halfD)),
+  };
 }
 
 function nextTableLabel(plan: FloorPlan): string {
@@ -75,6 +97,13 @@ export function FloorPlanSidebar({
   function addTable() {
     const size = tableSizeOptions.find((s) => s.id === selectedSizeId);
     if (!size || !hasDims(size) || !activeRoomId) return;
+    const room = plan.rooms.find((r) => r.id === activeRoomId);
+    if (!room) return;
+    const initial = pickInitialTablePosition(
+      room,
+      size.widthCm!,
+      size.depthCm!
+    );
     onChange({
       ...plan,
       tables: [
@@ -85,8 +114,8 @@ export function FloorPlanSidebar({
           tableSizeOptionId: size.id,
           roomId: activeRoomId,
           rotationDeg: 0,
-          x: 0,
-          y: 0,
+          x: initial.x,
+          y: initial.y,
           assignedApplicationId: null,
         },
       ],
