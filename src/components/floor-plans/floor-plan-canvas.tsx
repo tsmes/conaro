@@ -16,6 +16,12 @@ import {
   snapToAxis,
   snapToVertex,
 } from "@/lib/floor-plans/geometry";
+import {
+  type SnapGuide,
+  type SnapTarget,
+  computeTableSnap,
+  guidesEqual,
+} from "@/lib/floor-plans/snap";
 
 const GRID_CM = 100;
 const DEFAULT_ROOM_SIZE_CM = { widthCm: 1000, heightCm: 700 };
@@ -117,6 +123,12 @@ export function FloorPlanCanvas({
     edgeIndex: number;
     anchorPx: { xPx: number; yPx: number };
   } | null>(null);
+  // Smart-guide list active during a table drag. Cleared when no
+  // guides are engaged or when drag ends. Rendered by Task 3
+  // (DragSnapGuidesLayer); the value is captured here so the snap
+  // math can populate it from inside dragBoundFunc.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [snapGuides, setSnapGuides] = useState<SnapGuide[] | null>(null);
   // View transform applied to the Stage. The base Stage already
   // fits the room to the container width; this transform sits on
   // top so viewers can pinch/wheel-zoom and drag-pan. Editor mode
@@ -798,32 +810,84 @@ export function FloorPlanCanvas({
                   rotation={table.rotationDeg}
                   draggable={editable && viewMode === "populate"}
                   dragBoundFunc={(pos) => {
-                    // For polygon rooms, run the proposed centre through
-                    // clampToPolygon. The table half-extents are still
-                    // honoured by reusing the rect path's min/max as a
-                    // fallback when the polygon clamp returns a point
-                    // that would put the table outside the canvas.
                     const proposed: Point = {
                       xCm: (pos.x - PADDING_PX) / scale,
                       yCm: (pos.y - PADDING_PX) / scale,
                     };
-                    const half = {
-                      w: effWidthPx / 2 / scale,
-                      d: effDepthPx / 2 / scale,
-                    };
-                    const clamped = clampTableCenterToRoom(
-                      proposed,
-                      half.w,
-                      half.d
+                    const halfWCm = effWidthPx / 2 / scale;
+                    const halfDCm = effDepthPx / 2 / scale;
+
+                    // Build snap targets from siblings in this room.
+                    const others: SnapTarget[] = [];
+                    for (const sibling of tablesInRoom) {
+                      if (sibling.id === table.id) continue;
+                      const siblingSize = sizeById.get(
+                        sibling.tableSizeOptionId
+                      );
+                      if (
+                        !siblingSize?.widthCm ||
+                        !siblingSize?.depthCm
+                      ) {
+                        continue;
+                      }
+                      const siblingRotated =
+                        sibling.rotationDeg === 90 ||
+                        sibling.rotationDeg === 270;
+                      const sibEffW = siblingRotated
+                        ? siblingSize.depthCm
+                        : siblingSize.widthCm;
+                      const sibEffD = siblingRotated
+                        ? siblingSize.widthCm
+                        : siblingSize.depthCm;
+                      const sibCenterX =
+                        sibling.x + siblingSize.widthCm / 2;
+                      const sibCenterY =
+                        sibling.y + siblingSize.depthCm / 2;
+                      others.push({
+                        leftCm: sibCenterX - sibEffW / 2,
+                        rightCm: sibCenterX + sibEffW / 2,
+                        topCm: sibCenterY - sibEffD / 2,
+                        bottomCm: sibCenterY + sibEffD / 2,
+                        centerXCm: sibCenterX,
+                        centerYCm: sibCenterY,
+                      });
+                    }
+
+                    const snap = computeTableSnap({
+                      proposedCenter: proposed,
+                      halfWidthCm: halfWCm,
+                      halfDepthCm: halfDCm,
+                      others,
+                      canvas: {
+                        widthCm: activeRoom.widthCm,
+                        heightCm: activeRoom.heightCm,
+                      },
+                      thresholdCm: 6 / scale,
+                    });
+
+                    // Update guides only when they actually changed —
+                    // dragBoundFunc fires per mousemove, so the
+                    // short-circuit keeps re-renders bounded.
+                    setSnapGuides((prev) =>
+                      guidesEqual(prev, snap.guides) ? prev : snap.guides
                     );
+
+                    // Canvas-rect clamp wins (REQ-9): post-snap
+                    // position can't escape the canvas bounds.
                     return {
                       x: Math.max(
                         minCx,
-                        Math.min(maxCx, PADDING_PX + clamped.xCm * scale)
+                        Math.min(
+                          maxCx,
+                          PADDING_PX + snap.adjustedCenter.xCm * scale
+                        )
                       ),
                       y: Math.max(
                         minCy,
-                        Math.min(maxCy, PADDING_PX + clamped.yCm * scale)
+                        Math.min(
+                          maxCy,
+                          PADDING_PX + snap.adjustedCenter.yCm * scale
+                        )
                       ),
                     };
                   }}
@@ -844,7 +908,7 @@ export function FloorPlanCanvas({
                       onAssignedTableTap(table.assignment.applicationId);
                     }
                   }}
-                  onDragEnd={(e) =>
+                  onDragEnd={(e) => {
                     handleTableDragEnd(
                       table.id,
                       e.target.x(),
@@ -852,8 +916,9 @@ export function FloorPlanCanvas({
                       size.widthCm!,
                       size.depthCm!,
                       table.rotationDeg
-                    )
-                  }
+                    );
+                    setSnapGuides(null);
+                  }}
                 >
                   {/* Highlight halo (rendered under the rect when viewer
                       is the assigned artist). focusToken-keyed so it
