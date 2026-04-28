@@ -86,7 +86,7 @@ Introduce the Design / Populate switch and wire it to the sidebar's visibility. 
 
 **Depends on:** none
 
-### 4. `viewMode` prop on `FloorPlanCanvas` + pan/zoom in design mode
+### 4. `viewMode` prop on `FloorPlanCanvas` + pan/zoom in design mode ✅
 Pass the mode through to the canvas and let pan/zoom run in design mode (today it's gated by `!editable`).
 
 **Requirements:** REQ-11

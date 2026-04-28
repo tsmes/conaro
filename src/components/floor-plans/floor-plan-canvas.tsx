@@ -55,6 +55,8 @@ function initialsFor(name: string): string {
   return parts.map((p) => p[0]?.toUpperCase() ?? "").join("") || "?";
 }
 
+export type FloorPlanViewMode = "design" | "populate";
+
 interface FloorPlanCanvasProps {
   plan: ResolvedFloorPlan | null;
   activeRoomId: string | null;
@@ -73,6 +75,10 @@ interface FloorPlanCanvasProps {
    *  moves it. */
   selectedTableId?: string | null;
   onSelectTable?: (id: string | null) => void;
+  /** Editor-only switch between table placement (default) and
+   *  room-shape authoring. Pan/zoom is enabled in design mode so
+   *  organizers can work precisely. */
+  viewMode?: FloorPlanViewMode;
 }
 
 export function FloorPlanCanvas({
@@ -86,6 +92,7 @@ export function FloorPlanCanvas({
   onAssignedTableTap,
   selectedTableId,
   onSelectTable,
+  viewMode = "populate",
 }: FloorPlanCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(800);
@@ -231,9 +238,10 @@ export function FloorPlanCanvas({
   const roomWidthPx = viewportCm.widthCm * scale;
   const roomHeightPx = viewportCm.heightCm * scale;
 
-  // Pan/zoom is viewer-only. In editor mode the user drags tables
-  // directly; layering Stage drag on top would steal those events.
-  const panZoomEnabled = !editable;
+  // Pan/zoom is enabled in viewer mode and in editor's design mode.
+  // In populate mode the user drags tables directly; layering Stage
+  // drag on top would steal those events.
+  const panZoomEnabled = !editable || viewMode === "design";
   const SCALE_MIN = 0.4;
   const SCALE_MAX = 4;
 

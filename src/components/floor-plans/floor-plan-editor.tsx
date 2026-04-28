@@ -394,6 +394,7 @@ export function FloorPlanEditor({
             activeRoomId={activeRoomId}
             tableSizeOptions={tableSizeOptions}
             editable
+            viewMode={viewMode}
             onChange={handlePlanChange}
             selectedTableId={selectedTableId}
             onSelectTable={setSelectedTableId}
