@@ -232,7 +232,7 @@ Click an edge → HTML popup with current length in metres → submit to resize 
 
 **Depends on:** 2, 6
 
-### 10. Clear polygon action
+### 10. Clear polygon action ✅
 Toolbar button in design mode that discards the active room's polygon and reverts to the canvas rect.
 
 **Requirements:** REQ-12

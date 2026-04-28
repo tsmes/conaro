@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { saveFloorPlan } from "@/app/(authenticated)/conventions/manage/events/[eventId]/floor-plan-actions";
+import { Button } from "@/components/ui/button";
 import { Segmented } from "@/components/ui/segmented";
 import { FloorPlanCanvasDynamic } from "./floor-plan-canvas-dynamic";
 import { FloorPlanSidebar } from "./floor-plan-sidebar";
@@ -356,6 +357,27 @@ export function FloorPlanEditor({
   const editingLabel = editingLabelId
     ? (plan.labels ?? []).find((l) => l.id === editingLabelId) ?? null
     : null;
+  const activeRoom = plan.rooms.find((r) => r.id === activeRoomId) ?? null;
+  const canClearPolygon =
+    viewMode === "design" &&
+    !!activeRoom?.vertices &&
+    activeRoom.vertices.length >= 3;
+
+  function handleClearPolygon() {
+    if (!activeRoom) return;
+    handlePlanChange({
+      rooms: plan.rooms.map((r) => {
+        if (r.id !== activeRoom.id) return r;
+        // Strip the vertices field rather than setting to undefined so
+        // the saved JSON stays clean.
+        const next = { ...r };
+        delete next.vertices;
+        return next;
+      }),
+      tables: plan.tables,
+      labels: plan.labels,
+    });
+  }
 
   return (
     <div className="space-y-4">
@@ -373,6 +395,16 @@ export function FloorPlanEditor({
               size="sm"
               aria-label="Editor mode"
             />
+            {canClearPolygon && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleClearPolygon}
+              >
+                Clear polygon
+              </Button>
+            )}
             <SaveIndicator
               status={status}
               isPending={isPending}
