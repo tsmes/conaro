@@ -40,7 +40,7 @@ Add an optional polygon-vertex array to the room data model and accept it in the
 
 **Depends on:** none
 
-### 2. Geometry utility module
+### 2. Geometry utility module ✅
 Pure functions used by the design canvas, table clamping, and edge resize.
 
 **Requirements:** REQ-8, REQ-9, REQ-10, REQ-13 (infrastructure)
