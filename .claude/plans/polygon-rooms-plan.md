@@ -207,7 +207,7 @@ Wire `geometry.snapToAxis` and `geometry.snapToVertex` into the in-progress segm
 
 **Depends on:** 2, 6, 7
 
-### 9. Edge length popup (`EdgeLengthPopup`)
+### 9. Edge length popup (`EdgeLengthPopup`) ✅
 Click an edge → HTML popup with current length in metres → submit to resize the edge along its axis.
 
 **Requirements:** REQ-10

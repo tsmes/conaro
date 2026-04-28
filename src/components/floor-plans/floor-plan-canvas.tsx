@@ -8,8 +8,11 @@ import { Maximize2, Minus, Plus } from "lucide-react";
 import type { FloorPlan, TableSizeOption } from "@/lib/db/schema/events";
 import type { ResolvedFloorPlan } from "@/lib/floor-plans/queries";
 import { PolygonEditorLayer } from "./polygon-editor-layer";
+import { EdgeLengthPopup } from "./edge-length-popup";
 import {
   type Point,
+  edgeLengthCm,
+  resizeEdge,
   snapToAxis,
   snapToVertex,
 } from "@/lib/floor-plans/geometry";
@@ -108,6 +111,12 @@ export function FloorPlanCanvas({
   // first vertex), the vertices flush up via onChange and this clears.
   const [drawingVertices, setDrawingVertices] = useState<Point[]>([]);
   const [cursorCm, setCursorCm] = useState<Point | null>(null);
+  // When non-null, an edge-length popup is open for the active room's
+  // polygon. `anchorPx` is in the canvas container's coordinate space.
+  const [edgeEdit, setEdgeEdit] = useState<{
+    edgeIndex: number;
+    anchorPx: { xPx: number; yPx: number };
+  } | null>(null);
   // View transform applied to the Stage. The base Stage already
   // fits the room to the container width; this transform sits on
   // top so viewers can pinch/wheel-zoom and drag-pan. Editor mode
@@ -267,8 +276,42 @@ export function FloorPlanCanvas({
     });
   }
 
-  function handlePolygonEdgeClick() {
-    // Wired up in Task 9 (edge-length popup).
+  function handlePolygonEdgeClick(
+    edgeIndex: number,
+    midpointStagePx: { xPx: number; yPx: number }
+  ) {
+    // Stage coords already account for pan/zoom — they're effectively
+    // canvas-container coordinates from the user's perspective.
+    setEdgeEdit({ edgeIndex, anchorPx: midpointStagePx });
+  }
+
+  function handleEdgeLengthSubmit(newLengthM: number) {
+    if (!edgeEdit || !plan || !onChange || !activeRoom?.vertices) {
+      setEdgeEdit(null);
+      return;
+    }
+    const next = resizeEdge(
+      activeRoom.vertices,
+      edgeEdit.edgeIndex,
+      newLengthM * 100
+    ).map((v) => ({ xCm: Math.round(v.xCm), yCm: Math.round(v.yCm) }));
+    onChange({
+      rooms: plan.rooms.map((r) =>
+        r.id === activeRoom.id ? { ...r, vertices: next } : r
+      ),
+      tables: plan.tables.map((t) => ({
+        id: t.id,
+        label: t.label,
+        tableSizeOptionId: t.tableSizeOptionId,
+        roomId: t.roomId,
+        rotationDeg: t.rotationDeg,
+        x: t.x,
+        y: t.y,
+        assignedApplicationId: t.assignedApplicationId,
+      })),
+      labels: plan.labels,
+    });
+    setEdgeEdit(null);
   }
 
   // Drawing mode is automatic: we're in design view on a room without
@@ -845,6 +888,18 @@ export function FloorPlanCanvas({
             />
           )}
         </Stage>
+        {edgeEdit && activeRoom?.vertices && (
+          <EdgeLengthPopup
+            key={`${activeRoom.id}-${edgeEdit.edgeIndex}`}
+            open
+            currentLengthM={
+              edgeLengthCm(activeRoom.vertices, edgeEdit.edgeIndex) / 100
+            }
+            anchorPx={edgeEdit.anchorPx}
+            onSubmit={handleEdgeLengthSubmit}
+            onCancel={() => setEdgeEdit(null)}
+          />
+        )}
         </div>
       )}
     </div>
