@@ -1,18 +1,25 @@
 # Guest Portrait Licenses
 
-These 12 portrait photos are used as fake guest avatars in the seed/demo dataset. All are sourced from Pexels under the [Pexels License](https://www.pexels.com/license/), which permits free use for commercial and non-commercial purposes without attribution. Crediting photographers below as a courtesy and for traceability.
+These 19 portrait photos are used as fake guest avatars in the seed/demo dataset. All sourced from Pexels under the [Pexels License](https://www.pexels.com/license/), which permits free use for commercial and non-commercial purposes without attribution. Crediting photographers below as a courtesy and for traceability.
 
-| File    | Source URL                                                                | Credit                  | License        |
-| ------- | ------------------------------------------------------------------------- | ----------------------- | -------------- |
-| 1.jpg   | https://www.pexels.com/photo/portrait-of-a-woman-smiling-16152597/        | Korede Adenola          | Pexels License |
-| 2.jpg   | https://www.pexels.com/photo/portrait-of-a-jewish-woman-smiling-4040794/  | cottonbro studio        | Pexels License |
-| 3.jpg   | https://www.pexels.com/photo/portrait-of-smiling-woman-3732869/           | Anna Shvets             | Pexels License |
-| 4.jpg   | https://www.pexels.com/photo/portrait-of-man-15946547/                    | Korede Adenola          | Pexels License |
-| 5.jpg   | https://www.pexels.com/photo/portrait-of-a-man-smiling-12455720/          | Daniel Sikpi            | Pexels License |
-| 6.jpg   | https://www.pexels.com/photo/man-in-black-suit-smiling-3778602/           | Andrea Piacquadio       | Pexels License |
-| 7.jpg   | https://www.pexels.com/photo/portrait-of-a-young-asian-woman-in-traditional-clothing-18402062/ | HANUMAN PHOTO STUDIO    | Pexels License |
-| 8.jpg   | https://www.pexels.com/photo/a-woman-with-grey-hair-9711612/              | Dr. Samar Layek         | Pexels License |
-| 9.jpg   | https://www.pexels.com/photo/old-man-6110/                                | Karolina Grabowska      | Pexels License |
-| 10.jpg  | https://www.pexels.com/photo/smiling-man-in-pink-wig-and-with-makeup-17448477/ | Janeth Charris      | Pexels License |
-| 11.jpg  | https://www.pexels.com/photo/portrait-of-middle-eastern-man-in-traditional-attire-28977568/ | Mohameden beinbe | Pexels License |
-| 12.jpg  | https://www.pexels.com/photo/elegant-portrait-of-woman-with-red-bow-30049235/ | Phan Cuong          | Pexels License |
+| File   | Pexels photo ID | Photographer slug      | Source                                 | License        |
+| ------ | --------------- | ---------------------- | -------------------------------------- | -------------- |
+| 1.jpg  | 7900587         | andres-garcia          | https://www.pexels.com/photo/7900587/  | Pexels License |
+| 2.jpg  | 7253625         | christiano-sinisterra  | https://www.pexels.com/photo/7253625/  | Pexels License |
+| 3.jpg  | 10392442        | detrasdelfotografo     | https://www.pexels.com/photo/10392442/ | Pexels License |
+| 4.jpg  | 29081303        | martin-que             | https://www.pexels.com/photo/29081303/ | Pexels License |
+| 5.jpg  | 6996818         | michael-chen           | https://www.pexels.com/photo/6996818/  | Pexels License |
+| 6.jpg  | 9482196         | ottovonrascon          | https://www.pexels.com/photo/9482196/  | Pexels License |
+| 7.jpg  | 7426766         | pete79                 | https://www.pexels.com/photo/7426766/  | Pexels License |
+| 8.jpg  | 32986694        | rakhmatsuwandi         | https://www.pexels.com/photo/32986694/ | Pexels License |
+| 9.jpg  | 32986697        | rakhmatsuwandi         | https://www.pexels.com/photo/32986697/ | Pexels License |
+| 10.jpg | 4216998         | saeedkarimi            | https://www.pexels.com/photo/4216998/  | Pexels License |
+| 11.jpg | 5380115         | sinileunen             | https://www.pexels.com/photo/5380115/  | Pexels License |
+| 12.jpg | 29901253        | spencphoto             | https://www.pexels.com/photo/29901253/ | Pexels License |
+| 13.jpg | 29901406        | spencphoto             | https://www.pexels.com/photo/29901406/ | Pexels License |
+| 14.jpg | 29901412        | spencphoto             | https://www.pexels.com/photo/29901412/ | Pexels License |
+| 15.jpg | 29901539        | spencphoto             | https://www.pexels.com/photo/29901539/ | Pexels License |
+| 16.jpg | 33651503        | stevinosteven          | https://www.pexels.com/photo/33651503/ | Pexels License |
+| 17.jpg | 6657449         | taminh                 | https://www.pexels.com/photo/6657449/  | Pexels License |
+| 18.jpg | 9332761         | toni                   | https://www.pexels.com/photo/9332761/  | Pexels License |
+| 19.jpg | 10532562        | trashsmash             | https://www.pexels.com/photo/10532562/ | Pexels License |

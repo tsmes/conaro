@@ -123,7 +123,7 @@ function buildGuests(slug) {
     const seed = `${slug}:guest:${i}`;
     const role = ROLES[(seededInt(seed, ROLES.length) + i) % ROLES.length];
     const name = makeName(seed);
-    const photoIdx = ((seededInt(seed + ":photo", 12)) + i) % 12 + 1;
+    const photoIdx = ((seededInt(seed + ":photo", 19)) + i) % 19 + 1;
     const handle = name
       .toLowerCase()
       .replace(/ø/g, "o")
