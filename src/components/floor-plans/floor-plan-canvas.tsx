@@ -17,6 +17,7 @@ const COLORS = {
   backdrop: "#f6f7f9",
   roomFill: "#ffffff",
   roomStroke: "#cbd5e1",
+  canvasOutline: "#94a3b8",
   gridLine: "#e6e8ec",
   gridOrigin: "#d1d5db",
   tableUnassignedFill: "#f1f5f9",
@@ -421,7 +422,10 @@ export function FloorPlanCanvas({
           >
           {/* Layer 1: room frame (shadow + fill + grid) */}
           <Layer listening={false}>
-            {/* Drop shadow sits slightly below and to the right */}
+            {/* Drop shadow sits slightly below and to the right.
+                For polygons we still use the canvas-rect shadow — the
+                slight halo around concave corners is a feature, not a
+                bug; the actual room outline is drawn on top. */}
             <Rect
               x={PADDING_PX + 2}
               y={PADDING_PX + 4}
@@ -431,16 +435,45 @@ export function FloorPlanCanvas({
               cornerRadius={10}
               opacity={0.35}
             />
-            <Rect
-              x={PADDING_PX}
-              y={PADDING_PX}
-              width={roomWidthPx}
-              height={roomHeightPx}
-              fill={COLORS.roomFill}
-              stroke={COLORS.roomStroke}
-              strokeWidth={1.5}
-              cornerRadius={10}
-            />
+            {activeRoom?.vertices && activeRoom.vertices.length >= 3 ? (
+              <Line
+                points={activeRoom.vertices.flatMap((v) => [
+                  PADDING_PX + v.xCm * scale,
+                  PADDING_PX + v.yCm * scale,
+                ])}
+                closed
+                fill={COLORS.roomFill}
+                stroke={COLORS.roomStroke}
+                strokeWidth={1.5}
+              />
+            ) : (
+              <Rect
+                x={PADDING_PX}
+                y={PADDING_PX}
+                width={roomWidthPx}
+                height={roomHeightPx}
+                fill={COLORS.roomFill}
+                stroke={COLORS.roomStroke}
+                strokeWidth={1.5}
+                cornerRadius={10}
+              />
+            )}
+            {/* In design mode, always show a faint dashed canvas-rect
+                so organizers know the room's declared scale. When no
+                polygon is drawn this is the only outline; when a
+                polygon exists it serves as a scale reference. */}
+            {editable && viewMode === "design" && (
+              <Rect
+                x={PADDING_PX}
+                y={PADDING_PX}
+                width={roomWidthPx}
+                height={roomHeightPx}
+                stroke={COLORS.canvasOutline}
+                strokeWidth={1}
+                dash={[4, 4]}
+                opacity={0.55}
+              />
+            )}
             <GridBackground
               widthCm={viewportCm.widthCm}
               heightCm={viewportCm.heightCm}

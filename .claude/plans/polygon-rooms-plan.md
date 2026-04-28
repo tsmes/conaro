@@ -109,7 +109,7 @@ Pass the mode through to the canvas and let pan/zoom run in design mode (today i
 
 **Depends on:** 3
 
-### 5. Polygon-aware room-frame rendering
+### 5. Polygon-aware room-frame rendering ✅
 Render the polygon outline whenever `vertices` exists, in every mode. The rect rendering becomes the fallback.
 
 **Requirements:** REQ-3, REQ-4, REQ-14
