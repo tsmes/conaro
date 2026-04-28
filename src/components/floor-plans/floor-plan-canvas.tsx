@@ -9,6 +9,7 @@ import type { FloorPlan, TableSizeOption } from "@/lib/db/schema/events";
 import type { ResolvedFloorPlan } from "@/lib/floor-plans/queries";
 import { PolygonEditorLayer } from "./polygon-editor-layer";
 import { EdgeLengthPopup } from "./edge-length-popup";
+import { DragSnapGuidesLayer } from "./drag-snap-guides-layer";
 import {
   type Point,
   edgeLengthCm,
@@ -124,10 +125,7 @@ export function FloorPlanCanvas({
     anchorPx: { xPx: number; yPx: number };
   } | null>(null);
   // Smart-guide list active during a table drag. Cleared when no
-  // guides are engaged or when drag ends. Rendered by Task 3
-  // (DragSnapGuidesLayer); the value is captured here so the snap
-  // math can populate it from inside dragBoundFunc.
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // guides are engaged or when drag ends.
   const [snapGuides, setSnapGuides] = useState<SnapGuide[] | null>(null);
   // View transform applied to the Stage. The base Stage already
   // fits the room to the container width; this transform sits on
@@ -1003,6 +1001,13 @@ export function FloorPlanCanvas({
               vertexSnapPx={VERTEX_SNAP_PX}
               onVerticesChange={handlePolygonChange}
               onEdgeClick={handlePolygonEdgeClick}
+            />
+          )}
+          {snapGuides && snapGuides.length > 0 && (
+            <DragSnapGuidesLayer
+              guides={snapGuides}
+              paddingPx={PADDING_PX}
+              scale={scale}
             />
           )}
         </Stage>
