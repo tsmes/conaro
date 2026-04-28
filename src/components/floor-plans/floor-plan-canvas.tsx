@@ -99,6 +99,11 @@ export function FloorPlanCanvas({
 }: FloorPlanCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(800);
+  // In-progress polygon being drawn in design mode. Empty when not
+  // drawing. When committed (close-click or 3+ verts and click on
+  // first vertex), the vertices flush up via onChange and this clears.
+  const [drawingVertices, setDrawingVertices] = useState<Point[]>([]);
+  const [cursorCm, setCursorCm] = useState<Point | null>(null);
   // View transform applied to the Stage. The base Stage already
   // fits the room to the container width; this transform sits on
   // top so viewers can pinch/wheel-zoom and drag-pan. Editor mode
@@ -261,6 +266,120 @@ export function FloorPlanCanvas({
   function handlePolygonEdgeClick() {
     // Wired up in Task 9 (edge-length popup).
   }
+
+  // Drawing mode is automatic: we're in design view on a room without
+  // a saved polygon. Stage clicks place vertices; click on the first
+  // vertex (3+ placed) closes; Esc cancels; Backspace pops the last.
+  const drawingMode =
+    editable && viewMode === "design" && !activeRoom?.vertices;
+  const VERTEX_SNAP_PX = 10;
+
+  // Convert a Stage pointer position (already in stage coordinates,
+  // accounting for pan/zoom) into room-local centimetres. Returns null
+  // if the cursor is outside the canvas's positive area.
+  function stagePointToCm(stageX: number, stageY: number): Point | null {
+    const xCm = (stageX - PADDING_PX) / scale;
+    const yCm = (stageY - PADDING_PX) / scale;
+    if (!Number.isFinite(xCm) || !Number.isFinite(yCm)) return null;
+    return { xCm: Math.round(xCm), yCm: Math.round(yCm) };
+  }
+
+  function handleStageMouseMove(e: KonvaEventObject<MouseEvent>) {
+    if (!drawingMode) return;
+    const stage = e.target.getStage();
+    const pos = stage?.getRelativePointerPosition();
+    if (!pos) return;
+    setCursorCm(stagePointToCm(pos.x, pos.y));
+  }
+
+  function handleStageClick(e: KonvaEventObject<MouseEvent | TouchEvent>) {
+    if (!drawingMode) return;
+    // Clicks on draggable children (vertex circles, etc.) bubble up
+    // here too — ignore if the target isn't the stage itself.
+    if (e.target !== e.target.getStage()) return;
+    const stage = e.target.getStage();
+    const pos = stage?.getRelativePointerPosition();
+    if (!pos) return;
+    const cm = stagePointToCm(pos.x, pos.y);
+    if (!cm) return;
+
+    // Closing the polygon: cursor near the first placed vertex with
+    // 3+ vertices already.
+    if (drawingVertices.length >= 3) {
+      const first = drawingVertices[0];
+      const firstPx = {
+        x: PADDING_PX + first.xCm * scale,
+        y: PADDING_PX + first.yCm * scale,
+      };
+      const dx = firstPx.x - pos.x;
+      const dy = firstPx.y - pos.y;
+      if (Math.hypot(dx, dy) <= VERTEX_SNAP_PX) {
+        if (plan && onChange && activeRoom) {
+          onChange({
+            rooms: plan.rooms.map((r) =>
+              r.id === activeRoom.id
+                ? { ...r, vertices: drawingVertices }
+                : r
+            ),
+            tables: plan.tables.map((t) => ({
+              id: t.id,
+              label: t.label,
+              tableSizeOptionId: t.tableSizeOptionId,
+              roomId: t.roomId,
+              rotationDeg: t.rotationDeg,
+              x: t.x,
+              y: t.y,
+              assignedApplicationId: t.assignedApplicationId,
+            })),
+            labels: plan.labels,
+          });
+        }
+        setDrawingVertices([]);
+        setCursorCm(null);
+        return;
+      }
+    }
+
+    setDrawingVertices((prev) => [...prev, cm]);
+  }
+
+  // Esc cancels in-progress draw; Backspace pops the last vertex.
+  // Skip when focus is inside an input so typed text isn't intercepted.
+  useEffect(() => {
+    if (!drawingMode) return;
+    function onKey(e: KeyboardEvent) {
+      const target = e.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.tagName === "SELECT" ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+      if (e.key === "Escape") {
+        if (drawingVertices.length > 0) {
+          e.preventDefault();
+          setDrawingVertices([]);
+        }
+      } else if (e.key === "Backspace") {
+        if (drawingVertices.length > 0) {
+          e.preventDefault();
+          setDrawingVertices((prev) => prev.slice(0, -1));
+        }
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [drawingMode, drawingVertices.length]);
+
+  // Reset drawing state when the active room changes or the user
+  // leaves design mode mid-draw.
+  useEffect(() => {
+    setDrawingVertices([]);
+    setCursorCm(null);
+  }, [activeRoomId, viewMode]);
 
   const roomWidthPx = viewportCm.widthCm * scale;
   const roomHeightPx = viewportCm.heightCm * scale;
@@ -445,6 +564,9 @@ export function FloorPlanCanvas({
                 onSelectTable(null);
               }
             }}
+            onClick={handleStageClick}
+            onTap={handleStageClick}
+            onMouseMove={handleStageMouseMove}
           >
           {/* Layer 1: room frame (shadow + fill + grid) */}
           <Layer listening={false}>
@@ -689,8 +811,11 @@ export function FloorPlanCanvas({
           {editable && viewMode === "design" && activeRoom && (
             <PolygonEditorLayer
               vertices={activeRoom.vertices ?? null}
+              inProgressVertices={drawingVertices}
+              cursorCm={cursorCm}
               paddingPx={PADDING_PX}
               scale={scale}
+              vertexSnapPx={VERTEX_SNAP_PX}
               onVerticesChange={handlePolygonChange}
               onEdgeClick={handlePolygonEdgeClick}
             />

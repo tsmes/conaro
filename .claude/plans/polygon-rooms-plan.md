@@ -156,7 +156,7 @@ New Konva layer rendered only in design mode. Renders existing vertices as dragg
 
 **Depends on:** 1, 5
 
-### 7. Polygon drawing flow
+### 7. Polygon drawing flow ✅
 Click points to draw, click first vertex to close, Esc cancels, Backspace removes the last point, rubber-band line from last vertex to cursor.
 
 **Requirements:** REQ-6, REQ-7
