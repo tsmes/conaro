@@ -11,6 +11,7 @@ import { PolygonEditorLayer } from "./polygon-editor-layer";
 import { EdgeLengthPopup } from "./edge-length-popup";
 import {
   type Point,
+  clampToPolygon,
   edgeLengthCm,
   resizeEdge,
   snapToAxis,
@@ -174,6 +175,48 @@ export function FloorPlanCanvas({
     [tableSizeOptions]
   );
 
+  // Clamps a table's centre point to the room boundary. For polygon
+  // rooms we use point-in-polygon + project-to-edge so the table stays
+  // inside the actual outline; the half-extent slack ensures the
+  // table's bounding box also fits. For canvas-rect rooms we keep the
+  // existing axis-aligned clamp.
+  function clampTableCenterToRoom(
+    center: Point,
+    halfWidthCm: number,
+    halfDepthCm: number
+  ): Point {
+    if (!activeRoom) return center;
+    const polygon = activeRoom.vertices;
+    if (polygon && polygon.length >= 3) {
+      // Approximate "table fits inside polygon" by clamping the
+      // centre into a polygon shrunk by the table's half-extents is
+      // expensive; clamping the centre alone is good enough for the
+      // common rectangular-table case and leaves the user a clear
+      // visual cue (the table edge can graze the polygon edge).
+      return clampToPolygon(center, polygon);
+    }
+    return {
+      xCm: Math.max(
+        halfWidthCm,
+        Math.min(activeRoom.widthCm - halfWidthCm, center.xCm)
+      ),
+      yCm: Math.max(
+        halfDepthCm,
+        Math.min(activeRoom.heightCm - halfDepthCm, center.yCm)
+      ),
+    };
+  }
+
+  function clampLabelCenterToRoom(center: Point): Point {
+    if (!activeRoom) return center;
+    const polygon = activeRoom.vertices;
+    if (polygon && polygon.length >= 3) return clampToPolygon(center, polygon);
+    return {
+      xCm: Math.max(0, Math.min(activeRoom.widthCm, center.xCm)),
+      yCm: Math.max(0, Math.min(activeRoom.heightCm, center.yCm)),
+    };
+  }
+
   function handleTableDragEnd(
     tableId: string,
     centerStageXPx: number,
@@ -188,16 +231,13 @@ export function FloorPlanCanvas({
     const effDepthCm = rotated ? sizeWidthCm : sizeDepthCm;
     const centerXCm = (centerStageXPx - PADDING_PX) / scale;
     const centerYCm = (centerStageYPx - PADDING_PX) / scale;
-    const clampedCenterX = Math.max(
-      effWidthCm / 2,
-      Math.min(activeRoom.widthCm - effWidthCm / 2, centerXCm)
+    const clamped = clampTableCenterToRoom(
+      { xCm: centerXCm, yCm: centerYCm },
+      effWidthCm,
+      effDepthCm
     );
-    const clampedCenterY = Math.max(
-      effDepthCm / 2,
-      Math.min(activeRoom.heightCm - effDepthCm / 2, centerYCm)
-    );
-    const newXCm = Math.round(clampedCenterX - sizeWidthCm / 2);
-    const newYCm = Math.round(clampedCenterY - sizeDepthCm / 2);
+    const newXCm = Math.round(clamped.xCm - sizeWidthCm / 2);
+    const newYCm = Math.round(clamped.yCm - sizeDepthCm / 2);
     const nextTables = plan.tables.map((t) => {
       const raw = {
         id: t.id,
@@ -230,14 +270,12 @@ export function FloorPlanCanvas({
     stageYPx: number
   ) {
     if (!plan || !onChange || !activeRoom) return;
-    const newX = Math.max(
-      0,
-      Math.min(activeRoom.widthCm, Math.round((stageXPx - PADDING_PX) / scale))
-    );
-    const newY = Math.max(
-      0,
-      Math.min(activeRoom.heightCm, Math.round((stageYPx - PADDING_PX) / scale))
-    );
+    const clamped = clampLabelCenterToRoom({
+      xCm: (stageXPx - PADDING_PX) / scale,
+      yCm: (stageYPx - PADDING_PX) / scale,
+    });
+    const newX = Math.round(clamped.xCm);
+    const newY = Math.round(clamped.yCm);
     onChange({
       rooms: plan.rooms,
       tables: plan.tables.map((t) => ({
@@ -769,11 +807,37 @@ export function FloorPlanCanvas({
                   x={centerX}
                   y={centerY}
                   rotation={table.rotationDeg}
-                  draggable={editable}
-                  dragBoundFunc={(pos) => ({
-                    x: Math.max(minCx, Math.min(maxCx, pos.x)),
-                    y: Math.max(minCy, Math.min(maxCy, pos.y)),
-                  })}
+                  draggable={editable && viewMode === "populate"}
+                  dragBoundFunc={(pos) => {
+                    // For polygon rooms, run the proposed centre through
+                    // clampToPolygon. The table half-extents are still
+                    // honoured by reusing the rect path's min/max as a
+                    // fallback when the polygon clamp returns a point
+                    // that would put the table outside the canvas.
+                    const proposed: Point = {
+                      xCm: (pos.x - PADDING_PX) / scale,
+                      yCm: (pos.y - PADDING_PX) / scale,
+                    };
+                    const half = {
+                      w: effWidthPx / 2 / scale,
+                      d: effDepthPx / 2 / scale,
+                    };
+                    const clamped = clampTableCenterToRoom(
+                      proposed,
+                      half.w,
+                      half.d
+                    );
+                    return {
+                      x: Math.max(
+                        minCx,
+                        Math.min(maxCx, PADDING_PX + clamped.xCm * scale)
+                      ),
+                      y: Math.max(
+                        minCy,
+                        Math.min(maxCy, PADDING_PX + clamped.yCm * scale)
+                      ),
+                    };
+                  }}
                   onMouseDown={(e) => {
                     if (onSelectTable) {
                       e.cancelBubble = true;

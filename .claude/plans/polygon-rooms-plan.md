@@ -250,7 +250,7 @@ Toolbar button in design mode that discards the active room's polygon and revert
 
 **Depends on:** 5
 
-### 11. Polygon-aware table containment
+### 11. Polygon-aware table containment ✅
 Update the four clamp sites in editor + canvas to clamp to the polygon when one exists.
 
 **Requirements:** REQ-13

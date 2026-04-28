@@ -19,6 +19,7 @@ import type {
   TableSizeOption,
 } from "@/lib/db/schema/events";
 import type { ResolvedFloorPlan } from "@/lib/floor-plans/queries";
+import { clampToPolygon } from "@/lib/floor-plans/geometry";
 
 const SAVE_DEBOUNCE_MS = 500;
 
@@ -223,14 +224,27 @@ export function FloorPlanEditor({
       const effDepthCm = rotated ? size.widthCm : size.depthCm;
       const centreX = table.x + size.widthCm / 2 + dx;
       const centreY = table.y + size.depthCm / 2 + dy;
-      const clampedCx = Math.max(
-        effWidthCm / 2,
-        Math.min(room.widthCm - effWidthCm / 2, centreX)
-      );
-      const clampedCy = Math.max(
-        effDepthCm / 2,
-        Math.min(room.heightCm - effDepthCm / 2, centreY)
-      );
+      // Polygon rooms clamp via point-in-polygon; rect rooms keep the
+      // axis-aligned clamp that respects the table's half-extents.
+      let clampedCx: number;
+      let clampedCy: number;
+      if (room.vertices && room.vertices.length >= 3) {
+        const p = clampToPolygon(
+          { xCm: centreX, yCm: centreY },
+          room.vertices
+        );
+        clampedCx = p.xCm;
+        clampedCy = p.yCm;
+      } else {
+        clampedCx = Math.max(
+          effWidthCm / 2,
+          Math.min(room.widthCm - effWidthCm / 2, centreX)
+        );
+        clampedCy = Math.max(
+          effDepthCm / 2,
+          Math.min(room.heightCm - effDepthCm / 2, centreY)
+        );
+      }
       const newX = Math.round(clampedCx - size.widthCm / 2);
       const newY = Math.round(clampedCy - size.depthCm / 2);
       if (newX === table.x && newY === table.y) return;
