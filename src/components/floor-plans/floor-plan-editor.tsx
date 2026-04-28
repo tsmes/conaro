@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { saveFloorPlan } from "@/app/(authenticated)/conventions/manage/events/[eventId]/floor-plan-actions";
+import { Segmented } from "@/components/ui/segmented";
 import { FloorPlanCanvasDynamic } from "./floor-plan-canvas-dynamic";
 import { FloorPlanSidebar } from "./floor-plan-sidebar";
 import { RoomSwitcher } from "./room-switcher";
@@ -28,6 +29,13 @@ interface FloorPlanEditorProps {
 }
 
 type SaveStatus = "idle" | "saving" | "saved" | "error";
+
+export type FloorPlanViewMode = "design" | "populate";
+
+const VIEW_MODE_OPTIONS = [
+  { value: "design" as const, label: "Design" },
+  { value: "populate" as const, label: "Populate" },
+];
 
 function toRawPlan(resolved: ResolvedFloorPlan | null): FloorPlan {
   if (!resolved) return { rooms: [], tables: [], labels: [] };
@@ -84,6 +92,7 @@ export function FloorPlanEditor({
     const rooms = toRawPlan(initialPlan).rooms;
     return rooms[0]?.id ?? null;
   });
+  const [viewMode, setViewMode] = useState<FloorPlanViewMode>("populate");
   const [assignTableId, setAssignTableId] = useState<string | null>(null);
   const [editTableId, setEditTableId] = useState<string | null>(null);
   const [selectedTableId, setSelectedTableId] = useState<string | null>(null);
@@ -356,14 +365,29 @@ export function FloorPlanEditor({
         onActiveRoomChange={setActiveRoomId}
         onChange={handlePlanChange}
         rightSlot={
-          <SaveIndicator
-            status={status}
-            isPending={isPending}
-            error={errorMsg}
-          />
+          <div className="flex items-center gap-3">
+            <Segmented
+              value={viewMode}
+              onChange={setViewMode}
+              options={VIEW_MODE_OPTIONS}
+              size="sm"
+              aria-label="Editor mode"
+            />
+            <SaveIndicator
+              status={status}
+              isPending={isPending}
+              error={errorMsg}
+            />
+          </div>
         }
       />
-      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+      <div
+        className={
+          viewMode === "design"
+            ? "grid items-start gap-6"
+            : "grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px]"
+        }
+      >
         <div>
           <FloorPlanCanvasDynamic
             plan={resolvedForCanvas}
@@ -375,26 +399,37 @@ export function FloorPlanEditor({
             onSelectTable={setSelectedTableId}
           />
           <p className="mt-2 text-xs text-muted-foreground">
-            Drag tables to place them, or click a table and use the
-            arrow keys to nudge (hold Shift for 10&nbsp;cm steps).
-            <kbd className="mx-1 rounded border bg-muted px-1 py-0.5 font-mono text-[10px]">⌘Z</kbd>
-            undoes. Changes save automatically.
+            {viewMode === "populate" ? (
+              <>
+                Drag tables to place them, or click a table and use the
+                arrow keys to nudge (hold Shift for 10&nbsp;cm steps).
+                <kbd className="mx-1 rounded border bg-muted px-1 py-0.5 font-mono text-[10px]">⌘Z</kbd>
+                undoes. Changes save automatically.
+              </>
+            ) : (
+              <>
+                Design the room shape — draw an outline for non-rectangular
+                rooms, or leave blank to use the canvas dimensions as-is.
+              </>
+            )}
           </p>
         </div>
-        <div className="lg:sticky lg:top-4 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto lg:pr-1">
-          <FloorPlanSidebar
-            eventId={eventId}
-            plan={plan}
-            activeRoomId={activeRoomId}
-            tableSizeOptions={tableSizeOptions}
-            acceptedArtists={acceptedArtists}
-            onChange={handlePlanChange}
-            onSelectTable={(id) => setAssignTableId(id)}
-            onEditTable={(id) => setEditTableId(id)}
-            onAddLabel={() => setAddLabelOpen(true)}
-            onEditLabel={(id) => setEditingLabelId(id)}
-          />
-        </div>
+        {viewMode === "populate" && (
+          <div className="lg:sticky lg:top-4 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto lg:pr-1">
+            <FloorPlanSidebar
+              eventId={eventId}
+              plan={plan}
+              activeRoomId={activeRoomId}
+              tableSizeOptions={tableSizeOptions}
+              acceptedArtists={acceptedArtists}
+              onChange={handlePlanChange}
+              onSelectTable={(id) => setAssignTableId(id)}
+              onEditTable={(id) => setEditTableId(id)}
+              onAddLabel={() => setAddLabelOpen(true)}
+              onEditLabel={(id) => setEditingLabelId(id)}
+            />
+          </div>
+        )}
       </div>
       <AssignArtistDialog
         open={dialogTable !== null}

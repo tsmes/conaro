@@ -65,7 +65,7 @@ Pure functions used by the design canvas, table clamping, and edge resize.
 
 **Depends on:** none
 
-### 3. View-mode toggle in `FloorPlanEditor`
+### 3. View-mode toggle in `FloorPlanEditor` ✅
 Introduce the Design / Populate switch and wire it to the sidebar's visibility. The canvas is unchanged at this point — the toggle is UI-only.
 
 **Requirements:** REQ-5
