@@ -303,7 +303,11 @@ export function FloorPlanEditor({
     });
   }
 
-  function handleEditTable(next: { label: string; tableSizeOptionId: string }) {
+  function handleEditTable(next: {
+    label: string;
+    tableSizeOptionId: string;
+    rotationDeg: number;
+  }) {
     if (!editTableId) return;
     handlePlanChange({
       ...plan,
@@ -313,6 +317,7 @@ export function FloorPlanEditor({
               ...t,
               label: next.label,
               tableSizeOptionId: next.tableSizeOptionId,
+              rotationDeg: next.rotationDeg,
             }
           : t
       ),

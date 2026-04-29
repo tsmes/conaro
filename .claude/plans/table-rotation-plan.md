@@ -68,8 +68,10 @@ Pure functions used by the rotated-AABB clamp, snap gating, and the rotate-handl
 
 **Depends on:** none.
 
-### 3. EditTableDialog rotation input
+### 3. EditTableDialog rotation input ✅
 Add a numeric Rotation field to the existing dialog and thread the new value through.
+
+**Status:** Completed. Dialog has a numeric Rotation field with a `°` suffix; the input value is normalised on save (`((n % 360) + 360) % 360`) and falls back to the existing rotation on non-finite input. `formatRotationForInput` shows integer values plain and decimals to 1 dp, so `90` round-trips as `90` and `37.5` survives as `37.5`. `handleEditTable` in the editor accepts the new field and writes it onto the table row. Type-check + 87 floor-plan tests pass.
 
 **Requirements:** REQ-4
 

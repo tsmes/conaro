@@ -20,7 +20,24 @@ interface EditTableDialogProps {
   onOpenChange: (open: boolean) => void;
   table: FloorPlanTable | null;
   tableSizeOptions: TableSizeOption[];
-  onSave: (next: { label: string; tableSizeOptionId: string }) => void;
+  onSave: (next: {
+    label: string;
+    tableSizeOptionId: string;
+    rotationDeg: number;
+  }) => void;
+}
+
+function normaliseRotation(deg: number): number {
+  return ((deg % 360) + 360) % 360;
+}
+
+// Show one decimal at most so 90° doesn't render as "90.0" but a typed
+// 37.5° survives the round-trip.
+function formatRotationForInput(deg: number): string {
+  const normalised = normaliseRotation(deg);
+  return Number.isInteger(normalised)
+    ? String(normalised)
+    : normalised.toFixed(1);
 }
 
 function hasDims(size: TableSizeOption): boolean {
@@ -36,11 +53,13 @@ export function EditTableDialog({
 }: EditTableDialogProps) {
   const [label, setLabel] = useState("");
   const [sizeId, setSizeId] = useState("");
+  const [rotationInput, setRotationInput] = useState("");
 
   useEffect(() => {
     if (!table) return;
     setLabel(table.label);
     setSizeId(table.tableSizeOptionId);
+    setRotationInput(formatRotationForInput(table.rotationDeg));
   }, [table]);
 
   if (!table) return null;
@@ -95,6 +114,23 @@ export function EditTableDialog({
               ))}
             </select>
           </div>
+          <div className="space-y-1">
+            <Label htmlFor="table-rotation" className="text-xs">
+              Rotation
+            </Label>
+            <div className="flex items-center gap-2">
+              <Input
+                id="table-rotation"
+                type="number"
+                step="1"
+                min="0"
+                max="359"
+                value={rotationInput}
+                onChange={(e) => setRotationInput(e.target.value)}
+              />
+              <span className="text-sm text-muted-foreground">°</span>
+            </div>
+          </div>
         </div>
         <DialogFooter>
           <DialogClose
@@ -104,7 +140,15 @@ export function EditTableDialog({
             type="button"
             disabled={saveDisabled}
             onClick={() => {
-              onSave({ label: label.trim(), tableSizeOptionId: sizeId });
+              const parsed = Number.parseFloat(rotationInput);
+              const rotationDeg = Number.isFinite(parsed)
+                ? normaliseRotation(parsed)
+                : table.rotationDeg;
+              onSave({
+                label: label.trim(),
+                tableSizeOptionId: sizeId,
+                rotationDeg,
+              });
               onOpenChange(false);
             }}
           >
