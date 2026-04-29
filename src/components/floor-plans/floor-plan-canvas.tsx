@@ -14,6 +14,7 @@ import {
   type Point,
   edgeLengthCm,
   resizeEdge,
+  snapAngleTo15,
   snapToAxis,
   snapToVertex,
 } from "@/lib/floor-plans/geometry";
@@ -140,6 +141,24 @@ export function FloorPlanCanvas({
       altListenerCleanupRef.current = null;
     };
   }, []);
+  // Rotation gesture state. While a rotate-handle drag is active,
+  // `activeRotation` holds the in-progress angle for the table being
+  // rotated; the table renders with this value instead of
+  // table.rotationDeg, giving live feedback. The shared Alt key
+  // disables the 15° snap (free rotation), kept on its own ref so
+  // its window listeners can't collide with the table-drag ref.
+  const [activeRotation, setActiveRotation] = useState<{
+    tableId: string;
+    rotationDeg: number;
+  } | null>(null);
+  const rotateAltPressedRef = useRef(false);
+  const rotateAltCleanupRef = useRef<(() => void) | null>(null);
+  useEffect(() => {
+    return () => {
+      rotateAltCleanupRef.current?.();
+      rotateAltCleanupRef.current = null;
+    };
+  }, []);
   // View transform applied to the Stage. The base Stage already
   // fits the room to the container width; this transform sits on
   // top so viewers can pinch/wheel-zoom and drag-pan. Editor mode
@@ -263,6 +282,25 @@ export function FloorPlanCanvas({
       };
       if (t.id !== tableId) return raw;
       return { ...raw, x: newXCm, y: newYCm };
+    });
+    onChange({ rooms: plan.rooms, tables: nextTables, labels: plan.labels });
+  }
+
+  function handleTableRotationChange(tableId: string, rotationDeg: number) {
+    if (!plan || !onChange) return;
+    const nextTables = plan.tables.map((t) => {
+      const raw = {
+        id: t.id,
+        label: t.label,
+        tableSizeOptionId: t.tableSizeOptionId,
+        roomId: t.roomId,
+        rotationDeg: t.rotationDeg,
+        x: t.x,
+        y: t.y,
+        assignedApplicationId: t.assignedApplicationId,
+      };
+      if (t.id !== tableId) return raw;
+      return { ...raw, rotationDeg };
     });
     onChange({ rooms: plan.rooms, tables: nextTables, labels: plan.labels });
   }
@@ -787,6 +825,10 @@ export function FloorPlanCanvas({
               const hPx = size.depthCm * scale;
               const centerX = PADDING_PX + (table.x + size.widthCm / 2) * scale;
               const centerY = PADDING_PX + (table.y + size.depthCm / 2) * scale;
+              const currentRotation =
+                activeRotation?.tableId === table.id
+                  ? activeRotation.rotationDeg
+                  : table.rotationDeg;
               const rotated =
                 table.rotationDeg === 90 || table.rotationDeg === 270;
               const effWidthPx = (rotated ? size.depthCm : size.widthCm) * scale;
@@ -818,7 +860,7 @@ export function FloorPlanCanvas({
                   key={table.id}
                   x={centerX}
                   y={centerY}
-                  rotation={table.rotationDeg}
+                  rotation={currentRotation}
                   draggable={editable && viewMode === "populate"}
                   dragBoundFunc={(pos) => {
                     const proposed: Point = {
@@ -1036,6 +1078,67 @@ export function FloorPlanCanvas({
                       listening={false}
                     />
                   )}
+                  {/* Rotation handle — only on the selected table in
+                      editor populate mode. Lives inside the Group so
+                      its local position (top-edge offset) inherits the
+                      table's rotation transform; visually it always
+                      sits "above" the table's current top edge. */}
+                  {editable &&
+                    viewMode === "populate" &&
+                    selectedTableId === table.id && (
+                      <RotationHandle
+                        hPx={hPx}
+                        centerX={centerX}
+                        centerY={centerY}
+                        onStart={(altKey) => {
+                          rotateAltPressedRef.current = altKey;
+                          const onKeyDown = (event: KeyboardEvent) => {
+                            if (event.key === "Alt") {
+                              rotateAltPressedRef.current = true;
+                            }
+                          };
+                          const onKeyUp = (event: KeyboardEvent) => {
+                            if (event.key === "Alt") {
+                              rotateAltPressedRef.current = false;
+                            }
+                          };
+                          window.addEventListener("keydown", onKeyDown);
+                          window.addEventListener("keyup", onKeyUp);
+                          rotateAltCleanupRef.current?.();
+                          rotateAltCleanupRef.current = () => {
+                            window.removeEventListener("keydown", onKeyDown);
+                            window.removeEventListener("keyup", onKeyUp);
+                          };
+                          setActiveRotation({
+                            tableId: table.id,
+                            rotationDeg: table.rotationDeg,
+                          });
+                        }}
+                        onMove={(rotationDeg) => {
+                          setActiveRotation((prev) => {
+                            if (
+                              prev?.tableId === table.id &&
+                              prev.rotationDeg === rotationDeg
+                            ) {
+                              return prev;
+                            }
+                            return { tableId: table.id, rotationDeg };
+                          });
+                        }}
+                        onEnd={() => {
+                          const finalRotation =
+                            activeRotation?.tableId === table.id
+                              ? activeRotation.rotationDeg
+                              : table.rotationDeg;
+                          handleTableRotationChange(table.id, finalRotation);
+                          setActiveRotation(null);
+                          rotateAltCleanupRef.current?.();
+                          rotateAltCleanupRef.current = null;
+                          rotateAltPressedRef.current = false;
+                        }}
+                        altPressedRef={rotateAltPressedRef}
+                      />
+                    )}
                 </Group>
               );
             })}
@@ -1227,6 +1330,96 @@ function HighlightHalo({
       fill="rgba(139, 92, 246, 0.35)"
       cornerRadius={10}
     />
+  );
+}
+
+// Distance from the table's top edge to the centre of the rotation
+// handle, in stage pixels. Sets the connector-line length and the
+// handle's local-Y offset.
+const ROTATION_HANDLE_OFFSET_PX = 18;
+const ROTATION_HANDLE_RADIUS_PX = 6;
+const ROTATION_HANDLE_COLOR = "#6a37d4";
+
+interface RotationHandleProps {
+  hPx: number;
+  centerX: number;
+  centerY: number;
+  onStart: (altKey: boolean) => void;
+  onMove: (rotationDeg: number) => void;
+  onEnd: () => void;
+  altPressedRef: React.MutableRefObject<boolean>;
+}
+
+function RotationHandle({
+  hPx,
+  centerX,
+  centerY,
+  onStart,
+  onMove,
+  onEnd,
+  altPressedRef,
+}: RotationHandleProps) {
+  const handleY = -hPx / 2 - ROTATION_HANDLE_OFFSET_PX;
+  // Connector stops just before the circle so the join reads cleanly.
+  const connectorEndY = handleY + ROTATION_HANDLE_RADIUS_PX;
+  return (
+    <>
+      <Line
+        points={[0, -hPx / 2, 0, connectorEndY]}
+        stroke={ROTATION_HANDLE_COLOR}
+        strokeWidth={1.5}
+        listening={false}
+      />
+      <Circle
+        x={0}
+        y={handleY}
+        radius={ROTATION_HANDLE_RADIUS_PX}
+        fill="#ffffff"
+        stroke={ROTATION_HANDLE_COLOR}
+        strokeWidth={2}
+        draggable
+        onMouseDown={(e) => {
+          // Stop the table Group's onMouseDown from firing; the
+          // handle is the deepest draggable so Konva will pick it
+          // for the drag regardless, but cancelling avoids the
+          // sibling onSelectTable round-trip.
+          e.cancelBubble = true;
+        }}
+        onTouchStart={(e) => {
+          e.cancelBubble = true;
+        }}
+        onDragStart={(e) => {
+          e.cancelBubble = true;
+          onStart(Boolean(e.evt.altKey));
+        }}
+        dragBoundFunc={(pos) => {
+          // pos is in stage frame. Compute the angle from the table
+          // centre to the cursor and derive the table's new rotation.
+          const dx = pos.x - centerX;
+          const dy = pos.y - centerY;
+          const angleDeg = (Math.atan2(dy, dx) * 180) / Math.PI;
+          const proposed = (((angleDeg + 90) % 360) + 360) % 360;
+          const finalRotation = altPressedRef.current
+            ? proposed
+            : snapAngleTo15(proposed);
+          onMove(finalRotation);
+          // Lock the handle to the top edge of the rotated table
+          // explicitly: Konva would otherwise place it at a position
+          // derived from the *pre-rotation* parent transform for one
+          // frame, briefly detaching the visual from the table.
+          const rad = ((finalRotation - 90) * Math.PI) / 180;
+          const offsetPx = hPx / 2 + ROTATION_HANDLE_OFFSET_PX;
+          return {
+            x: centerX + offsetPx * Math.cos(rad),
+            y: centerY + offsetPx * Math.sin(rad),
+          };
+        }}
+        onDragEnd={(e) => {
+          e.cancelBubble = true;
+          onEnd();
+        }}
+      />
+    </>
   );
 }
 

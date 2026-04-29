@@ -93,8 +93,10 @@ Add a numeric Rotation field to the existing dialog and thread the new value thr
 
 **Depends on:** 1.
 
-### 4. Rotation handle in the canvas + Alt-aware 15° snap
+### 4. Rotation handle in the canvas + Alt-aware 15° snap ✅
 Adds the visible rotate handle on the selected table and the drag gesture that turns it.
+
+**Status:** Completed. The selected table renders a `RotationHandle` (connector line + circle) anchored above its top edge inside the table Group, so the handle inherits the parent's rotation transform and visually stays "above" the rotated table. Drag start sets `activeRotation` so the Group renders with the in-progress angle (live feedback) and attaches Alt keydown/keyup listeners to a dedicated `rotateAltPressedRef`. The handle's `dragBoundFunc` derives the new rotation from `atan2(cursor - centre)`, snaps to the nearest 15° via `snapAngleTo15` unless Alt is held, and returns the explicit stage-frame point on the rotated top edge to avoid a one-frame visual flash. Drag end persists via `handleTableRotationChange` (mirrors the field-stripping pattern in `handleTableDragEnd`) and cleans up listeners + refs. Type-check + 87 floor-plan tests pass.
 
 **Requirements:** REQ-2, REQ-3, REQ-6
 
