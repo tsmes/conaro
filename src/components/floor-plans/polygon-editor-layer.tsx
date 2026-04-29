@@ -36,6 +36,10 @@ interface PolygonEditorLayerProps {
     edgeIndex: number,
     midpointScreenPx: { xPx: number; yPx: number }
   ) => void;
+  /** Suppresses vertex drag while the canvas's pan modifier is held
+   *  so a Ctrl-click on a vertex pans the stage instead of moving
+   *  the vertex. */
+  vertexDragEnabled?: boolean;
 }
 
 const COLORS = {
@@ -62,6 +66,7 @@ export function PolygonEditorLayer({
   vertexSnapPx,
   onVerticesChange,
   onEdgeClick,
+  vertexDragEnabled = true,
 }: PolygonEditorLayerProps) {
   const cmToPx = (v: Point) => ({
     x: paddingPx + v.xCm * scale,
@@ -110,7 +115,7 @@ export function PolygonEditorLayer({
               fill={COLORS.vertexFill}
               stroke={COLORS.vertexStroke}
               strokeWidth={2}
-              draggable
+              draggable={vertexDragEnabled}
               onMouseDown={(e: KonvaEventObject<MouseEvent>) => {
                 e.cancelBubble = true;
               }}

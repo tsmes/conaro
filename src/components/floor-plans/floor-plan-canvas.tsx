@@ -450,6 +450,8 @@ export function FloorPlanCanvas({
 
   function handleStageClick(e: KonvaEventObject<MouseEvent | TouchEvent>) {
     if (!drawingMode) return;
+    // Ctrl/Cmd-clicks are pan gestures, not vertex placements.
+    if (panModifierHeld) return;
     // Clicks on draggable children (vertex circles, etc.) bubble up
     // here too — ignore if the target isn't the stage itself.
     if (e.target !== e.target.getStage()) return;
@@ -541,12 +543,55 @@ export function FloorPlanCanvas({
   const roomWidthPx = viewportCm.widthCm * scale;
   const roomHeightPx = viewportCm.heightCm * scale;
 
-  // Stage-drag panning is on in viewer mode and editor design mode,
-  // off in editor populate mode where clicking empty canvas already
-  // means "deselect the active table". Wheel and pinch zoom (plus
-  // the toolbar buttons) work in every mode so organizers can zoom
-  // in to place tables precisely.
-  const stageDraggable = !editable || viewMode === "design";
+  // Wheel/pinch zoom and the toolbar buttons work in every mode.
+  // Stage-drag panning in editor modes is gated behind the Ctrl/Cmd
+  // modifier so the same gesture works consistently in both design
+  // and populate — without it, design's click-to-place-vertex and
+  // populate's click-to-deselect would each need different rules to
+  // coexist with stage drag. Viewer mode (non-editor) panning is
+  // unconditional since there are no other empty-canvas gestures
+  // there.
+  const [panModifierHeld, setPanModifierHeld] = useState(false);
+  const stageDraggable = !editable || panModifierHeld;
+  // Table / label / rotation-handle drags are suppressed while the
+  // pan modifier is held so a Ctrl-click on any of them pans the
+  // stage instead of moving the element.
+  const tableDragEnabled =
+    editable && viewMode === "populate" && !panModifierHeld;
+  const labelDragEnabled = editable && !panModifierHeld;
+  // Track Ctrl/Cmd globally — a window-level listener catches keys
+  // pressed before the cursor enters the canvas. Reset on blur so a
+  // tab-out doesn't leave the modifier wedged on.
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Control" || e.key === "Meta") {
+        setPanModifierHeld(true);
+      }
+    }
+    function onKeyUp(e: KeyboardEvent) {
+      if (e.key === "Control" || e.key === "Meta") {
+        setPanModifierHeld(false);
+      }
+    }
+    function onBlur() {
+      setPanModifierHeld(false);
+    }
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("keyup", onKeyUp);
+    window.addEventListener("blur", onBlur);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("keyup", onKeyUp);
+      window.removeEventListener("blur", onBlur);
+    };
+  }, []);
+  // Visual cue: grab cursor when the modifier is held in any editor
+  // mode so the user sees they're in pan mode.
+  useEffect(() => {
+    const el = stageContainerRef.current;
+    if (!el) return;
+    el.style.cursor = editable && panModifierHeld ? "grab" : "";
+  }, [editable, panModifierHeld]);
   const SCALE_MIN = 0.4;
   const SCALE_MAX = 4;
 
@@ -715,6 +760,9 @@ export function FloorPlanCanvas({
             }
             onMouseDown={(e) => {
               // Click on the stage background → clear selection.
+              // Ctrl/Cmd is the pan modifier; don't deselect on a
+              // pan gesture.
+              if (panModifierHeld) return;
               if (e.target === e.target.getStage() && onSelectTable) {
                 onSelectTable(null);
               }
@@ -795,7 +843,7 @@ export function FloorPlanCanvas({
                 x={PADDING_PX + label.x * scale}
                 y={PADDING_PX + label.y * scale}
                 rotation={label.rotationDeg}
-                draggable={editable}
+                draggable={labelDragEnabled}
                 onDragEnd={(e) =>
                   handleLabelDragEnd(label.id, e.target.x(), e.target.y())
                 }
@@ -869,7 +917,7 @@ export function FloorPlanCanvas({
                   x={centerX}
                   y={centerY}
                   rotation={currentRotation}
-                  draggable={editable && viewMode === "populate"}
+                  draggable={tableDragEnabled}
                   dragBoundFunc={(pos) => {
                     const proposed: Point = {
                       xCm: (pos.x - PADDING_PX) / scale,
@@ -1105,7 +1153,8 @@ export function FloorPlanCanvas({
                       sits "above" the table's current top edge. */}
                   {editable &&
                     viewMode === "populate" &&
-                    selectedTableId === table.id && (
+                    selectedTableId === table.id &&
+                    !panModifierHeld && (
                       <RotationHandle
                         hPx={hPx}
                         centerX={centerX}
@@ -1170,6 +1219,7 @@ export function FloorPlanCanvas({
               vertexSnapPx={VERTEX_SNAP_PX}
               onVerticesChange={handlePolygonChange}
               onEdgeClick={handlePolygonEdgeClick}
+              vertexDragEnabled={!panModifierHeld}
             />
           )}
           {snapGuides && snapGuides.length > 0 && (
