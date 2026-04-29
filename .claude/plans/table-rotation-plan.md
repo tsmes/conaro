@@ -173,8 +173,10 @@ Replace the existing `effWidthPx`/`effDepthPx` clamp math (which assumes orthogo
 
 **Depends on:** 1, 2.
 
-### 6. Gate table-to-table snap on orthogonal rotation
+### 6. Gate table-to-table snap on orthogonal rotation ✅
 Stop running `computeTableSnap` when the dragged table isn't at 0/90/180/270.
+
+**Status:** Completed. The dragBoundFunc's "skip snap" branch now also fires when `!isOrthogonalRotation(currentRotation)`, returning the canvas-rect-clamped raw cursor with guides cleared. The sibling SnapTarget collection loop additionally skips any sibling whose own rotation isn't orthogonal — its AABB wouldn't represent its actual edges, so snapping to it would line up against empty space. Both checks use the existing `isOrthogonalRotation` helper (0.01° epsilon). Type-check + 87 floor-plan tests pass.
 
 **Requirements:** REQ-8
 

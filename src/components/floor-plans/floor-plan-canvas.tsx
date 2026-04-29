@@ -13,6 +13,7 @@ import { DragSnapGuidesLayer } from "./drag-snap-guides-layer";
 import {
   type Point,
   edgeLengthCm,
+  isOrthogonalRotation,
   resizeEdge,
   rotatedAabbExtents,
   snapAngleTo15,
@@ -879,10 +880,15 @@ export function FloorPlanCanvas({
                     const halfWCm = effWidthPx / 2 / scale;
                     const halfDCm = effDepthPx / 2 / scale;
 
-                    // Alt held → no snap, no guides. The table follows
-                    // the raw cursor (still subject to the canvas-rect
-                    // clamp below).
-                    if (altPressedRef.current) {
+                    // Alt held OR the dragged table isn't at a
+                    // cardinal angle → no snap, no guides. Snap edges
+                    // are only meaningful between axis-aligned rects;
+                    // rotated tables follow the raw cursor (still
+                    // subject to the canvas-rect clamp below).
+                    if (
+                      altPressedRef.current ||
+                      !isOrthogonalRotation(currentRotation)
+                    ) {
                       setSnapGuides((prev) => (prev === null ? prev : null));
                       return {
                         x: Math.max(
@@ -897,9 +903,16 @@ export function FloorPlanCanvas({
                     }
 
                     // Build snap targets from siblings in this room.
+                    // Non-orthogonal siblings are skipped — their AABB
+                    // doesn't represent their actual edges, so snapping
+                    // to it would line the dragged table up with empty
+                    // space rather than a real edge.
                     const others: SnapTarget[] = [];
                     for (const sibling of tablesInRoom) {
                       if (sibling.id === table.id) continue;
+                      if (!isOrthogonalRotation(sibling.rotationDeg)) {
+                        continue;
+                      }
                       const siblingSize = sizeById.get(
                         sibling.tableSizeOptionId
                       );
