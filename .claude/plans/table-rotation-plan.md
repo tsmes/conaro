@@ -205,8 +205,10 @@ Stop running `computeTableSnap` when the dragged table isn't at 0/90/180/270.
 
 **Depends on:** 1, 2.
 
-### 7. Manual verification + spec sign-off
+### 7. Manual verification + spec sign-off ⏳
 Walk through the spec's acceptance criteria; capture a results file.
+
+**Status:** Test-results scaffold + manual checklist written to `table-rotation-test-results.md`. Server-validation acceptance criterion checked off in the spec (covered by `floor-plan-save.test.ts`). The remaining 12 acceptance criteria require Konva canvas interaction — `agent-browser` isn't installed in this environment and rotate-handle drag needs precise mouse gestures that wouldn't be reliable through automation anyway. The user runs through the manual checklist with the dev server already up at http://localhost:3000.
 
 **Requirements:** All
 

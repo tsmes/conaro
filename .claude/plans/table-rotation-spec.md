@@ -55,7 +55,7 @@ These are verified during manual testing. Each must be checked off before the fe
 - [ ] Dragging a table that's at exactly 0/90/180/270 still produces alignment guides against neighbours.
 - [ ] Dragging a table that's at a non-orthogonal angle (e.g. 37°) does not produce alignment guides; the table moves freely (still canvas-clamped).
 - [ ] Arrow-key nudge of a rotated table moves it without changing rotation.
-- [ ] Server rejects rotation values that aren't finite numbers; accepts and normalises any finite number to `[0, 360)` (e.g. `370` → `10`, `-5` → `355`).
+- [x] Server rejects rotation values that aren't finite numbers; accepts and normalises any finite number to `[0, 360)` (e.g. `370` → `10`, `-5` → `355`). _Covered by `floor-plan-save.test.ts`._
 
 ## Constraints
 
