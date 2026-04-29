@@ -1,12 +1,9 @@
 import { describe, it, expect } from "vitest";
 import {
   type Point,
-  pointInPolygon,
   snapToAxis,
   snapToVertex,
   resizeEdge,
-  clampToPolygon,
-  polygonBoundingBox,
   edgeLengthCm,
 } from "@/lib/floor-plans/geometry";
 
@@ -16,57 +13,6 @@ const rect = (w: number, h: number): Point[] => [
   { xCm: w, yCm: h },
   { xCm: 0, yCm: h },
 ];
-
-// L-shape used for concave-polygon tests:
-//
-//   (0, 0)──────(800, 0)
-//      │           │
-//      │           │
-//      │       (800, 300)
-//      │           │
-//      │           ├───(400, 300)
-//      │                  │
-//      │              (400, 500)
-//      │                  │
-//   (0, 500)──────(0, 500)
-const lShape: Point[] = [
-  { xCm: 0, yCm: 0 },
-  { xCm: 800, yCm: 0 },
-  { xCm: 800, yCm: 300 },
-  { xCm: 400, yCm: 300 },
-  { xCm: 400, yCm: 500 },
-  { xCm: 0, yCm: 500 },
-];
-
-describe("pointInPolygon", () => {
-  it("returns true for a point inside a rectangle", () => {
-    expect(pointInPolygon({ xCm: 100, yCm: 100 }, rect(500, 400))).toBe(true);
-  });
-
-  it("returns false for a point outside a rectangle", () => {
-    expect(pointInPolygon({ xCm: 600, yCm: 100 }, rect(500, 400))).toBe(false);
-  });
-
-  it("returns false for polygons with fewer than 3 vertices", () => {
-    expect(
-      pointInPolygon({ xCm: 50, yCm: 50 }, [
-        { xCm: 0, yCm: 0 },
-        { xCm: 100, yCm: 0 },
-      ])
-    ).toBe(false);
-  });
-
-  it("includes points in the filled portion of an L-shape", () => {
-    expect(pointInPolygon({ xCm: 100, yCm: 100 }, lShape)).toBe(true);
-    expect(pointInPolygon({ xCm: 100, yCm: 400 }, lShape)).toBe(true);
-  });
-
-  it("excludes points in the notch of an L-shape", () => {
-    // (600, 400) sits in the notch — outside the L-shape but inside its
-    // bounding box.
-    expect(pointInPolygon({ xCm: 600, yCm: 400 }, lShape)).toBe(false);
-  });
-});
 
 describe("snapToAxis", () => {
   const prev: Point = { xCm: 100, yCm: 100 };
@@ -160,52 +106,6 @@ describe("resizeEdge", () => {
     const before = JSON.stringify(polygon);
     resizeEdge(polygon, 0, 250);
     expect(JSON.stringify(polygon)).toBe(before);
-  });
-});
-
-describe("clampToPolygon", () => {
-  it("returns inside points unchanged", () => {
-    const point = { xCm: 100, yCm: 100 };
-    expect(clampToPolygon(point, rect(500, 500))).toEqual(point);
-  });
-
-  it("projects an outside point onto the nearest edge", () => {
-    const clamped = clampToPolygon({ xCm: 700, yCm: 100 }, rect(500, 500));
-    expect(clamped).toEqual({ xCm: 500, yCm: 100 });
-  });
-
-  it("snaps to the nearest corner when nearest to a vertex", () => {
-    const clamped = clampToPolygon({ xCm: 700, yCm: -100 }, rect(500, 500));
-    expect(clamped).toEqual({ xCm: 500, yCm: 0 });
-  });
-
-  it("clamps a notch-region point to the L-shape's perimeter", () => {
-    const clamped = clampToPolygon({ xCm: 600, yCm: 400 }, lShape);
-    // Closest perimeter point to (600, 400) is on the horizontal edge
-    // at y=300 from x=400 to x=800 → projects straight up to (600, 300).
-    expect(clamped).toEqual({ xCm: 600, yCm: 300 });
-  });
-
-  it("returns the point unchanged for degenerate polygons", () => {
-    expect(clampToPolygon({ xCm: 5, yCm: 5 }, [])).toEqual({ xCm: 5, yCm: 5 });
-    expect(
-      clampToPolygon({ xCm: 5, yCm: 5 }, [{ xCm: 0, yCm: 0 }])
-    ).toEqual({ xCm: 5, yCm: 5 });
-  });
-});
-
-describe("polygonBoundingBox", () => {
-  it("returns the rectangle bounds for a polygon", () => {
-    expect(polygonBoundingBox(rect(400, 200))).toEqual({
-      minX: 0,
-      minY: 0,
-      maxX: 400,
-      maxY: 200,
-    });
-  });
-
-  it("returns null for an empty polygon", () => {
-    expect(polygonBoundingBox([])).toBeNull();
   });
 });
 

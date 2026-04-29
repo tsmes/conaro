@@ -7,26 +7,6 @@ export interface Point {
   yCm: number;
 }
 
-// Returns true when `point` is strictly inside `polygon` using a
-// ray-cast from the test point along the +x direction. Half-open edge
-// inclusion (top edge in / bottom edge out) avoids double-counting at
-// shared vertices. Polygons may be convex or concave; a polygon with
-// fewer than 3 vertices contains nothing.
-export function pointInPolygon(point: Point, polygon: Point[]): boolean {
-  if (polygon.length < 3) return false;
-  let inside = false;
-  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i, i += 1) {
-    const a = polygon[i];
-    const b = polygon[j];
-    const intersects =
-      a.yCm > point.yCm !== b.yCm > point.yCm &&
-      point.xCm <
-        ((b.xCm - a.xCm) * (point.yCm - a.yCm)) / (b.yCm - a.yCm) + a.xCm;
-    if (intersects) inside = !inside;
-  }
-  return inside;
-}
-
 // Locks a candidate vertex to the horizontal/vertical axis through
 // `prev` when the angle from `prev → candidate` is within
 // `toleranceDeg` of 0°/90°/180°/270°. The locked axis takes priority
@@ -106,65 +86,6 @@ export function resizeEdge(
     yCm: start.yCm + uy * newLengthCm,
   };
   return next;
-}
-
-// Clamps `point` to lie inside `polygon`. Points already inside pass
-// through unchanged. Points outside are projected onto the nearest
-// point on the polygon's perimeter. A polygon with fewer than 3
-// vertices is treated as no-clamp (returns the point unchanged) —
-// callers are expected to fall back to canvas-rect clamping in that
-// case.
-export function clampToPolygon(point: Point, polygon: Point[]): Point {
-  if (polygon.length < 3) return point;
-  if (pointInPolygon(point, polygon)) return point;
-  let bestX = point.xCm;
-  let bestY = point.yCm;
-  let bestDistSq = Infinity;
-  for (let i = 0; i < polygon.length; i += 1) {
-    const a = polygon[i];
-    const b = polygon[(i + 1) % polygon.length];
-    const projected = projectOntoSegment(point, a, b);
-    const dx = projected.xCm - point.xCm;
-    const dy = projected.yCm - point.yCm;
-    const distSq = dx * dx + dy * dy;
-    if (distSq < bestDistSq) {
-      bestDistSq = distSq;
-      bestX = projected.xCm;
-      bestY = projected.yCm;
-    }
-  }
-  return { xCm: bestX, yCm: bestY };
-}
-
-function projectOntoSegment(p: Point, a: Point, b: Point): Point {
-  const abx = b.xCm - a.xCm;
-  const aby = b.yCm - a.yCm;
-  const lenSq = abx * abx + aby * aby;
-  if (lenSq === 0) return a;
-  const t = Math.max(
-    0,
-    Math.min(1, ((p.xCm - a.xCm) * abx + (p.yCm - a.yCm) * aby) / lenSq)
-  );
-  return { xCm: a.xCm + t * abx, yCm: a.yCm + t * aby };
-}
-
-// Returns the polygon's bounding box in cm. Useful for centering /
-// auto-fitting viewport calculations.
-export function polygonBoundingBox(
-  polygon: Point[]
-): { minX: number; minY: number; maxX: number; maxY: number } | null {
-  if (polygon.length === 0) return null;
-  let minX = polygon[0].xCm;
-  let minY = polygon[0].yCm;
-  let maxX = minX;
-  let maxY = minY;
-  for (const v of polygon) {
-    if (v.xCm < minX) minX = v.xCm;
-    if (v.yCm < minY) minY = v.yCm;
-    if (v.xCm > maxX) maxX = v.xCm;
-    if (v.yCm > maxY) maxY = v.yCm;
-  }
-  return { minX, minY, maxX, maxY };
 }
 
 // Returns the length in cm of the edge from polygon[i] to polygon[i+1]
