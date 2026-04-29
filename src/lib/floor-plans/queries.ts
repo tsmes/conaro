@@ -41,10 +41,7 @@ function migrateLegacyPlan(stored: FloorPlan): FloorPlan {
   const tables: FloorPlanTable[] = [];
   for (const t of stored.tables) {
     const hasValidRoom = t.roomId && roomIds.has(t.roomId);
-    const rotationDeg =
-      t.rotationDeg === 90 || t.rotationDeg === 180 || t.rotationDeg === 270
-        ? t.rotationDeg
-        : 0;
+    const rotationDeg = Number.isFinite(t.rotationDeg) ? t.rotationDeg : 0;
     if (hasValidRoom) {
       tables.push({ ...t, rotationDeg });
       continue;

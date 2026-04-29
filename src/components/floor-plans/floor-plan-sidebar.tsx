@@ -133,7 +133,7 @@ export function FloorPlanSidebar({
         t.id === id
           ? {
               ...t,
-              rotationDeg: (((t.rotationDeg + 90) % 360) as 0 | 90 | 180 | 270),
+              rotationDeg: ((t.rotationDeg + 90) % 360),
             }
           : t
       ),

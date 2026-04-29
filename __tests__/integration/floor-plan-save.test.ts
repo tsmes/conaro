@@ -519,6 +519,185 @@ describe("saveFloorPlan", () => {
     expect(result.error).toContain("validation failed");
   });
 
+  it("saves a table with a non-orthogonal rotation as-is", async () => {
+    const { profile, convention } = await createTestOrganizer();
+    const event = await createTestEvent(convention.id, {
+      tableSizeOptions: [sizeWithDims],
+    });
+    mockAuth.mockResolvedValue({
+      user: { id: "u", role: "organizer", profileId: profile.id },
+    });
+
+    const result = await submit({
+      eventId: event.id,
+      plan: {
+        rooms: [
+          {
+            id: "r-1",
+            name: "Hall",
+            x: 0,
+            y: 0,
+            widthCm: 800,
+            heightCm: 500,
+          },
+        ],
+        tables: [
+          {
+            id: "t-1",
+            label: "T1",
+            tableSizeOptionId: "ts-std",
+            roomId: "r-1",
+            rotationDeg: 37,
+            x: 100,
+            y: 100,
+            assignedApplicationId: null,
+          },
+        ],
+      },
+    });
+    expect(result.success).toBe(true);
+
+    const [row] = await db
+      .select({ floorPlan: events.floorPlan })
+      .from(events)
+      .where(eq(events.id, event.id));
+    expect(row.floorPlan?.tables[0].rotationDeg).toBe(37);
+  });
+
+  it("normalises a rotation > 360 into [0, 360)", async () => {
+    const { profile, convention } = await createTestOrganizer();
+    const event = await createTestEvent(convention.id, {
+      tableSizeOptions: [sizeWithDims],
+    });
+    mockAuth.mockResolvedValue({
+      user: { id: "u", role: "organizer", profileId: profile.id },
+    });
+
+    const result = await submit({
+      eventId: event.id,
+      plan: {
+        rooms: [
+          {
+            id: "r-1",
+            name: "Hall",
+            x: 0,
+            y: 0,
+            widthCm: 800,
+            heightCm: 500,
+          },
+        ],
+        tables: [
+          {
+            id: "t-1",
+            label: "T1",
+            tableSizeOptionId: "ts-std",
+            roomId: "r-1",
+            rotationDeg: 370,
+            x: 100,
+            y: 100,
+            assignedApplicationId: null,
+          },
+        ],
+      },
+    });
+    expect(result.success).toBe(true);
+
+    const [row] = await db
+      .select({ floorPlan: events.floorPlan })
+      .from(events)
+      .where(eq(events.id, event.id));
+    expect(row.floorPlan?.tables[0].rotationDeg).toBe(10);
+  });
+
+  it("normalises a negative rotation into [0, 360)", async () => {
+    const { profile, convention } = await createTestOrganizer();
+    const event = await createTestEvent(convention.id, {
+      tableSizeOptions: [sizeWithDims],
+    });
+    mockAuth.mockResolvedValue({
+      user: { id: "u", role: "organizer", profileId: profile.id },
+    });
+
+    const result = await submit({
+      eventId: event.id,
+      plan: {
+        rooms: [
+          {
+            id: "r-1",
+            name: "Hall",
+            x: 0,
+            y: 0,
+            widthCm: 800,
+            heightCm: 500,
+          },
+        ],
+        tables: [
+          {
+            id: "t-1",
+            label: "T1",
+            tableSizeOptionId: "ts-std",
+            roomId: "r-1",
+            rotationDeg: -5,
+            x: 100,
+            y: 100,
+            assignedApplicationId: null,
+          },
+        ],
+      },
+    });
+    expect(result.success).toBe(true);
+
+    const [row] = await db
+      .select({ floorPlan: events.floorPlan })
+      .from(events)
+      .where(eq(events.id, event.id));
+    expect(row.floorPlan?.tables[0].rotationDeg).toBe(355);
+  });
+
+  it("rejects a non-finite rotation", async () => {
+    const { profile, convention } = await createTestOrganizer();
+    const event = await createTestEvent(convention.id, {
+      tableSizeOptions: [sizeWithDims],
+    });
+    mockAuth.mockResolvedValue({
+      user: { id: "u", role: "organizer", profileId: profile.id },
+    });
+
+    // NaN doesn't survive JSON.stringify, so build the payload with a
+    // Number-valued sentinel that fails Zod's `.finite()` check via
+    // string substitution. Easier: send the JSON manually.
+    const payload = {
+      rooms: [
+        {
+          id: "r-1",
+          name: "Hall",
+          x: 0,
+          y: 0,
+          widthCm: 800,
+          heightCm: 500,
+        },
+      ],
+      tables: [
+        {
+          id: "t-1",
+          label: "T1",
+          tableSizeOptionId: "ts-std",
+          roomId: "r-1",
+          rotationDeg: "NaN",
+          x: 100,
+          y: 100,
+          assignedApplicationId: null,
+        },
+      ],
+    };
+    const formData = buildFormData({
+      eventId: event.id,
+      floorPlan: JSON.stringify(payload),
+    });
+    const result = await saveFloorPlan({}, formData);
+    expect(result.error).toContain("validation failed");
+  });
+
   it("preserves vertices through migrateLegacyPlan on read", async () => {
     const { profile, convention } = await createTestOrganizer();
     const event = await createTestEvent(convention.id);

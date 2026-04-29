@@ -34,12 +34,10 @@ const tableSchema = z.object({
   label: z.string().trim().min(1, "Table label is required").max(10),
   tableSizeOptionId: z.string().min(1),
   roomId: z.string().min(1),
-  rotationDeg: z.union([
-    z.literal(0),
-    z.literal(90),
-    z.literal(180),
-    z.literal(270),
-  ]),
+  rotationDeg: z
+    .number()
+    .finite()
+    .transform((n) => ((n % 360) + 360) % 360),
   x: z.number().int().min(0).max(10000),
   y: z.number().int().min(0).max(10000),
   assignedApplicationId: z.string().min(1).nullable(),
