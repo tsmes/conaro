@@ -41,8 +41,10 @@ Drop the literal-union constraint on `FloorPlanTable.rotationDeg`; have the save
 
 **Depends on:** none.
 
-### 2. Rotation geometry helpers + unit tests
+### 2. Rotation geometry helpers + unit tests ✅
 Pure functions used by the rotated-AABB clamp, snap gating, and the rotate-handle gesture.
+
+**Status:** Completed. `rotatedAabbExtents`, `isOrthogonalRotation`, `snapAngleTo15` added with 14 new test cases (orthogonal/diagonal AABB, epsilon honoured, NaN rejected, custom snap step). `snapAngleTo15(-10)` is 345 not 350 — the plan's 350 was a typo (not a 15° multiple).
 
 **Requirements:** REQ-3, REQ-7, REQ-8 (math); infrastructure for the rest.
 
