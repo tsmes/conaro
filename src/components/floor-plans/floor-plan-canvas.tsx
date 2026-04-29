@@ -14,6 +14,7 @@ import {
   type Point,
   edgeLengthCm,
   resizeEdge,
+  rotatedAabbExtents,
   snapAngleTo15,
   snapToAxis,
   snapToVertex,
@@ -257,9 +258,9 @@ export function FloorPlanCanvas({
     rotationDeg: number
   ) {
     if (!plan || !onChange || !activeRoom) return;
-    const rotated = rotationDeg === 90 || rotationDeg === 270;
-    const effWidthCm = rotated ? sizeDepthCm : sizeWidthCm;
-    const effDepthCm = rotated ? sizeWidthCm : sizeDepthCm;
+    const aabb = rotatedAabbExtents(sizeWidthCm, sizeDepthCm, rotationDeg);
+    const effWidthCm = aabb.halfWidthCm * 2;
+    const effDepthCm = aabb.halfDepthCm * 2;
     const centerXCm = (centerStageXPx - PADDING_PX) / scale;
     const centerYCm = (centerStageYPx - PADDING_PX) / scale;
     const clamped = clampTableCenterToRoom(
@@ -829,10 +830,18 @@ export function FloorPlanCanvas({
                 activeRotation?.tableId === table.id
                   ? activeRotation.rotationDeg
                   : table.rotationDeg;
-              const rotated =
-                table.rotationDeg === 90 || table.rotationDeg === 270;
-              const effWidthPx = (rotated ? size.depthCm : size.widthCm) * scale;
-              const effDepthPx = (rotated ? size.widthCm : size.depthCm) * scale;
+              // The drag clamp uses the rotated rectangle's
+              // axis-aligned bounding box so the visible table stays
+              // inside the canvas at any angle. For orthogonal
+              // rotations this matches the previous swap-axes math
+              // (cos/sin collapse to 0/1).
+              const aabb = rotatedAabbExtents(
+                size.widthCm,
+                size.depthCm,
+                currentRotation
+              );
+              const effWidthPx = aabb.halfWidthCm * 2 * scale;
+              const effDepthPx = aabb.halfDepthCm * 2 * scale;
               const minCx = PADDING_PX + effWidthPx / 2;
               const maxCx = PADDING_PX + activeRoom.widthCm * scale - effWidthPx / 2;
               const minCy = PADDING_PX + effDepthPx / 2;

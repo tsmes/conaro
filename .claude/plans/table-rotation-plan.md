@@ -135,8 +135,10 @@ Adds the visible rotate handle on the selected table and the drag gesture that t
 
 **Depends on:** 1, 2.
 
-### 5. Rotated-AABB clamp during table drag
+### 5. Rotated-AABB clamp during table drag ✅
 Replace the existing `effWidthPx`/`effDepthPx` clamp math (which assumes orthogonal rotation) with `rotatedAabbExtents` so any angle stays within the canvas.
+
+**Status:** Completed. `rotatedAabbExtents` now drives the canvas-clamp half-extents in three places: the per-table render-loop (which feeds `dragBoundFunc`'s `minCx/maxCx/minCy/maxCy`), `handleTableDragEnd` in the canvas, and `nudgeSelected` in the editor. The render-loop call uses `currentRotation` so the live rotate-handle gesture clamps against the in-progress angle, not the pre-drag one. Orthogonal cases collapse to the previous swap-axes math (cos/sin = 0 or 1) so existing behaviour is preserved. Type-check + 87 floor-plan tests pass.
 
 **Requirements:** REQ-7
 

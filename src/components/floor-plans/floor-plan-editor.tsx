@@ -18,6 +18,7 @@ import type {
   FloorPlanTable,
   TableSizeOption,
 } from "@/lib/db/schema/events";
+import { rotatedAabbExtents } from "@/lib/floor-plans/geometry";
 import type { ResolvedFloorPlan } from "@/lib/floor-plans/queries";
 
 const SAVE_DEBOUNCE_MS = 500;
@@ -218,18 +219,20 @@ export function FloorPlanEditor({
         (s) => s.id === table.tableSizeOptionId
       );
       if (!room || !size?.widthCm || !size?.depthCm) return;
-      const rotated = table.rotationDeg === 90 || table.rotationDeg === 270;
-      const effWidthCm = rotated ? size.depthCm : size.widthCm;
-      const effDepthCm = rotated ? size.widthCm : size.depthCm;
+      const aabb = rotatedAabbExtents(
+        size.widthCm,
+        size.depthCm,
+        table.rotationDeg
+      );
       const centreX = table.x + size.widthCm / 2 + dx;
       const centreY = table.y + size.depthCm / 2 + dy;
       const clampedCx = Math.max(
-        effWidthCm / 2,
-        Math.min(room.widthCm - effWidthCm / 2, centreX)
+        aabb.halfWidthCm,
+        Math.min(room.widthCm - aabb.halfWidthCm, centreX)
       );
       const clampedCy = Math.max(
-        effDepthCm / 2,
-        Math.min(room.heightCm - effDepthCm / 2, centreY)
+        aabb.halfDepthCm,
+        Math.min(room.heightCm - aabb.halfDepthCm, centreY)
       );
       const newX = Math.round(clampedCx - size.widthCm / 2);
       const newY = Math.round(clampedCy - size.depthCm / 2);
