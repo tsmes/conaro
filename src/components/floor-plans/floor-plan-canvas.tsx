@@ -1112,6 +1112,7 @@ export function FloorPlanCanvas({
                         hPx={hPx}
                         centerX={centerX}
                         centerY={centerY}
+                        initialRotation={table.rotationDeg}
                         onStart={(altKey) => {
                           rotateAltPressedRef.current = altKey;
                           const onKeyDown = (event: KeyboardEvent) => {
@@ -1147,12 +1148,8 @@ export function FloorPlanCanvas({
                             return { tableId: table.id, rotationDeg };
                           });
                         }}
-                        onEnd={() => {
-                          const finalRotation =
-                            activeRotation?.tableId === table.id
-                              ? activeRotation.rotationDeg
-                              : table.rotationDeg;
-                          handleTableRotationChange(table.id, finalRotation);
+                        onEnd={(rotationDeg) => {
+                          handleTableRotationChange(table.id, rotationDeg);
                           setActiveRotation(null);
                           rotateAltCleanupRef.current?.();
                           rotateAltCleanupRef.current = null;
@@ -1366,9 +1363,10 @@ interface RotationHandleProps {
   hPx: number;
   centerX: number;
   centerY: number;
+  initialRotation: number;
   onStart: (altKey: boolean) => void;
   onMove: (rotationDeg: number) => void;
-  onEnd: () => void;
+  onEnd: (rotationDeg: number) => void;
   altPressedRef: React.MutableRefObject<boolean>;
 }
 
@@ -1376,11 +1374,18 @@ function RotationHandle({
   hPx,
   centerX,
   centerY,
+  initialRotation,
   onStart,
   onMove,
   onEnd,
   altPressedRef,
 }: RotationHandleProps) {
+  // Tracks the most recently computed rotation so onEnd can read the
+  // exact final value without depending on a React-state round-trip.
+  // The parent's onEnd closure is recreated on each render after a
+  // setState, but a Konva mouseup that fires before React commits the
+  // queued render would otherwise read a stale rotation.
+  const latestRotationRef = useRef(0);
   const handleY = -hPx / 2 - ROTATION_HANDLE_OFFSET_PX;
   // Connector stops just before the circle so the join reads cleanly.
   const connectorEndY = handleY + ROTATION_HANDLE_RADIUS_PX;
@@ -1412,6 +1417,9 @@ function RotationHandle({
         }}
         onDragStart={(e) => {
           e.cancelBubble = true;
+          // Seed the latest-rotation ref so a click-without-drag
+          // releases at the unchanged angle rather than dispatching 0.
+          latestRotationRef.current = initialRotation;
           onStart(Boolean(e.evt.altKey));
         }}
         dragBoundFunc={(pos) => {
@@ -1424,6 +1432,7 @@ function RotationHandle({
           const finalRotation = altPressedRef.current
             ? proposed
             : snapAngleTo15(proposed);
+          latestRotationRef.current = finalRotation;
           onMove(finalRotation);
           // Lock the handle to the top edge of the rotated table
           // explicitly: Konva would otherwise place it at a position
@@ -1438,7 +1447,7 @@ function RotationHandle({
         }}
         onDragEnd={(e) => {
           e.cancelBubble = true;
-          onEnd();
+          onEnd(latestRotationRef.current);
         }}
       />
     </>

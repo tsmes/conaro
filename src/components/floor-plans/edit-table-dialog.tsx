@@ -32,12 +32,10 @@ function normaliseRotation(deg: number): number {
 }
 
 // Show one decimal at most so 90° doesn't render as "90.0" but a typed
-// 37.5° survives the round-trip.
+// 37.5° survives the round-trip. Incoming `deg` is already normalised
+// by the save action's Zod transform, so no normalising here.
 function formatRotationForInput(deg: number): string {
-  const normalised = normaliseRotation(deg);
-  return Number.isInteger(normalised)
-    ? String(normalised)
-    : normalised.toFixed(1);
+  return Number.isInteger(deg) ? String(deg) : deg.toFixed(1);
 }
 
 function hasDims(size: TableSizeOption): boolean {
