@@ -541,10 +541,12 @@ export function FloorPlanCanvas({
   const roomWidthPx = viewportCm.widthCm * scale;
   const roomHeightPx = viewportCm.heightCm * scale;
 
-  // Pan/zoom is enabled in viewer mode and in editor's design mode.
-  // In populate mode the user drags tables directly; layering Stage
-  // drag on top would steal those events.
-  const panZoomEnabled = !editable || viewMode === "design";
+  // Stage-drag panning is on in viewer mode and editor design mode,
+  // off in editor populate mode where clicking empty canvas already
+  // means "deselect the active table". Wheel and pinch zoom (plus
+  // the toolbar buttons) work in every mode so organizers can zoom
+  // in to place tables precisely.
+  const stageDraggable = !editable || viewMode === "design";
   const SCALE_MIN = 0.4;
   const SCALE_MAX = 4;
 
@@ -555,7 +557,6 @@ export function FloorPlanCanvas({
 
   const handleWheel = useCallback(
     (e: KonvaEventObject<WheelEvent>) => {
-      if (!panZoomEnabled) return;
       e.evt.preventDefault();
       const stage = e.target.getStage();
       const pointer = stage?.getPointerPosition();
@@ -575,12 +576,11 @@ export function FloorPlanCanvas({
         };
       });
     },
-    [panZoomEnabled, clampScale]
+    [clampScale]
   );
 
   const handleTouchMove = useCallback(
     (e: KonvaEventObject<TouchEvent>) => {
-      if (!panZoomEnabled) return;
       const touches = e.evt.touches;
       if (touches.length !== 2) return;
       e.evt.preventDefault();
@@ -611,7 +611,7 @@ export function FloorPlanCanvas({
         };
       });
     },
-    [panZoomEnabled, clampScale]
+    [clampScale]
   );
 
   const handleTouchEnd = useCallback(() => {
@@ -646,7 +646,7 @@ export function FloorPlanCanvas({
   // a re-focus). Centres the table at scale 1.6 so the artist sees
   // their stand without hunting through the room.
   useEffect(() => {
-    if (!panZoomEnabled || !focusToken || !highlightApplicationId) return;
+    if (!focusToken || !highlightApplicationId) return;
     const target = tablesInRoom.find(
       (t) => t.assignment?.applicationId === highlightApplicationId
     );
@@ -665,7 +665,7 @@ export function FloorPlanCanvas({
     // the focus token bumps or the highlight target changes, not on
     // every container resize.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [panZoomEnabled, focusToken, highlightApplicationId]);
+  }, [focusToken, highlightApplicationId]);
 
   return (
     <div
@@ -684,27 +684,25 @@ export function FloorPlanCanvas({
         </div>
       ) : (
         <div ref={stageContainerRef} className="relative">
-          {panZoomEnabled && (
-            <ZoomToolbar
-              scale={view.scale}
-              onZoomIn={() => zoomBy(1.25)}
-              onZoomOut={() => zoomBy(1 / 1.25)}
-              onReset={resetView}
-            />
-          )}
+          <ZoomToolbar
+            scale={view.scale}
+            onZoomIn={() => zoomBy(1.25)}
+            onZoomOut={() => zoomBy(1 / 1.25)}
+            onReset={resetView}
+          />
           <Stage
             width={stageWidth}
             height={stageHeight}
-            scaleX={panZoomEnabled ? view.scale : 1}
-            scaleY={panZoomEnabled ? view.scale : 1}
-            x={panZoomEnabled ? view.x : 0}
-            y={panZoomEnabled ? view.y : 0}
-            draggable={panZoomEnabled}
+            scaleX={view.scale}
+            scaleY={view.scale}
+            x={view.x}
+            y={view.y}
+            draggable={stageDraggable}
             onWheel={handleWheel}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
             onDragEnd={
-              panZoomEnabled
+              stageDraggable
                 ? (e) => {
                     if (e.target.getStage() !== e.target) return;
                     setView((v) => ({
