@@ -60,6 +60,8 @@ export interface SelectionApplicantView {
   images: {
     id: string;
     url: string;
+    width: number | null;
+    height: number | null;
     sortOrder: number;
     caption: string | null;
   }[];

@@ -171,12 +171,16 @@ describe("DeepReviewLayout", () => {
         {
           id: "img-1",
           url: "https://cdn.test/1.webp",
+          width: 1024,
+          height: 768,
           sortOrder: 0,
           caption: "Booth 2024 at Kawaiicon",
         },
         {
           id: "img-2",
           url: "https://cdn.test/2.webp",
+          width: 1024,
+          height: 768,
           sortOrder: 1,
           caption: null,
         },

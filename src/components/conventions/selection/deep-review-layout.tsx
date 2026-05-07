@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -18,7 +19,8 @@ import { Markdown } from "@/components/ui/markdown";
 import { cn } from "@/lib/utils";
 import { formatDateNo } from "@/lib/utils/format-date-no";
 import { getStatusDisplay } from "./applicant-visuals";
-import { PortfolioCollage } from "./portfolio-collage";
+import { ImageLightbox } from "./image-lightbox";
+import { PortfolioRows } from "./portfolio-rows";
 import { WaitlistControls } from "./waitlist-controls";
 import type {
   ApplicationAnswersView,
@@ -161,7 +163,48 @@ export function DeepReviewLayout({
   eventId,
   waitlistEnabled,
 }: DeepReviewLayoutProps) {
-  if (applicants.length === 0) {
+  const clampedIndex =
+    applicants.length === 0
+      ? 0
+      : Math.min(Math.max(index, 0), applicants.length - 1);
+  const applicant = applicants[clampedIndex];
+  const applicantId = applicant?.id;
+
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  // Switching applicants while the lightbox is open would surface the
+  // wrong portfolio, so close it on every applicant change. The
+  // previous-value-in-render pattern resets without an effect.
+  // https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
+  const [lastApplicantId, setLastApplicantId] = useState<string | undefined>(
+    applicantId
+  );
+  if (applicantId !== lastApplicantId) {
+    setLastApplicantId(applicantId);
+    setLightboxIndex(null);
+  }
+
+  // Track the info-panel height so the rows-layout collage can match it.
+  // Falls back to a reasonable default before the first measurement.
+  const infoPanelRef = useRef<HTMLDivElement | null>(null);
+  const [infoPanelHeight, setInfoPanelHeight] = useState(480);
+  useEffect(() => {
+    const node = infoPanelRef.current;
+    if (!node || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (!entry) return;
+      // borderBoxSize is what the grid cell actually stretches to —
+      // contentRect excludes padding (info panel has p-6 = 48px) and
+      // would leave the album short by exactly that much.
+      const borderBox = entry.borderBoxSize?.[0]?.blockSize;
+      const next = Math.round(borderBox ?? node.getBoundingClientRect().height);
+      if (next > 0) setInfoPanelHeight(next);
+    });
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
+  if (applicants.length === 0 || !applicant) {
     return (
       <Card className="shadow-gallery p-10 text-center text-muted-foreground">
         Nothing matches this filter.
@@ -169,8 +212,6 @@ export function DeepReviewLayout({
     );
   }
 
-  const clampedIndex = Math.min(Math.max(index, 0), applicants.length - 1);
-  const applicant = applicants[clampedIndex];
   const status = getStatusDisplay(applicant.status, applicant.pinned);
   const isPublished = eventStatus === "results_published";
   const canConfirmPayment =
@@ -178,13 +219,20 @@ export function DeepReviewLayout({
   const canRevoke = isPublished && applicant.status === "accepted";
 
   return (
+    <>
     <Card className="shadow-gallery overflow-hidden p-0">
       <div className="grid lg:grid-cols-[1.15fr_1fr]">
-        <div className="relative bg-muted">
-          <PortfolioCollage
+        <div className="relative bg-muted lg:h-full">
+          <PortfolioRows
             images={applicant.images}
             displayName={applicant.displayName}
-            className="aspect-[4/3]"
+            containerHeight={infoPanelHeight}
+            className="lg:h-full"
+            onImageClick={
+              applicant.images.length > 0
+                ? (i) => setLightboxIndex(i)
+                : undefined
+            }
           />
           <div className="absolute left-3 top-3 flex gap-2">
             <Badge variant={status.variant}>{status.label}</Badge>
@@ -217,7 +265,10 @@ export function DeepReviewLayout({
           )}
         </div>
 
-        <div className="flex min-w-0 flex-col gap-5 p-6">
+        <div
+          ref={infoPanelRef}
+          className="flex min-w-0 flex-col gap-5 p-6"
+        >
           <div>
             <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
               Applicant
@@ -372,5 +423,16 @@ export function DeepReviewLayout({
         </div>
       </div>
     </Card>
+    <ImageLightbox
+      open={lightboxIndex !== null}
+      onOpenChange={(next) => {
+        if (!next) setLightboxIndex(null);
+      }}
+      images={applicant.images}
+      index={lightboxIndex ?? 0}
+      onIndexChange={setLightboxIndex}
+      displayName={applicant.displayName}
+    />
+    </>
   );
 }

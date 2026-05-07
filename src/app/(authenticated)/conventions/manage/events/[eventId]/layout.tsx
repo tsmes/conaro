@@ -57,7 +57,7 @@ export default async function EventLayout({
       <div className="mb-8">
         <EventTabsNav
           eventId={event.id}
-          publishedFeaturesEnabled={isPublished}
+          messagingEnabled={isPublished}
         />
       </div>
 

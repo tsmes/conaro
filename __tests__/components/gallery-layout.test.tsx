@@ -56,7 +56,7 @@ const applicants: SelectionApplicantView[] = [
     genres: ["Comics", "Zines"],
     mediums: ["Ink"],
     images: [
-      { id: "img1", url: "/test.webp", sortOrder: 0, caption: null },
+      { id: "img1", url: "/test.webp", width: 1024, height: 768, sortOrder: 0, caption: null },
     ],
   }),
   makeApplicant({

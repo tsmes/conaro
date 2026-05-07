@@ -29,3 +29,35 @@ if (typeof window !== "undefined" && !window.matchMedia) {
     }),
   });
 }
+
+// jsdom doesn't ship with ResizeObserver, but several components depend on
+// it (e.g. react-photo-album measures its container width). Stub it as a
+// no-op so render() doesn't throw and SSR/default-width fallbacks kick in.
+if (typeof globalThis.ResizeObserver === "undefined") {
+  class ResizeObserverStub {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  }
+  globalThis.ResizeObserver =
+    ResizeObserverStub as unknown as typeof ResizeObserver;
+}
+
+// jsdom always reports `clientWidth: 0`. react-photo-album reads it once
+// the container ref is attached and discards `defaultContainerWidth`,
+// leaving the album with width=0 and rendering nothing. Forcing a non-
+// zero default lets the layout compute photo cells in tests.
+if (typeof HTMLElement !== "undefined") {
+  const descriptor = Object.getOwnPropertyDescriptor(
+    HTMLElement.prototype,
+    "clientWidth"
+  );
+  if (!descriptor || descriptor.configurable !== false) {
+    Object.defineProperty(HTMLElement.prototype, "clientWidth", {
+      configurable: true,
+      get() {
+        return 800;
+      },
+    });
+  }
+}

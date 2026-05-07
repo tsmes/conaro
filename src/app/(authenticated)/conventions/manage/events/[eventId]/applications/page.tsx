@@ -69,6 +69,8 @@ export default async function ApplicationsPage({
           .map((image) => ({
             id: image.id,
             url: storage.getUrl(image.storagePath),
+            width: image.width,
+            height: image.height,
             sortOrder: image.sortOrder,
             caption: image.caption ?? null,
           })),

@@ -7,11 +7,12 @@ import { cn } from "@/lib/utils";
 interface EventTabsNavProps {
   eventId: string;
   /**
-   * When false the Messaging + Floor plan tabs render disabled and
-   * can't be navigated to. Lets organizers see the full shape of the
-   * event workspace before they publish.
+   * When false the Messaging tab renders disabled and can't be navigated
+   * to — messaging an empty accepted-artist list isn't useful. Floor
+   * plan is always enabled so organizers can set up rooms and tables
+   * ahead of accepting applications.
    */
-  publishedFeaturesEnabled: boolean;
+  messagingEnabled: boolean;
 }
 
 interface Tab {
@@ -24,11 +25,10 @@ interface Tab {
 
 export function EventTabsNav({
   eventId,
-  publishedFeaturesEnabled,
+  messagingEnabled,
 }: EventTabsNavProps) {
   const pathname = usePathname();
   const base = `/conventions/manage/events/${eventId}`;
-  const publishedHint = "Available after results are published";
 
   const tabs: Tab[] = [
     {
@@ -55,15 +55,13 @@ export function EventTabsNav({
       href: `${base}/messaging`,
       label: "Messaging",
       isActive: pathname.startsWith(`${base}/messaging`),
-      disabled: !publishedFeaturesEnabled,
-      disabledHint: publishedHint,
+      disabled: !messagingEnabled,
+      disabledHint: "Available after results are published",
     },
     {
       href: `${base}/floor-plan`,
       label: "Floor plan",
       isActive: pathname.startsWith(`${base}/floor-plan`),
-      disabled: !publishedFeaturesEnabled,
-      disabledHint: publishedHint,
     },
   ];
 
