@@ -19,6 +19,7 @@
 
 import "./lib/env";
 
+import path from "node:path";
 import { eq } from "drizzle-orm";
 import { db } from "../src/lib/db";
 import { users } from "../src/lib/db/schema/auth";
@@ -80,10 +81,12 @@ export async function runResetSeedData(
 }
 
 // Run when invoked directly via `tsx scripts/seed-reset.ts`.
+// Stricter than endsWith: a path like /tmp/foo-seed-reset.ts would
+// match endsWith("seed-reset.ts") but not basename === "seed-reset.ts".
 const isDirectInvocation =
   typeof process !== "undefined" &&
   process.argv[1] &&
-  process.argv[1].endsWith("seed-reset.ts");
+  path.basename(process.argv[1]) === "seed-reset.ts";
 
 if (isDirectInvocation) {
   runResetSeedData({ logger: (msg) => console.log(msg) })

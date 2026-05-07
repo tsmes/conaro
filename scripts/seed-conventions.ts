@@ -392,7 +392,11 @@ function writeCredentialsFile(
     "",
   ];
 
-  const filePath = path.resolve(__dirname, "seed-credentials.md");
+  const filePath = path.resolve(
+    process.cwd(),
+    "scripts",
+    "seed-credentials.md"
+  );
   fs.writeFileSync(filePath, lines.join("\n"), "utf-8");
   log(`  Credentials:      scripts/seed-credentials.md`);
 }
@@ -400,7 +404,7 @@ function writeCredentialsFile(
 const isDirectInvocation =
   typeof process !== "undefined" &&
   process.argv[1] &&
-  process.argv[1].endsWith("seed-conventions.ts");
+  path.basename(process.argv[1]) === "seed-conventions.ts";
 
 if (isDirectInvocation) {
   runSeedConventions({

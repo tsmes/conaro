@@ -11,6 +11,7 @@
 
 import "./lib/env";
 
+import path from "node:path";
 import { asc, eq } from "drizzle-orm";
 
 import { db } from "../src/lib/db";
@@ -454,7 +455,7 @@ export async function runSeedApplications(
 const isDirectInvocation =
   typeof process !== "undefined" &&
   process.argv[1] &&
-  process.argv[1].endsWith("seed-applications.ts");
+  path.basename(process.argv[1]) === "seed-applications.ts";
 
 if (isDirectInvocation) {
   runSeedApplications({ logger: (msg) => console.log(msg) })

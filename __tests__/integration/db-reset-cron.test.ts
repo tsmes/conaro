@@ -78,15 +78,32 @@ function flushMicrotasks(): Promise<void> {
 describe("cron POST /api/cron/db-reset", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // ENABLE_DB_RESET is checked first by the route, so most tests
+    // need it set to "true" to exercise the auth path. Tests that
+    // verify the disabled-state behavior override it.
     vi.stubEnv("CRON_RESET_SECRET", RESET_SECRET);
-    vi.stubEnv("ENABLE_DB_RESET", "false");
+    vi.stubEnv("ENABLE_DB_RESET", "true");
   });
 
   afterEach(() => {
     vi.unstubAllEnvs();
   });
 
-  it("returns 500 when CRON_RESET_SECRET is unset", async () => {
+  it("returns 403 when ENABLE_DB_RESET is not 'true' (checked before auth)", async () => {
+    vi.stubEnv("ENABLE_DB_RESET", "false");
+    const response = await POST(makeRequest(`Bearer ${RESET_SECRET}`));
+    expect(response.status).toBe(403);
+    expect(runResetSeedDataMock).not.toHaveBeenCalled();
+  });
+
+  it("returns 403 even with a wrong bearer when disabled (no auth oracle)", async () => {
+    vi.stubEnv("ENABLE_DB_RESET", "false");
+    const response = await POST(makeRequest("Bearer wrong"));
+    expect(response.status).toBe(403);
+    expect(runResetSeedDataMock).not.toHaveBeenCalled();
+  });
+
+  it("returns 500 when CRON_RESET_SECRET is empty", async () => {
     vi.stubEnv("CRON_RESET_SECRET", "");
     const response = await POST(makeRequest(`Bearer ${RESET_SECRET}`));
     expect(response.status).toBe(500);
@@ -105,21 +122,12 @@ describe("cron POST /api/cron/db-reset", () => {
     expect(runResetSeedDataMock).not.toHaveBeenCalled();
   });
 
-  it("returns 403 when ENABLE_DB_RESET is not 'true'", async () => {
-    const response = await POST(makeRequest(`Bearer ${RESET_SECRET}`));
-    expect(response.status).toBe(403);
-    expect(runResetSeedDataMock).not.toHaveBeenCalled();
-  });
-
   it("returns 202 and dispatches the four seed phases in order when enabled", async () => {
-    vi.stubEnv("ENABLE_DB_RESET", "true");
     const response = await POST(makeRequest(`Bearer ${RESET_SECRET}`));
     expect(response.status).toBe(202);
 
-    // Let the fire-and-forget background work complete.
-    await flushMicrotasks();
-    await flushMicrotasks();
-    await flushMicrotasks();
+    // setImmediate resolves after the current macrotask, draining
+    // all pending microtasks regardless of await-chain depth.
     await flushMicrotasks();
 
     expect(runResetSeedDataMock).toHaveBeenCalledTimes(1);
@@ -144,5 +152,38 @@ describe("cron POST /api/cron/db-reset", () => {
     expect(runSeedArtistsMock).toHaveBeenCalledWith(
       expect.objectContaining({ count: 100, withPortfolios: true })
     );
+  });
+
+  it("aborts the chain and logs the failing phase when a phase rejects", async () => {
+    runSeedConventionsMock.mockRejectedValueOnce(new Error("boom"));
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const response = await POST(makeRequest(`Bearer ${RESET_SECRET}`));
+    expect(response.status).toBe(202);
+
+    await flushMicrotasks();
+
+    // Reset ran first (succeeds), conventions failed, downstream
+    // phases must not be invoked.
+    expect(runResetSeedDataMock).toHaveBeenCalledTimes(1);
+    expect(runSeedConventionsMock).toHaveBeenCalledTimes(1);
+    expect(runSeedArtistsMock).not.toHaveBeenCalled();
+    expect(runSeedApplicationsMock).not.toHaveBeenCalled();
+
+    const errorMessages = errorSpy.mock.calls.map((args) =>
+      args.map(String).join(" ")
+    );
+    expect(
+      errorMessages.some((msg) =>
+        msg.includes("phase=conventions failed")
+      )
+    ).toBe(true);
+    expect(
+      errorMessages.some((msg) =>
+        /\[db-reset\] aborted phase=conventions ms=\d+/.test(msg)
+      )
+    ).toBe(true);
+
+    errorSpy.mockRestore();
   });
 });

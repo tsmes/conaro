@@ -14,6 +14,21 @@ import { runSeedApplications } from "../../../../../scripts/seed-applications";
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
+  // ENABLE_DB_RESET gate goes first so the route is genuinely inert
+  // on any service that did not deliberately opt in. If we checked
+  // the bearer first, a service that happened to also set
+  // CRON_RESET_SECRET (e.g. copy-pasted from another env) would
+  // become a token-validation oracle even with the route disabled.
+  if (process.env.ENABLE_DB_RESET !== "true") {
+    return NextResponse.json(
+      {
+        error:
+          "Disabled. Set ENABLE_DB_RESET=true on this service to enable.",
+      },
+      { status: 403 }
+    );
+  }
+
   const secret = process.env.CRON_RESET_SECRET;
   if (!secret) {
     console.error("[db-reset] CRON_RESET_SECRET not configured");
@@ -28,21 +43,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  if (process.env.ENABLE_DB_RESET !== "true") {
-    return NextResponse.json(
-      {
-        error:
-          "Disabled. Set ENABLE_DB_RESET=true on this service to enable.",
-      },
-      { status: 403 }
-    );
-  }
-
   // Fire-and-forget: return 202 immediately, let the seed work
   // continue in the background. cron-job.org's request times out
   // long before a full reset+seed completes (~minutes for image
-  // processing).
-  void runResetAndSeed();
+  // processing). The .catch is defensive: every phase has its own
+  // try/catch, but any future refactor introducing work outside
+  // those blocks should not become an unhandledRejection.
+  runResetAndSeed().catch((err) => {
+    console.error("[db-reset] unhandled", err);
+  });
 
   return NextResponse.json({ status: "accepted" }, { status: 202 });
 }
@@ -87,7 +96,12 @@ async function runResetAndSeed(): Promise<void> {
         result
       );
     } catch (err) {
-      console.error(`[db-reset] phase=${phase.name} failed`, err);
+      const totalMs = Date.now() - startedAt;
+      console.error(
+        `[db-reset] phase=${phase.name} failed`,
+        err
+      );
+      console.error(`[db-reset] aborted phase=${phase.name} ms=${totalMs}`);
       return;
     }
   }

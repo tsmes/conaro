@@ -17,6 +17,8 @@
 
 import "./lib/env";
 
+import path from "node:path";
+
 import {
   SEED_ARTIST_DOMAIN,
   SEED_PASSWORD,
@@ -127,7 +129,7 @@ export async function runSeedArtists(
 const isDirectInvocation =
   typeof process !== "undefined" &&
   process.argv[1] &&
-  process.argv[1].endsWith("seed-artists.ts");
+  path.basename(process.argv[1]) === "seed-artists.ts";
 
 if (isDirectInvocation) {
   const { count, withPortfolios } = parseArgs();

@@ -143,7 +143,9 @@ database on a schedule.**
 
 1. Create a second cron job with:
    - **URL**: `https://<demo-service>.up.railway.app/api/cron/db-reset`
-   - **Method**: POST
+   - **Method**: **POST** — note this differs from the events tick
+     endpoint above, which is GET. cron-job.org's default is GET, so
+     verify the method dropdown before saving or you'll get a 405.
    - **Headers**: `Authorization: Bearer <CRON_RESET_SECRET value>`
    - **Schedule**: once every 24 hours, e.g. daily at 04:00 UTC.
 2. Save and enable the job.
@@ -164,19 +166,30 @@ To confirm a run completed:
    ```
    [db-reset] start
    [db-reset] phase=reset starting
-   [db-reset] phase=reset done ms=...
+   [db-reset] phase=reset done ms=... { deleted: ..., total: ..., emails: [...] }
    [db-reset] phase=conventions starting
-   [db-reset] phase=conventions done ms=...
+   [db-reset] phase=conventions done ms=... { manifests: ..., conventionsCreated: ..., ... }
    [db-reset] phase=artists starting
-   [db-reset] phase=artists done ms=...
+   [db-reset] phase=artists done ms=... { total: ..., created: ..., portfoliosSeeded: ..., ... }
    [db-reset] phase=applications starting
-   [db-reset] phase=applications done ms=...
+   [db-reset] phase=applications done ms=... { eventsSeeded: ..., newlyCreated: ..., ... }
    [db-reset] complete ms=...
    ```
 
-2. A failure logs `[db-reset] phase=<name> failed` and aborts the chain. The
-   next scheduled run will pick up cleanly because the reset phase is
-   idempotent.
+   Each `phase done` line is followed by the phase's structured result; the
+   exact fields vary per phase. Grep for `[db-reset] complete` to confirm the
+   whole chain succeeded.
+
+2. A failure logs:
+
+   ```
+   [db-reset] phase=<name> failed <stack trace>
+   [db-reset] aborted phase=<name> ms=<elapsed>
+   ```
+
+   …and aborts the chain. The next scheduled run will pick up cleanly because
+   the reset phase is idempotent. Grep for `[db-reset] aborted` to find
+   failed runs.
 
 ### Rotate the secret
 
