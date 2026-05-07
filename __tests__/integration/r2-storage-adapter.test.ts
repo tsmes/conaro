@@ -69,7 +69,15 @@ describe("R2StorageAdapter", () => {
       stubValidEnv();
       vi.stubEnv("R2_BUCKET", "");
       vi.stubEnv("R2_PUBLIC_URL", "");
-      expect(() => new R2StorageAdapter()).toThrow(/R2_BUCKET/);
+      // Both names appear in the same error message.
+      expect(() => new R2StorageAdapter()).toThrow(
+        /R2_BUCKET.*R2_PUBLIC_URL|R2_PUBLIC_URL.*R2_BUCKET/
+      );
+    });
+
+    it("treats whitespace-only values as missing", () => {
+      stubValidEnv();
+      vi.stubEnv("R2_PUBLIC_URL", "   ");
       expect(() => new R2StorageAdapter()).toThrow(/R2_PUBLIC_URL/);
     });
   });

@@ -73,7 +73,10 @@ Steps for a fresh service:
    - `AUTH_TRUST_HOST=true` — required behind Railway's HTTPS proxy
    - `CRON_SECRET` — any random string; used to authenticate cron calls
    - `STORAGE_DRIVER=r2` — production uses Cloudflare R2 for image
-     storage (see "R2 storage" below for the rest of the variables)
+     storage. **Don't deploy until you've also set the five `R2_*`
+     variables below.** Setting `STORAGE_DRIVER=r2` without the rest
+     of the R2 config crashes the server at boot with a clear error
+     naming the missing variables.
    `DATABASE_URL` is already wired up by the Postgres plugin.
 4. Set up R2 storage and configure the `R2_*` variables (see
    "R2 storage" section below). Run the smoke test against a dev
@@ -162,6 +165,22 @@ bucket's actual CDN domain. The upload itself (step 4) succeeds
 even when only the public-read side is broken — the asymmetry is a
 common source of "uploads work but images don't show" bugs, hence
 the explicit step-5 verification.
+
+### After the first R2 deploy: existing rows render broken until reseed
+
+DB rows from before the R2 cutover reference storage keys that no
+longer exist (Railway wiped the local `./uploads` on the same
+deploy that switched the adapter). They will render as broken
+images in the UI until the demo db-reset cron next runs — the
+reset re-uploads everything to R2 from `scripts/seed-assets/`.
+
+To fix immediately, trigger a manual run from cron-job.org's "Run
+now" on the db-reset job. The `[db-reset]` log lines on Railway
+confirm the reseed completed.
+
+This is expected behavior, not a misconfiguration. If broken
+images persist *after* a successful db-reset run, then the public
+URL or bucket access is misconfigured (see the smoke test above).
 
 ## Cron setup (events lifecycle)
 

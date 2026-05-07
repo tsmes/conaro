@@ -1,3 +1,9 @@
+// Local-storage serving route. Reachable only when STORAGE_DRIVER
+// is "local" (or unset): LocalStorageAdapter.getUrl() returns
+// "/api/uploads/${key}" which routes here. In R2 mode getUrl()
+// returns absolute CDN URLs and this route is never hit. Kept
+// alongside R2 because local mode remains a supported development
+// backend.
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";

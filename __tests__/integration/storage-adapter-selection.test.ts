@@ -28,8 +28,14 @@ function stubR2Env() {
 
 describe("storage adapter selection", () => {
   beforeEach(() => {
-    // Default both vars to a clean slate; each case overrides.
+    // Clean slate for every case: STORAGE_DRIVER unset and every
+    // R2_* var empty. Cases that need R2 to be configured opt in
+    // via stubR2Env(). Defends against shell pollution and any
+    // future test env file that might surface R2 values.
     vi.stubEnv("STORAGE_DRIVER", "");
+    for (const k of Object.keys(VALID_R2_ENV)) {
+      vi.stubEnv(k, "");
+    }
   });
 
   afterEach(() => {
