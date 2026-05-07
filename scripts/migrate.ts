@@ -34,10 +34,12 @@ async function run() {
       process.env.NODE_ENV === "test" ? " (test)" : ""
     }…`
   );
-  await migrate(db, { migrationsFolder: "./src/lib/db/migrations" });
-  console.log("Migrations applied.");
-
-  await pool.end();
+  try {
+    await migrate(db, { migrationsFolder: "./src/lib/db/migrations" });
+    console.log("Migrations applied.");
+  } finally {
+    await pool.end();
+  }
 }
 
 run().catch((err) => {
