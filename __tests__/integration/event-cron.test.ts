@@ -174,10 +174,10 @@ describe("cron /api/cron/events/tick", () => {
         const matchingCalls = infoSpy.mock.calls.filter(
           (args) =>
             typeof args[0] === "string" &&
-            (args[0] as string).startsWith("[cron/events/tick]")
+            args[0].startsWith("[cron/events/tick]")
         );
         expect(matchingCalls).toHaveLength(1);
-        const line = matchingCalls[0][0] as string;
+        const line = matchingCalls[0][0];
         expect(line).toContain("opened=1");
         expect(line).toContain("closed=0");
         expect(line).toContain("floorPlansPublished=0");
@@ -196,10 +196,10 @@ describe("cron /api/cron/events/tick", () => {
         const matchingCalls = infoSpy.mock.calls.filter(
           (args) =>
             typeof args[0] === "string" &&
-            (args[0] as string).startsWith("[cron/events/tick]")
+            args[0].startsWith("[cron/events/tick]")
         );
         expect(matchingCalls).toHaveLength(1);
-        const line = matchingCalls[0][0] as string;
+        const line = matchingCalls[0][0];
         expect(line).toContain("opened=0");
         expect(line).toContain("closed=0");
         expect(line).toContain("floorPlansPublished=0");
