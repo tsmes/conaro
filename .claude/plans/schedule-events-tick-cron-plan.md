@@ -44,9 +44,11 @@ Emit a single summary log line at the end of every successful tick run, includin
 
 **Depends on:** none
 
-### 2. Update README cron section into a complete operator checklist
+### 2. Update README cron section into a complete operator checklist ✅
 
 Tighten the existing "Cron setup (events lifecycle)" section so it (a) reads as a self-contained operator checklist and (b) explains how to use the new heartbeat log line for verification.
+
+**Status:** Completed. Restructured the section into two H3 subsections: `Configure cron-job.org` (account → job config → save) and `Verify` (cron-job.org history + Railway log grep for `[cron/events/tick]`). The verification step explicitly references the heartbeat line introduced in task 1, including the no-op behavior so absence of recent lines is recognized as a missed schedule. Failure-alerting and secret rotation were intentionally omitted per spec scope.
 
 **Requirements:** REQ-4
 

@@ -84,19 +84,41 @@ Steps for a fresh service:
 The events lifecycle (transitioning events between `published`,
 `accepting_applications`, `reviewing`, etc. based on dates) is driven by an
 HTTP endpoint at `/api/cron/events/tick`. It needs to be hit on a schedule by
-an external scheduler — Railway-internal cron is not used.
+an external scheduler — Railway-internal cron is not used. Recommended:
+<https://cron-job.org> (free tier is enough).
 
-Recommended scheduler: <https://cron-job.org> (free tier is enough).
+### Configure cron-job.org
 
 1. Sign up for cron-job.org.
-2. Create a new cron job:
+2. Create a new cron job with:
    - **URL**: `https://<service>.up.railway.app/api/cron/events/tick`
    - **Method**: GET
-   - **Headers**: `Authorization: Bearer <CRON_SECRET value>`
-   - **Schedule**: every hour at `:00` is plenty (the endpoint is idempotent
-     and the underlying date comparison is day-granularity).
-3. Confirm successful runs by checking the job's history in cron-job.org and
-   tailing the Railway service logs.
+   - **Headers**: `Authorization: Bearer <CRON_SECRET value>` (use the same
+     value set on the Railway service)
+   - **Schedule**: every hour at `:00`. The endpoint is idempotent and its
+     date comparisons are day-granular, so hourly is the practical floor of
+     usefulness.
+3. Save and enable the job.
+
+### Verify
+
+After enabling the job, confirm runs are landing on the service:
+
+1. **In cron-job.org**: open the job's history. Each scheduled run should
+   show a 2xx response. 4xx means the bearer token is wrong or the route is
+   misconfigured; 5xx means the handler errored — check Railway logs.
+2. **In Railway logs**: tail the service log and look for lines matching
+   `[cron/events/tick]`. Each invocation produces a single heartbeat line
+   like:
+
+   ```
+   [cron/events/tick] opened=0 closed=0 floorPlansPublished=0
+   ```
+
+   The line is emitted on **every** run including no-ops. If the cron-job.org
+   history shows recent runs but Railway logs have no matching heartbeat
+   lines (or vice versa), the two ends are out of sync — investigate before
+   relying on the schedule.
 
 ## Known limitations
 
