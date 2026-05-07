@@ -120,6 +120,81 @@ After enabling the job, confirm runs are landing on the service:
    lines (or vice versa), the two ends are out of sync — investigate before
    relying on the schedule.
 
+## Demo database reset cron
+
+A second cron endpoint at `/api/cron/db-reset` can wipe and re-seed the demo
+database on a 24-hour schedule so demos always start from a known state. It is
+**inert by default**: even with the bearer token, the route refuses to do
+anything unless `ENABLE_DB_RESET=true` is also set on the service. Only enable
+this on a dedicated demo Railway service. **Setting `ENABLE_DB_RESET=true` on
+a real production environment will allow demo data to wipe the production
+database on a schedule.**
+
+### Configure on a demo Railway service
+
+1. In the demo service's **Variables** tab, set:
+   - `CRON_RESET_SECRET` — generate with `openssl rand -base64 32`. Must be
+     different from `CRON_SECRET` so the events tick token can't trigger a
+     reset.
+   - `ENABLE_DB_RESET=true` — the opt-in guard.
+2. Redeploy so the new variables take effect.
+
+### Configure cron-job.org
+
+1. Create a second cron job with:
+   - **URL**: `https://<demo-service>.up.railway.app/api/cron/db-reset`
+   - **Method**: POST
+   - **Headers**: `Authorization: Bearer <CRON_RESET_SECRET value>`
+   - **Schedule**: once every 24 hours, e.g. daily at 04:00 UTC.
+2. Save and enable the job.
+
+### Verify
+
+The endpoint accepts the request asynchronously: it returns `202 Accepted`
+within a few seconds and then does the reset+seed work in the background
+(image processing for ~100 portfolios takes a few minutes). The 202 response
+in cron-job.org's history only confirms the work was *started*, not that it
+finished.
+
+To confirm a run completed:
+
+1. **In Railway logs**: tail the demo service log and look for lines starting
+   with `[db-reset]`. A successful run produces:
+
+   ```
+   [db-reset] start
+   [db-reset] phase=reset starting
+   [db-reset] phase=reset done ms=...
+   [db-reset] phase=conventions starting
+   [db-reset] phase=conventions done ms=...
+   [db-reset] phase=artists starting
+   [db-reset] phase=artists done ms=...
+   [db-reset] phase=applications starting
+   [db-reset] phase=applications done ms=...
+   [db-reset] complete ms=...
+   ```
+
+2. A failure logs `[db-reset] phase=<name> failed` and aborts the chain. The
+   next scheduled run will pick up cleanly because the reset phase is
+   idempotent.
+
+### Rotate the secret
+
+1. In the Railway service's Variables tab, set `CRON_RESET_SECRET` to a new
+   value and redeploy.
+2. Update the `Authorization` header on the cron-job.org job to match.
+3. Trigger a manual run from cron-job.org to confirm the new value works.
+
+### Operational notes
+
+- **Don't run two resets concurrently.** There is no concurrency lock; an
+  overlapping manual "Run now" from cron-job.org while the previous run is
+  still seeding will race on the same database.
+- **Storage files are not cleaned up.** `LocalStorageAdapter` writes to
+  `./uploads` which Railway already wipes on redeploy, so this is
+  self-correcting today. If R2 is wired in later, orphaned files in R2 will
+  need a separate cleanup pass.
+
 ## Known limitations
 
 The first Railway deploy uses stub adapters for the file-bound integrations:
