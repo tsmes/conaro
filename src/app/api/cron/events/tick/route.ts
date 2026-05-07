@@ -174,5 +174,9 @@ export async function GET(request: NextRequest) {
     }
   }
 
+  console.info(
+    `[cron/events/tick] opened=${opened} closed=${closed} floorPlansPublished=${floorPlansPublished}`
+  );
+
   return NextResponse.json({ opened, closed, floorPlansPublished });
 }

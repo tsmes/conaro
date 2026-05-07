@@ -149,6 +149,66 @@ describe("cron /api/cron/events/tick", () => {
     expect(updated.status).toBe("accepting_applications");
   });
 
+  describe("heartbeat log line", () => {
+    it("logs a single info line with the run counters when work is performed", async () => {
+      const { convention } = await createTestOrganizer();
+      const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000)
+        .toISOString()
+        .slice(0, 10);
+      const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000)
+        .toISOString()
+        .slice(0, 10);
+
+      await createTestEvent(convention.id, {
+        status: "published",
+        applicationOpenDate: yesterday,
+        applicationCloseDate: tomorrow,
+      });
+
+      const infoSpy = vi.spyOn(console, "info").mockImplementation(() => {});
+      try {
+        const secret = process.env.CRON_SECRET!;
+        const response = await GET(makeRequest(`Bearer ${secret}`));
+        expect(response.status).toBe(200);
+
+        const matchingCalls = infoSpy.mock.calls.filter(
+          (args) =>
+            typeof args[0] === "string" &&
+            (args[0] as string).startsWith("[cron/events/tick]")
+        );
+        expect(matchingCalls).toHaveLength(1);
+        const line = matchingCalls[0][0] as string;
+        expect(line).toContain("opened=1");
+        expect(line).toContain("closed=0");
+        expect(line).toContain("floorPlansPublished=0");
+      } finally {
+        infoSpy.mockRestore();
+      }
+    });
+
+    it("logs the heartbeat line on no-op runs (all counters zero)", async () => {
+      const infoSpy = vi.spyOn(console, "info").mockImplementation(() => {});
+      try {
+        const secret = process.env.CRON_SECRET!;
+        const response = await GET(makeRequest(`Bearer ${secret}`));
+        expect(response.status).toBe(200);
+
+        const matchingCalls = infoSpy.mock.calls.filter(
+          (args) =>
+            typeof args[0] === "string" &&
+            (args[0] as string).startsWith("[cron/events/tick]")
+        );
+        expect(matchingCalls).toHaveLength(1);
+        const line = matchingCalls[0][0] as string;
+        expect(line).toContain("opened=0");
+        expect(line).toContain("closed=0");
+        expect(line).toContain("floorPlansPublished=0");
+      } finally {
+        infoSpy.mockRestore();
+      }
+    });
+  });
+
   describe("auto-publish floor plan", () => {
     function ymdOffset(days: number): string {
       return new Date(Date.now() + days * 86_400_000)
