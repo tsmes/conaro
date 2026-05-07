@@ -17,6 +17,8 @@
  * That blows away pgdata entirely. This script is the gentler option.
  */
 
+import "./lib/env";
+
 import { eq } from "drizzle-orm";
 import { db } from "../src/lib/db";
 import { users } from "../src/lib/db/schema/auth";

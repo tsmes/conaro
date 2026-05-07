@@ -14,6 +14,8 @@
  *   organizer review UI has something to render.
  */
 
+import "./lib/env";
+
 import { and, eq, inArray } from "drizzle-orm";
 import { db } from "../src/lib/db";
 import { applications } from "../src/lib/db/schema/applications";

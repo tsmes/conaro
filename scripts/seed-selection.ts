@@ -8,6 +8,8 @@
  * organizer (seed-organizer@conaro.test) only.
  */
 
+import "./lib/env";
+
 import { eq } from "drizzle-orm";
 
 import { hashPassword } from "../src/lib/auth/helpers";

@@ -27,6 +27,7 @@
     "@dnd-kit/sortable": "10.0.0",
     "@dnd-kit/utilities": "3.2.2",
     "@hookform/resolvers": "5.0.1",
+    "@next/env": "16.2.3",
     "@tiptap/extension-placeholder": "3.22.4",
     "@tiptap/pm": "3.22.4",
     "@tiptap/react": "3.22.4",

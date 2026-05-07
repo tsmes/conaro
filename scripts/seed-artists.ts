@@ -15,6 +15,8 @@
  * All accounts use password "seed-pass-123".
  */
 
+import "./lib/env";
+
 import {
   SEED_ARTIST_DOMAIN,
   SEED_PASSWORD,

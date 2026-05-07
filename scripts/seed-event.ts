@@ -12,6 +12,8 @@
  * immediately submit applications via the apply-seed script.
  */
 
+import "./lib/env";
+
 import { eq, ilike } from "drizzle-orm";
 import { db } from "../src/lib/db";
 import { conventions } from "../src/lib/db/schema/conventions";

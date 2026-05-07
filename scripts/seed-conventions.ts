@@ -14,6 +14,8 @@
  * sharing the standard SEED_PASSWORD ("seed-pass-123").
  */
 
+import "./lib/env";
+
 import fs from "node:fs";
 import path from "node:path";
 import { eq } from "drizzle-orm";
