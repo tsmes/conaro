@@ -32,7 +32,21 @@ import {
 // before the per-convention organizer split.
 const LEGACY_SELECTION_ORGANIZER_EMAIL = "demo-organizer@conaro.test";
 
-async function run() {
+export interface RunResetSeedDataOptions {
+  logger?: (msg: string) => void;
+}
+
+export interface RunResetSeedDataResult {
+  deleted: number;
+  total: number;
+  emails: string[];
+}
+
+export async function runResetSeedData(
+  opts: RunResetSeedDataOptions = {}
+): Promise<RunResetSeedDataResult> {
+  const log = opts.logger ?? (() => {});
+
   const all = await db.select({ id: users.id, email: users.email }).from(users);
 
   const targets = all.filter(
@@ -42,28 +56,40 @@ async function run() {
       u.email === LEGACY_SELECTION_ORGANIZER_EMAIL
   );
 
-  console.log(
+  log(
     `Found ${targets.length} seed user(s) to delete (of ${all.length} total)…`
   );
 
   for (const target of targets) {
     await db.delete(users).where(eq(users.id, target.id));
-    console.log(`  - ${target.email}`);
+    log(`  - ${target.email}`);
   }
 
-  console.log("");
-  console.log(`  Deleted: ${targets.length} user(s)`);
-  console.log(
+  log("");
+  log(`  Deleted: ${targets.length} user(s)`);
+  log(
     "  Storage: convention/event/portfolio files in storage are NOT removed."
   );
-  console.log(
-    "  Re-run db:seed:conventions / db:seed:artists to re-populate."
-  );
+  log("  Re-run db:seed:conventions / db:seed:artists to re-populate.");
+
+  return {
+    deleted: targets.length,
+    total: all.length,
+    emails: targets.map((t) => t.email),
+  };
 }
 
-run()
-  .then(() => process.exit(0))
-  .catch((err) => {
-    console.error(err);
-    process.exit(1);
-  });
+// Run when invoked directly via `tsx scripts/seed-reset.ts`.
+const isDirectInvocation =
+  typeof process !== "undefined" &&
+  process.argv[1] &&
+  process.argv[1].endsWith("seed-reset.ts");
+
+if (isDirectInvocation) {
+  runResetSeedData({ logger: (msg) => console.log(msg) })
+    .then(() => process.exit(0))
+    .catch((err) => {
+      console.error(err);
+      process.exit(1);
+    });
+}
