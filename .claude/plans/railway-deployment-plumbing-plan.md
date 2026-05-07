@@ -195,9 +195,11 @@ Document every env var an operator must provide on Railway, with a placeholder a
 
 ---
 
-### 6. Create `README.md` with deploy guide
+### 6. Create `README.md` with deploy guide ✅
 
 The single piece of operator-facing documentation. Walks a reader from "fresh clone" to "deployed on Railway with cron firing." Includes the cron-job.org setup the spec calls for.
+
+**Status:** Completed. README under target length (117 lines). Sections: project blurb, tech stack, local dev (docker-compose + db:migrate + optional seed + dev), tests, Railway deploy walkthrough (Postgres plugin, env vars, deploy log expectations, smoke check), cron-job.org setup for `/api/cron/events/tick`, and a "Known limitations" section calling out the ephemeral uploads / console-only email situation so operators don't get surprised in production.
 
 **Requirements:** REQ-7, REQ-5 (cron documentation), REQ-1 (SSL documentation)
 
