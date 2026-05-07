@@ -12,17 +12,15 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 
-// Client-safe URL helper. The storage adapter lives server-side
-// (it imports fs/promises for the local backend), so we can't
-// import it from a client component without breaking the build.
-// Mirrors `LocalStorageAdapter#getUrl`.
-function uploadUrl(key: string): string {
-  return `/api/uploads/${key}`;
-}
-
 interface GuestsEditorProps {
   eventId: string;
   initialGuests: Guest[];
+  // URLs precomputed by the parent server component for guests that
+  // already have an imagePath. Keyed by imagePath. The client doesn't
+  // construct storage URLs — this keeps the storage adapter (which
+  // imports fs/promises for the local backend, or the AWS SDK for
+  // R2) confined to server code.
+  guestImageUrls: Record<string, string>;
 }
 
 interface SocialDraft {
@@ -38,6 +36,11 @@ interface GuestDraft extends Guest {
   // socialLinks is optional on Guest; the editor materialises an
   // empty array when the guest has none, so the row UI can append.
   socialLinks: SocialDraft[];
+  // URL of a freshly-uploaded portrait, returned by the upload route
+  // before the form is saved. Stripped on serialise — the persisted
+  // shape stores the imagePath only and URLs are reconstructed on
+  // the next render.
+  _uploadedUrl?: string;
 }
 
 function newId(): string {
@@ -57,16 +60,19 @@ function toDraft(g: Guest): GuestDraft {
 function toGuest(d: GuestDraft): Guest {
   // Drop empty social rows on serialise so the server doesn't see
   // `{type: "Instagram", url: ""}` ghosts. Strip `_key` — it's a
-  // UI-only handle, not part of the persisted shape.
+  // UI-only handle, not part of the persisted shape. Strip
+  // `_uploadedUrl` — the server stores imagePath only.
   const cleaned = d.socialLinks
     .filter((s) => s.type.trim().length > 0 && s.url.trim().length > 0)
     .map(({ _key: _, ...rest }) => rest);
-  return { ...d, socialLinks: cleaned.length > 0 ? cleaned : undefined };
+  const { _uploadedUrl: _ignored, ...rest } = d;
+  return { ...rest, socialLinks: cleaned.length > 0 ? cleaned : undefined };
 }
 
 export function GuestsEditor({
   eventId,
   initialGuests,
+  guestImageUrls,
 }: GuestsEditorProps) {
   const [guests, setGuests] = useState<GuestDraft[]>(() =>
     initialGuests.map(toDraft)
@@ -156,8 +162,23 @@ export function GuestsEditor({
                   <GuestImageField
                     eventId={eventId}
                     imagePath={guest.imagePath}
-                    onChange={(imagePath) =>
-                      updateGuest(index, { imagePath })
+                    previewUrl={
+                      guest._uploadedUrl ??
+                      (guest.imagePath
+                        ? guestImageUrls[guest.imagePath] ?? null
+                        : null)
+                    }
+                    onUploaded={({ imagePath, url }) =>
+                      updateGuest(index, {
+                        imagePath,
+                        _uploadedUrl: url,
+                      })
+                    }
+                    onCleared={() =>
+                      updateGuest(index, {
+                        imagePath: undefined,
+                        _uploadedUrl: undefined,
+                      })
                     }
                   />
                   <div className="space-y-3">
@@ -316,13 +337,17 @@ export function GuestsEditor({
 interface GuestImageFieldProps {
   eventId: string;
   imagePath?: string;
-  onChange: (imagePath: string | undefined) => void;
+  previewUrl: string | null;
+  onUploaded: (data: { imagePath: string; url: string }) => void;
+  onCleared: () => void;
 }
 
 function GuestImageField({
   eventId,
   imagePath,
-  onChange,
+  previewUrl,
+  onUploaded,
+  onCleared,
 }: GuestImageFieldProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -346,15 +371,13 @@ function GuestImageField({
         setError("error" in data ? data.error : "Upload failed");
         return;
       }
-      onChange(data.storagePath);
+      onUploaded({ imagePath: data.storagePath, url: data.url });
     } catch {
       setError("Upload failed");
     } finally {
       setUploading(false);
     }
   };
-
-  const previewUrl = imagePath ? uploadUrl(imagePath) : null;
 
   return (
     <div className="space-y-1.5">
@@ -398,7 +421,7 @@ function GuestImageField({
             type="button"
             size="sm"
             variant="ghost"
-            onClick={() => onChange(undefined)}
+            onClick={onCleared}
             className="text-destructive"
           >
             <X className="size-3.5" />
