@@ -12,9 +12,10 @@ import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { Pool } from "pg";
 
 // Must flip NODE_ENV before loadEnvConfig so it picks the test env file
-// instead of the dev one.
+// instead of the dev one. Object.assign avoids the readonly NODE_ENV
+// constraint that @types/node + Next's augmentation impose.
 if (process.argv.includes("--test")) {
-  process.env.NODE_ENV = "test";
+  Object.assign(process.env, { NODE_ENV: "test" });
 }
 
 loadEnvConfig(process.cwd());
