@@ -89,9 +89,11 @@ Add the migration script that will be used both locally (`npm run db:migrate`) a
 
 ---
 
-### 3. Drop `--env-file` from npm scripts; switch to programmatic runner
+### 3. Drop `--env-file` from npm scripts; switch to programmatic runner ✅
 
 Cut over the script surface to the new env-loading mechanism. After this task, all scripts work both locally (via `loadEnvConfig` reading `.env.local` or `.env.test`) and on Railway (via platform env vars).
+
+**Status:** Completed. All `db:*` scripts and `test`/`test:watch` rewritten to bare `tsx`/`drizzle-kit`/`vitest` invocations. `db:migrate` now points at the programmatic runner; `db:migrate:test` uses the `--test` flag. Verified locally: `npm run db:migrate`, `npm run db:migrate:test`, and `npm test` (all 567 tests passing) all work without any --env-file flag in scripts. The pre-existing `db:seed:applications` and `db:reset-and-seed` entries from in-flight work were left unstaged in this commit (their seed-applications.ts source file is also untracked); when that work lands the rewritten forms (without --env-file) will go with it.
 
 **Requirements:** REQ-3, REQ-2
 
