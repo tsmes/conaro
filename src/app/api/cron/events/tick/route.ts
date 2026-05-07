@@ -1,18 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { timingSafeEqual } from "crypto";
 import { and, eq, isNull, lte, lt, isNotNull } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { events } from "@/lib/db/schema/events";
 import { notifyEventOpened } from "@/lib/notifications/triggers";
+import { secureCompare } from "@/lib/auth/secure-compare";
 
 export const dynamic = "force-dynamic";
-
-function secureCompare(a: string, b: string): boolean {
-  const ab = Buffer.from(a);
-  const bb = Buffer.from(b);
-  if (ab.length !== bb.length) return false;
-  return timingSafeEqual(ab, bb);
-}
 
 export async function GET(request: NextRequest) {
   const secret = process.env.CRON_SECRET;
