@@ -52,9 +52,11 @@ Wire `loadEnvConfig` into every entry point that runs outside Next.js (drizzle c
 
 ---
 
-### 2. Programmatic migration runner
+### 2. Programmatic migration runner ✅
 
 Add the migration script that will be used both locally (`npm run db:migrate`) and as Railway's pre-deploy command. Doesn't replace anything yet — additive.
+
+**Status:** Completed. `scripts/migrate.ts` implemented using `drizzle-orm/node-postgres/migrator` with a `--test` flag that flips `NODE_ENV` before `loadEnvConfig`. Verified locally: default run applies migrations against the dev DB; `--test` run targets `conaro_test` (23 migrations present in `drizzle.__drizzle_migrations`). Idempotent — re-running on an already-migrated DB exits 0 with no errors.
 
 **Requirements:** REQ-2
 
