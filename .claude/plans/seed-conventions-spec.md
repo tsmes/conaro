@@ -50,7 +50,7 @@ Seeder must run sharp through the same `processImage()` helper used for live upl
 
 ## Suggested split
 
-- `npm run db:seed:conventions` — creates a seed organizer per convention (idempotent: `seed-organizer-<slug>@seed-organizer.conaro.test`), inserts the convention row, uploads logo + banner + banner-mobile, sets header_color, optionally seeds 1–2 events per convention.
+- `npm run db:seed:conventions` — creates a seed organizer per convention (idempotent: `<slug>@conaro.test`), inserts the convention row, uploads logo + banner + banner-mobile, sets header_color, optionally seeds 1–2 events per convention.
 - Extend `npm run db:seed:artists` with `--with-portfolios` flag that picks N images from `scripts/seed-assets/artists/<n>/` per artist and writes `portfolio_images` rows.
 
 ## Acceptance

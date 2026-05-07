@@ -33,17 +33,17 @@ Decision (from user): all 25 cons get synthetic-but-plausible guests and program
 
 ### Tasks
 
-- [ ] A2.1. Curate 12 CC0 portraits from Pexels/Unsplash; write `LICENSES.md`.
-- [ ] A2.2. Extend manifest README with `guests[]` and `programme[]` schema.
-- [ ] A2.3. Add Zod schema entries for the new fields and update `loadConventionManifests()`.
-- [ ] A2.4. Author guests + programme entries for all 25 manifests (4–6 guests, 10–18 programme items per event day).
+- [x] A2.1. Curate 12 CC0 portraits from Pexels/Unsplash; write `LICENSES.md`.
+- [x] A2.2. Extend manifest README with `guests[]` and `programme[]` schema.
+- [x] A2.3. Add Zod schema entries for the new fields and update `loadConventionManifests()`.
+- [x] A2.4. Author guests + programme entries for all 25 manifests (4–6 guests, 10–18 programme items per event day).
 
 ## Phase B — `npm run db:seed:conventions`
 
 New file `scripts/seed-conventions.ts`. Helpers added to `scripts/lib/seed.ts`:
 
-- `SEED_ORGANIZER_DOMAIN = "seed-organizer.conaro.test"`
-- `ensureSeedOrganizer({ slug, name }, passwordHash)` — idempotent: looks up the organizer profile by `email = seed-organizer-<slug>@…`, creates if missing.
+- `SEED_ORGANIZER_DOMAIN = "conaro.test"`
+- `ensureSeedOrganizer({ slug, name }, passwordHash)` — idempotent: looks up the organizer profile by `email = <slug>@…`, creates if missing.
 - `loadConventionManifests()` — reads every `scripts/seed-assets/conventions/*/manifest.json`, validates with a Zod schema, skips folders without a manifest.
 - `uploadConventionAsset(conventionId, kind, filePath, sourceFilename)` — reads the file, runs through `processImage()`, calls `storage.upload()` to `conventions/<id>/<kind>.webp`, returns the storage path.
 
@@ -62,10 +62,10 @@ Add npm script `"db:seed:conventions": "tsx scripts/seed-conventions.ts"` to `pa
 
 ### Tasks
 
-- [ ] B1. Add `SEED_ORGANIZER_DOMAIN` + `ensureSeedOrganizer` to `scripts/lib/seed.ts`.
-- [ ] B2. Add manifest loader + Zod schema (`scripts/lib/conventions-manifest.ts`).
-- [ ] B3. Implement `scripts/seed-conventions.ts` main loop.
-- [ ] B4. Add `db:seed:conventions` npm script.
+- [x] B1. Add `SEED_ORGANIZER_DOMAIN` + `ensureSeedOrganizer` to `scripts/lib/seed.ts`.
+- [x] B2. Add manifest loader + Zod schema (`scripts/lib/conventions-manifest.ts`).
+- [x] B3. Implement `scripts/seed-conventions.ts` main loop.
+- [x] B4. Add `db:seed:conventions` npm script.
 - [ ] B5. Smoke-test on local DB: run the script, verify rows + storage; rerun, verify no duplicates.
 
 ## Phase C — `db:seed:artists -- --with-portfolios`

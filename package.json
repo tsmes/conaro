@@ -20,6 +20,8 @@
     "db:seed:reset": "tsx scripts/seed-reset.ts",
     "db:seed:event": "tsx scripts/seed-event.ts",
     "db:seed:apply": "tsx scripts/seed-apply.ts",
+    "db:seed:applications": "tsx scripts/seed-applications.ts",
+    "db:reset-and-seed": "npm run db:seed:reset && npm run db:seed:conventions && npm run db:seed:artists -- --with-portfolios 100 && npm run db:seed:applications",
     "test": "vitest run",
     "test:watch": "vitest"
   },

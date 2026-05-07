@@ -3,7 +3,7 @@
  *
  *   npm run db:seed:reset
  *
- * Targets users whose email ends with `@seed-organizer.conaro.test`,
+ * Targets users whose email ends with `@conaro.test`,
  * `@seed-artist.conaro.test`, or matches the legacy seed-selection
  * organizer email. ON DELETE CASCADE walks through profiles into
  * conventions, events, applications, and portfolio_images, so deleting

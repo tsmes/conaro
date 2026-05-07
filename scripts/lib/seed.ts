@@ -32,8 +32,8 @@ import {
 } from "./portfolio-manifest";
 
 export const SEED_PASSWORD = "seed-pass-123";
-export const SEED_ARTIST_DOMAIN = "seed-artist.conaro.test";
-export const SEED_ORGANIZER_DOMAIN = "seed-organizer.conaro.test";
+export const SEED_ARTIST_DOMAIN = "conaro.test";
+export const SEED_ORGANIZER_DOMAIN = "conaro.test";
 
 const FIRST_NAMES = [
   "Mika", "Jun", "Clara", "Marcus", "Isolde", "Rafael", "Fenna", "Priya",
@@ -274,7 +274,7 @@ export async function ensureSeedOrganizer(
   args: { slug: string; name: string },
   passwordHash: string
 ): Promise<SeedOrganizerIds> {
-  const email = `seed-organizer-${args.slug}@${SEED_ORGANIZER_DOMAIN}`;
+  const email = `${args.slug}@${SEED_ORGANIZER_DOMAIN}`;
 
   const [existingUser] = await db
     .select()
