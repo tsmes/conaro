@@ -129,9 +129,11 @@ Cut over the script surface to the new env-loading mechanism. After this task, a
 
 ---
 
-### 4. Add Railway deploy config and Node version pin
+### 4. Add Railway deploy config and Node version pin ✅
 
 The smallest config that gives Railway deterministic build/release/start commands and a fixed Node version. After this task, a Railway service connected to `main` with the right env vars set will build and deploy correctly.
+
+**Status:** Completed. `railway.json` written using Railway's current schema (verified via docs.railway.com): `RAILPACK` builder (NIXPACKS has been replaced by RAILPACK as Railway's default builder; the original plan referenced NIXPACKS which is no longer documented). `preDeployCommand` is the array form `["npm run db:migrate"]`. `engines.node` set to `>=20.10.0` in `package.json`. JSON validates; `npm install` does not warn on the engines field.
 
 **Requirements:** REQ-2, REQ-7 (partial — doc lives in task 6)
 
