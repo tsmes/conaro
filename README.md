@@ -72,12 +72,96 @@ Steps for a fresh service:
    - `AUTH_SECRET` — generate with `openssl rand -base64 32`
    - `AUTH_TRUST_HOST=true` — required behind Railway's HTTPS proxy
    - `CRON_SECRET` — any random string; used to authenticate cron calls
+   - `STORAGE_DRIVER=r2` — production uses Cloudflare R2 for image
+     storage (see "R2 storage" below for the rest of the variables)
    `DATABASE_URL` is already wired up by the Postgres plugin.
-4. Deploy. Watch the deploy logs to confirm the pre-deploy step ran
+4. Set up R2 storage and configure the `R2_*` variables (see
+   "R2 storage" section below). Run the smoke test against a dev
+   bucket before this first deploy.
+5. Deploy. Watch the deploy logs to confirm the pre-deploy step ran
    `npm run db:migrate` and the app started.
-5. Visit the Railway-provided URL (`<service>.up.railway.app`) and verify the
+6. Visit the Railway-provided URL (`<service>.up.railway.app`) and verify the
    homepage loads, then register a new account to confirm Auth.js + DB writes
    are working end to end.
+
+## R2 storage
+
+User-uploaded images (portfolios, convention banners, application
+snapshots, guest portraits) are persisted to Cloudflare R2 in
+production. Railway's container filesystem is ephemeral — every
+redeploy wipes any local `./uploads` directory — so R2 is required
+for any deployment that needs uploads to survive a deploy.
+
+Local development can keep `STORAGE_DRIVER=local` (or unset); the
+`LocalStorageAdapter` writes to `./uploads` and serves files via
+`/api/uploads/[...path]`. Both adapters implement the same
+interface, so swapping is config-only.
+
+### Set up an R2 bucket
+
+1. In the Cloudflare dashboard, go to **R2** and create a new bucket
+   (e.g. `conaro-prod`). Note the bucket name.
+2. Enable public access for the bucket. Either:
+   - Use the auto-provisioned `*.r2.dev` subdomain (simplest for
+     demos), or
+   - Connect a custom domain through Cloudflare DNS for a
+     production-grade CDN URL (e.g. `cdn.conaro.no`). The custom
+     domain must be in a Cloudflare-managed zone.
+   The resulting public URL is what the app uses to serve images
+   from `<img src>` tags.
+3. Create an R2 API token under **R2 → Manage R2 API Tokens**. The
+   token needs **Object Read & Write** scope on this bucket. Save
+   the **Access Key ID** and **Secret Access Key** — Cloudflare
+   only shows the secret once.
+4. Find your **Account ID** in the R2 sidebar of the Cloudflare
+   dashboard.
+
+### Configure on Railway
+
+Set these five variables on the service alongside the others above:
+
+- `R2_ACCOUNT_ID` — Cloudflare account ID
+- `R2_ACCESS_KEY_ID` — from the R2 API token
+- `R2_SECRET_ACCESS_KEY` — from the R2 API token
+- `R2_BUCKET` — bucket name (e.g. `conaro-prod`)
+- `R2_PUBLIC_URL` — the bucket's public CDN URL with **no trailing
+  slash**, e.g. `https://pub-abc123.r2.dev` or
+  `https://cdn.conaro.no`
+
+Setting `STORAGE_DRIVER=r2` without all five `R2_*` variables
+crashes the server at boot with a clear error naming the missing
+ones — the route handlers never see a misconfigured client.
+
+### Smoke test (mandatory before first deploy)
+
+Mocked tests cover the adapter's command shapes but cannot catch
+issues with bucket permissions, custom-domain DNS, content-type
+delivery, or CORS. Run this end-to-end smoke test against a dev
+bucket before the first production deploy and after any R2
+configuration change:
+
+1. Create a separate dev R2 bucket (e.g. `conaro-dev`) with the
+   same public-access setup.
+2. In `.env.local`, set `STORAGE_DRIVER=r2` and the five `R2_*`
+   variables pointing at the dev bucket.
+3. Run `npm run dev`. The server should boot without errors.
+4. Open the app, log in as a seed artist (or register a new
+   account), navigate to **Dashboard → Profile**, and upload a
+   portfolio image.
+5. Verify in the browser that the image renders. Inspect the
+   `<img src>` value — it must be `${R2_PUBLIC_URL}/portfolios/...`
+   (not `/api/uploads/...`).
+6. In the Cloudflare R2 dashboard, confirm the object exists at the
+   expected key (`portfolios/{profileId}/{imageId}.webp`).
+7. Document the smoke-test result in the PR description so future
+   infrastructure changes can be re-verified the same way.
+
+If step 5's image fails to render: typically the bucket's public
+access is misconfigured, or `R2_PUBLIC_URL` doesn't match the
+bucket's actual CDN domain. The upload itself (step 4) succeeds
+even when only the public-read side is broken — the asymmetry is a
+common source of "uploads work but images don't show" bugs, hence
+the explicit step-5 verification.
 
 ## Cron setup (events lifecycle)
 
