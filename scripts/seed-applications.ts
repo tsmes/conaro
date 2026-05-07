@@ -243,7 +243,24 @@ function responseMessageFor(status: SeededStatus): string | null {
   }
 }
 
-async function run() {
+export interface RunSeedApplicationsOptions {
+  logger?: (msg: string) => void;
+}
+
+export interface RunSeedApplicationsResult {
+  eventsSeeded: number;
+  alreadyPresent: number;
+  newlyCreated: number;
+  byStatus: Record<SeededStatus, number>;
+  imagesCopied: number;
+  artistsCreatedOnTheFly: number;
+}
+
+export async function runSeedApplications(
+  opts: RunSeedApplicationsOptions = {}
+): Promise<RunSeedApplicationsResult> {
+  const log = opts.logger ?? (() => {});
+
   const passwordHash = await getHashedSeedPassword();
 
   const eventRows = await db
@@ -262,7 +279,7 @@ async function run() {
     SEED_FOR_EVENT_STATUSES.has(row.eventStatus)
   );
 
-  console.log(
+  log(
     `Found ${seedable.length} seedable event(s) ` +
       `(of ${eventRows.length} total).`
   );
@@ -289,7 +306,7 @@ async function run() {
     const needed = Math.max(0, target - existingProfileIds.size);
 
     if (needed === 0) {
-      console.log(
+      log(
         `  ${row.conventionName.padEnd(28)} ` +
           `${row.eventName} — ${existingProfileIds.size}/${target} (skip)`
       );
@@ -316,8 +333,8 @@ async function run() {
     }
 
     if (candidateProfileIds.length < needed) {
-      console.warn(
-        `  ${row.conventionName} ${row.eventName}: only found ` +
+      log(
+        `  ⚠ ${row.conventionName} ${row.eventName}: only found ` +
           `${candidateProfileIds.length} unused artist(s) of ${needed} ` +
           "needed; raise ARTIST_INDEX_PROBE_LIMIT."
       );
@@ -384,7 +401,7 @@ async function run() {
 
     totalCreated += createdForEvent;
     totalAlreadyPresent += existingProfileIds.size;
-    console.log(
+    log(
       `  ${row.conventionName.padEnd(28)} ` +
         `${row.eventName} — +${createdForEvent} (now ` +
         `${existingProfileIds.size + createdForEvent}/${target})  ` +
@@ -394,40 +411,56 @@ async function run() {
     );
   }
 
-  console.log("");
-  console.log(`  Events seeded:    ${seedable.length}`);
-  console.log(`  Already present:  ${totalAlreadyPresent}`);
-  console.log(`  Newly created:    ${totalCreated}`);
-  console.log(
+  log("");
+  log(`  Events seeded:    ${seedable.length}`);
+  log(`  Already present:  ${totalAlreadyPresent}`);
+  log(`  Newly created:    ${totalCreated}`);
+  log(
     `  Status mix (new): ` +
       `S=${byStatus.submitted}  U=${byStatus.under_review}  ` +
       `A=${byStatus.accepted}  R=${byStatus.rejected}`
   );
-  console.log(`  Images copied:    ${totalImagesSnapshotted}`);
+  log(`  Images copied:    ${totalImagesSnapshotted}`);
   if (
     eventRows.length > seedable.length &&
     eventRows.length - seedable.length > 0
   ) {
     const skipped = eventRows.length - seedable.length;
-    console.log(
+    log(
       `  Skipped:          ${skipped} event(s) outside ` +
         `[${[...SEED_FOR_EVENT_STATUSES].join(", ")}]`
     );
   }
   if (artistsCreatedOnTheFly > 0) {
-    console.log("");
-    console.log(
+    log("");
+    log(
       `  ⚠ Created ${artistsCreatedOnTheFly} new seed artist(s) without ` +
         "portfolios. Re-run\n    `npm run db:seed:artists -- --with-portfolios " +
         `${artistsCreatedOnTheFly + 50}\` (or higher) before next demo to give ` +
         "them art."
     );
   }
+
+  return {
+    eventsSeeded: seedable.length,
+    alreadyPresent: totalAlreadyPresent,
+    newlyCreated: totalCreated,
+    byStatus,
+    imagesCopied: totalImagesSnapshotted,
+    artistsCreatedOnTheFly,
+  };
 }
 
-run()
-  .then(() => process.exit(0))
-  .catch((err) => {
-    console.error(err);
-    process.exit(1);
-  });
+const isDirectInvocation =
+  typeof process !== "undefined" &&
+  process.argv[1] &&
+  process.argv[1].endsWith("seed-applications.ts");
+
+if (isDirectInvocation) {
+  runSeedApplications({ logger: (msg) => console.log(msg) })
+    .then(() => process.exit(0))
+    .catch((err) => {
+      console.error(err);
+      process.exit(1);
+    });
+}
