@@ -49,9 +49,28 @@ function parseArgs(): ParsedArgs {
   return { count: count ?? 50, withPortfolios };
 }
 
-async function run() {
-  const { count, withPortfolios } = parseArgs();
-  console.log(
+export interface RunSeedArtistsOptions {
+  count?: number;
+  withPortfolios?: boolean;
+  logger?: (msg: string) => void;
+}
+
+export interface RunSeedArtistsResult {
+  total: number;
+  created: number;
+  existing: number;
+  portfoliosSeeded: number;
+  imagesUploaded: number;
+}
+
+export async function runSeedArtists(
+  opts: RunSeedArtistsOptions = {}
+): Promise<RunSeedArtistsResult> {
+  const count = opts.count ?? 50;
+  const withPortfolios = opts.withPortfolios ?? false;
+  const log = opts.logger ?? (() => {});
+
+  log(
     `Seeding ${count} artist account(s)${withPortfolios ? " with portfolios" : ""}…`
   );
 
@@ -80,26 +99,46 @@ async function run() {
         `stand:${portfolio.bySection.previous_stand})`;
     }
 
-    console.log(
+    log(
       `  ${result.created ? "+" : "="} ${result.email}  (${result.fullName})${portfolioSummary}`
     );
   }
 
-  console.log("");
-  console.log(`  Total:    ${count}`);
-  console.log(`  Created:  ${created}`);
-  console.log(`  Existing: ${existed}`);
+  log("");
+  log(`  Total:    ${count}`);
+  log(`  Created:  ${created}`);
+  log(`  Existing: ${existed}`);
   if (pool) {
-    console.log(`  Portfolios:       ${portfoliosSeeded}`);
-    console.log(`  Images uploaded:  ${imagesUploaded}`);
+    log(`  Portfolios:       ${portfoliosSeeded}`);
+    log(`  Images uploaded:  ${imagesUploaded}`);
   }
-  console.log(`  Domain:   @${SEED_ARTIST_DOMAIN}`);
-  console.log(`  Password: ${SEED_PASSWORD}`);
+  log(`  Domain:   @${SEED_ARTIST_DOMAIN}`);
+  log(`  Password: ${SEED_PASSWORD}`);
+
+  return {
+    total: count,
+    created,
+    existing: existed,
+    portfoliosSeeded,
+    imagesUploaded,
+  };
 }
 
-run()
-  .then(() => process.exit(0))
-  .catch((err) => {
-    console.error(err);
-    process.exit(1);
-  });
+const isDirectInvocation =
+  typeof process !== "undefined" &&
+  process.argv[1] &&
+  process.argv[1].endsWith("seed-artists.ts");
+
+if (isDirectInvocation) {
+  const { count, withPortfolios } = parseArgs();
+  runSeedArtists({
+    count,
+    withPortfolios,
+    logger: (msg) => console.log(msg),
+  })
+    .then(() => process.exit(0))
+    .catch((err) => {
+      console.error(err);
+      process.exit(1);
+    });
+}
