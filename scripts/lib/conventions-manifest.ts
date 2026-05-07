@@ -2,16 +2,20 @@ import fs from "node:fs";
 import path from "node:path";
 import { z } from "zod";
 
+// Resolve via process.cwd() so these paths work both from CLI tsx
+// invocation (cwd = repo root) and from a Next.js route handler at
+// runtime, where __dirname points into .next/server/... and would
+// not reach the repo's scripts/ directory.
 export const SEED_ASSETS_DIR = path.resolve(
-  __dirname,
-  "..",
+  process.cwd(),
+  "scripts",
   "seed-assets",
   "conventions"
 );
 
 export const SEED_GUESTS_DIR = path.resolve(
-  __dirname,
-  "..",
+  process.cwd(),
+  "scripts",
   "seed-assets",
   "guests"
 );

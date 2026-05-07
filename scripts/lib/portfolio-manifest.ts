@@ -4,9 +4,13 @@ import { z } from "zod";
 
 import type { PortfolioSection } from "../../src/lib/db/schema/portfolio-images";
 
+// Resolve via process.cwd() so this path works both from CLI tsx
+// invocation (cwd = repo root) and from a Next.js route handler at
+// runtime, where __dirname points into .next/server/... and would
+// not reach the repo's scripts/ directory.
 export const SEED_PORTFOLIOS_DIR = path.resolve(
-  __dirname,
-  "..",
+  process.cwd(),
+  "scripts",
   "seed-assets",
   "portfolios"
 );
