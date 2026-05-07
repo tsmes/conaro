@@ -131,9 +131,29 @@ function isoDaysFromNow(offset: number): string {
   return d.toISOString().slice(0, 10);
 }
 
-async function run() {
+export interface RunSeedConventionsOptions {
+  logger?: (msg: string) => void;
+  writeCredentialsFile?: boolean;
+}
+
+export interface RunSeedConventionsResult {
+  manifests: number;
+  organizersCreated: number;
+  conventionsCreated: number;
+  eventsUpserted: number;
+  assetsUploaded: number;
+  guestsSeeded: number;
+  programmeItemsSeeded: number;
+}
+
+export async function runSeedConventions(
+  opts: RunSeedConventionsOptions = {}
+): Promise<RunSeedConventionsResult> {
+  const log = opts.logger ?? (() => {});
+  const shouldWriteCredentialsFile = opts.writeCredentialsFile ?? false;
+
   const manifests = loadConventionManifests();
-  console.log(
+  log(
     `Found ${manifests.length} convention manifest(s) under scripts/seed-assets/conventions/`
   );
 
@@ -307,24 +327,36 @@ async function run() {
       guestsSeeded += seededGuests.length;
       programmeItemsSeeded += programme?.length ?? 0;
 
-      console.log(
+      log(
         `  ${manifest.slug.padEnd(28)} ${eventManifest.name} (${eventManifest.startDate})  ` +
           `guests=${seededGuests.length}  programme=${programme?.length ?? 0}`
       );
     }
   }
 
-  console.log("");
-  console.log(`  Manifests:        ${manifests.length}`);
-  console.log(`  Organizers added: ${organizersCreated}`);
-  console.log(`  Conventions new:  ${conventionsCreated}`);
-  console.log(`  Events upserted:  ${eventsUpserted}`);
-  console.log(`  Assets uploaded:  ${assetsUploaded}`);
-  console.log(`  Guests seeded:    ${guestsSeeded}`);
-  console.log(`  Programme items:  ${programmeItemsSeeded}`);
-  console.log(`  Domain:           @${SEED_ORGANIZER_DOMAIN}`);
-  console.log(`  Password:         ${SEED_PASSWORD}`);
-  writeCredentialsFile(manifests);
+  log("");
+  log(`  Manifests:        ${manifests.length}`);
+  log(`  Organizers added: ${organizersCreated}`);
+  log(`  Conventions new:  ${conventionsCreated}`);
+  log(`  Events upserted:  ${eventsUpserted}`);
+  log(`  Assets uploaded:  ${assetsUploaded}`);
+  log(`  Guests seeded:    ${guestsSeeded}`);
+  log(`  Programme items:  ${programmeItemsSeeded}`);
+  log(`  Domain:           @${SEED_ORGANIZER_DOMAIN}`);
+  log(`  Password:         ${SEED_PASSWORD}`);
+  if (shouldWriteCredentialsFile) {
+    writeCredentialsFile(manifests, log);
+  }
+
+  return {
+    manifests: manifests.length,
+    organizersCreated,
+    conventionsCreated,
+    eventsUpserted,
+    assetsUploaded,
+    guestsSeeded,
+    programmeItemsSeeded,
+  };
 }
 
 function shiftDate(iso: string, days: number): string {
@@ -333,7 +365,10 @@ function shiftDate(iso: string, days: number): string {
   return d.toISOString().slice(0, 10);
 }
 
-function writeCredentialsFile(manifests: LoadedManifest[]) {
+function writeCredentialsFile(
+  manifests: LoadedManifest[],
+  log: (msg: string) => void
+) {
   const sorted = [...manifests].sort((a, b) =>
     a.manifest.name.localeCompare(b.manifest.name)
   );
@@ -359,12 +394,22 @@ function writeCredentialsFile(manifests: LoadedManifest[]) {
 
   const filePath = path.resolve(__dirname, "seed-credentials.md");
   fs.writeFileSync(filePath, lines.join("\n"), "utf-8");
-  console.log(`  Credentials:      scripts/seed-credentials.md`);
+  log(`  Credentials:      scripts/seed-credentials.md`);
 }
 
-run()
-  .then(() => process.exit(0))
-  .catch((err) => {
-    console.error(err);
-    process.exit(1);
-  });
+const isDirectInvocation =
+  typeof process !== "undefined" &&
+  process.argv[1] &&
+  process.argv[1].endsWith("seed-conventions.ts");
+
+if (isDirectInvocation) {
+  runSeedConventions({
+    logger: (msg) => console.log(msg),
+    writeCredentialsFile: true,
+  })
+    .then(() => process.exit(0))
+    .catch((err) => {
+      console.error(err);
+      process.exit(1);
+    });
+}
