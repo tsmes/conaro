@@ -46,17 +46,17 @@ Source: Batch E of `.claude/plans/test-coverage-audit-spec.md`.
 
 These are verified during manual testing (step 5 of the workflow). Each must be checked off before the feature is considered complete.
 
-- [ ] Running `npm install` after pulling the branch installs `@playwright/test` at the pinned version.
-- [ ] Running `npx playwright install chromium` (or the documented equivalent) succeeds.
-- [ ] `npm run test:e2e` starts the Next.js app automatically, runs both register journeys against the test database, and exits with code 0.
-- [ ] Re-running `npm run test:e2e` immediately after a successful run also passes (i.e., the suite is idempotent — no leftover state breaks the second run).
-- [ ] The artist-register E2E test fails if the artist register form is broken (verified by temporarily breaking the form and confirming the test fails with a clear error).
-- [ ] The organizer-register E2E test fails if the organizer register form is broken (same verification).
-- [ ] `npm test` (Vitest) does not pick up any file under `__tests__/e2e/`.
-- [ ] `npm run test:e2e` does not pick up any file under `__tests__/unit/`, `__tests__/integration/`, or `__tests__/components/`.
-- [ ] The README contains a section explaining how to run E2E tests locally and any prerequisites (test DB, migrations).
-- [ ] After a successful E2E run, the test database contains no leftover users from the run (or at minimum, this is documented behavior — see plan).
-- [ ] No skipped, `.only`, or TODO-suppressed tests are introduced.
+- [x] Running `npm install` after pulling the branch installs `@playwright/test` at the pinned version.
+- [x] Running `npx playwright install chromium` (or the documented equivalent) succeeds.
+- [x] `npm run test:e2e` starts the Next.js app automatically, runs both register journeys against the test database, and exits with code 0.
+- [x] Re-running `npm run test:e2e` immediately after a successful run also passes (i.e., the suite is idempotent — no leftover state breaks the second run).
+- [x] The artist-register E2E test fails if the artist register form is broken (verified by temporarily breaking the form and confirming the test fails with a clear error).
+- [x] The organizer-register E2E test fails if the organizer register form is broken (same verification).
+- [x] `npm test` (Vitest) does not pick up any file under `__tests__/e2e/`.
+- [x] `npm run test:e2e` does not pick up any file under `__tests__/unit/`, `__tests__/integration/`, or `__tests__/components/`.
+- [x] The README contains a section explaining how to run E2E tests locally and any prerequisites (test DB, migrations).
+- [x] After a successful E2E run, the test database contains no leftover users from the run (or at minimum, this is documented behavior — see plan).
+- [x] No skipped, `.only`, or TODO-suppressed tests are introduced.
 
 ## Constraints
 
