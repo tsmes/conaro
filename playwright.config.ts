@@ -12,6 +12,7 @@ const BASE_URL = `http://localhost:${PORT}`;
 export default defineConfig({
   testDir: "__tests__/e2e",
   testMatch: "**/*.test.ts",
+  globalSetup: "./__tests__/e2e/global-setup.ts",
   fullyParallel: false,
   workers: 1,
   forbidOnly: true,
