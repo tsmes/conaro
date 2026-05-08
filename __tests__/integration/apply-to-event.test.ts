@@ -27,9 +27,12 @@ vi.mock("next/cache", () => ({
 
 vi.mock("@/lib/storage", () => ({
   storage: {
-    copy: vi.fn(),
-    delete: vi.fn(),
-    upload: vi.fn(),
+    // The real adapters return Promises from copy/delete/upload —
+    // the mocks must too, so the production code can `.catch(...)`
+    // on the cleanup paths without crashing on undefined.
+    copy: vi.fn().mockResolvedValue(undefined),
+    delete: vi.fn().mockResolvedValue(undefined),
+    upload: vi.fn().mockResolvedValue(undefined),
     getUrl: vi.fn((key: string) => `/api/uploads/${key}`),
   },
 }));
@@ -350,6 +353,147 @@ describe("applyToEvent", () => {
       })
     );
     expect(result.error).toContain("no longer available");
+  });
+
+  it("rolls back the transaction when a snapshot image copy fails", async () => {
+    const { convention } = await createTestOrganizer();
+    const event = await createTestEvent(convention.id);
+    const artist = await setupArtistWithProfile();
+
+    // Give the artist a portfolio image so storage.copy is invoked.
+    await db.insert(portfolioImages).values({
+      id: "img-fail-1",
+      profileId: artist.profile.id,
+      filename: "art.webp",
+      storagePath: `portfolios/${artist.profile.id}/img-fail-1.webp`,
+      mimeType: "image/webp",
+      width: 800,
+      height: 600,
+      sortOrder: 0,
+      section: "promo",
+    });
+
+    const { storage } = await import("@/lib/storage");
+    vi.mocked(storage.copy).mockRejectedValueOnce(new Error("R2 unreachable"));
+
+    mockAuth.mockResolvedValue({
+      user: { id: "u", role: "artist", profileId: artist.profile.id },
+    });
+
+    const result = await applyToEvent(
+      {},
+      buildFormData({ eventId: event.id, guidelinesAcknowledged: "true" })
+    );
+    expect(result.error).toContain("Failed to submit application");
+
+    // Transaction rolled back: no row persisted.
+    const apps = await findApplicationsByEventId(event.id);
+    expect(apps).toHaveLength(0);
+
+    // Nothing was successfully copied before the throw, so cleanup
+    // had nothing to delete. Confirm we did not attempt to clean up
+    // a path we never copied.
+    expect(storage.delete).not.toHaveBeenCalled();
+  });
+
+  it("cleans up already-copied snapshot images when a later copy fails", async () => {
+    const { convention } = await createTestOrganizer();
+    const event = await createTestEvent(convention.id);
+    const artist = await setupArtistWithProfile();
+
+    await db.insert(portfolioImages).values([
+      {
+        id: "img-ok-1",
+        profileId: artist.profile.id,
+        filename: "first.webp",
+        storagePath: `portfolios/${artist.profile.id}/img-ok-1.webp`,
+        mimeType: "image/webp",
+        width: 800,
+        height: 600,
+        sortOrder: 0,
+        section: "promo",
+      },
+      {
+        id: "img-fail-2",
+        profileId: artist.profile.id,
+        filename: "second.webp",
+        storagePath: `portfolios/${artist.profile.id}/img-fail-2.webp`,
+        mimeType: "image/webp",
+        width: 800,
+        height: 600,
+        sortOrder: 1,
+        section: "product",
+      },
+    ]);
+
+    const { storage } = await import("@/lib/storage");
+    vi.mocked(storage.copy)
+      .mockResolvedValueOnce(undefined) // first copy succeeds
+      .mockRejectedValueOnce(new Error("R2 unreachable")); // second fails
+
+    mockAuth.mockResolvedValue({
+      user: { id: "u", role: "artist", profileId: artist.profile.id },
+    });
+
+    const result = await applyToEvent(
+      {},
+      buildFormData({ eventId: event.id, guidelinesAcknowledged: "true" })
+    );
+    expect(result.error).toContain("Failed to submit application");
+
+    // Transaction rolled back: no row persisted.
+    const apps = await findApplicationsByEventId(event.id);
+    expect(apps).toHaveLength(0);
+
+    // The first (successful) copy must be cleaned up best-effort.
+    expect(storage.delete).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(storage.delete).mock.calls[0][0]).toMatch(
+      /^snapshots\/.*img-ok-1\.webp$/
+    );
+  });
+
+  it("does not perform any storage.copy when applying a duplicate (DB failure fast-path)", async () => {
+    const { convention } = await createTestOrganizer();
+    const event = await createTestEvent(convention.id);
+    const artist = await setupArtistWithProfile();
+
+    await db.insert(portfolioImages).values({
+      id: "img-dup-1",
+      profileId: artist.profile.id,
+      filename: "a.webp",
+      storagePath: `portfolios/${artist.profile.id}/img-dup-1.webp`,
+      mimeType: "image/webp",
+      width: 800,
+      height: 600,
+      sortOrder: 0,
+      section: "promo",
+    });
+
+    mockAuth.mockResolvedValue({
+      user: { id: "u", role: "artist", profileId: artist.profile.id },
+    });
+
+    // First apply: succeeds.
+    const first = await applyToEvent(
+      {},
+      buildFormData({ eventId: event.id, guidelinesAcknowledged: "true" })
+    );
+    expect(first.success).toBe(true);
+
+    const { storage } = await import("@/lib/storage");
+    const copyCallsAfterFirst = vi.mocked(storage.copy).mock.calls.length;
+
+    // Second apply: should hit the unique-violation path WITHOUT
+    // doing any storage.copy.
+    const second = await applyToEvent(
+      {},
+      buildFormData({ eventId: event.id, guidelinesAcknowledged: "true" })
+    );
+    expect(second.error).toContain("already applied");
+
+    // Insert-first ordering: the duplicate insert fails before any
+    // copy is attempted. Total copy calls should be unchanged.
+    expect(vi.mocked(storage.copy).mock.calls.length).toBe(copyCallsAfterFirst);
   });
 
   it("rejects non-artist role", async () => {

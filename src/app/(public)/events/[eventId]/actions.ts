@@ -197,35 +197,19 @@ export async function applyToEvent(
 
   const isBlockListed = !!blockEntry;
 
-  // Build profile snapshot
+  // Build profile snapshot. Snapshot paths are deterministic from
+  // (eventId, applicationId, image.id) so we can compute them up
+  // front, embed them in the DB row, and copy the bytes after.
   const applicationId = crypto.randomUUID();
-  const snapshotImages: SnapshotImage[] = [];
-
-  // Copy portfolio images to snapshot path
-  for (const image of images) {
-    const snapshotPath = `snapshots/${eventId}/${applicationId}/${image.id}.webp`;
-    try {
-      await storage.copy(image.storagePath, snapshotPath);
-      snapshotImages.push({
-        id: image.id,
-        filename: image.filename,
-        storagePath: snapshotPath,
-        width: image.width,
-        height: image.height,
-        sortOrder: image.sortOrder,
-        caption: image.caption ?? null,
-      });
-    } catch (copyError) {
-      console.error("Snapshot image copy failed:", copyError);
-      // Clean up any already-copied images on failure
-      for (const copied of snapshotImages) {
-        await storage.delete(copied.storagePath).catch((e) => {
-          console.error("Failed to clean up snapshot image:", e);
-        });
-      }
-      return { error: "Failed to process application. Please try again." };
-    }
-  }
+  const snapshotImages: SnapshotImage[] = images.map((image) => ({
+    id: image.id,
+    filename: image.filename,
+    storagePath: `snapshots/${eventId}/${applicationId}/${image.id}.webp`,
+    width: image.width,
+    height: image.height,
+    sortOrder: image.sortOrder,
+    caption: image.caption ?? null,
+  }));
 
   const profileSnapshot: ProfileSnapshot = {
     displayName: profile.displayName,
@@ -246,27 +230,42 @@ export async function applyToEvent(
     images: snapshotImages,
   };
 
-  // Insert application
+  // Insert the application row, then copy portfolio image bytes,
+  // both inside a single SQL transaction. If any storage.copy throws
+  // — or the insert fails for any reason (e.g. duplicate apply) —
+  // the transaction rolls back and the row never persists. Already
+  // copied snapshot bytes are best-effort cleaned up afterward.
+  // Insert-first ordering means we fail fast on a duplicate apply
+  // without doing any storage I/O.
+  const copiedPaths: string[] = [];
   try {
-    await db.insert(applications).values({
-      id: applicationId,
-      eventId,
-      profileId,
-      profileSnapshot,
-      answers,
-      guidelinesAcknowledgedAt: new Date(),
-      isBlockListed,
+    await db.transaction(async (tx) => {
+      await tx.insert(applications).values({
+        id: applicationId,
+        eventId,
+        profileId,
+        profileSnapshot,
+        answers,
+        guidelinesAcknowledgedAt: new Date(),
+        isBlockListed,
+      });
+
+      for (const image of images) {
+        const snapshotPath = `snapshots/${eventId}/${applicationId}/${image.id}.webp`;
+        await storage.copy(image.storagePath, snapshotPath);
+        copiedPaths.push(snapshotPath);
+      }
     });
   } catch (error: unknown) {
-    // Clean up snapshot images on DB failure
-    for (const img of snapshotImages) {
-      await storage.delete(img.storagePath).catch((e) => {
-        console.error("Failed to clean up snapshot image:", e);
+    for (const path of copiedPaths) {
+      await storage.delete(path).catch((cleanupError) => {
+        console.error("Failed to clean up snapshot image:", cleanupError);
       });
     }
     if (isUniqueViolation(error)) {
       return { error: "You have already applied to this event" };
     }
+    console.error("Failed to submit application:", error);
     return { error: "Failed to submit application. Please try again." };
   }
 
