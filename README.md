@@ -43,6 +43,8 @@ needed; see the file headers for usage.
 
 ## Tests
 
+### Unit / integration / component (Vitest)
+
 ```bash
 npm run db:migrate:test    # apply schema to the test DB (one-time per change)
 npm test                   # run all suites
@@ -51,6 +53,27 @@ npm run test:watch         # watch mode
 
 Vitest loads `.env.test` automatically via `@next/env`. The test runner skips
 `.env.local` so dev secrets never leak into test runs.
+
+### End-to-end (Playwright)
+
+```bash
+npx playwright install chromium    # one-time browser install
+npm run test:e2e                   # run all E2E tests
+```
+
+Playwright's `globalSetup` applies migrations to the test database before the
+suite runs, and each test calls `cleanDatabase()` in `beforeEach`, so no manual
+DB ceremony is required. Tests use `uniqueEmail()` to avoid cross-run
+collisions.
+
+The config starts the app via `npm run dev` with `NODE_ENV=test` (so the dev
+server talks to the test DB) and uses `reuseExistingServer: true` for fast
+local reruns. **If you have `npm run dev` already running against the dev DB,
+stop it before invoking `npm run test:e2e`** — Playwright will reuse the
+running server and tests will hit the wrong database.
+
+Currently covered: artist registration, organizer registration. Other critical
+journeys (profile setup, apply, review, publish) are tracked separately.
 
 ## Deployment (Railway)
 
