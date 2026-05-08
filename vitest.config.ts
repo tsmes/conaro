@@ -46,7 +46,11 @@ export default defineConfig({
             "__tests__/unit/**/*.test.{ts,tsx}",
             "__tests__/integration/**/*.test.{ts,tsx}",
           ],
-          exclude: ["__tests__/unit/components/**", "__tests__/components/**"],
+          exclude: [
+            "__tests__/unit/components/**",
+            "__tests__/components/**",
+            "__tests__/e2e/**",
+          ],
         },
       },
       {
@@ -58,6 +62,7 @@ export default defineConfig({
             "__tests__/components/**/*.test.{ts,tsx}",
             "__tests__/unit/components/**/*.test.{ts,tsx}",
           ],
+          exclude: ["__tests__/e2e/**"],
         },
       },
     ],

@@ -214,7 +214,7 @@ Keep it ~20 lines, factual.
 
 - [x] Task 1 — installed `@playwright/test@1.59.1` (exact pin), Chromium browser, `playwright.config.ts`, `.gitignore` entries, `test:e2e` script. Verified config loads via `npx playwright test --list` (exits 1 with "no tests found" as expected for an empty suite — see Risks).
 - [x] Task 2 — extracted `runMigrations()` into `scripts/lib/migrate.ts` (reused by both the existing `db:migrate` CLI and the new globalSetup); created `__tests__/e2e/global-setup.ts` and `__tests__/e2e/helpers.ts` (re-exports `cleanDatabase`, adds `uniqueEmail`); wired `globalSetup` into `playwright.config.ts`. Pre-existing tsc errors in `.next/dev/types/validator.ts` are unchanged; new files introduce no TS errors. globalSetup will be exercised by Task 4's first test run.
-- [ ] Task 3
+- [x] Task 3 — added `exclude: ["__tests__/e2e/**"]` to both `node` and `jsdom` projects in `vitest.config.ts`. Verified `npm test` still runs the full 597-test suite cleanly (89 files passed) and does not pick up anything under `__tests__/e2e/`.
 - [ ] Task 4
 - [ ] Task 5
 - [ ] Task 6
