@@ -210,6 +210,15 @@ Keep it ~20 lines, factual.
 | REQ-11 (Vitest/Playwright don't overlap) | 1, 3 |
 | REQ-12 (README runbook) | 6 |
 
+## Implementation Status
+
+- [x] Task 1 — installed `@playwright/test@1.59.1` (exact pin), Chromium browser, `playwright.config.ts`, `.gitignore` entries, `test:e2e` script. Verified config loads via `npx playwright test --list` (exits 1 with "no tests found" as expected for an empty suite — see Risks).
+- [ ] Task 2
+- [ ] Task 3
+- [ ] Task 4
+- [ ] Task 5
+- [ ] Task 6
+
 ## Risks
 
 - **Path-alias resolution under Playwright's TS loader.** Playwright supports tsconfig `paths` since 1.28 but occasionally needs explicit configuration. If `@/lib/db` (transitively imported via `cleanDatabase`) fails to resolve, fall back to relative imports in `__tests__/e2e/helpers.ts` (since the underlying `__tests__/helpers/db.ts` already uses `@/...` itself, the fallback would mean ensuring Playwright's tsconfig honors the alias — likely fine but worth verifying early in Task 2).

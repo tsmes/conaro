@@ -23,7 +23,8 @@
     "db:seed:applications": "tsx scripts/seed-applications.ts",
     "db:reset-and-seed": "npm run db:seed:reset && npm run db:seed:conventions && npm run db:seed:artists -- --with-portfolios 100 && npm run db:seed:applications",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "1.7.4",
@@ -64,6 +65,7 @@
     "zod": "3.25.7"
   },
   "devDependencies": {
+    "@playwright/test": "1.59.1",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
