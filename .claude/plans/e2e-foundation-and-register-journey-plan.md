@@ -219,6 +219,21 @@ Keep it ~20 lines, factual.
 - [x] Task 5 — added `__tests__/e2e/organizer/register.test.ts`. Same shape as the artist test plus the `Convention name` field; asserts navigation to `/conventions/manage` and visibility of both "Welcome back" h1 and the "Create event" QuickAction h3. Initial run hit a strict-mode violation on the bare `getByText("Create event")` (matched both a button-link and the h3) — switched to `getByRole("heading", { name: "Create event" })`. Verified: both tests pass in ~1.7s each, idempotent across consecutive runs.
 - [x] Task 6 — split README's `## Tests` section into `### Unit / integration / component (Vitest)` and `### End-to-end (Playwright)`. The Playwright subsection covers the one-time `npx playwright install chromium`, the `npm run test:e2e` command, the auto-applied migrations + per-test cleanup, what's currently covered, and the developer-server-collision warning called out as a risk in the plan.
 
+### Post-implementation review fix
+
+Code review (Step 4) caught a critical correctness bug: the webServer was connecting to the dev DB instead of the test DB. Empirical proof: after E2E runs, the test DB had 0 users while the dev DB had 10 e2e-pattern users. Two compounding causes inside the spawned `next dev` child:
+
+1. `next dev` overrides `NODE_ENV` to `"development"` regardless of what the spawn passed in (confirmed by inspecting `/proc/<pid>/environ` of the running webServer).
+2. Playwright's `webServer.env` REPLACES the child's `process.env` rather than merging — so the child started with only the keys we explicitly listed.
+
+Fix: `playwright.config.ts` now calls `loadEnvConfig(process.cwd())` after forcing `NODE_ENV=test` (which populates `process.env` with the test env file values) and spreads the resulting `process.env` into `webServer.env`. Per Next.js env-precedence rules, values already in `process.env` (from the spawn) win over `.env` files re-read inside the child, so `DATABASE_URL` stays pinned to the test DB even after `next dev` flips `NODE_ENV` back to `"development"`.
+
+Re-verified after the fix: test DB has the expected 1 leftover user from the last `beforeEach`/`it` cycle (organizer); dev DB is no longer being written to by E2E runs. Both register tests still pass in ~1.3s each.
+
+Also fixed during review: `waitForURL` patterns tightened from `**/dashboard` and `**/conventions/manage` globs to exact paths `/dashboard` and `/conventions/manage`. Probe scripts created during diagnosis (`scripts/_probe-test-db.ts`, `scripts/_probe-dev-db.ts`, `scripts/_verify-fix.ts`) deleted before commit.
+
+**Note for the user:** The pre-fix runs leaked 10 users matching `artist-{timestamp}-{hex}@conaro.test` / `organizer-{timestamp}-{hex}@conaro.test` into the dev database. They're harmless but pollute the dev user table; clean up with a targeted DELETE if desired (`DELETE FROM users WHERE email LIKE 'artist-%@conaro.test' OR email LIKE 'organizer-%@conaro.test'`).
+
 ## Risks
 
 - **Path-alias resolution under Playwright's TS loader.** Playwright supports tsconfig `paths` since 1.28 but occasionally needs explicit configuration. If `@/lib/db` (transitively imported via `cleanDatabase`) fails to resolve, fall back to relative imports in `__tests__/e2e/helpers.ts` (since the underlying `__tests__/helpers/db.ts` already uses `@/...` itself, the fallback would mean ensuring Playwright's tsconfig honors the alias — likely fine but worth verifying early in Task 2).

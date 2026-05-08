@@ -23,7 +23,7 @@ test.describe("artist register", () => {
       .getByRole("button", { name: /create artist account/i })
       .click();
 
-    await page.waitForURL("**/dashboard");
+    await page.waitForURL("/dashboard");
     await expect(
       page.getByRole("heading", { name: /my applications/i })
     ).toBeVisible();

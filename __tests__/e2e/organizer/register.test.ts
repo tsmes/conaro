@@ -24,7 +24,7 @@ test.describe("organizer register", () => {
       .getByRole("button", { name: /create organizer account/i })
       .click();
 
-    await page.waitForURL("**/conventions/manage");
+    await page.waitForURL("/conventions/manage");
     await expect(
       page.getByRole("heading", { name: /welcome back/i })
     ).toBeVisible();
