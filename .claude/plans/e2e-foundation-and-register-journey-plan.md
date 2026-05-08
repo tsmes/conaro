@@ -216,7 +216,7 @@ Keep it ~20 lines, factual.
 - [x] Task 2 — extracted `runMigrations()` into `scripts/lib/migrate.ts` (reused by both the existing `db:migrate` CLI and the new globalSetup); created `__tests__/e2e/global-setup.ts` and `__tests__/e2e/helpers.ts` (re-exports `cleanDatabase`, adds `uniqueEmail`); wired `globalSetup` into `playwright.config.ts`. Pre-existing tsc errors in `.next/dev/types/validator.ts` are unchanged; new files introduce no TS errors. globalSetup will be exercised by Task 4's first test run.
 - [x] Task 3 — added `exclude: ["__tests__/e2e/**"]` to both `node` and `jsdom` projects in `vitest.config.ts`. Verified `npm test` still runs the full 597-test suite cleanly (89 files passed) and does not pick up anything under `__tests__/e2e/`.
 - [x] Task 4 — added `__tests__/e2e/artist/register.test.ts`. Visits `/register/artist`, fills the four labeled fields, submits, asserts navigation to `/dashboard` and the visible "My Applications" heading. `beforeEach` calls `cleanDatabase()`. Verified: first run passes in 2.3s (incl. globalSetup migrations + dev cold start), second consecutive run passes in 1.3s (idempotent).
-- [ ] Task 5
+- [x] Task 5 — added `__tests__/e2e/organizer/register.test.ts`. Same shape as the artist test plus the `Convention name` field; asserts navigation to `/conventions/manage` and visibility of both "Welcome back" h1 and the "Create event" QuickAction h3. Initial run hit a strict-mode violation on the bare `getByText("Create event")` (matched both a button-link and the h3) — switched to `getByRole("heading", { name: "Create event" })`. Verified: both tests pass in ~1.7s each, idempotent across consecutive runs.
 - [ ] Task 6
 
 ## Risks
