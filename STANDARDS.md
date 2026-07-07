@@ -79,10 +79,11 @@ src/
 ### Auth & Authorization
 
 - Auth.js v5 with Credentials provider for email/password
-- Session stored in PostgreSQL via Drizzle adapter
+- Sessions use the JWT strategy; the Drizzle adapter persists users/accounts, and role + `profileId` are captured into the token at sign-in
 - Role (`artist` | `organizer`) stored in `profiles` table
-- Middleware protects routes by role — artists cannot access organizer routes and vice versa
-- Always check ownership in service functions (e.g., an organizer can only manage their own convention)
+- There is **no route-gating middleware**. Authorization is enforced at two layers: (1) each authenticated `page.tsx` re-checks the session/role and redirects, and (2) every server action and API route independently re-checks. Use the guards in `lib/auth/guards.ts` (`requireOrganizer` / `requireArtist` / `requireProfile`) in server actions rather than re-implementing the `auth()` + role check — they return `{ profileId, role }` or `{ error: "Unauthorized" }`.
+- Always check ownership in service functions (e.g., an organizer can only manage their own convention) — role checks alone are not sufficient
+- When adding a new authenticated page or action, the role/ownership check is your responsibility: there is no middleware backstop
 
 ### Notifications
 

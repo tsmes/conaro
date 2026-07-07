@@ -3,7 +3,7 @@
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
-import { auth } from "@/lib/auth";
+import { requireOrganizer } from "@/lib/auth/guards";
 import { db } from "@/lib/db";
 import { events } from "@/lib/db/schema/events";
 import { getOrganizerEvent } from "@/lib/conventions/queries";
@@ -24,12 +24,9 @@ async function authorize(
   | { event: { id: string; status: string; conventionId: string } }
   | { error: string }
 > {
-  const session = await auth();
-  if (!session?.user?.id || session.user.role !== "organizer") {
-    return { error: "Unauthorized" };
-  }
-  const profileId = session.user.profileId;
-  if (!profileId) return { error: "Profile not found" };
+  const guard = await requireOrganizer();
+  if ("error" in guard) return guard;
+  const { profileId } = guard;
 
   const eventId = formData.get("eventId")?.toString();
   if (!eventId) return { error: "Event ID is required" };

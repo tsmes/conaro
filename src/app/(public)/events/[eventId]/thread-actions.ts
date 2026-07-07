@@ -4,7 +4,7 @@ import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { db } from "@/lib/db";
-import { auth } from "@/lib/auth";
+import { requireArtist } from "@/lib/auth/guards";
 import { events } from "@/lib/db/schema/events";
 import { applications } from "@/lib/db/schema/applications";
 import { conventions } from "@/lib/db/schema/conventions";
@@ -27,11 +27,9 @@ export async function sendThreadMessage(
   _prevState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  const session = await auth();
-  if (!session?.user?.profileId || session.user.role !== "artist") {
-    return { error: "Unauthorized" };
-  }
-  const artistProfileId = session.user.profileId;
+  const guard = await requireArtist();
+  if ("error" in guard) return guard;
+  const artistProfileId = guard.profileId;
 
   const parsed = sendMessageSchema.safeParse({
     eventId: formData.get("eventId")?.toString(),
@@ -145,11 +143,9 @@ export async function markThreadReadAsArtist(
   _prevState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  const session = await auth();
-  if (!session?.user?.profileId || session.user.role !== "artist") {
-    return { error: "Unauthorized" };
-  }
-  const artistProfileId = session.user.profileId;
+  const guard = await requireArtist();
+  if ("error" in guard) return guard;
+  const artistProfileId = guard.profileId;
 
   const parsed = markReadSchema.safeParse({
     threadId: formData.get("threadId")?.toString(),
