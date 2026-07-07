@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { notificationPreferences } from "@/lib/db/schema/notifications";
-import { auth } from "@/lib/auth";
+import { requireProfile } from "@/lib/auth/guards";
 import { type ActionState } from "@/lib/validations/auth";
 
 const ARTIST_TYPES = [
@@ -24,14 +24,11 @@ export async function updateNotificationPreferences(
   _prevState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  const session = await auth();
-  if (!session?.user?.profileId || !session.user.role) {
-    return { error: "Unauthorized" };
-  }
+  const guard = await requireProfile();
+  if ("error" in guard) return guard;
+  const { profileId, role } = guard;
 
-  const profileId = session.user.profileId;
-  const types =
-    session.user.role === "artist" ? ARTIST_TYPES : ORGANIZER_TYPES;
+  const types = role === "artist" ? ARTIST_TYPES : ORGANIZER_TYPES;
 
   try {
     for (const type of types) {

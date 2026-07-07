@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { profiles } from "@/lib/db/schema/profiles";
 import { artistProfiles } from "@/lib/db/schema/artist-profiles";
-import { auth } from "@/lib/auth";
+import { requireArtist } from "@/lib/auth/guards";
 import { type ActionState } from "@/lib/validations/auth";
 import { basicInfoSchema, logisticsSchema } from "@/lib/validations/profile";
 
@@ -13,10 +13,9 @@ export async function updateBasicInfo(
   _prevState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  const session = await auth();
-  if (!session?.user?.id || session.user.role !== "artist") {
-    return { error: "Unauthorized" };
-  }
+  const guard = await requireArtist();
+  if ("error" in guard) return guard;
+  const { profileId } = guard;
 
   const raw = {
     displayName: (formData.get("displayName") ?? "").toString(),
@@ -52,11 +51,6 @@ export async function updateBasicInfo(
     genres,
     mediums,
   } = result.data;
-
-  const profileId = session.user.profileId;
-  if (!profileId) {
-    return { error: "Profile not found" };
-  }
 
   try {
     await db.transaction(async (tx) => {
@@ -96,10 +90,9 @@ export async function updateLogistics(
   _prevState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  const session = await auth();
-  if (!session?.user?.id || session.user.role !== "artist") {
-    return { error: "Unauthorized" };
-  }
+  const guard = await requireArtist();
+  if ("error" in guard) return guard;
+  const { profileId } = guard;
 
   const raw = {
     helpers: (formData.get("helpers") ?? "0").toString(),
@@ -113,11 +106,6 @@ export async function updateLogistics(
   }
 
   const { helpers, accessibilityNeeds, notes } = result.data;
-
-  const profileId = session.user.profileId;
-  if (!profileId) {
-    return { error: "Profile not found" };
-  }
 
   try {
     await db

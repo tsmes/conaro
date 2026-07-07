@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { conventions } from "@/lib/db/schema/conventions";
-import { auth } from "@/lib/auth";
+import { requireOrganizer } from "@/lib/auth/guards";
 import { type ActionState } from "@/lib/validations/auth";
 import { conventionProfileSchema } from "@/lib/validations/convention";
 import { getOrganizerConvention } from "@/lib/conventions/queries";
@@ -13,15 +13,9 @@ export async function updateConventionProfile(
   _prevState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  const session = await auth();
-  if (!session?.user?.id || session.user.role !== "organizer") {
-    return { error: "Unauthorized" };
-  }
-
-  const profileId = session.user.profileId;
-  if (!profileId) {
-    return { error: "Profile not found" };
-  }
+  const guard = await requireOrganizer();
+  if ("error" in guard) return guard;
+  const { profileId } = guard;
 
   const raw = {
     name: (formData.get("name") ?? "").toString(),

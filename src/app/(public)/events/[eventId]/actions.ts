@@ -20,7 +20,7 @@ import type {
 import { buildApplicationAnswersSchema } from "@/lib/validations/application";
 import { conventions } from "@/lib/db/schema/conventions";
 import { conventionArtistLists } from "@/lib/db/schema/convention-artist-lists";
-import { auth } from "@/lib/auth";
+import { requireArtist } from "@/lib/auth/guards";
 import { storage } from "@/lib/storage";
 import { type ActionState } from "@/lib/validations/auth";
 import {
@@ -42,11 +42,9 @@ export async function joinWaitlist(
   _prevState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  const session = await auth();
-  if (!session?.user?.profileId || session.user.role !== "artist") {
-    return { error: "Unauthorized" };
-  }
-  const profileId = session.user.profileId;
+  const guard = await requireArtist();
+  if ("error" in guard) return guard;
+  const { profileId } = guard;
 
   const eventId = formData.get("eventId")?.toString();
   if (!eventId) return { error: "Event ID is required" };
@@ -98,12 +96,10 @@ export async function applyToEvent(
   _prevState: ApplyResult,
   formData: FormData
 ): Promise<ApplyResult> {
-  const session = await auth();
-  if (!session?.user?.profileId || session.user.role !== "artist") {
-    return { error: "Unauthorized" };
-  }
+  const guard = await requireArtist();
+  if ("error" in guard) return guard;
+  const { profileId } = guard;
 
-  const profileId = session.user.profileId;
   const eventId = formData.get("eventId")?.toString();
   if (!eventId) {
     return { error: "Event ID is required" };

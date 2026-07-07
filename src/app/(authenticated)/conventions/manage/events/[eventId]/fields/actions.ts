@@ -6,7 +6,7 @@ import { db } from "@/lib/db";
 import { events } from "@/lib/db/schema/events";
 import type { FieldRequirements } from "@/lib/db/schema/events";
 import { FIELD_REGISTRY } from "@/lib/db/field-registry";
-import { auth } from "@/lib/auth";
+import { requireOrganizer } from "@/lib/auth/guards";
 import { type ActionState } from "@/lib/validations/auth";
 import { fieldConfigSchema } from "@/lib/validations/convention";
 import { getOrganizerEvent } from "@/lib/conventions/queries";
@@ -15,15 +15,9 @@ export async function updateFieldConfig(
   _prevState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  const session = await auth();
-  if (!session?.user?.id || session.user.role !== "organizer") {
-    return { error: "Unauthorized" };
-  }
-
-  const profileId = session.user.profileId;
-  if (!profileId) {
-    return { error: "Profile not found" };
-  }
+  const guard = await requireOrganizer();
+  if ("error" in guard) return guard;
+  const { profileId } = guard;
 
   const eventId = formData.get("eventId")?.toString();
   if (!eventId) {

@@ -5,17 +5,16 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { conventions } from "@/lib/db/schema/conventions";
 import { conventionFollows } from "@/lib/db/schema/convention-follows";
-import { auth } from "@/lib/auth";
+import { requireArtist } from "@/lib/auth/guards";
 import { type ActionState } from "@/lib/validations/auth";
 
 export async function toggleFollow(
   _prevState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  const session = await auth();
-  if (!session?.user?.profileId || session.user.role !== "artist") {
-    return { error: "Unauthorized" };
-  }
+  const guard = await requireArtist();
+  if ("error" in guard) return guard;
+  const { profileId } = guard;
 
   const conventionId = formData.get("conventionId")?.toString();
   if (!conventionId) {
@@ -30,8 +29,6 @@ export async function toggleFollow(
   if (!convention) {
     return { error: "Convention not found" };
   }
-
-  const profileId = session.user.profileId;
 
   // Check current follow state and toggle
   const [existing] = await db

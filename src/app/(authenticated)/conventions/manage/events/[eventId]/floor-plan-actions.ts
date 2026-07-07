@@ -3,7 +3,7 @@
 import { and, eq, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { auth } from "@/lib/auth";
+import { requireOrganizer } from "@/lib/auth/guards";
 import { db } from "@/lib/db";
 import { events } from "@/lib/db/schema/events";
 import { applications } from "@/lib/db/schema/applications";
@@ -75,10 +75,9 @@ export async function saveFloorPlan(
   _prevState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  const session = await auth();
-  if (!session?.user?.profileId || session.user.role !== "organizer") {
-    return { error: "Unauthorized" };
-  }
+  const guard = await requireOrganizer();
+  if ("error" in guard) return guard;
+  const { profileId } = guard;
 
   const eventId = formData.get("eventId")?.toString();
   if (!eventId) return { error: "Event ID is required" };
@@ -97,7 +96,7 @@ export async function saveFloorPlan(
   }
   const plan = parsed.data satisfies FloorPlan;
 
-  const event = await getOrganizerEvent(session.user.profileId, eventId);
+  const event = await getOrganizerEvent(profileId, eventId);
   if (!event) return { error: "Event not found" };
 
   // Every table and label must live in a room that's part of the same

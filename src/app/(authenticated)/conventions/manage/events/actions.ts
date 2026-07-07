@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { events } from "@/lib/db/schema/events";
 import type { Amenities, TableSizeOption } from "@/lib/db/schema/events";
-import { auth } from "@/lib/auth";
+import { requireOrganizer } from "@/lib/auth/guards";
 import { type ActionState } from "@/lib/validations/auth";
 import { eventSchema, type EventInput } from "@/lib/validations/convention";
 import {
@@ -104,15 +104,9 @@ export async function createEvent(
   _prevState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  const session = await auth();
-  if (!session?.user?.id || session.user.role !== "organizer") {
-    return { error: "Unauthorized" };
-  }
-
-  const profileId = session.user.profileId;
-  if (!profileId) {
-    return { error: "Profile not found" };
-  }
+  const guard = await requireOrganizer();
+  if ("error" in guard) return guard;
+  const { profileId } = guard;
 
   const convention = await getOrganizerConvention(profileId);
   if (!convention) {
@@ -145,15 +139,9 @@ export async function updateEvent(
   _prevState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  const session = await auth();
-  if (!session?.user?.id || session.user.role !== "organizer") {
-    return { error: "Unauthorized" };
-  }
-
-  const profileId = session.user.profileId;
-  if (!profileId) {
-    return { error: "Profile not found" };
-  }
+  const guard = await requireOrganizer();
+  if ("error" in guard) return guard;
+  const { profileId } = guard;
 
   const eventId = formData.get("eventId")?.toString();
   if (!eventId) {
@@ -193,15 +181,9 @@ export async function openApplications(
   _prevState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  const session = await auth();
-  if (!session?.user?.id || session.user.role !== "organizer") {
-    return { error: "Unauthorized" };
-  }
-
-  const profileId = session.user.profileId;
-  if (!profileId) {
-    return { error: "Profile not found" };
-  }
+  const guard = await requireOrganizer();
+  if ("error" in guard) return guard;
+  const { profileId } = guard;
 
   const eventId = formData.get("eventId")?.toString();
   if (!eventId) {
@@ -242,15 +224,9 @@ export async function closeApplications(
   _prevState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  const session = await auth();
-  if (!session?.user?.id || session.user.role !== "organizer") {
-    return { error: "Unauthorized" };
-  }
-
-  const profileId = session.user.profileId;
-  if (!profileId) {
-    return { error: "Profile not found" };
-  }
+  const guard = await requireOrganizer();
+  if ("error" in guard) return guard;
+  const { profileId } = guard;
 
   const eventId = formData.get("eventId")?.toString();
   if (!eventId) {
@@ -287,15 +263,9 @@ export async function publishEvent(
   _prevState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  const session = await auth();
-  if (!session?.user?.id || session.user.role !== "organizer") {
-    return { error: "Unauthorized" };
-  }
-
-  const profileId = session.user.profileId;
-  if (!profileId) {
-    return { error: "Profile not found" };
-  }
+  const guard = await requireOrganizer();
+  if ("error" in guard) return guard;
+  const { profileId } = guard;
 
   const eventId = formData.get("eventId")?.toString();
   if (!eventId) {

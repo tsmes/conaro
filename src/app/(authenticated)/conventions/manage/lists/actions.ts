@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { conventionArtistLists } from "@/lib/db/schema/convention-artist-lists";
 import { profiles } from "@/lib/db/schema/profiles";
-import { auth } from "@/lib/auth";
+import { requireOrganizer } from "@/lib/auth/guards";
 import { type ActionState } from "@/lib/validations/auth";
 import { getOrganizerConvention } from "@/lib/conventions/queries";
 
@@ -13,15 +13,9 @@ export async function addToList(
   _prevState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  const session = await auth();
-  if (!session?.user?.id || session.user.role !== "organizer") {
-    return { error: "Unauthorized" };
-  }
-
-  const profileId = session.user.profileId;
-  if (!profileId) {
-    return { error: "Profile not found" };
-  }
+  const guard = await requireOrganizer();
+  if ("error" in guard) return guard;
+  const { profileId } = guard;
 
   const convention = await getOrganizerConvention(profileId);
   if (!convention) {
@@ -76,15 +70,9 @@ export async function removeFromList(
   _prevState: ActionState,
   formData: FormData
 ): Promise<ActionState> {
-  const session = await auth();
-  if (!session?.user?.id || session.user.role !== "organizer") {
-    return { error: "Unauthorized" };
-  }
-
-  const profileId = session.user.profileId;
-  if (!profileId) {
-    return { error: "Profile not found" };
-  }
+  const guard = await requireOrganizer();
+  if ("error" in guard) return guard;
+  const { profileId } = guard;
 
   const convention = await getOrganizerConvention(profileId);
   if (!convention) {
