@@ -11,6 +11,7 @@ import { artistProfiles } from "@/lib/db/schema/artist-profiles";
 import { auth } from "@/lib/auth";
 import { type ActionState } from "@/lib/validations/auth";
 import { getOrganizerEvent } from "@/lib/conventions/queries";
+import { unassignApplicationFromPlan } from "@/lib/floor-plans/assignments";
 import {
   buildTemplateContext,
   renderTemplate,
@@ -442,14 +443,31 @@ export async function revokeApplication(
     return { error: "Only accepted applications can be revoked" };
   }
 
-  await db
-    .update(applications)
-    .set({
-      status: "revoked",
-      responseMessage: message || null,
-      updatedAt: new Date(),
-    })
-    .where(eq(applications.id, applicationId));
+  // Revoke and clear any floor-plan assignment atomically, so the stored
+  // plan never keeps a dead reference to a no-longer-accepted application.
+  await db.transaction(async (tx) => {
+    await tx
+      .update(applications)
+      .set({
+        status: "revoked",
+        responseMessage: message || null,
+        updatedAt: new Date(),
+      })
+      .where(eq(applications.id, applicationId));
+
+    if (event.floorPlan) {
+      const { plan, changed } = unassignApplicationFromPlan(
+        event.floorPlan,
+        applicationId
+      );
+      if (changed) {
+        await tx
+          .update(events)
+          .set({ floorPlan: plan, updatedAt: new Date() })
+          .where(eq(events.id, eventId));
+      }
+    }
+  });
 
   // Notify the affected artist
   try {

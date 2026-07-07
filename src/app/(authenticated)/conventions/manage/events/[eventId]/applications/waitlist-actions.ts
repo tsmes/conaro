@@ -5,9 +5,13 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { applications } from "@/lib/db/schema/applications";
 import { conventions } from "@/lib/db/schema/conventions";
+import { events } from "@/lib/db/schema/events";
 import { auth } from "@/lib/auth";
 import { type ActionState } from "@/lib/validations/auth";
 import { getOrganizerEvent } from "@/lib/conventions/queries";
+import { unassignApplicationFromPlan } from "@/lib/floor-plans/assignments";
+
+type EventRow = typeof events.$inferSelect;
 
 // Organizer-side post-publish transitions. Unlike setApplicationDecision
 // these are allowed once results are published so the organizer can
@@ -16,17 +20,17 @@ import { getOrganizerEvent } from "@/lib/conventions/queries";
 async function ensureWaitlistEnabled(
   profileId: string,
   eventId: string
-): Promise<string | null> {
+): Promise<{ event: EventRow } | { error: string }> {
   const event = await getOrganizerEvent(profileId, eventId);
-  if (!event) return "Event not found";
+  if (!event) return { error: "Event not found" };
   const [convention] = await db
     .select({ waitlistEnabled: conventions.waitlistEnabled })
     .from(conventions)
     .where(eq(conventions.id, event.conventionId));
   if (!convention?.waitlistEnabled) {
-    return "Waitlist is not enabled for this convention";
+    return { error: "Waitlist is not enabled for this convention" };
   }
-  return null;
+  return { event };
 }
 
 async function updateApplicationStatus(
@@ -44,19 +48,40 @@ async function updateApplicationStatus(
     return { error: "Application and event id are required" };
   }
 
-  const err = await ensureWaitlistEnabled(session.user.profileId, eventId);
-  if (err) return { error: err };
+  const gate = await ensureWaitlistEnabled(session.user.profileId, eventId);
+  if ("error" in gate) return { error: gate.error };
+  const { event } = gate;
 
-  const result = await db
-    .update(applications)
-    .set({ status: nextStatus, updatedAt: new Date() })
-    .where(
-      and(
-        eq(applications.id, applicationId),
-        eq(applications.eventId, eventId)
+  // Demoting out of accepted (waitlisted/rejected) must also drop any
+  // floor-plan seat, or the stored plan keeps a dead reference that later
+  // blocks saveFloorPlan. Done in one transaction with the status change.
+  const result = await db.transaction(async (tx) => {
+    const updated = await tx
+      .update(applications)
+      .set({ status: nextStatus, updatedAt: new Date() })
+      .where(
+        and(
+          eq(applications.id, applicationId),
+          eq(applications.eventId, eventId)
+        )
       )
-    )
-    .returning({ id: applications.id });
+      .returning({ id: applications.id });
+
+    if (updated.length > 0 && nextStatus !== "accepted" && event.floorPlan) {
+      const { plan, changed } = unassignApplicationFromPlan(
+        event.floorPlan,
+        applicationId
+      );
+      if (changed) {
+        await tx
+          .update(events)
+          .set({ floorPlan: plan, updatedAt: new Date() })
+          .where(eq(events.id, eventId));
+      }
+    }
+
+    return updated;
+  });
 
   if (result.length === 0) {
     return { error: "Application not found" };
