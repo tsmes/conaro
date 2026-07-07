@@ -8,6 +8,8 @@ import { NextRequest, NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
 
+import { resolveWithinDir } from "@/lib/storage/safe-path";
+
 const UPLOADS_DIR = path.join(process.cwd(), "uploads");
 
 export async function GET(
@@ -15,10 +17,10 @@ export async function GET(
   { params }: { params: Promise<{ path: string[] }> }
 ) {
   const { path: segments } = await params;
-  const filePath = path.join(UPLOADS_DIR, ...segments);
 
-  // Prevent path traversal
-  if (!filePath.startsWith(UPLOADS_DIR)) {
+  // Reject path traversal, including sibling-directory prefix escapes.
+  const filePath = resolveWithinDir(UPLOADS_DIR, ...segments);
+  if (!filePath) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
