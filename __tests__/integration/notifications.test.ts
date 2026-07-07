@@ -19,6 +19,7 @@ import {
   notifyResultsPublished,
   notifyApplicationRevoked,
   notifyNewApplication,
+  notifyAcceptedApplicantsOfAnnouncement,
 } from "@/lib/notifications/triggers";
 
 // Mock the email adapter
@@ -244,6 +245,56 @@ describe("notification triggers", () => {
       expect(notifs[0].type).toBe("thread_message_from_organizer");
       expect(notifs[0].message).toContain("Kawaiicon 2026");
       expect(notifs[0].link).toBe("/events/ev-1/messages");
+    });
+  });
+
+  describe("notifyAcceptedApplicantsOfAnnouncement", () => {
+    it("notifies accepted applicants only, with the announcement link", async () => {
+      const { convention } = await createTestOrganizer();
+      const event = await createTestEvent(convention.id);
+      const accepted = await createTestArtist("acc@test.com", "Accepted");
+      const rejected = await createTestArtist("rej@test.com", "Rejected");
+
+      await createTestApplication(event.id, accepted.profile.id, {
+        status: "accepted",
+      });
+      await createTestApplication(event.id, rejected.profile.id, {
+        status: "rejected",
+      });
+
+      await notifyAcceptedApplicantsOfAnnouncement(event.id, "Setup times");
+
+      const acceptedNotifs = await findNotificationsByProfileId(
+        accepted.profile.id
+      );
+      const rejectedNotifs = await findNotificationsByProfileId(
+        rejected.profile.id
+      );
+
+      expect(acceptedNotifs).toHaveLength(1);
+      expect(acceptedNotifs[0].type).toBe("event_announcement");
+      expect(acceptedNotifs[0].message).toContain("Setup times");
+      expect(acceptedNotifs[0].link).toBe(`/events/${event.id}`);
+      expect(rejectedNotifs).toHaveLength(0);
+    });
+
+    it("sends email to accepted applicants who opted in", async () => {
+      const { convention } = await createTestOrganizer();
+      const event = await createTestEvent(convention.id);
+      const artist = await createTestArtist();
+
+      await createTestApplication(event.id, artist.profile.id, {
+        status: "accepted",
+      });
+      await db.insert(notificationPreferences).values({
+        profileId: artist.profile.id,
+        notificationType: "event_announcement",
+        emailEnabled: true,
+      });
+
+      await notifyAcceptedApplicantsOfAnnouncement(event.id, "Setup times");
+
+      expect(emailAdapter.sendEmail).toHaveBeenCalledOnce();
     });
   });
 

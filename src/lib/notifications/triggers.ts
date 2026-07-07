@@ -99,6 +99,34 @@ export async function notifyResultsPublished(
   await createNotifications(inputs);
 }
 
+export async function notifyAcceptedApplicantsOfAnnouncement(
+  eventId: string,
+  subject: string
+): Promise<void> {
+  const accepted = await db
+    .select({ profileId: applications.profileId })
+    .from(applications)
+    .where(
+      and(
+        eq(applications.eventId, eventId),
+        eq(applications.status, "accepted")
+      )
+    );
+
+  if (accepted.length === 0) return;
+
+  const link = `/events/${eventId}`;
+
+  const inputs = accepted.map((a) => ({
+    recipientProfileId: a.profileId,
+    type: "event_announcement" as const,
+    message: `New announcement: ${subject}`,
+    link,
+  }));
+
+  await createNotifications(inputs);
+}
+
 export async function notifyApplicationRevoked(
   artistProfileId: string,
   eventName: string
