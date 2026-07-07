@@ -316,6 +316,82 @@ describe("application review", () => {
 
       expect(result.error).toContain("accepted");
     });
+
+    it("clears the revoked applicant's floor-plan assignment", async () => {
+      const { profile, convention } = await createTestOrganizer();
+      const artist = await createTestArtist();
+      const otherArtist = await createTestArtist("o@test.com", "Other");
+      const event = await createTestEvent(convention.id, {
+        status: "results_published",
+      });
+      const application = await createTestApplication(
+        event.id,
+        artist.profile.id,
+        { status: "accepted" }
+      );
+      const otherApp = await createTestApplication(
+        event.id,
+        otherArtist.profile.id,
+        { status: "accepted" }
+      );
+
+      // Seat both accepted artists on the plan.
+      await db
+        .update(events)
+        .set({
+          floorPlan: {
+            rooms: [
+              { id: "r1", name: "Main", x: 0, y: 0, widthCm: 100, heightCm: 100 },
+            ],
+            tables: [
+              {
+                id: "t1",
+                label: "A1",
+                tableSizeOptionId: "s1",
+                roomId: "r1",
+                rotationDeg: 0,
+                x: 0,
+                y: 0,
+                assignedApplicationId: application.id,
+              },
+              {
+                id: "t2",
+                label: "A2",
+                tableSizeOptionId: "s1",
+                roomId: "r1",
+                rotationDeg: 0,
+                x: 10,
+                y: 0,
+                assignedApplicationId: otherApp.id,
+              },
+            ],
+            labels: [],
+          },
+        })
+        .where(eq(events.id, event.id));
+
+      mockAuth.mockResolvedValue({
+        user: { id: "u", role: "organizer", profileId: profile.id },
+      });
+
+      const result = await revokeApplication(
+        {},
+        buildFormData({ applicationId: application.id, eventId: event.id })
+      );
+
+      expect(result.success).toBe(true);
+
+      const [updated] = await db
+        .select()
+        .from(events)
+        .where(eq(events.id, event.id));
+      const tables = updated.floorPlan?.tables ?? [];
+      expect(tables.find((t) => t.id === "t1")?.assignedApplicationId).toBeNull();
+      // Unrelated assignment is untouched.
+      expect(tables.find((t) => t.id === "t2")?.assignedApplicationId).toBe(
+        otherApp.id
+      );
+    });
   });
 
   describe("getEventApplicants", () => {
