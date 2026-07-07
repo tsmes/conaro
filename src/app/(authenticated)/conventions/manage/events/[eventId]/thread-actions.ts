@@ -5,15 +5,16 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { applications } from "@/lib/db/schema/applications";
 import { eventAnnouncements } from "@/lib/db/schema/event-announcements";
-import { notifications } from "@/lib/db/schema/notifications";
 import {
   eventThreads,
   eventThreadMessages,
 } from "@/lib/db/schema/event-threads";
 import { getOrganizerEvent } from "@/lib/conventions/queries";
-import { notifyThreadMessageFromOrganizer } from "@/lib/notifications/triggers";
+import {
+  notifyThreadMessageFromOrganizer,
+  notifyAcceptedApplicantsOfAnnouncement,
+} from "@/lib/notifications/triggers";
 import { type ActionState } from "@/lib/validations/auth";
 
 const replySchema = z
@@ -32,34 +33,6 @@ const replySchema = z
       message: "Subject is required when posting as an announcement",
     }
   );
-
-// Batch-insert announcement notifications for every currently-accepted
-// applicant on the event. Mirrors announcements/actions.ts exactly.
-async function notifyAcceptedApplicantsOfAnnouncement(
-  eventId: string,
-  subject: string
-): Promise<void> {
-  const accepted = await db
-    .select({ profileId: applications.profileId })
-    .from(applications)
-    .where(
-      and(
-        eq(applications.eventId, eventId),
-        eq(applications.status, "accepted")
-      )
-    );
-  if (accepted.length === 0) return;
-
-  const link = `/events/${eventId}`;
-  await db.insert(notifications).values(
-    accepted.map((a) => ({
-      recipientProfileId: a.profileId,
-      type: "event_announcement" as const,
-      message: `New announcement: ${subject}`,
-      link,
-    }))
-  );
-}
 
 // Organizer replies in a Q&A thread. When alsoAsAnnouncement is on, the
 // same body is additionally posted as an event_announcements row and the

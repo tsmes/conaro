@@ -1,15 +1,14 @@
 "use server";
 
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { applications } from "@/lib/db/schema/applications";
 import { eventAnnouncements } from "@/lib/db/schema/event-announcements";
-import { notifications } from "@/lib/db/schema/notifications";
 import { type ActionState } from "@/lib/validations/auth";
 import { getOrganizerEvent } from "@/lib/conventions/queries";
+import { notifyAcceptedApplicantsOfAnnouncement } from "@/lib/notifications/triggers";
 
 const announcementSchema = z.object({
   subject: z
@@ -28,34 +27,6 @@ async function ensureOrganizerEvent(profileId: string, eventId: string) {
     throw new Error("Event not found");
   }
   return event;
-}
-
-// Insert a notification row for every currently-accepted applicant so the
-// announcement lights up their bell.
-async function notifyAcceptedApplicants(
-  eventId: string,
-  subject: string
-): Promise<void> {
-  const accepted = await db
-    .select({ profileId: applications.profileId })
-    .from(applications)
-    .where(
-      and(
-        eq(applications.eventId, eventId),
-        eq(applications.status, "accepted")
-      )
-    );
-  if (accepted.length === 0) return;
-
-  const link = `/events/${eventId}`;
-  await db.insert(notifications).values(
-    accepted.map((a) => ({
-      recipientProfileId: a.profileId,
-      type: "event_announcement" as const,
-      message: `New announcement: ${subject}`,
-      link,
-    }))
-  );
 }
 
 export async function createEventAnnouncement(
@@ -92,7 +63,7 @@ export async function createEventAnnouncement(
     body: parsed.data.body,
   });
 
-  await notifyAcceptedApplicants(eventId, parsed.data.subject);
+  await notifyAcceptedApplicantsOfAnnouncement(eventId, parsed.data.subject);
 
   revalidatePath(`/conventions/manage/events/${eventId}`);
   revalidatePath(`/events/${eventId}`);
@@ -188,11 +159,9 @@ export async function deleteEventAnnouncement(
     return { error: "Announcement not found" };
   }
 
-  // Remove any unread notifications pointing at this event that match the
-  // same link; we can't reliably identify the exact notification row for
-  // the deleted announcement, so we leave historical rows in place.
-  // (Cleanup would require a per-announcement notification pointer.)
-  void inArray;
+  // We can't reliably identify the exact notification rows for the deleted
+  // announcement (no per-announcement notification pointer), so historical
+  // notification rows are left in place.
 
   revalidatePath(`/conventions/manage/events/${eventId}`);
   revalidatePath(`/events/${eventId}`);

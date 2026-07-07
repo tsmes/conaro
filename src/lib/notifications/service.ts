@@ -3,20 +3,17 @@ import { db } from "@/lib/db";
 import {
   notifications,
   notificationPreferences,
+  notificationTypeEnum,
 } from "@/lib/db/schema/notifications";
 import { profiles } from "@/lib/db/schema/profiles";
 import { users } from "@/lib/db/schema/auth";
 import { emailAdapter } from "@/lib/email";
 
-type NotificationType =
-  | "event_published"
-  | "event_opened"
-  | "new_event"
-  | "results_published"
-  | "application_revoked"
-  | "new_application"
-  | "thread_message_from_artist"
-  | "thread_message_from_organizer";
+// Single source of truth: derive the type union from the pg enum so a new
+// notification_type value forces updates here (and in formatSubject) at
+// compile time rather than allowing a raw insert to bypass this service.
+export type NotificationType =
+  (typeof notificationTypeEnum.enumValues)[number];
 
 interface NotificationInput {
   recipientProfileId: string;
@@ -146,6 +143,7 @@ function formatSubject(type: NotificationType): string {
     results_published: "Application results are in",
     application_revoked: "Your application status has changed",
     new_application: "New application received",
+    event_announcement: "New announcement",
     thread_message_from_artist: "New message from an applicant",
     thread_message_from_organizer: "New message from the organizer",
   };
