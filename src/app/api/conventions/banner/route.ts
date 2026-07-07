@@ -76,7 +76,8 @@ export async function POST(request: NextRequest) {
     if (oldPath && oldPath !== storagePath) {
       await storage.delete(oldPath).catch(() => {});
     }
-  } catch {
+  } catch (error) {
+    console.error("Convention banner upload failed:", error);
     await storage.delete(storagePath).catch(() => {});
     return NextResponse.json(
       { error: "Failed to upload banner. Please try again." },

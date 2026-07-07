@@ -81,7 +81,8 @@ export async function POST(request: NextRequest) {
     if (oldLogoPath && oldLogoPath !== storagePath) {
       await storage.delete(oldLogoPath).catch(() => {});
     }
-  } catch {
+  } catch (error) {
+    console.error("Convention logo upload failed:", error);
     // Clean up newly uploaded file on failure
     await storage.delete(storagePath).catch(() => {});
     return NextResponse.json(

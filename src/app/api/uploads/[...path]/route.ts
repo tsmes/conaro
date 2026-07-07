@@ -37,7 +37,12 @@ export async function GET(
     return new NextResponse(data, {
       headers: { "Content-Type": contentType, "Cache-Control": "public, max-age=31536000" },
     });
-  } catch {
+  } catch (error) {
+    // ENOENT is the normal "file missing" case → 404 without noise. Log
+    // anything else (permission/IO errors) so real problems stay visible.
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
+      console.error("Failed to read upload:", error);
+    }
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 }

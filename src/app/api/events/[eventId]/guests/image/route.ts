@@ -69,7 +69,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
     const processed = await processImage(buffer);
     await storage.upload(storagePath, processed.data, "image/webp");
-  } catch {
+  } catch (error) {
+    console.error("Guest image upload failed:", error);
     await storage.delete(storagePath).catch(() => {});
     return NextResponse.json(
       { error: "Failed to upload image. Please try again." },
