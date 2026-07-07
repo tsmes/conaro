@@ -89,7 +89,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     if (oldBannerPath && oldBannerPath !== storagePath) {
       await storage.delete(oldBannerPath).catch(() => {});
     }
-  } catch {
+  } catch (error) {
+    console.error("Event banner upload failed:", error);
     await storage.delete(storagePath).catch(() => {});
     return NextResponse.json(
       { error: "Failed to upload banner. Please try again." },
